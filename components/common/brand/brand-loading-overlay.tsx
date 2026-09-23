@@ -10,8 +10,8 @@ interface BrandLoadingOverlayProps {
 }
 
 export function BrandLoadingOverlay({
-  message = "Validando permisos corporativos...",
-  subMessage = "JLH Corredores de Seguros • Marketing & AIS",
+  message = "Cargando plataforma institucional...",
+  subMessage = "SGA · Sistema de Gestión Académica",
   className,
 }: BrandLoadingOverlayProps) {
   return (
@@ -21,21 +21,19 @@ export function BrandLoadingOverlay({
         className,
       )}
     >
-      {/* Background radial glow muy sutil */}
-      <div className="bg-primary/5 pointer-events-none absolute -top-24 size-96 rounded-full blur-3xl" />
-      <div className="bg-secondary/5 pointer-events-none absolute -bottom-24 size-96 rounded-full blur-3xl" />
+      {/* Background radial glow sutil */}
+      <div className="bg-primary/10 pointer-events-none absolute -top-24 size-96 rounded-full blur-3xl" />
+      <div className="bg-secondary/10 pointer-events-none absolute -bottom-24 size-96 rounded-full blur-3xl" />
 
       <div className="relative flex flex-col items-center gap-6 text-center">
-        {/* Contenedor del Logo con animación de pulso elegante y sombra suave sin bordes toscos */}
+        {/* Contenedor del Logo con animación de pulso elegante */}
         <div className="relative flex items-center justify-center">
-          {/* Pulso suave continuo sin bordes */}
-          <div className="bg-primary/10 absolute size-24 animate-pulse rounded-3xl blur-md" />
+          <div className="bg-primary/20 absolute size-24 animate-pulse rounded-3xl blur-md" />
 
-          {/* Tarjeta del Logo JLH con sombra elegante y sin bordes */}
-          <div className="bg-card relative flex size-20 animate-pulse items-center justify-center rounded-2xl p-3.5 shadow-2xl shadow-slate-200/80 transition-transform dark:shadow-black/50">
+          <div className="bg-card shadow-primary/10 ring-border relative flex size-20 animate-pulse items-center justify-center rounded-2xl p-3.5 shadow-2xl ring-1 transition-transform">
             <Image
-              src="/brand/jlh-favicon.png"
-              alt="JLH Seguros"
+              src="/logo.png"
+              alt="SGA Institucional"
               width={56}
               height={56}
               priority
@@ -50,9 +48,9 @@ export function BrandLoadingOverlay({
           <p className="text-muted-foreground text-xs font-medium tracking-wide">{subMessage}</p>
         </div>
 
-        {/* Barra de progreso fina y elegante */}
-        <div className="bg-muted/70 relative h-1 w-44 overflow-hidden rounded-full">
-          <div className="from-primary via-secondary to-primary absolute h-full w-full animate-[shimmer_1.6s_infinite] rounded-full bg-gradient-to-r" />
+        {/* Barra de progreso fina */}
+        <div className="bg-muted relative h-1 w-44 overflow-hidden rounded-full">
+          <div className="from-primary via-primary-foreground to-primary absolute h-full w-full animate-[shimmer_1.6s_infinite] rounded-full bg-gradient-to-r" />
         </div>
       </div>
     </div>
