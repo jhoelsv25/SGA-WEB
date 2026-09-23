@@ -60,7 +60,7 @@ const sizeConfig: Record<
 export function BrandMark({
   size = "md",
   priority = false,
-  alt = "JLH Seguros",
+  alt = "SGA - Sistema de Gestión Académica",
   className,
   imageClassName,
   ...props
@@ -73,7 +73,7 @@ export function BrandMark({
       {...props}
     >
       <Image
-        src="/brand/jlh-favicon.png"
+        src="/logo.png"
         alt={alt}
         width={config.markSize}
         height={config.markSize}
@@ -87,8 +87,8 @@ export function BrandMark({
 export function BrandWordmark({
   size = "md",
   useImage = false,
-  title = "JLH",
-  subtitle = "Corredores de Seguros",
+  title = "SGA",
+  subtitle = "Gestión Académica",
   showSubtitle = true,
   priority = false,
   className,
@@ -101,15 +101,12 @@ export function BrandWordmark({
     return (
       <div className={cn("flex items-center select-none", className)} {...props}>
         <Image
-          src="/brand/jlh-wordmark.png"
+          src="/logo.png"
           alt={`${title} ${subtitle}`}
           width={config.wordmarkWidth}
           height={config.wordmarkHeight}
           priority={priority}
-          className={cn(
-            "h-auto w-auto object-contain brightness-0 dark:brightness-100 dark:invert-0",
-            imageClassName,
-          )}
+          className={cn("h-auto w-auto object-contain", imageClassName)}
         />
       </div>
     );
@@ -117,9 +114,16 @@ export function BrandWordmark({
 
   return (
     <div className={cn("flex flex-col text-left leading-none select-none", className)} {...props}>
-      <span className={cn("text-foreground tracking-tight", config.titleClass)}>{title}</span>
+      <span className={cn("text-foreground font-black tracking-tight", config.titleClass)}>
+        {title}
+      </span>
       {showSubtitle && subtitle ? (
-        <span className={cn("text-muted-foreground mt-0.5 uppercase", config.subtitleClass)}>
+        <span
+          className={cn(
+            "text-muted-foreground mt-0.5 font-semibold tracking-wider uppercase",
+            config.subtitleClass,
+          )}
+        >
           {subtitle}
         </span>
       ) : null}
@@ -132,8 +136,8 @@ export function Brand({
   size = "md",
   href,
   collapsed = false,
-  title = "JLH",
-  subtitle = "Corredores de Seguros",
+  title = "SGA",
+  subtitle = "Gestión Académica",
   showSubtitle = true,
   useImageWordmark = false,
   priority = false,
