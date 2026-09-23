@@ -71,7 +71,7 @@ export function PortalNavbar() {
           </Button>
 
           <Button asChild size="sm" className="gap-2 font-semibold shadow-xs">
-            <Link href="/auth/login">
+            <Link href="/login">
               <HugeiconsIcon icon={LogInIcon} className="size-4" />
               <span>Iniciar Sesión</span>
             </Link>
@@ -123,7 +123,7 @@ export function PortalNavbar() {
                 className="w-full justify-center gap-2 font-semibold"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Link href="/auth/login">
+                <Link href="/login">
                   <HugeiconsIcon icon={LogInIcon} className="size-4" />
                   <span>Iniciar Sesión</span>
                 </Link>

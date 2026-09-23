@@ -58,7 +58,7 @@ export default function PortalPage() {
                   size="lg"
                   className="shadow-primary/20 w-full gap-2.5 px-6 font-semibold shadow-md transition-all hover:shadow-lg sm:w-auto"
                 >
-                  <Link href="/auth/login">
+                  <Link href="/login">
                     <HugeiconsIcon icon={LogInIcon} className="size-5" />
                     <span>Acceder a la Plataforma</span>
                   </Link>
@@ -156,7 +156,7 @@ export default function PortalPage() {
                     </div>
 
                     <Button asChild className="mt-6 w-full gap-2 font-semibold" variant="default">
-                      <Link href="/auth/login">
+                      <Link href="/login">
                         <span>Ingresar con mis Credenciales</span>
                         <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
                       </Link>
@@ -200,7 +200,7 @@ export default function PortalPage() {
               </CardHeader>
               <CardContent className="pt-0">
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="text-primary inline-flex items-center gap-1.5 text-xs font-semibold hover:underline"
                 >
                   <span>Acceso Docente</span>
@@ -246,7 +246,7 @@ export default function PortalPage() {
               </CardHeader>
               <CardContent className="pt-0">
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="text-primary inline-flex items-center gap-1.5 text-xs font-semibold hover:underline"
                 >
                   <span>Portal Familiar</span>
@@ -269,7 +269,7 @@ export default function PortalPage() {
               </CardHeader>
               <CardContent className="pt-0">
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="text-primary inline-flex items-center gap-1.5 text-xs font-semibold hover:underline"
                 >
                   <span>Módulo Directivo</span>
@@ -395,7 +395,7 @@ export default function PortalPage() {
 
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className="w-full gap-2 font-semibold shadow-sm sm:w-auto">
-                <Link href="/auth/login">
+                <Link href="/login">
                   <HugeiconsIcon icon={LogInIcon} className="size-5" />
                   <span>Iniciar Sesión en SGA</span>
                 </Link>
