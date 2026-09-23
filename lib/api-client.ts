@@ -1,0 +1,114 @@
+import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from "axios";
+
+export interface ApiErrorPayload {
+  message: string;
+  statusCode?: number;
+  errors?: Record<string, string[]>;
+  code?: string;
+}
+
+export class ApiClientError extends Error {
+  public statusCode?: number;
+  public errors?: Record<string, string[]>;
+  public code?: string;
+
+  constructor(payload: ApiErrorPayload) {
+    super(payload.message);
+    this.name = "ApiClientError";
+    this.statusCode = payload.statusCode;
+    this.errors = payload.errors;
+    this.code = payload.code;
+  }
+}
+
+type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+
+/**
+ * Cliente centralizado de Axios para la comunicación con el Backend.
+ * withCredentials: true asegura el envío/recepción de cookies HttpOnly (sesión, refresh token).
+ */
+export const apiClient: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
+
+let refreshPromise: Promise<boolean> | null = null;
+
+/**
+ * Solicita renovación silenciosa de tokens (GET /auth/refresh-token).
+ */
+async function refreshSessionTokens(): Promise<boolean> {
+  try {
+    const refreshAxios = axios.create({
+      baseURL: API_BASE_URL,
+      timeout: 10000,
+      withCredentials: true,
+    });
+
+    await refreshAxios.get("/auth/refresh-token");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Interceptor de respuestas para refresco silencioso y normalización de errores
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error: unknown) => {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ApiErrorPayload>;
+      const originalRequest = axiosError.config as RetryConfig | undefined;
+      const status = axiosError.response?.status;
+
+      const url = originalRequest?.url || "";
+      const isAuthRoute =
+        url.includes("/auth/login") ||
+        url.includes("/auth/refresh-token") ||
+        url.includes("/auth/register");
+
+      // Si es 401 y no es petición de autenticación recursiva
+      if (status === 401 && originalRequest && !originalRequest._retry && !isAuthRoute) {
+        originalRequest._retry = true;
+
+        refreshPromise ??= refreshSessionTokens().finally(() => {
+          refreshPromise = null;
+        });
+
+        const refreshed = await refreshPromise;
+
+        if (refreshed) {
+          return apiClient(originalRequest);
+        }
+
+        // Si falló el refresh y estamos en el cliente, redirigir a login
+        if (typeof window !== "undefined" && !window.location.pathname.startsWith("/auth")) {
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+          window.location.href = `/auth/login?expired=true&redirectTo=${encodeURIComponent(
+            window.location.pathname,
+          )}`;
+        }
+      }
+
+      const data = axiosError.response?.data;
+      const normalizedError = new ApiClientError({
+        message:
+          data?.message || axiosError.message || "Ocurrió un error inesperado en la solicitud.",
+        statusCode: status,
+        errors: data?.errors,
+        code: data?.code,
+      });
+
+      return Promise.reject(normalizedError);
+    }
+
+    return Promise.reject(error);
+  },
+);
