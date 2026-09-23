@@ -1,0 +1,9 @@
+.next/
+out/
+build/
+dist/
+node_modules/
+bun.lock
+*.svg
+next-env.d.ts
+.husky/
