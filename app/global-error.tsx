@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { siteConfig } from "@/config";
+import { Button } from "@/components/ui/button";
 
 export interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -48,24 +49,27 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           )}
 
           <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row">
-            <button
+            <Button
               type="button"
               onClick={() => reset()}
-              className="flex h-11 flex-1 items-center justify-center rounded-full bg-rose-700 px-6 text-sm font-bold text-white shadow-md transition-all hover:bg-rose-800"
+              size="lg"
+              className="h-11 flex-1 rounded-full text-sm font-bold shadow-md"
             >
               Reintentar
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              size="lg"
               onClick={() => {
                 if (typeof window !== "undefined") {
                   window.location.reload();
                 }
               }}
-              className="flex h-11 flex-1 items-center justify-center rounded-full border border-neutral-300 px-6 text-sm font-semibold text-neutral-800 transition-colors hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-900"
+              className="h-11 flex-1 rounded-full text-sm font-semibold"
             >
               Recargar Portal
-            </button>
+            </Button>
           </div>
 
           <p className="mt-8 text-xs text-neutral-500 dark:text-neutral-500">
