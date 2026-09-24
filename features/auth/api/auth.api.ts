@@ -1,37 +1,5 @@
-import axios from "axios";
-import { apiClient, ApiClientError, type ApiErrorPayload } from "@/lib/api-client";
+import { apiClient, handleApiError } from "@/lib/api-client";
 import type { AuthResponse, ForgotPasswordPayload, LoginCredentials } from "../types/auth.types";
-
-function handleAuthApiError(error: unknown): never {
-  if (error instanceof ApiClientError) {
-    throw error;
-  }
-
-  if (axios.isAxiosError(error)) {
-    const data = error.response?.data as ApiErrorPayload | undefined;
-    const message =
-      data?.message ||
-      error.message ||
-      "Ocurrió un error al procesar la solicitud de autenticación.";
-
-    throw new ApiClientError({
-      message,
-      statusCode: error.response?.status,
-      errors: data?.errors,
-      code: data?.code,
-    });
-  }
-
-  if (error instanceof Error) {
-    throw new ApiClientError({
-      message: error.message,
-    });
-  }
-
-  throw new ApiClientError({
-    message: "Error inesperado en la comunicación con el servidor.",
-  });
-}
 
 export const authApi = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -39,7 +7,7 @@ export const authApi = {
       const { data } = await apiClient.post<AuthResponse>("/auth/login", credentials);
       return data;
     } catch (error) {
-      handleAuthApiError(error);
+      handleApiError(error, "Ocurrió un error al procesar el inicio de sesión.");
     }
   },
 
@@ -48,7 +16,10 @@ export const authApi = {
       const { data } = await apiClient.post<{ message?: string }>("/auth/forgot-password", payload);
       return data;
     } catch (error) {
-      handleAuthApiError(error);
+      handleApiError(
+        error,
+        "No se pudo procesar la solicitud. Verifica el usuario y tu fecha de nacimiento.",
+      );
     }
   },
 
@@ -56,7 +27,7 @@ export const authApi = {
     try {
       await apiClient.get("/auth/logout");
     } catch (error) {
-      handleAuthApiError(error);
+      handleApiError(error, "Ocurrió un error al cerrar sesión.");
     }
   },
 
@@ -65,7 +36,7 @@ export const authApi = {
       const { data } = await apiClient.get<AuthResponse>("/auth/check-token");
       return data;
     } catch (error) {
-      handleAuthApiError(error);
+      handleApiError(error, "No se pudo verificar el estado de la sesión.");
     }
   },
 };

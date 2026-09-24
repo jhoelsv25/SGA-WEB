@@ -6,3 +6,4 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export { getInitials } from "./formatters/string";
+export { handleApiError } from "./api-client";

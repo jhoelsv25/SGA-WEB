@@ -112,3 +112,38 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+/**
+ * Intercepta y normaliza cualquier error de petición HTTP garantizando
+ * el lanzamiento de una instancia de ApiClientError con message amigable y errors estructurados.
+ */
+export function handleApiError(
+  error: unknown,
+  defaultMessage = "Error inesperado en la comunicación con el servidor.",
+): never {
+  if (error instanceof ApiClientError) {
+    throw error;
+  }
+
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as ApiErrorPayload | undefined;
+    const message = data?.message || error.message || defaultMessage;
+
+    throw new ApiClientError({
+      message,
+      statusCode: error.response?.status,
+      errors: data?.errors,
+      code: data?.code,
+    });
+  }
+
+  if (error instanceof Error) {
+    throw new ApiClientError({
+      message: error.message,
+    });
+  }
+
+  throw new ApiClientError({
+    message: defaultMessage,
+  });
+}
