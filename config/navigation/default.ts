@@ -1,5 +1,5 @@
 import {
-  DashboardSquare01Icon,
+  Home01Icon,
   UserIcon,
   Notification01Icon,
   HelpCircleIcon,
@@ -9,17 +9,21 @@ import type { NavSection } from "./types";
 
 export const defaultNavigation: NavSection[] = [
   {
-    title: "General",
     items: [
       {
         id: "default-dashboard",
-        label: "Panel Principal",
+        label: "Inicio",
         link: "/dashboard",
-        icon: DashboardSquare01Icon,
+        icon: Home01Icon,
         permissions: ["dashboard:view"],
         exact: true,
         description: "Vista general y métricas del sistema",
       },
+    ],
+  },
+  {
+    title: "General",
+    items: [
       {
         id: "default-notifications",
         label: "Notificaciones",

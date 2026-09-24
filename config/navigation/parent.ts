@@ -1,5 +1,5 @@
 import {
-  DashboardSquare01Icon,
+  Home01Icon,
   UserIcon,
   Award01Icon,
   Clock01Icon,
@@ -10,18 +10,22 @@ import type { NavSection } from "./types";
 
 export const parentNavigation: NavSection[] = [
   {
-    title: "Seguimiento Familiar",
     items: [
       {
         id: "parent-dashboard",
-        label: "Panel del Apoderado",
+        label: "Inicio",
         link: "/dashboard",
-        icon: DashboardSquare01Icon,
+        icon: Home01Icon,
         permissions: ["parent:dashboard:view"],
         roles: ["parent", "apoderado"],
         exact: true,
         description: "Resumen académico y asistencial de mis hijos",
       },
+    ],
+  },
+  {
+    title: "Seguimiento Familiar",
+    items: [
       {
         id: "parent-children",
         label: "Mis Hijos Matriculados",

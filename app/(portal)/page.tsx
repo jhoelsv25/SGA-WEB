@@ -202,7 +202,7 @@ export default function PortalPage() {
 
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {/* Card 1: Gestión Docente */}
-            <Card className="border-border/80 hover:border-primary/40 flex flex-col justify-between transition-all hover:shadow-md">
+            <Card className="flex flex-col justify-between shadow-sm transition-all hover:shadow-lg">
               <CardHeader className="space-y-3 pb-4">
                 <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-xl">
                   <HugeiconsIcon icon={Book02Icon} className="size-6" />
@@ -225,7 +225,7 @@ export default function PortalPage() {
             </Card>
 
             {/* Card 2: Control de Asistencia & Kiosco */}
-            <Card className="border-border/80 hover:border-primary/40 flex flex-col justify-between transition-all hover:shadow-md">
+            <Card className="flex flex-col justify-between shadow-sm transition-all hover:shadow-lg">
               <CardHeader className="space-y-3 pb-4">
                 <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-xl">
                   <HugeiconsIcon icon={Time02Icon} className="size-6" />
@@ -248,7 +248,7 @@ export default function PortalPage() {
             </Card>
 
             {/* Card 3: Familias y Comunidad */}
-            <Card className="border-border/80 hover:border-primary/40 flex flex-col justify-between transition-all hover:shadow-md">
+            <Card className="flex flex-col justify-between shadow-sm transition-all hover:shadow-lg">
               <CardHeader className="space-y-3 pb-4">
                 <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-xl">
                   <HugeiconsIcon icon={UserGroupIcon} className="size-6" />
@@ -271,7 +271,7 @@ export default function PortalPage() {
             </Card>
 
             {/* Card 4: Administración & Matrícula */}
-            <Card className="border-border/80 hover:border-primary/40 flex flex-col justify-between transition-all hover:shadow-md">
+            <Card className="flex flex-col justify-between shadow-sm transition-all hover:shadow-lg">
               <CardHeader className="space-y-3 pb-4">
                 <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-xl">
                   <HugeiconsIcon icon={School01Icon} className="size-6" />

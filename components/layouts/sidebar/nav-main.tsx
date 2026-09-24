@@ -27,23 +27,23 @@ export function NavMain({ sections }: NavMainProps) {
   const pathname = usePathname();
 
   return (
-    <>
+    <div className="space-y-3">
       {sections.map((section, idx) => (
-        <SidebarGroup key={section.title || `section-${idx}`} className="px-0 py-1.5">
+        <SidebarGroup key={section.title || `section-${idx}`} className="px-0 py-0">
           {section.title && (
-            <SidebarGroupLabel className="text-muted-foreground/80 px-3 text-[10.5px] font-semibold tracking-wider uppercase">
+            <SidebarGroupLabel className="text-muted-foreground/70 px-3 pt-2.5 pb-1 text-[11px] font-semibold tracking-wider uppercase select-none">
               {section.title}
             </SidebarGroupLabel>
           )}
 
-          <SidebarMenu className="gap-0.5">
+          <SidebarMenu className="gap-1">
             {section.items.map((item) => (
               <NavMenuItem key={item.id} item={item} currentPath={pathname} />
             ))}
           </SidebarMenu>
         </SidebarGroup>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -78,10 +78,9 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
               tooltip={item.label}
               isActive={isActive || isAnyChildActive}
               className={cn(
-                "group relative h-10 rounded-full px-3.5 text-[13.5px] font-medium transition-all duration-200",
-                "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
-                (isActive || isAnyChildActive) &&
-                  "bg-primary/10 text-primary hover:bg-primary/15 font-bold shadow-2xs",
+                "group relative h-9.5 rounded-xl px-3 text-[13px] font-medium tracking-tight transition-all duration-200",
+                "text-foreground/80 hover:bg-sidebar-accent/70 hover:text-foreground",
+                (isActive || isAnyChildActive) && "bg-sidebar-accent text-foreground font-semibold",
               )}
             >
               <RenderNavIcon
@@ -115,9 +114,9 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
                       asChild
                       isActive={isSubActive}
                       className={cn(
-                        "h-8.5 rounded-full px-3 text-[13px] font-medium transition-colors",
-                        "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
-                        isSubActive && "bg-primary/10 text-primary font-bold",
+                        "h-8 rounded-lg px-2.5 text-[12.5px] font-medium transition-colors",
+                        "text-foreground/75 hover:bg-sidebar-accent/70 hover:text-foreground",
+                        isSubActive && "bg-primary/10 text-primary font-semibold",
                       )}
                     >
                       <Link href={subItem.link} className="flex items-center gap-2">
@@ -152,10 +151,10 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
         tooltip={item.label}
         isActive={isActive}
         className={cn(
-          "group relative h-10 rounded-full px-3.5 text-[13.5px] font-medium transition-all duration-200",
-          "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
+          "group relative h-9.5 rounded-xl px-3 text-[13px] font-medium tracking-tight transition-all duration-200",
+          "text-foreground/80 hover:bg-sidebar-accent/70 hover:text-foreground",
           isActive &&
-            "!bg-primary !text-primary-foreground hover:!bg-primary/90 hover:!text-primary-foreground shadow-primary/25 font-bold shadow-md",
+            "bg-primary text-primary-foreground hover:bg-primary/95 hover:text-primary-foreground shadow-primary/25 font-semibold shadow-xs",
         )}
       >
         <Link href={item.link} className="flex w-full items-center gap-2.5">
@@ -164,7 +163,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
             className={cn(
               "size-4 shrink-0 transition-colors",
               isActive
-                ? "!text-primary-foreground"
+                ? "text-primary-foreground"
                 : "text-muted-foreground/80 group-hover:text-foreground",
             )}
           />
@@ -202,53 +201,39 @@ function RenderNavBadge({
   badge: NavBadge | string;
   isParentActive?: boolean;
 }) {
-  if (typeof badge === "string") {
+  const text = typeof badge === "string" ? badge : badge.text;
+  const variant = typeof badge === "string" ? "default" : (badge.variant ?? "default");
+
+  if (isParentActive) {
     return (
-      <span
-        className={cn(
-          "ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition-colors",
-          isParentActive
-            ? "bg-white/20 text-white"
-            : "border-primary/20 bg-primary/10 text-primary border",
-        )}
-      >
-        {badge}
+      <span className="ml-auto inline-flex items-center rounded-md bg-white/20 px-1.5 py-0.5 text-[9.5px] font-semibold text-white">
+        {text}
       </span>
     );
   }
 
   const variantStyles: Record<string, string> = {
-    default: isParentActive
-      ? "bg-white/20 text-white"
-      : "bg-primary/10 text-primary border border-primary/20",
-    secondary: isParentActive
-      ? "bg-white/20 text-white"
-      : "bg-secondary text-secondary-foreground border border-border/50",
-    destructive:
-      "bg-destructive/15 text-destructive border border-destructive/25 dark:bg-destructive/25",
-    outline: isParentActive
-      ? "bg-white/20 text-white"
-      : "border border-border/80 text-muted-foreground bg-background/50",
+    default: "bg-primary/10 text-primary border border-primary/20",
+    secondary: "bg-secondary text-secondary-foreground border border-border/50",
+    destructive: "bg-destructive/10 text-destructive border border-destructive/20",
+    outline: "border border-border/70 text-muted-foreground bg-background/50",
     success:
-      "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25",
-    warning: "bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30",
-    info: "bg-sky-500/15 text-sky-800 dark:text-sky-300 border border-sky-500/30",
+      "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20",
+    warning: "bg-amber-500/10 text-amber-800 dark:text-amber-400 border border-amber-500/20",
+    info: "bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/20",
   };
 
-  const selectedStyle =
-    badge.variant && variantStyles[badge.variant]
-      ? variantStyles[badge.variant]
-      : variantStyles.default;
+  const badgeStyle = variantStyles[variant] || variantStyles.default;
 
   return (
     <span
       className={cn(
-        "ml-auto inline-flex shrink-0 items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight shadow-2xs",
-        selectedStyle,
-        badge.className,
+        "ml-auto inline-flex shrink-0 items-center justify-center rounded-md px-1.5 py-0.5 text-[9.5px] font-semibold tracking-tight shadow-2xs",
+        badgeStyle,
+        typeof badge !== "string" && badge.className,
       )}
     >
-      {badge.text}
+      {text}
     </span>
   );
 }

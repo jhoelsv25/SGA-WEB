@@ -84,15 +84,15 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
 
   return (
     <>
-      {/* Botón trigger en el Sidebar redondeado estilo Login Input */}
+      {/* Botón trigger en el Sidebar moderno y estilizado */}
       <button
         type="button"
         onClick={() => setOpenDialog(true)}
         className={cn(
-          "bg-background/80 hover:bg-background text-muted-foreground hover:text-foreground group/search border-border/80 hover:border-primary/40 focus-visible:ring-primary/25 flex w-full items-center gap-2.5 shadow-2xs transition-all duration-200 outline-none focus-visible:ring-2",
+          "bg-background/60 hover:bg-background text-muted-foreground hover:text-foreground group/search border-sidebar-border/80 hover:border-primary/40 focus-visible:ring-primary/25 flex w-full items-center gap-2.5 shadow-2xs transition-all duration-200 outline-none focus-visible:ring-2",
           isCollapsed
-            ? "mx-auto size-9.5 justify-center rounded-xl p-0"
-            : "h-10 rounded-full border px-3.5 text-left",
+            ? "mx-auto size-9 justify-center rounded-xl p-0"
+            : "h-9 rounded-xl border px-3 text-left",
         )}
         title="Buscar módulo o función (Ctrl + K)"
       >
@@ -106,7 +106,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
             <span className="text-muted-foreground/75 group-hover/search:text-foreground flex-1 truncate text-xs font-normal">
               Buscar en el portal...
             </span>
-            <kbd className="bg-muted text-muted-foreground border-border/60 pointer-events-none hidden h-5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-[9.5px] font-bold select-none sm:inline-flex">
+            <kbd className="bg-muted/80 text-muted-foreground border-border/70 pointer-events-none hidden h-5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-[9.5px] font-semibold select-none sm:inline-flex">
               <span className="text-[10px]">⌘</span>K
             </kbd>
           </>

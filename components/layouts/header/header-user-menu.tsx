@@ -71,7 +71,7 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="border-border/80 bg-popover/98 w-68 rounded-2xl border p-2 shadow-2xl backdrop-blur-xl"
+        className="bg-popover/98 w-68 rounded-2xl border-none p-2 shadow-2xl backdrop-blur-xl"
         align="end"
         sideOffset={10}
       >

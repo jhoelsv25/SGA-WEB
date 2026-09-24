@@ -1,5 +1,5 @@
 import {
-  DashboardSquare01Icon,
+  Home01Icon,
   Analytics01Icon,
   TeacherIcon,
   School01Icon,
@@ -11,18 +11,22 @@ import type { NavSection } from "./types";
 
 export const principalNavigation: NavSection[] = [
   {
-    title: "Dirección Institucional",
     items: [
       {
         id: "principal-dashboard",
-        label: "Panel Directivo",
+        label: "Inicio",
         link: "/dashboard",
-        icon: DashboardSquare01Icon,
+        icon: Home01Icon,
         permissions: ["principal:dashboard:view", "director:dashboard:view"],
         roles: ["principal", "director"],
         exact: true,
         description: "Tablero ejecutivo e indicadores clave de la I.E.",
       },
+    ],
+  },
+  {
+    title: "Dirección Institucional",
+    items: [
       {
         id: "principal-analytics",
         label: "Monitoreo y Métricas",

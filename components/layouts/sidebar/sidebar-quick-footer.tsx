@@ -25,16 +25,19 @@ export function SidebarQuickFooter() {
   }
 
   return (
-    <div className="flex items-center justify-between px-2 py-1 text-xs">
+    <div className="flex items-center justify-between px-2 py-0.5">
       <Link
         href="/dashboard/help"
-        className="text-muted-foreground hover:text-primary flex items-center gap-2 font-medium transition-colors"
+        className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-xs font-medium transition-colors"
       >
-        <HugeiconsIcon icon={HelpCircleIcon} className="text-muted-foreground/80 size-4 shrink-0" />
+        <HugeiconsIcon
+          icon={HelpCircleIcon}
+          className="text-muted-foreground/80 size-3.5 shrink-0"
+        />
         <span>Ayuda y Soporte</span>
       </Link>
 
-      <span className="flex items-center gap-1.5 text-[10.5px] font-semibold text-emerald-600 dark:text-emerald-400">
+      <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
         <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
         Online
       </span>

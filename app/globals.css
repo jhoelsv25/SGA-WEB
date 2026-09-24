@@ -7,9 +7,13 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans:
+    var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-heading: var(--font-sans);
+  --font-heading:
+    var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --color-base-50: var(--base-50);
   --color-base-100: var(--base-100);
@@ -71,6 +75,11 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-card-hover: 0 6px 12px -2px rgb(0 0 0 / 0.08), 0 3px 6px -3px rgb(0 0 0 / 0.05);
+  --shadow-popover: 0 12px 28px -4px rgb(0 0 0 / 0.1), 0 8px 12px -6px rgb(0 0 0 / 0.06);
+  --shadow-dialog: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 }
 
 :root {
@@ -203,9 +212,35 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  /* Cards elevadas limpias con sombra suave y sin bordes */
+  [data-slot="card"] {
+    @apply border-none shadow-sm ring-0 transition-shadow duration-200;
+  }
+
+  /* Popovers, Menús y Selects flotantes con sombra profunda elegante y sin bordes */
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="select-content"],
+  [data-slot="context-menu-content"] {
+    @apply border-none shadow-xl ring-0;
+  }
+
+  /* Diálogos y Modales con máxima elevación y sin bordes */
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"] {
+    @apply border-none shadow-2xl ring-0;
   }
 }

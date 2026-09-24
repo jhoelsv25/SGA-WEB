@@ -294,7 +294,7 @@ function MetricCard({
   badgeText?: string;
 }) {
   return (
-    <Card className="border-border/60 bg-card/50 shadow-xs backdrop-blur-xs">
+    <Card className="bg-card shadow-sm transition-shadow hover:shadow-md">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-muted-foreground text-xs font-semibold">{title}</CardTitle>
         <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
@@ -362,7 +362,7 @@ function RoleScheduleCard({ role }: { role: UserRole }) {
   ];
 
   return (
-    <Card className="border-border/60 bg-card/50 shadow-xs">
+    <Card className="bg-card shadow-sm transition-shadow hover:shadow-md">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -417,7 +417,7 @@ function RoleScheduleCard({ role }: { role: UserRole }) {
  */
 function RoleQuickActionsCard({ role }: { role: UserRole }) {
   return (
-    <Card className="border-border/60 bg-card/50 shadow-xs">
+    <Card className="bg-card shadow-sm transition-shadow hover:shadow-md">
       <CardHeader>
         <CardTitle className="text-base font-bold sm:text-lg">Acciones Rápidas</CardTitle>
         <CardDescription className="text-xs">
@@ -489,7 +489,7 @@ function QuickActionButton({
  */
 function AttendanceOverviewCard() {
   return (
-    <Card className="border-border/60 bg-card/50 shadow-xs">
+    <Card className="bg-card shadow-sm transition-shadow hover:shadow-md">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-bold">Asistencia General de Hoy</CardTitle>
         <CardDescription className="text-xs">Estado en tiempo real de la jornada</CardDescription>
@@ -546,7 +546,7 @@ function InstitutionalNoticesCard() {
   ];
 
   return (
-    <Card className="border-border/60 bg-card/50 shadow-xs">
+    <Card className="bg-card shadow-sm transition-shadow hover:shadow-md">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-bold">Avisos de Dirección</CardTitle>
@@ -578,7 +578,7 @@ function InstitutionalNoticesCard() {
  */
 function UpcomingEventsCard() {
   return (
-    <Card className="border-border/60 bg-card/50 shadow-xs">
+    <Card className="bg-card shadow-sm transition-shadow hover:shadow-md">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-bold">Fechas Clave del Periodo</CardTitle>
       </CardHeader>

@@ -1,5 +1,5 @@
 import {
-  DashboardSquare01Icon,
+  Home01Icon,
   UserGroupIcon,
   ShieldCheckIcon,
   School01Icon,
@@ -10,18 +10,22 @@ import type { NavSection } from "./types";
 
 export const adminNavigation: NavSection[] = [
   {
-    title: "Administración Central",
     items: [
       {
         id: "admin-dashboard",
-        label: "Panel de Administración",
+        label: "Inicio",
         link: "/dashboard",
-        icon: DashboardSquare01Icon,
+        icon: Home01Icon,
         permissions: ["admin:dashboard:view"],
         roles: ["admin"],
         exact: true,
         description: "Estado de la infraestructura, servicios y métricas técnicas",
       },
+    ],
+  },
+  {
+    title: "Administración Central",
+    items: [
       {
         id: "admin-users",
         label: "Gestión de Usuarios",

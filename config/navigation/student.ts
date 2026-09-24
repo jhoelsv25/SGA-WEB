@@ -1,5 +1,5 @@
 import {
-  DashboardSquare01Icon,
+  Home01Icon,
   Book02Icon,
   Award01Icon,
   Clock01Icon,
@@ -11,18 +11,22 @@ import type { NavSection } from "./types";
 
 export const studentNavigation: NavSection[] = [
   {
-    title: "Mi Aprendizaje",
     items: [
       {
         id: "student-dashboard",
-        label: "Panel del Estudiante",
+        label: "Inicio",
         link: "/dashboard",
-        icon: DashboardSquare01Icon,
+        icon: Home01Icon,
         permissions: ["student:dashboard:view"],
         roles: ["student"],
         exact: true,
         description: "Resumen de mis clases y tareas próximas",
       },
+    ],
+  },
+  {
+    title: "Mi Aprendizaje",
+    items: [
       {
         id: "student-courses",
         label: "Mis Asignaturas",

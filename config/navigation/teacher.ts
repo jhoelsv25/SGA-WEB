@@ -1,5 +1,5 @@
 import {
-  DashboardSquare01Icon,
+  Home01Icon,
   TeacherIcon,
   Award01Icon,
   CheckmarkCircle02Icon,
@@ -12,18 +12,22 @@ import type { NavSection } from "./types";
 
 export const teacherNavigation: NavSection[] = [
   {
-    title: "Gestión Pedagógica",
     items: [
       {
         id: "teacher-dashboard",
-        label: "Panel del Docente",
+        label: "Inicio",
         link: "/dashboard",
-        icon: DashboardSquare01Icon,
+        icon: Home01Icon,
         permissions: ["teacher:dashboard:view"],
         roles: ["teacher"],
         exact: true,
         description: "Resumen de mis clases del día y alertas",
       },
+    ],
+  },
+  {
+    title: "Gestión Pedagógica",
+    items: [
       {
         id: "teacher-courses",
         label: "Mis Cursos a Cargo",
