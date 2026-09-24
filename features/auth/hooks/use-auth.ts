@@ -2,17 +2,12 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import type { UseFormSetError } from "react-hook-form";
 import { authApi } from "../api/auth.api";
 import type { LoginCredentials, AuthResponse, ForgotPasswordPayload } from "../types/auth.types";
-import type { LoginFormValues } from "../schemas/login.schema";
-import type { RecoverFormValues } from "../schemas/recover.schema";
-import { handleFormApiErrors } from "../utils/auth-error.utils";
 import type { ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
 
 export interface UseLoginOptions {
-  setError?: UseFormSetError<LoginFormValues>;
   onSuccess?: (data: AuthResponse) => void;
   onError?: (error: ApiClientError) => void;
   redirectTo?: string;
@@ -20,7 +15,7 @@ export interface UseLoginOptions {
 
 /**
  * Hook para inicio de sesión institucional.
- * Accede directamente a error.message normalizado por authApi.
+ * Expone la mutación con mutate, isPending, y error real del servidor.
  */
 export function useLogin(options?: UseLoginOptions) {
   const router = useRouter();
@@ -37,9 +32,6 @@ export function useLogin(options?: UseLoginOptions) {
       router.refresh();
     },
     onError: (error) => {
-      if (error.errors && options?.setError) {
-        handleFormApiErrors(error.errors, options.setError);
-      }
       options?.onError?.(error);
       toast.error(error.message);
     },
@@ -47,14 +39,13 @@ export function useLogin(options?: UseLoginOptions) {
 }
 
 export interface UseRecoverOptions {
-  setError?: UseFormSetError<RecoverFormValues>;
   onSuccess?: (data: { message?: string }) => void;
   onError?: (error: ApiClientError) => void;
 }
 
 /**
  * Hook para recuperación de credenciales institucionales.
- * Accede directamente a error.message normalizado por authApi.
+ * Expone mutate, isPending, y error real del servidor.
  */
 export function useRecover(options?: UseRecoverOptions) {
   return useMutation<{ message?: string }, ApiClientError, ForgotPasswordPayload>({
@@ -67,9 +58,6 @@ export function useRecover(options?: UseRecoverOptions) {
       );
     },
     onError: (error) => {
-      if (error.errors && options?.setError) {
-        handleFormApiErrors(error.errors, options.setError);
-      }
       options?.onError?.(error);
       toast.error(error.message);
     },

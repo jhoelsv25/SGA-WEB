@@ -11,7 +11,12 @@ import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/common/date-picker";
 import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { UserIcon, CheckmarkCircle02Icon, HelpCircleIcon } from "@hugeicons/core-free-icons";
+import {
+  UserIcon,
+  CheckmarkCircle02Icon,
+  HelpCircleIcon,
+  AlertCircleIcon,
+} from "@hugeicons/core-free-icons";
 
 export function RecoverForm() {
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
@@ -20,7 +25,6 @@ export function RecoverForm() {
     register,
     handleSubmit,
     control,
-    setError,
     formState: { errors },
   } = useForm<RecoverFormValues>({
     resolver: zodResolver(recoverSchema),
@@ -29,8 +33,11 @@ export function RecoverForm() {
     },
   });
 
-  const { mutate: recoverPassword, isPending: isSubmitting } = useRecover({
-    setError,
+  const {
+    mutate: recoverPassword,
+    isPending: isSubmitting,
+    error,
+  } = useRecover({
     onSuccess: (res) => {
       setSuccessMessage(
         res.message ||
@@ -75,6 +82,17 @@ export function RecoverForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      {/* Alerta de Error del Servidor */}
+      {error && (
+        <div className="bg-destructive/10 border-destructive/20 text-destructive animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200">
+          <HugeiconsIcon icon={AlertCircleIcon} className="mt-0.5 size-4 shrink-0" />
+          <div className="flex-1 space-y-0.5">
+            <p className="leading-tight font-semibold">Error de solicitud</p>
+            <p className="text-[11px] leading-relaxed opacity-90">{error.message}</p>
+          </div>
+        </div>
+      )}
+
       {/* Campo Usuario o Código */}
       <div className="space-y-1.5">
         <Label htmlFor="username" className="text-foreground text-xs font-semibold">

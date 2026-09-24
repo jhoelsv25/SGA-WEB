@@ -18,6 +18,7 @@ import {
   ViewIcon,
   ViewOffSlashIcon,
   LogInIcon,
+  AlertCircleIcon,
 } from "@hugeicons/core-free-icons";
 
 export function LoginForm() {
@@ -29,16 +30,13 @@ export function LoginForm() {
     register,
     handleSubmit,
     setValue,
-    setError,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: initialValues,
   });
 
-  const { mutate: login, isPending: isSubmitting } = useLogin({
-    setError,
-  });
+  const { mutate: login, isPending: isSubmitting, error } = useLogin();
 
   const onSubmit = (values: LoginFormValues) => {
     saveRememberedUsername(values.username, values.rememberUser);
@@ -51,6 +49,17 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      {/* Alerta de Error del Servidor */}
+      {error && (
+        <div className="bg-destructive/10 border-destructive/20 text-destructive animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200">
+          <HugeiconsIcon icon={AlertCircleIcon} className="mt-0.5 size-4 shrink-0" />
+          <div className="flex-1 space-y-0.5">
+            <p className="leading-tight font-semibold">Error de autenticación</p>
+            <p className="text-[11px] leading-relaxed opacity-90">{error.message}</p>
+          </div>
+        </div>
+      )}
+
       {/* Campo Usuario */}
       <div className="space-y-1.5">
         <Label htmlFor="username" className="text-foreground text-xs font-semibold">
