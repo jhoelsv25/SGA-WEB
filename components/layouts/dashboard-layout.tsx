@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./sidebar/app-sidebar";
 import { AppHeader } from "./header/app-header";
 import type { UserProfileData } from "./sidebar/nav-user";
+import { useOptionalDashboardRole } from "./dashboard-role-context";
 
 export interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -16,14 +17,19 @@ export interface DashboardLayoutProps {
 
 export function DashboardLayout({
   children,
-  role = "teacher",
-  user,
+  role: roleProp,
+  user: userProp,
   defaultOpen = true,
 }: DashboardLayoutProps) {
+  const roleContext = useOptionalDashboardRole();
+
+  const activeRole = roleProp ?? roleContext?.role ?? "teacher";
+  const activeUser = userProp ?? roleContext?.user;
+
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       {/* Sidebar estilo sidebar-07 (colapsable a iconos) */}
-      <AppSidebar role={role} user={user} />
+      <AppSidebar role={activeRole} user={activeUser} />
 
       {/* Contenedor del contenido principal con AppHeader integrado */}
       <SidebarInset className="flex min-h-screen flex-col">
