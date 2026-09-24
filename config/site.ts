@@ -30,7 +30,7 @@ export const siteConfig = {
     administration: {
       ugel: "UGEL Angaraes",
       dre: "DRE Huancavelica",
-      levels: ["Educación Secundaria", "Educación Primaria"],
+      levels: ["Educación Secundaria"],
     },
     contact: {
       phone: "+51 967 123 456",
