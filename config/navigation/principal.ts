@@ -9,27 +9,27 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
-export const directorNavigation: NavSection[] = [
+export const principalNavigation: NavSection[] = [
   {
     title: "Dirección Institucional",
     items: [
       {
-        id: "director-dashboard",
+        id: "principal-dashboard",
         label: "Panel Directivo",
         link: "/dashboard",
         icon: DashboardSquare01Icon,
-        permissions: ["director:dashboard:view"],
-        roles: ["director"],
+        permissions: ["principal:dashboard:view", "director:dashboard:view"],
+        roles: ["principal", "director"],
         exact: true,
         description: "Tablero ejecutivo e indicadores clave de la I.E.",
       },
       {
-        id: "director-analytics",
+        id: "principal-analytics",
         label: "Monitoreo y Métricas",
-        link: "/dashboard/director/analytics",
+        link: "/dashboard/principal/analytics",
         icon: Analytics01Icon,
-        permissions: ["director:analytics:view"],
-        roles: ["director"],
+        permissions: ["principal:analytics:view", "director:analytics:view"],
+        roles: ["principal", "director"],
         badge: { text: "En vivo", variant: "success" },
         description: "Rendimiento escolar, deserción y cumplimiento pedagógico",
       },
@@ -39,30 +39,34 @@ export const directorNavigation: NavSection[] = [
     title: "Comunidad Escolar",
     items: [
       {
-        id: "director-teachers",
+        id: "principal-teachers",
         label: "Planta Docente",
-        link: "/dashboard/director/teachers",
+        link: "/dashboard/principal/teachers",
         icon: TeacherIcon,
-        permissions: ["director:teachers:view", "director:teachers:manage"],
-        roles: ["director"],
+        permissions: [
+          "principal:teachers:view",
+          "principal:teachers:manage",
+          "director:teachers:view",
+        ],
+        roles: ["principal", "director"],
         description: "Distribución de carga horaria, asignaciones y supervisiones",
       },
       {
-        id: "director-enrollment",
+        id: "principal-enrollment",
         label: "Matrícula y Vacantes",
-        link: "/dashboard/director/enrollments",
+        link: "/dashboard/principal/enrollments",
         icon: School01Icon,
-        permissions: ["director:enrollment:manage"],
-        roles: ["director"],
+        permissions: ["principal:enrollment:manage", "director:enrollment:manage"],
+        roles: ["principal", "director"],
         description: "Padrón general de estudiantes, secciones y vacantes",
       },
       {
-        id: "director-attendance",
+        id: "principal-attendance",
         label: "Asistencia Institucional",
-        link: "/dashboard/director/attendance",
+        link: "/dashboard/principal/attendance",
         icon: Clock01Icon,
-        permissions: ["director:attendance:view"],
-        roles: ["director"],
+        permissions: ["principal:attendance:view", "director:attendance:view"],
+        roles: ["principal", "director"],
         description: "Consolidado de asistencia de estudiantes y docentes",
       },
     ],
@@ -71,24 +75,27 @@ export const directorNavigation: NavSection[] = [
     title: "Reportes Oficiales",
     items: [
       {
-        id: "director-reports",
+        id: "principal-reports",
         label: "Reportes MINEDU / SIAGIE",
-        link: "/dashboard/director/reports",
+        link: "/dashboard/principal/reports",
         icon: ChartHistogramIcon,
-        permissions: ["director:reports:generate"],
-        roles: ["director"],
+        permissions: ["principal:reports:generate", "director:reports:generate"],
+        roles: ["principal", "director"],
         badge: "Oficial",
         description: "Actas consolidadas, nóminas y cuadros de mérito",
       },
       {
-        id: "director-calendar",
+        id: "principal-calendar",
         label: "Calendario Institucional",
-        link: "/dashboard/director/calendar",
+        link: "/dashboard/principal/calendar",
         icon: Calendar03Icon,
-        permissions: ["director:calendar:manage"],
-        roles: ["director"],
+        permissions: ["principal:calendar:manage", "director:calendar:manage"],
+        roles: ["principal", "director"],
         description: "Jornadas de reflexión, semanas de gestión y feriados",
       },
     ],
   },
 ];
+
+// Alias para compatibilidad en español
+export const directorNavigation = principalNavigation;

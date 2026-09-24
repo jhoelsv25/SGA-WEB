@@ -2,32 +2,34 @@ import type { NavSection, UserRole } from "./types";
 import { defaultNavigation } from "./default";
 import { studentNavigation } from "./student";
 import { teacherNavigation } from "./teacher";
-import { directorNavigation } from "./director";
+import { principalNavigation, directorNavigation } from "./principal";
 import { adminNavigation } from "./admin";
-import { apoderadoNavigation } from "./apoderado";
+import { parentNavigation, apoderadoNavigation } from "./parent";
 
 export * from "./types";
 export * from "./default";
 export * from "./student";
 export * from "./teacher";
-export * from "./director";
+export * from "./principal";
 export * from "./admin";
-export * from "./apoderado";
+export * from "./parent";
 
 /**
- * Mapa centralizado de navegaciones indexadas por rol institucional.
+ * Mapa centralizado de navegaciones indexadas por rol institucional en inglés (con alias en español).
  */
 export const roleNavigations: Record<UserRole, NavSection[]> = {
   admin: adminNavigation,
+  principal: principalNavigation,
   director: directorNavigation,
   teacher: teacherNavigation,
   student: studentNavigation,
+  parent: parentNavigation,
   apoderado: apoderadoNavigation,
 };
 
 /**
  * Obtiene la estructura de navegación configurada para un rol específico.
- * Si el rol no existe o no se provee, retorna la navegación por defecto (defaultNavigation).
+ * Soporta tanto nombres en inglés (principal, parent) como en español (director, apoderado).
  */
 export function getNavigationForRole(role?: UserRole | string | null): NavSection[] {
   if (!role) return defaultNavigation;
@@ -77,9 +79,7 @@ export function filterNavigationByPermissions(
   return sections
     .map((section) => {
       const allowedItems = section.items.filter((item) => {
-        // Si el elemento no define permisos específicos, se permite por defecto
         if (!item.permissions || item.permissions.length === 0) return true;
-        // Si define permisos, el usuario debe tener al menos uno
         return item.permissions.some((p) => permSet.has(p));
       });
 

@@ -8,7 +8,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
-export const apoderadoNavigation: NavSection[] = [
+export const parentNavigation: NavSection[] = [
   {
     title: "Seguimiento Familiar",
     items: [
@@ -18,7 +18,7 @@ export const apoderadoNavigation: NavSection[] = [
         link: "/dashboard",
         icon: DashboardSquare01Icon,
         permissions: ["parent:dashboard:view"],
-        roles: ["apoderado"],
+        roles: ["parent", "apoderado"],
         exact: true,
         description: "Resumen académico y asistencial de mis hijos",
       },
@@ -28,7 +28,7 @@ export const apoderadoNavigation: NavSection[] = [
         link: "/dashboard/parent/children",
         icon: UserIcon,
         permissions: ["parent:children:view"],
-        roles: ["apoderado"],
+        roles: ["parent", "apoderado"],
         badge: { text: "2026", variant: "default" },
         description: "Selección de hijo, ficha escolar y datos del aula",
       },
@@ -43,7 +43,7 @@ export const apoderadoNavigation: NavSection[] = [
         link: "/dashboard/parent/grades",
         icon: Award01Icon,
         permissions: ["parent:grades:view"],
-        roles: ["apoderado"],
+        roles: ["parent", "apoderado"],
         description: "Notas por competencia, conclusiones y avance bimestral",
       },
       {
@@ -52,7 +52,7 @@ export const apoderadoNavigation: NavSection[] = [
         link: "/dashboard/parent/attendance",
         icon: Clock01Icon,
         permissions: ["parent:attendance:view"],
-        roles: ["apoderado"],
+        roles: ["parent", "apoderado"],
         description: "Control de ingresos, tardanzas e inasistencias",
       },
       {
@@ -61,7 +61,7 @@ export const apoderadoNavigation: NavSection[] = [
         link: "/dashboard/parent/communications",
         icon: Message01Icon,
         permissions: ["parent:communications:view"],
-        roles: ["apoderado"],
+        roles: ["parent", "apoderado"],
         badge: { text: "Avisos", variant: "warning" },
         description: "Mensajes de docentes, citaciones a reuniones y circulares",
       },
@@ -76,9 +76,12 @@ export const apoderadoNavigation: NavSection[] = [
         link: "/dashboard/parent/administrative",
         icon: Invoice01Icon,
         permissions: ["parent:administrative:view"],
-        roles: ["apoderado"],
+        roles: ["parent", "apoderado"],
         description: "Solicitud de certificados de estudios y estado de matrícula",
       },
     ],
   },
 ];
+
+// Alias para compatibilidad en español
+export const apoderadoNavigation = parentNavigation;

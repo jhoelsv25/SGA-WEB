@@ -2,9 +2,10 @@ import type * as React from "react";
 import type { IconSvgElement } from "@hugeicons/react";
 
 /**
- * Roles del sistema SGA institucional.
+ * Roles del sistema SGA institucional (estándar en inglés con alias en español).
  */
-export type UserRole = "admin" | "director" | "teacher" | "student" | "apoderado";
+export type UserRole =
+  "admin" | "principal" | "teacher" | "student" | "parent" | "director" | "apoderado";
 
 /**
  * Variante de color visual para el badge indicador del menú.
