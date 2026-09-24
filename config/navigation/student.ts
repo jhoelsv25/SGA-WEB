@@ -31,26 +31,18 @@ export const studentNavigation: NavSection[] = [
         permissions: ["student:courses:view"],
         roles: ["student"],
         badge: "2026",
-        description: "Acceso a mis cursos, docentes y materiales",
-        items: [
-          {
-            id: "student-courses-list",
-            label: "Cursos Activos",
-            link: "/dashboard/student/courses",
-            icon: Book02Icon,
-            permissions: ["student:courses:view"],
-            roles: ["student"],
-          },
-          {
-            id: "student-materials",
-            label: "Materiales y Guías",
-            link: "/dashboard/student/materials",
-            icon: File01Icon,
-            permissions: ["student:materials:view"],
-            roles: ["student"],
-          },
-        ],
+        description: "Acceso a mis cursos y docentes",
       },
+      {
+        id: "student-materials",
+        label: "Materiales y Guías",
+        link: "/dashboard/student/materials",
+        icon: File01Icon,
+        permissions: ["student:materials:view"],
+        roles: ["student"],
+        description: "Recursos didácticos y guías de estudio",
+      },
+
       {
         id: "student-tasks",
         label: "Tareas y Evaluaciones",

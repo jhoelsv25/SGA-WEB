@@ -30,26 +30,9 @@ export const adminNavigation: NavSection[] = [
         permissions: ["admin:users:manage"],
         roles: ["admin"],
         badge: { text: "Cuentas", variant: "default" },
-        description: "Creación, activación, reseteo de claves y asignación de roles",
-        items: [
-          {
-            id: "admin-users-all",
-            label: "Todos los Usuarios",
-            link: "/dashboard/admin/users",
-            icon: UserGroupIcon,
-            permissions: ["admin:users:manage"],
-            roles: ["admin"],
-          },
-          {
-            id: "admin-users-import",
-            label: "Importación Masiva (Excel)",
-            link: "/dashboard/admin/users/import",
-            icon: UserGroupIcon,
-            permissions: ["admin:users:manage"],
-            roles: ["admin"],
-          },
-        ],
+        description: "Creación, activación y reseteo de claves",
       },
+
       {
         id: "admin-roles",
         label: "Roles y Permisos",
