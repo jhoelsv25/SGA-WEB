@@ -84,26 +84,30 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
 
   return (
     <>
-      {/* Botón trigger en el Sidebar */}
+      {/* Botón trigger en el Sidebar redondeado estilo Login Input */}
       <button
         type="button"
         onClick={() => setOpenDialog(true)}
         className={cn(
-          "bg-sidebar-accent/50 text-muted-foreground hover:bg-sidebar-accent hover:text-foreground group/search border-sidebar-border/60 focus-visible:ring-sidebar-ring flex w-full items-center gap-2.5 rounded-lg border transition-all duration-200 outline-none focus-visible:ring-2",
-          isCollapsed ? "h-9 justify-center px-2" : "h-9 px-3 text-left",
+          "bg-background/80 hover:bg-background text-muted-foreground hover:text-foreground group/search border-border/80 hover:border-primary/40 focus-visible:ring-primary/25 flex w-full items-center gap-2.5 shadow-2xs transition-all duration-200 outline-none focus-visible:ring-2",
+          isCollapsed
+            ? "mx-auto size-9.5 justify-center rounded-xl p-0"
+            : "h-10 rounded-full border px-3.5 text-left",
         )}
         title="Buscar módulo o función (Ctrl + K)"
       >
         <HugeiconsIcon
           icon={Search01Icon}
-          className="group-hover/search:text-primary size-4 shrink-0 transition-colors"
+          className="text-muted-foreground/80 group-hover/search:text-primary size-4 shrink-0 transition-colors"
         />
 
         {!isCollapsed && (
           <>
-            <span className="flex-1 truncate text-xs font-normal">Buscar en el portal...</span>
-            <kbd className="bg-background/80 text-muted-foreground/80 border-border pointer-events-none hidden h-5 items-center gap-0.5 rounded border px-1.5 font-mono text-[10px] font-semibold select-none sm:inline-flex">
-              <span className="text-[11px]">⌘</span>K
+            <span className="text-muted-foreground/75 group-hover/search:text-foreground flex-1 truncate text-xs font-normal">
+              Buscar en el portal...
+            </span>
+            <kbd className="bg-muted text-muted-foreground border-border/60 pointer-events-none hidden h-5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-[9.5px] font-bold select-none sm:inline-flex">
+              <span className="text-[10px]">⌘</span>K
             </kbd>
           </>
         )}
@@ -111,7 +115,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
 
       {/* Modal interactivo de búsqueda */}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="max-w-md overflow-hidden p-0 sm:max-w-lg">
+        <DialogContent className="max-w-md overflow-hidden rounded-2xl p-0 shadow-2xl sm:max-w-lg">
           <DialogHeader className="sr-only">
             <DialogTitle>Buscador institucional</DialogTitle>
             <DialogDescription>
@@ -119,21 +123,23 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
             </DialogDescription>
           </DialogHeader>
 
-          {/* Campo de búsqueda con icono */}
+          {/* Campo de búsqueda con icono estilo Login */}
           <div className="border-border/70 flex items-center gap-3 border-b px-4 py-3">
-            <HugeiconsIcon icon={Search01Icon} className="text-primary size-5 shrink-0" />
+            <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full">
+              <HugeiconsIcon icon={Search01Icon} className="size-4" />
+            </div>
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar cursos, notas, asistencias, trámites..."
-              className="placeholder:text-muted-foreground h-9 border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+              placeholder="Buscar asignaturas, calificaciones, nóminas, reportes..."
+              className="placeholder:text-muted-foreground/70 h-9 border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
               autoFocus
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery("")}
-                className="text-muted-foreground hover:text-foreground rounded px-1.5 py-0.5 text-xs font-semibold"
+                className="text-muted-foreground hover:text-foreground rounded-full px-2 py-0.5 text-xs font-semibold"
               >
                 Limpiar
               </button>

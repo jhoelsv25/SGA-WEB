@@ -78,10 +78,10 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
               tooltip={item.label}
               isActive={isActive || isAnyChildActive}
               className={cn(
-                "group relative h-9.5 rounded-lg px-3 text-[13.5px] font-medium transition-all duration-150",
-                "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
+                "group relative h-10 rounded-full px-3.5 text-[13.5px] font-medium transition-all duration-200",
+                "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
                 (isActive || isAnyChildActive) &&
-                  "bg-sidebar-accent/90 text-primary font-semibold shadow-2xs",
+                  "bg-primary/10 text-primary hover:bg-primary/15 font-bold shadow-2xs",
               )}
             >
               <RenderNavIcon
@@ -103,7 +103,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
           </CollapsibleTrigger>
 
           <CollapsibleContent>
-            <SidebarMenuSub className="border-sidebar-border/70 my-0.5 ml-4 border-l py-1 pl-2">
+            <SidebarMenuSub className="border-sidebar-border/70 my-1 ml-4 border-l py-1 pl-2.5">
               {item.items?.map((subItem) => {
                 const isSubActive = subItem.exact
                   ? currentPath === subItem.link
@@ -115,9 +115,9 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
                       asChild
                       isActive={isSubActive}
                       className={cn(
-                        "h-8.5 rounded-md px-2.5 text-[13px] font-medium transition-colors",
-                        "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
-                        isSubActive && "bg-primary/10 text-primary font-semibold",
+                        "h-8.5 rounded-full px-3 text-[13px] font-medium transition-colors",
+                        "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
+                        isSubActive && "bg-primary/10 text-primary font-bold",
                       )}
                     >
                       <Link href={subItem.link} className="flex items-center gap-2">
@@ -152,26 +152,24 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
         tooltip={item.label}
         isActive={isActive}
         className={cn(
-          "group relative h-9.5 rounded-lg px-3 text-[13.5px] font-medium transition-all duration-150",
-          "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
+          "group relative h-10 rounded-full px-3.5 text-[13.5px] font-medium transition-all duration-200",
+          "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
           isActive &&
-            "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary font-semibold shadow-2xs",
+            "bg-primary text-primary-foreground hover:bg-primary/95 hover:text-primary-foreground shadow-primary/20 font-bold shadow-md",
         )}
       >
         <Link href={item.link} className="flex w-full items-center gap-2.5">
-          {/* Pequeña barra indicadora activa a la izquierda */}
-          {isActive && (
-            <span className="bg-primary absolute top-2 bottom-2 -left-1 w-1 rounded-r-full" />
-          )}
           <RenderNavIcon
             icon={item.icon}
             className={cn(
               "size-4 shrink-0 transition-colors",
-              isActive ? "text-primary" : "text-muted-foreground/80 group-hover:text-foreground",
+              isActive
+                ? "text-primary-foreground"
+                : "text-muted-foreground/80 group-hover:text-foreground",
             )}
           />
           <span className="min-w-0 flex-1 truncate">{item.label}</span>
-          {item.badge && <RenderNavBadge badge={item.badge} />}
+          {item.badge && <RenderNavBadge badge={item.badge} isParentActive={isActive} />}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
@@ -197,25 +195,44 @@ function RenderNavIcon({
   return null;
 }
 
-function RenderNavBadge({ badge }: { badge: NavBadge | string }) {
+function RenderNavBadge({
+  badge,
+  isParentActive = false,
+}: {
+  badge: NavBadge | string;
+  isParentActive?: boolean;
+}) {
   if (typeof badge === "string") {
     return (
-      <span className="bg-primary/10 text-primary border-primary/20 py-0.2 ml-auto rounded-full border px-1.5 text-[10px] font-bold">
+      <span
+        className={cn(
+          "ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition-colors",
+          isParentActive
+            ? "bg-white/20 text-white"
+            : "border-primary/20 bg-primary/10 text-primary border",
+        )}
+      >
         {badge}
       </span>
     );
   }
 
   const variantStyles: Record<string, string> = {
-    default: "bg-primary/10 text-primary border border-primary/20",
-    secondary: "bg-secondary text-secondary-foreground border border-border/50",
+    default: isParentActive
+      ? "bg-white/20 text-white"
+      : "bg-primary/10 text-primary border border-primary/20",
+    secondary: isParentActive
+      ? "bg-white/20 text-white"
+      : "bg-secondary text-secondary-foreground border border-border/50",
     destructive:
-      "bg-destructive/10 text-destructive border border-destructive/20 dark:bg-destructive/20",
-    outline: "border border-border/80 text-muted-foreground bg-background/50",
+      "bg-destructive/15 text-destructive border border-destructive/25 dark:bg-destructive/25",
+    outline: isParentActive
+      ? "bg-white/20 text-white"
+      : "border border-border/80 text-muted-foreground bg-background/50",
     success:
-      "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25",
-    info: "bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/25",
+      "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25",
+    warning: "bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30",
+    info: "bg-sky-500/15 text-sky-800 dark:text-sky-300 border border-sky-500/30",
   };
 
   const selectedStyle =
@@ -226,7 +243,7 @@ function RenderNavBadge({ badge }: { badge: NavBadge | string }) {
   return (
     <span
       className={cn(
-        "py-0.2 ml-auto inline-flex shrink-0 items-center justify-center rounded-full px-2 text-[10px] font-bold tracking-tight shadow-2xs",
+        "ml-auto inline-flex shrink-0 items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight shadow-2xs",
         selectedStyle,
         badge.className,
       )}
