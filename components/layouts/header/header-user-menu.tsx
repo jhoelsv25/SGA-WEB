@@ -70,21 +70,25 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-64 rounded-xl p-1.5 shadow-xl" align="end" sideOffset={8}>
+      <DropdownMenuContent
+        className="border-border/80 bg-popover/98 w-68 rounded-2xl border p-2 shadow-2xl backdrop-blur-xl"
+        align="end"
+        sideOffset={10}
+      >
         <DropdownMenuLabel className="p-0 font-normal">
-          <div className="flex items-center gap-2.5 px-2.5 py-2 text-left text-sm">
-            <Avatar className="ring-primary/20 size-9 rounded-xl shadow-2xs ring-1">
+          <div className="flex items-center gap-3 px-2 py-2 text-left text-sm">
+            <Avatar className="ring-primary/20 size-10 rounded-xl shadow-xs ring-1">
               <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                 {initials || "U"}
               </AvatarFallback>
             </Avatar>
-            <div className="grid flex-1 text-left text-xs leading-tight">
-              <span className="text-foreground truncate font-bold">{user.name}</span>
+            <div className="grid flex-1 text-left leading-tight">
+              <span className="text-foreground truncate text-[13.5px] font-bold">{user.name}</span>
               <span className="text-muted-foreground truncate text-[11px]">{user.email}</span>
               {user.roleLabel && (
-                <div className="mt-1">
-                  <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center rounded-md border px-1.5 py-0.5 text-[9.5px] font-bold">
+                <div className="mt-1.5">
+                  <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-tight">
                     {user.roleLabel}
                   </span>
                 </div>
@@ -93,20 +97,20 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
           </div>
         </DropdownMenuLabel>
 
-        <DropdownMenuSeparator className="my-1" />
+        <DropdownMenuSeparator className="bg-border/60 my-1.5" />
 
-        <div className="bg-muted/40 text-muted-foreground mb-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px]">
+        <div className="bg-muted/50 text-muted-foreground/90 my-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px]">
           <HugeiconsIcon icon={School01Icon} className="text-primary size-3.5 shrink-0" />
-          <span className="truncate font-medium">I.E. Carmelitas · Lircay</span>
+          <span className="truncate font-semibold">I.E. Carmelitas · Lircay</span>
         </div>
 
-        <DropdownMenuGroup>
+        <DropdownMenuGroup className="space-y-0.5">
           <DropdownMenuItem asChild>
             <Link
               href="/dashboard/profile"
-              className="flex cursor-pointer items-center gap-2.5 text-xs font-medium"
+              className="hover:bg-accent flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium transition-colors"
             >
-              <HugeiconsIcon icon={UserIcon} className="size-4 shrink-0" />
+              <HugeiconsIcon icon={UserIcon} className="text-muted-foreground size-4 shrink-0" />
               <span>Mi Perfil</span>
             </Link>
           </DropdownMenuItem>
@@ -114,9 +118,12 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
           <DropdownMenuItem asChild>
             <Link
               href="/dashboard/notifications"
-              className="flex cursor-pointer items-center gap-2.5 text-xs font-medium"
+              className="hover:bg-accent flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium transition-colors"
             >
-              <HugeiconsIcon icon={Notification01Icon} className="size-4 shrink-0" />
+              <HugeiconsIcon
+                icon={Notification01Icon}
+                className="text-muted-foreground size-4 shrink-0"
+              />
               <span>Notificaciones</span>
             </Link>
           </DropdownMenuItem>
@@ -124,20 +131,23 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
           <DropdownMenuItem asChild>
             <Link
               href="/dashboard/settings"
-              className="flex cursor-pointer items-center gap-2.5 text-xs font-medium"
+              className="hover:bg-accent flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium transition-colors"
             >
-              <HugeiconsIcon icon={Settings02Icon} className="size-4 shrink-0" />
+              <HugeiconsIcon
+                icon={Settings02Icon}
+                className="text-muted-foreground size-4 shrink-0"
+              />
               <span>Preferencias</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator className="my-1" />
+        <DropdownMenuSeparator className="bg-border/60 my-1.5" />
 
         <DropdownMenuItem
           disabled={isLoggingOut}
           onClick={() => logout()}
-          className="text-destructive focus:bg-destructive/10 focus:text-destructive flex cursor-pointer items-center gap-2.5 text-xs font-medium"
+          className="text-destructive focus:bg-destructive/10 focus:text-destructive flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium transition-colors"
         >
           <HugeiconsIcon icon={Logout01Icon} className="size-4 shrink-0" />
           <span>{isLoggingOut ? "Cerrando sesión..." : "Cerrar Sesión"}</span>

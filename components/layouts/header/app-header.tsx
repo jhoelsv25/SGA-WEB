@@ -31,7 +31,7 @@ export function AppHeader({ user }: AppHeaderProps) {
       </div>
 
       {/* Lado Derecho: Badge de Año Escolar + Notificaciones + ThemeToggle + HeaderUserMenu */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* Badge Institucional del Periodo Escolar */}
         <div className="border-primary/20 bg-primary/5 text-primary hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold lg:flex">
           <HugeiconsIcon icon={School01Icon} className="size-3.5" />
@@ -57,7 +57,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 
         <Separator
           orientation="vertical"
-          className="mx-1 hidden data-[orientation=vertical]:h-4 sm:block"
+          className="mx-0.5 hidden data-[orientation=vertical]:h-4 sm:block"
         />
 
         {/* Menú de Usuario en el Header */}
