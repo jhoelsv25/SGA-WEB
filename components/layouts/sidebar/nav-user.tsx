@@ -63,38 +63,40 @@ export function NavUser({ user = DEFAULT_USER }: NavUserProps) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent/50"
+              className="hover:bg-sidebar-accent/70 data-[state=open]:bg-sidebar-accent h-13 rounded-xl p-2 transition-all duration-200"
             >
-              <Avatar className="size-8 rounded-lg">
+              <Avatar className="ring-primary/20 size-9 shrink-0 rounded-xl shadow-2xs ring-1">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                   {initials || "U"}
                 </AvatarFallback>
               </Avatar>
 
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="text-foreground truncate font-semibold">{user.name}</span>
+              <div className="grid flex-1 text-left leading-tight">
+                <span className="text-foreground truncate text-[13px] font-semibold">
+                  {user.name}
+                </span>
                 <span className="text-muted-foreground truncate text-[11px]">{user.email}</span>
               </div>
 
               <HugeiconsIcon
                 icon={MoreVerticalIcon}
-                className="ml-auto size-4 shrink-0 opacity-70"
+                className="text-muted-foreground/70 group-hover/menu-button:text-foreground ml-auto size-4 shrink-0 transition-colors"
               />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-xl p-1.5 shadow-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-64 rounded-xl p-1.5 shadow-xl"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={8}
           >
             <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2.5 px-1.5 py-1.5 text-left text-sm">
-                <Avatar className="size-8 rounded-lg">
+              <div className="flex items-center gap-2.5 px-2 py-2 text-left text-sm">
+                <Avatar className="ring-primary/20 size-9 rounded-xl ring-1">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                     {initials || "U"}
                   </AvatarFallback>
                 </Avatar>
@@ -102,9 +104,11 @@ export function NavUser({ user = DEFAULT_USER }: NavUserProps) {
                   <span className="text-foreground truncate font-bold">{user.name}</span>
                   <span className="text-muted-foreground truncate text-[11px]">{user.email}</span>
                   {user.roleLabel && (
-                    <span className="text-primary mt-0.5 inline-block text-[10px] font-semibold">
-                      {user.roleLabel}
-                    </span>
+                    <div className="mt-1">
+                      <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center rounded-md border px-1.5 py-0.5 text-[9.5px] font-bold">
+                        {user.roleLabel}
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>

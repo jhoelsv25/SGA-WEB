@@ -22,19 +22,19 @@ export function AppSidebar({ role = "teacher", user, ...props }: AppSidebarProps
   const sections = React.useMemo(() => getNavigationForRole(role), [role]);
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" className="border-sidebar-border/70 border-r" {...props}>
       {/* Cabecera Institucional del Sidebar */}
-      <SidebarHeader className="border-sidebar-border border-b p-2">
+      <SidebarHeader className="border-sidebar-border/60 border-b px-3 py-2.5">
         <NavInstitution />
       </SidebarHeader>
 
       {/* Contenido Dinámico de Rutas agrupadas por Rol */}
-      <SidebarContent className="px-2 py-1">
+      <SidebarContent className="px-2.5 py-2">
         <NavMain sections={sections} />
       </SidebarContent>
 
       {/* Pie de página con Perfil y Dropdown de Usuario */}
-      <SidebarFooter className="border-sidebar-border border-t p-2">
+      <SidebarFooter className="border-sidebar-border/60 border-t px-3 py-2.5">
         <NavUser user={user} />
       </SidebarFooter>
 

@@ -29,14 +29,14 @@ export function NavMain({ sections }: NavMainProps) {
   return (
     <>
       {sections.map((section, idx) => (
-        <SidebarGroup key={section.title || `section-${idx}`} className="py-2">
+        <SidebarGroup key={section.title || `section-${idx}`} className="px-0 py-1.5">
           {section.title && (
-            <SidebarGroupLabel className="text-muted-foreground/70 text-[11px] font-bold tracking-wider uppercase">
+            <SidebarGroupLabel className="text-muted-foreground/80 px-3 text-[10.5px] font-semibold tracking-wider uppercase">
               {section.title}
             </SidebarGroupLabel>
           )}
 
-          <SidebarMenu>
+          <SidebarMenu className="gap-0.5">
             {section.items.map((item) => (
               <NavMenuItem key={item.id} item={item} currentPath={pathname} />
             ))}
@@ -78,23 +78,32 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
               tooltip={item.label}
               isActive={isActive || isAnyChildActive}
               className={cn(
-                "group hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                "group relative h-9.5 rounded-lg px-3 text-[13.5px] font-medium transition-all duration-150",
+                "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
                 (isActive || isAnyChildActive) &&
-                  "bg-sidebar-accent text-sidebar-accent-foreground font-semibold",
+                  "bg-sidebar-accent/90 text-primary font-semibold shadow-2xs",
               )}
             >
-              <RenderNavIcon icon={item.icon} />
+              <RenderNavIcon
+                icon={item.icon}
+                className={cn(
+                  "size-4 shrink-0 transition-colors",
+                  isActive || isAnyChildActive
+                    ? "text-primary"
+                    : "text-muted-foreground/80 group-hover:text-foreground",
+                )}
+              />
               <span className="truncate">{item.label}</span>
               {item.badge && <RenderNavBadge badge={item.badge} />}
               <HugeiconsIcon
                 icon={ChevronRightIcon}
-                className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+                className="ml-auto size-4 opacity-60 transition-transform duration-200 group-hover:opacity-100 group-data-[state=open]/collapsible:rotate-90"
               />
             </SidebarMenuButton>
           </CollapsibleTrigger>
 
           <CollapsibleContent>
-            <SidebarMenuSub>
+            <SidebarMenuSub className="border-sidebar-border/70 my-0.5 ml-4 border-l py-1 pl-2">
               {item.items?.map((subItem) => {
                 const isSubActive = subItem.exact
                   ? currentPath === subItem.link
@@ -102,9 +111,25 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
 
                 return (
                   <SidebarMenuSubItem key={subItem.id}>
-                    <SidebarMenuSubButton asChild isActive={isSubActive}>
+                    <SidebarMenuSubButton
+                      asChild
+                      isActive={isSubActive}
+                      className={cn(
+                        "h-8.5 rounded-md px-2.5 text-[13px] font-medium transition-colors",
+                        "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
+                        isSubActive && "bg-primary/10 text-primary font-semibold",
+                      )}
+                    >
                       <Link href={subItem.link} className="flex items-center gap-2">
-                        {subItem.icon && <RenderNavIcon icon={subItem.icon} className="size-3.5" />}
+                        {subItem.icon && (
+                          <RenderNavIcon
+                            icon={subItem.icon}
+                            className={cn(
+                              "size-3.5",
+                              isSubActive ? "text-primary" : "text-muted-foreground",
+                            )}
+                          />
+                        )}
                         <span className="truncate">{subItem.label}</span>
                         {subItem.badge && <RenderNavBadge badge={subItem.badge} />}
                       </Link>
@@ -127,12 +152,24 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
         tooltip={item.label}
         isActive={isActive}
         className={cn(
-          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors",
-          isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-semibold",
+          "group relative h-9.5 rounded-lg px-3 text-[13.5px] font-medium transition-all duration-150",
+          "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
+          isActive &&
+            "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary font-semibold shadow-2xs",
         )}
       >
         <Link href={item.link} className="flex items-center gap-2.5">
-          <RenderNavIcon icon={item.icon} />
+          {/* Pequeña barra indicadora activa a la izquierda */}
+          {isActive && (
+            <span className="bg-primary absolute top-2 bottom-2 -left-1 w-1 rounded-r-full" />
+          )}
+          <RenderNavIcon
+            icon={item.icon}
+            className={cn(
+              "size-4 shrink-0 transition-colors",
+              isActive ? "text-primary" : "text-muted-foreground/80 group-hover:text-foreground",
+            )}
+          />
           <span className="truncate">{item.label}</span>
           {item.badge && <RenderNavBadge badge={item.badge} />}
         </Link>
@@ -170,14 +207,15 @@ function RenderNavBadge({ badge }: { badge: NavBadge | string }) {
   }
 
   const variantStyles: Record<string, string> = {
-    default: "bg-primary text-primary-foreground",
-    secondary: "bg-secondary text-secondary-foreground",
-    destructive: "bg-destructive text-destructive-foreground",
-    outline: "border border-border text-foreground",
+    default: "bg-primary/10 text-primary border border-primary/20",
+    secondary: "bg-secondary text-secondary-foreground border border-border/50",
+    destructive:
+      "bg-destructive/10 text-destructive border border-destructive/20 dark:bg-destructive/20",
+    outline: "border border-border/80 text-muted-foreground bg-background/50",
     success:
-      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
-    info: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20",
+      "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20",
+    warning: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25",
+    info: "bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/25",
   };
 
   const selectedStyle =
@@ -188,7 +226,7 @@ function RenderNavBadge({ badge }: { badge: NavBadge | string }) {
   return (
     <span
       className={cn(
-        "py-0.2 ml-auto shrink-0 rounded-full px-1.5 text-[9.5px] font-bold tracking-tight",
+        "py-0.2 ml-auto inline-flex shrink-0 items-center justify-center rounded-full px-2 text-[10px] font-bold tracking-tight shadow-2xs",
         selectedStyle,
         badge.className,
       )}
