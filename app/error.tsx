@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { siteConfig } from "@/config";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -15,7 +16,6 @@ export interface ErrorProps {
 
 export default function ErrorPage({ error, reset }: ErrorProps) {
   React.useEffect(() => {
-    // Registrar el error en la consola o servicio de monitoreo en producción
     console.error("Runtime Error capturado por app/error.tsx:", error);
   }, [error]);
 
@@ -24,19 +24,21 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
       {/* Barra Superior */}
       <div className="flex items-center justify-between">
         <Link
-          href="/"
+          href={siteConfig.routes.home}
           className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-xs font-semibold transition-colors"
         >
           <div className="bg-card ring-border flex size-8 items-center justify-center rounded-lg p-1 shadow-xs ring-1">
             <Image
-              src="/logo.png"
-              alt="Logo I.E. Carmelitas"
+              src={siteConfig.branding.logo}
+              alt={`Logo ${siteConfig.institution.shortName}`}
               width={24}
               height={24}
               className="object-contain"
             />
           </div>
-          <span>SGA · I.E. Carmelitas Lircay</span>
+          <span>
+            {siteConfig.acronym} · {siteConfig.institution.badge}
+          </span>
         </Link>
         <ThemeToggle />
       </div>
@@ -89,7 +91,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
             size="lg"
             className="h-11 w-full gap-2 rounded-full text-sm font-semibold sm:w-auto"
           >
-            <Link href="/">
+            <Link href={siteConfig.routes.home}>
               <HugeiconsIcon icon={Home01Icon} className="size-4.5" />
               <span>Volver al Portal</span>
             </Link>
@@ -99,9 +101,12 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
 
       {/* Pie de página institucional */}
       <div className="text-muted-foreground space-y-1 text-center text-xs">
-        <p>Si el problema persiste, contacta al administrador del sistema en la I.E. Carmelitas.</p>
+        <p>
+          Si el problema persiste, contacta al administrador del sistema en la{" "}
+          {siteConfig.institution.shortName}.
+        </p>
         <p className="text-[11px] opacity-75">
-          © {new Date().getFullYear()} I.E. Carmelitas · Lircay, Huancavelica.
+          © {new Date().getFullYear()} {siteConfig.institution.badge}.
         </p>
       </div>
     </div>

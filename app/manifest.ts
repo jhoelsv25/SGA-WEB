@@ -1,15 +1,15 @@
 import type { MetadataRoute } from "next";
+import { siteConfig } from "@/config";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SGA · Sistema de Gestión Académica - I.E. Carmelitas",
-    short_name: "SGA Carmelitas",
-    description:
-      "Plataforma integral de gestión pedagógica, control escolar y asistencia de la I.E. Carmelitas (Lircay, Huancavelica).",
-    start_url: "/",
+    name: `${siteConfig.name} - ${siteConfig.institution.shortName}`,
+    short_name: siteConfig.shortName,
+    description: siteConfig.description,
+    start_url: siteConfig.routes.home,
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#881337",
+    theme_color: siteConfig.branding.themeColor,
     icons: [
       {
         src: "/assets/icons/icon-72x72.png",
@@ -32,12 +32,12 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
       {
-        src: "/assets/icons/icon-152x152.png",
+        src: siteConfig.branding.icons.appleTouch,
         sizes: "152x152",
         type: "image/png",
       },
       {
-        src: "/assets/icons/icon-192x192.png",
+        src: siteConfig.branding.icons.icon192,
         sizes: "192x192",
         type: "image/png",
       },
@@ -47,7 +47,7 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
       {
-        src: "/assets/icons/icon-512x512.png",
+        src: siteConfig.branding.icons.icon512,
         sizes: "512x512",
         type: "image/png",
       },

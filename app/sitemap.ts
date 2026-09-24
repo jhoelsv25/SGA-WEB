@@ -1,18 +1,18 @@
 import type { MetadataRoute } from "next";
+import { siteConfig } from "@/config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sga.carmelitas.edu.pe";
   const currentDate = new Date();
 
   return [
     {
-      url: baseUrl,
+      url: siteConfig.url,
       lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/login`,
+      url: `${siteConfig.url}${siteConfig.routes.login}`,
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.8,

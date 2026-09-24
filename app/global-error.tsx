@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { siteConfig } from "@/config";
 
 export interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -19,8 +20,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
         <div className="flex max-w-md flex-col items-center text-center">
           <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-rose-100 p-2 shadow-sm dark:bg-rose-950/50">
             <Image
-              src="/logo.png"
-              alt="Logo I.E. Carmelitas"
+              src={siteConfig.branding.logo}
+              alt={`Logo ${siteConfig.institution.shortName}`}
               width={44}
               height={44}
               className="object-contain"
@@ -68,7 +69,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           </div>
 
           <p className="mt-8 text-xs text-neutral-500 dark:text-neutral-500">
-            SGA · I.E. Carmelitas · Lircay, Huancavelica
+            {siteConfig.acronym} · {siteConfig.institution.badge}
           </p>
         </div>
       </body>

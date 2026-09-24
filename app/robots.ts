@@ -1,16 +1,20 @@
 import type { MetadataRoute } from "next";
+import { siteConfig } from "@/config";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sga.carmelitas.edu.pe";
-
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/login"],
-        disallow: ["/api/", "/dashboard/", "/admin/", "/recover"],
+        allow: [siteConfig.routes.home, siteConfig.routes.login],
+        disallow: [
+          "/api/",
+          `${siteConfig.routes.dashboard}/`,
+          "/admin/",
+          siteConfig.routes.recover,
+        ],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${siteConfig.url}/sitemap.xml`,
   };
 }

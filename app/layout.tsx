@@ -2,17 +2,16 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/config";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { QueryProvider } from "@/providers/query-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://sga.carmelitas.edu.pe";
-
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#171012" },
+    { media: "(prefers-color-scheme: dark)", color: siteConfig.branding.themeColorDark },
   ],
   width: "device-width",
   initialScale: 1,
@@ -20,71 +19,63 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "SGA · Sistema de Gestión Académica | I.E. Carmelitas",
-    template: "%s | SGA Carmelitas",
+    default: `${siteConfig.name} | ${siteConfig.institution.shortName}`,
+    template: `%s | ${siteConfig.shortName}`,
   },
-  description:
-    "Plataforma integral de gestión pedagógica, control escolar, asistencia, calificaciones y comunicación de la Institución Educativa Carmelitas de Lircay, Huancavelica.",
-  applicationName: "SGA Carmelitas",
-  authors: [{ name: "I.E. Carmelitas · Lircay, Huancavelica", url: SITE_URL }],
-  creator: "I.E. Carmelitas - Lircay",
-  publisher: "I.E. Carmelitas",
-  generator: "Next.js",
-  keywords: [
-    "SGA",
-    "I.E. Carmelitas",
-    "Carmelitas Lircay",
-    "Sistema de Gestión Académica",
-    "Control Escolar Lircay",
-    "Colegio Carmelitas Huancavelica",
-    "Intranet Escolar",
-    "Asistencia y Calificaciones",
-    "Educación Lircay Angaraes",
+  description: siteConfig.description,
+  applicationName: siteConfig.shortName,
+  authors: [
+    {
+      name: `${siteConfig.institution.shortName} · ${siteConfig.institution.location.reference}`,
+      url: siteConfig.url,
+    },
   ],
+  creator: `${siteConfig.institution.shortName} - ${siteConfig.institution.location.district}`,
+  publisher: siteConfig.institution.name,
+  generator: "Next.js",
+  keywords: [...siteConfig.seo.keywords],
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   alternates: {
-    canonical: "/",
+    canonical: siteConfig.routes.home,
   },
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/assets/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/assets/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: siteConfig.branding.favicon },
+      { url: siteConfig.branding.icons.icon192, sizes: "192x192", type: "image/png" },
+      { url: siteConfig.branding.icons.icon512, sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/assets/icons/icon-152x152.png", sizes: "152x152", type: "image/png" },
-      { url: "/assets/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: siteConfig.branding.icons.appleTouch, sizes: "152x152", type: "image/png" },
+      { url: siteConfig.branding.icons.icon192, sizes: "192x192", type: "image/png" },
     ],
   },
   openGraph: {
     type: "website",
-    locale: "es_PE",
-    url: "/",
-    siteName: "SGA · I.E. Carmelitas",
-    title: "SGA · Sistema de Gestión Académica | I.E. Carmelitas",
-    description:
-      "Plataforma integral de gestión escolar, control de asistencia y calificaciones de la I.E. Carmelitas en Lircay, Huancavelica.",
+    locale: siteConfig.seo.locale,
+    url: siteConfig.routes.home,
+    siteName: `${siteConfig.acronym} · ${siteConfig.institution.shortName}`,
+    title: `${siteConfig.name} | ${siteConfig.institution.shortName}`,
+    description: siteConfig.description,
     images: [
       {
-        url: "/logo.png",
+        url: siteConfig.branding.logo,
         width: 800,
         height: 800,
-        alt: "Insignia Institucional - I.E. Carmelitas Lircay",
+        alt: `Insignia Institucional - ${siteConfig.institution.badge}`,
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "SGA · Sistema de Gestión Académica | I.E. Carmelitas",
-    description:
-      "Plataforma integral de gestión escolar y asistencia de la I.E. Carmelitas (Lircay, Huancavelica).",
-    images: ["/logo.png"],
+    card: siteConfig.seo.twitterCard,
+    title: `${siteConfig.name} | ${siteConfig.institution.shortName}`,
+    description: siteConfig.description,
+    images: [siteConfig.branding.logo],
   },
   robots: {
     index: true,
