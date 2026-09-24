@@ -31,7 +31,7 @@ export function NavMain({ sections }: NavMainProps) {
       {sections.map((section, idx) => (
         <SidebarGroup key={section.title || `section-${idx}`} className="px-0 py-0">
           {section.title && (
-            <SidebarGroupLabel className="text-muted-foreground/70 px-3 pt-2.5 pb-1 text-[11px] font-semibold tracking-wider uppercase select-none">
+            <SidebarGroupLabel className="text-sidebar-foreground/50 px-3 pt-2.5 pb-1 text-[10.5px] font-bold tracking-wider uppercase select-none">
               {section.title}
             </SidebarGroupLabel>
           )}
@@ -79,8 +79,8 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
               isActive={isActive || isAnyChildActive}
               className={cn(
                 "group relative h-9.5 rounded-xl px-3 text-[13px] font-medium tracking-tight transition-all duration-200",
-                "text-foreground/80 hover:bg-sidebar-accent/70 hover:text-foreground",
-                (isActive || isAnyChildActive) && "bg-sidebar-accent text-foreground font-semibold",
+                "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                (isActive || isAnyChildActive) && "bg-primary/10 text-primary font-semibold",
               )}
             >
               <RenderNavIcon
@@ -89,7 +89,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
                   "size-4 shrink-0 transition-colors",
                   isActive || isAnyChildActive
                     ? "text-primary"
-                    : "text-muted-foreground/80 group-hover:text-foreground",
+                    : "text-sidebar-foreground/60 group-hover:text-sidebar-foreground",
                 )}
               />
               <span className="min-w-0 flex-1 truncate">{item.label}</span>
@@ -115,7 +115,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
                       isActive={isSubActive}
                       className={cn(
                         "h-8 rounded-lg px-2.5 text-[12.5px] font-medium transition-colors",
-                        "text-foreground/75 hover:bg-sidebar-accent/70 hover:text-foreground",
+                        "text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground",
                         isSubActive && "bg-primary/10 text-primary font-semibold",
                       )}
                     >
@@ -125,7 +125,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
                             icon={subItem.icon}
                             className={cn(
                               "size-3.5",
-                              isSubActive ? "text-primary" : "text-muted-foreground",
+                              isSubActive ? "text-primary" : "text-sidebar-foreground/60",
                             )}
                           />
                         )}
@@ -152,19 +152,22 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
         isActive={isActive}
         className={cn(
           "group relative h-9.5 rounded-xl px-3 text-[13px] font-medium tracking-tight transition-all duration-200",
-          "text-foreground/80 hover:bg-sidebar-accent/70 hover:text-foreground",
-          isActive &&
-            "bg-primary text-primary-foreground hover:bg-primary/95 hover:text-primary-foreground shadow-primary/25 font-semibold shadow-xs",
+          "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+          isActive && "bg-primary/10 text-primary hover:bg-primary/15 font-semibold",
         )}
       >
         <Link href={item.link} className="flex w-full items-center gap-2.5">
+          {/* Barra indicadora vertical en estado activo */}
+          {isActive && (
+            <span className="bg-primary absolute top-2 bottom-2 left-0 w-1 rounded-r-full" />
+          )}
           <RenderNavIcon
             icon={item.icon}
             className={cn(
               "size-4 shrink-0 transition-colors",
               isActive
-                ? "text-primary-foreground"
-                : "text-muted-foreground/80 group-hover:text-foreground",
+                ? "text-primary"
+                : "text-sidebar-foreground/60 group-hover:text-sidebar-foreground",
             )}
           />
           <span className="min-w-0 flex-1 truncate">{item.label}</span>
@@ -206,7 +209,7 @@ function RenderNavBadge({
 
   if (isParentActive) {
     return (
-      <span className="ml-auto inline-flex items-center rounded-md bg-white/20 px-1.5 py-0.5 text-[9.5px] font-semibold text-white">
+      <span className="bg-primary/15 text-primary ml-auto inline-flex items-center rounded-md px-1.5 py-0.5 text-[9.5px] font-semibold">
         {text}
       </span>
     );
