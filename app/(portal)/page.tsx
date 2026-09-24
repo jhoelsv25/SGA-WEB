@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,20 @@ import {
   ArrowRight01Icon,
   School01Icon,
 } from "@hugeicons/core-free-icons";
+
+export const metadata: Metadata = {
+  title: "Portal Institucional",
+  description:
+    "Portal Oficial del Sistema de Gestión Académica (SGA) de la Institución Educativa Carmelitas en Lircay, Huancavelica. Servicios educativos, control escolar y vida institucional.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Portal Institucional · I.E. Carmelitas Lircay",
+    description: "Excelencia en la Gestión Educativa y Control Escolar en Lircay, Huancavelica.",
+    url: "/",
+  },
+};
 
 export default function PortalPage() {
   return (

@@ -5,8 +5,16 @@ import { LoginForm } from "@/features/auth";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 
 export const metadata: Metadata = {
-  title: "Iniciar Sesión | I.E. Carmelitas",
-  description: "Ingresa con tus credenciales institucionales.",
+  title: "Iniciar Sesión",
+  description:
+    "Acceso seguro a la plataforma del Sistema de Gestión Académica (SGA) para estudiantes, docentes y directivos de la I.E. Carmelitas.",
+  alternates: {
+    canonical: "/login",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function LoginPage() {

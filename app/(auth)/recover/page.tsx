@@ -8,9 +8,16 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
 export const metadata: Metadata = {
-  title: "Recuperar Contraseña | I.E. Carmelitas",
+  title: "Recuperar Acceso",
   description:
-    "Recupera el acceso a tu cuenta mediante tu código o usuario institucional y fecha de nacimiento.",
+    "Recuperación segura de contraseña institucional mediante código y fecha de nacimiento.",
+  alternates: {
+    canonical: "/recover",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RecoverPage() {
