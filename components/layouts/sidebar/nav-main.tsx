@@ -155,7 +155,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
           "group relative h-10 rounded-full px-3.5 text-[13.5px] font-medium transition-all duration-200",
           "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
           isActive &&
-            "bg-primary text-primary-foreground hover:bg-primary/95 hover:text-primary-foreground shadow-primary/20 font-bold shadow-md",
+            "!bg-primary !text-primary-foreground hover:!bg-primary/90 hover:!text-primary-foreground shadow-primary/25 font-bold shadow-md",
         )}
       >
         <Link href={item.link} className="flex w-full items-center gap-2.5">
@@ -164,7 +164,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
             className={cn(
               "size-4 shrink-0 transition-colors",
               isActive
-                ? "text-primary-foreground"
+                ? "!text-primary-foreground"
                 : "text-muted-foreground/80 group-hover:text-foreground",
             )}
           />

@@ -3,8 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { HelpCircleIcon, HeadsetIcon } from "@hugeicons/core-free-icons";
-import { siteConfig } from "@/config";
+import { HelpCircleIcon } from "@hugeicons/core-free-icons";
 import { useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarQuickFooter() {
@@ -26,37 +25,19 @@ export function SidebarQuickFooter() {
   }
 
   return (
-    <div className="bg-card ring-border/80 border-border/80 flex flex-col gap-2 rounded-2xl border p-3 shadow-xs ring-1 transition-all">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-xl">
-            <HugeiconsIcon icon={HeadsetIcon} className="size-4" />
-          </div>
-          <div className="leading-tight">
-            <div className="text-foreground text-xs font-bold">Mesa de Ayuda</div>
-            <div className="text-muted-foreground text-[10.5px]">Soporte institucional</div>
-          </div>
-        </div>
+    <div className="flex items-center justify-between px-2 py-1 text-xs">
+      <Link
+        href="/dashboard/help"
+        className="text-muted-foreground hover:text-primary flex items-center gap-2 font-medium transition-colors"
+      >
+        <HugeiconsIcon icon={HelpCircleIcon} className="text-muted-foreground/80 size-4 shrink-0" />
+        <span>Ayuda y Soporte</span>
+      </Link>
 
-        <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400">
-          Online
-        </span>
-      </div>
-
-      <div className="border-border/50 flex items-center justify-between border-t pt-2 text-[11px]">
-        <Link
-          href="/dashboard/help"
-          className="text-primary font-semibold transition-colors hover:underline"
-        >
-          Guía y Tutoriales
-        </Link>
-        <a
-          href={`mailto:${siteConfig.institution.contact.supportEmail}`}
-          className="text-muted-foreground hover:text-foreground font-medium transition-colors"
-        >
-          Contacto
-        </a>
-      </div>
+      <span className="flex items-center gap-1.5 text-[10.5px] font-semibold text-emerald-600 dark:text-emerald-400">
+        <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
+        Online
+      </span>
     </div>
   );
 }
