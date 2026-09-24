@@ -9,21 +9,31 @@ import { ThemeToggle } from "@/components/common/theme-toggle";
 import { BreadcrumbNav } from "./breadcrumb-nav";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Notification01Icon, School01Icon } from "@hugeicons/core-free-icons";
+import { HeaderUserMenu } from "./header-user-menu";
+import type { UserProfileData } from "../sidebar/nav-user";
+import { useOptionalDashboardRole } from "../dashboard-role-context";
 
-export function AppHeader() {
+export interface AppHeaderProps {
+  user?: UserProfileData;
+}
+
+export function AppHeader({ user }: AppHeaderProps) {
+  const roleContext = useOptionalDashboardRole();
+  const activeUser = user ?? roleContext?.user;
+
   return (
-    <header className="border-border/60 bg-background/95 sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-2 border-b px-4 backdrop-blur-md transition-[width,height] ease-linear">
+    <header className="border-border/60 bg-background/95 sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-2 border-b px-3 backdrop-blur-md transition-[width,height] ease-linear md:px-4">
       {/* Lado Izquierdo: Trigger del Sidebar + Separador + Breadcrumb */}
       <div className="flex items-center gap-2">
         <SidebarTrigger className="text-muted-foreground hover:text-foreground -ml-1" />
-        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+        <Separator orientation="vertical" className="mr-1 data-[orientation=vertical]:h-4" />
         <BreadcrumbNav />
       </div>
 
-      {/* Lado Derecho: Badge de Año Escolar + Notificaciones + ThemeToggle */}
-      <div className="flex items-center gap-2">
+      {/* Lado Derecho: Badge de Año Escolar + Notificaciones + ThemeToggle + HeaderUserMenu */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {/* Badge Institucional del Periodo Escolar */}
-        <div className="border-primary/20 bg-primary/5 text-primary hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold md:flex">
+        <div className="border-primary/20 bg-primary/5 text-primary hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold lg:flex">
           <HugeiconsIcon icon={School01Icon} className="size-3.5" />
           <span>Año 2026 · I.E. Carmelitas</span>
         </div>
@@ -44,6 +54,14 @@ export function AppHeader() {
 
         {/* Alternador de Tema Claro / Oscuro */}
         <ThemeToggle />
+
+        <Separator
+          orientation="vertical"
+          className="mx-1 hidden data-[orientation=vertical]:h-4 sm:block"
+        />
+
+        {/* Menú de Usuario en el Header */}
+        <HeaderUserMenu user={activeUser} />
       </div>
     </header>
   );

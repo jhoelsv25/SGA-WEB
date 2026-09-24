@@ -58,7 +58,7 @@ export const studentNavigation: NavSection[] = [
         icon: File01Icon,
         permissions: ["student:tasks:view"],
         roles: ["student"],
-        badge: { text: "Pendientes", variant: "warning" },
+        badge: { text: "3 pend.", variant: "warning" },
         description: "Entregas, actividades y exámenes programados",
       },
     ],

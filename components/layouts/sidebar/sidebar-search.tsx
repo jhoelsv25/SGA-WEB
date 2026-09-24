@@ -1,0 +1,193 @@
+"use client";
+
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import type { NavSection, NavItem } from "@/config/navigation/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useSidebar } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+
+export interface SidebarSearchProps {
+  sections: NavSection[];
+}
+
+export function SidebarSearch({ sections }: SidebarSearchProps) {
+  const router = useRouter();
+  const { state, setOpenMobile, isMobile } = useSidebar();
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [query, setQuery] = React.useState("");
+
+  // Aplanar todos los items y subitems para búsqueda instantánea
+  const allItems = React.useMemo(() => {
+    const list: Array<NavItem & { sectionTitle?: string }> = [];
+
+    sections.forEach((section) => {
+      section.items.forEach((item) => {
+        list.push({ ...item, sectionTitle: section.title });
+        if (item.items) {
+          item.items.forEach((sub) => {
+            list.push({
+              ...sub,
+              sectionTitle: `${section.title ?? ""} · ${item.label}`,
+            });
+          });
+        }
+      });
+    });
+
+    return list;
+  }, [sections]);
+
+  // Filtrar según query
+  const filteredItems = React.useMemo(() => {
+    if (!query.trim()) return allItems.slice(0, 8);
+    const q = query.toLowerCase().trim();
+    return allItems.filter(
+      (item) =>
+        item.label.toLowerCase().includes(q) ||
+        (item.description && item.description.toLowerCase().includes(q)) ||
+        (item.sectionTitle && item.sectionTitle.toLowerCase().includes(q)),
+    );
+  }, [allItems, query]);
+
+  // Atajo de teclado (Ctrl + K o Cmd + K)
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setOpenDialog((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleSelect = (link: string) => {
+    setOpenDialog(false);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+    router.push(link);
+  };
+
+  const isCollapsed = state === "collapsed";
+
+  return (
+    <>
+      {/* Botón trigger en el Sidebar */}
+      <button
+        type="button"
+        onClick={() => setOpenDialog(true)}
+        className={cn(
+          "bg-sidebar-accent/50 text-muted-foreground hover:bg-sidebar-accent hover:text-foreground group/search border-sidebar-border/60 focus-visible:ring-sidebar-ring flex w-full items-center gap-2.5 rounded-lg border transition-all duration-200 outline-none focus-visible:ring-2",
+          isCollapsed ? "h-9 justify-center px-2" : "h-9 px-3 text-left",
+        )}
+        title="Buscar módulo o función (Ctrl + K)"
+      >
+        <HugeiconsIcon
+          icon={Search01Icon}
+          className="group-hover/search:text-primary size-4 shrink-0 transition-colors"
+        />
+
+        {!isCollapsed && (
+          <>
+            <span className="flex-1 truncate text-xs font-normal">Buscar en el portal...</span>
+            <kbd className="bg-background/80 text-muted-foreground/80 border-border pointer-events-none hidden h-5 items-center gap-0.5 rounded border px-1.5 font-mono text-[10px] font-semibold select-none sm:inline-flex">
+              <span className="text-[11px]">⌘</span>K
+            </kbd>
+          </>
+        )}
+      </button>
+
+      {/* Modal interactivo de búsqueda */}
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="max-w-md overflow-hidden p-0 sm:max-w-lg">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Buscador institucional</DialogTitle>
+            <DialogDescription>
+              Busca y navega rápidamente a cualquier módulo o sección de la plataforma
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Campo de búsqueda con icono */}
+          <div className="border-border/70 flex items-center gap-3 border-b px-4 py-3">
+            <HugeiconsIcon icon={Search01Icon} className="text-primary size-5 shrink-0" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar cursos, notas, asistencias, trámites..."
+              className="placeholder:text-muted-foreground h-9 border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+              autoFocus
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="text-muted-foreground hover:text-foreground rounded px-1.5 py-0.5 text-xs font-semibold"
+              >
+                Limpiar
+              </button>
+            )}
+          </div>
+
+          {/* Resultados de la búsqueda */}
+          <div className="max-h-[320px] overflow-y-auto p-2">
+            {filteredItems.length === 0 ? (
+              <div className="text-muted-foreground py-8 text-center text-sm">
+                No se encontraron módulos con &ldquo;{query}&rdquo;
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {filteredItems.map((item) => (
+                  <button
+                    key={`${item.id}-${item.link}`}
+                    type="button"
+                    onClick={() => handleSelect(item.link)}
+                    className="hover:bg-accent/80 hover:text-accent-foreground group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 truncate">
+                      <div className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground flex size-7 shrink-0 items-center justify-center rounded-md transition-colors">
+                        <HugeiconsIcon icon={Search01Icon} className="size-3.5" />
+                      </div>
+                      <div className="truncate">
+                        <div className="text-foreground group-hover:text-primary truncate font-semibold">
+                          {item.label}
+                        </div>
+                        {item.sectionTitle && (
+                          <div className="text-muted-foreground/75 truncate text-[11px]">
+                            {item.sectionTitle}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <HugeiconsIcon
+                      icon={ArrowRight01Icon}
+                      className="text-muted-foreground/60 size-3.5 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer de navegación rápida */}
+          <div className="border-border/60 bg-muted/30 text-muted-foreground flex items-center justify-between border-t px-4 py-2 text-[11px]">
+            <span>Navegación Institucional · I.E. Carmelitas</span>
+            <span>Presiona ESC para salir</span>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}

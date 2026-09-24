@@ -29,11 +29,11 @@ export function DashboardLayout({
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       {/* Sidebar estilo sidebar-07 (colapsable a iconos) */}
-      <AppSidebar role={activeRole} user={activeUser} />
+      <AppSidebar role={activeRole} />
 
-      {/* Contenedor del contenido principal con AppHeader integrado */}
+      {/* Contenedor del contenido principal con AppHeader integrado y UserMenu */}
       <SidebarInset className="flex min-h-screen flex-col">
-        <AppHeader />
+        <AppHeader user={activeUser} />
         <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>

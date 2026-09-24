@@ -11,21 +11,25 @@ import {
 } from "@/components/ui/sidebar";
 import { NavInstitution } from "./nav-institution";
 import { NavMain } from "./nav-main";
-import { NavUser, type UserProfileData } from "./nav-user";
+import { SidebarSearch } from "./sidebar-search";
+import { SidebarQuickFooter } from "./sidebar-quick-footer";
 
 export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   role?: UserRole;
-  user?: UserProfileData;
 }
 
-export function AppSidebar({ role = "teacher", user, ...props }: AppSidebarProps) {
+export function AppSidebar({ role = "teacher", ...props }: AppSidebarProps) {
   const sections = React.useMemo(() => getNavigationForRole(role), [role]);
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border/70 border-r" {...props}>
       {/* Cabecera Institucional del Sidebar */}
-      <SidebarHeader className="border-sidebar-border/60 border-b px-3 py-2.5">
+      <SidebarHeader className="border-sidebar-border/60 border-b p-3">
         <NavInstitution />
+        {/* Buscador Integrado en el Sidebar */}
+        <div className="pt-2">
+          <SidebarSearch sections={sections} />
+        </div>
       </SidebarHeader>
 
       {/* Contenido Dinámico de Rutas agrupadas por Rol */}
@@ -33,9 +37,9 @@ export function AppSidebar({ role = "teacher", user, ...props }: AppSidebarProps
         <NavMain sections={sections} />
       </SidebarContent>
 
-      {/* Pie de página con Perfil y Dropdown de Usuario */}
-      <SidebarFooter className="border-sidebar-border/60 border-t px-3 py-2.5">
-        <NavUser user={user} />
+      {/* Pie de página con Soporte y Mesa de Ayuda */}
+      <SidebarFooter className="border-sidebar-border/60 border-t p-2.5">
+        <SidebarQuickFooter />
       </SidebarFooter>
 
       {/* Riel colapsable interactivo */}

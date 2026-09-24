@@ -93,11 +93,11 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
                     : "text-muted-foreground/80 group-hover:text-foreground",
                 )}
               />
-              <span className="truncate">{item.label}</span>
+              <span className="min-w-0 flex-1 truncate">{item.label}</span>
               {item.badge && <RenderNavBadge badge={item.badge} />}
               <HugeiconsIcon
                 icon={ChevronRightIcon}
-                className="ml-auto size-4 opacity-60 transition-transform duration-200 group-hover:opacity-100 group-data-[state=open]/collapsible:rotate-90"
+                className="ml-1.5 size-4 shrink-0 opacity-60 transition-transform duration-200 group-hover:opacity-100 group-data-[state=open]/collapsible:rotate-90"
               />
             </SidebarMenuButton>
           </CollapsibleTrigger>
@@ -158,7 +158,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
             "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary font-semibold shadow-2xs",
         )}
       >
-        <Link href={item.link} className="flex items-center gap-2.5">
+        <Link href={item.link} className="flex w-full items-center gap-2.5">
           {/* Pequeña barra indicadora activa a la izquierda */}
           {isActive && (
             <span className="bg-primary absolute top-2 bottom-2 -left-1 w-1 rounded-r-full" />
@@ -170,7 +170,7 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
               isActive ? "text-primary" : "text-muted-foreground/80 group-hover:text-foreground",
             )}
           />
-          <span className="truncate">{item.label}</span>
+          <span className="min-w-0 flex-1 truncate">{item.label}</span>
           {item.badge && <RenderNavBadge badge={item.badge} />}
         </Link>
       </SidebarMenuButton>
