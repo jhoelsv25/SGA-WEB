@@ -1,12 +1,8 @@
 "use client";
 
-import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, type LoginFormValues } from "../../schemas/login.schema";
-import { useLoginMutation } from "../../hooks/use-login-mutation";
+import { useLoginForm } from "../../hooks/use-login-form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -21,75 +17,17 @@ import {
   LogInIcon,
 } from "@hugeicons/core-free-icons";
 
-function getInitialLoginValues(): LoginFormValues {
-  if (typeof window !== "undefined") {
-    try {
-      const saved = localStorage.getItem("sga_remembered_username");
-      if (saved) {
-        return {
-          username: saved,
-          password: "",
-          rememberUser: true,
-        };
-      }
-    } catch {
-      // Ignorar en entornos de almacenamiento restringido
-    }
-  }
-  return {
-    username: "",
-    password: "",
-    rememberUser: false,
-  };
-}
-
 export function LoginForm() {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const initialValues = React.useMemo(() => getInitialLoginValues(), []);
-  const [rememberUser, setRememberUser] = React.useState(initialValues.rememberUser);
-
-  const loginMutation = useLoginMutation();
-
   const {
     register,
-    handleSubmit,
-    setValue,
-    setError,
-    formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: initialValues,
-  });
-
-  const onSubmit = (values: LoginFormValues) => {
-    if (values.rememberUser) {
-      localStorage.setItem("sga_remembered_username", values.username);
-    } else {
-      localStorage.removeItem("sga_remembered_username");
-    }
-
-    loginMutation.mutate(
-      {
-        username: values.username,
-        password: values.password,
-        rememberMe: values.rememberUser,
-      },
-      {
-        onError: (err) => {
-          if (err.errors) {
-            Object.entries(err.errors).forEach(([field, messages]) => {
-              setError(field as keyof LoginFormValues, {
-                type: "manual",
-                message: messages[0],
-              });
-            });
-          }
-        },
-      },
-    );
-  };
-
-  const isSubmitting = loginMutation.isPending;
+    onSubmit,
+    errors,
+    isSubmitting,
+    showPassword,
+    toggleShowPassword,
+    rememberUser,
+    handleRememberUserChange,
+  } = useLoginForm();
 
   return (
     <div className="bg-background relative flex min-h-screen w-full flex-col justify-between px-6 py-8 sm:px-12 lg:px-16">
@@ -130,7 +68,7 @@ export function LoginForm() {
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4" noValidate>
           {/* Campo Usuario */}
           <div className="space-y-1.5">
             <Label htmlFor="username" className="text-foreground text-xs font-semibold">
@@ -181,7 +119,7 @@ export function LoginForm() {
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={toggleShowPassword}
                 className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3.5 -translate-y-1/2 p-0.5 focus:outline-hidden"
                 aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
               >
@@ -204,11 +142,7 @@ export function LoginForm() {
               <Checkbox
                 id="rememberUser"
                 checked={rememberUser}
-                onCheckedChange={(checked) => {
-                  const val = !!checked;
-                  setValue("rememberUser", val);
-                  setRememberUser(val);
-                }}
+                onCheckedChange={handleRememberUserChange}
               />
               <Label
                 htmlFor="rememberUser"

@@ -1,13 +1,9 @@
 "use client";
 
-import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { recoverSchema, type RecoverFormValues } from "../../schemas/recover.schema";
-import { useRecoverPasswordMutation } from "../../hooks/use-recover-password-mutation";
+import { Controller } from "react-hook-form";
+import { useRecoverForm } from "../../hooks/use-recover-form";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/common/date-picker";
@@ -22,54 +18,8 @@ import {
 } from "@hugeicons/core-free-icons";
 
 export function RecoverForm() {
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
-
-  const recoverMutation = useRecoverPasswordMutation();
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    setError,
-    formState: { errors },
-  } = useForm<RecoverFormValues>({
-    resolver: zodResolver(recoverSchema),
-    defaultValues: {
-      username: "",
-    },
-  });
-
-  const onSubmit = (values: RecoverFormValues) => {
-    setSuccessMessage(null);
-    const birthdateStr = format(values.birthdate, "yyyy-MM-dd");
-
-    recoverMutation.mutate(
-      {
-        username: values.username,
-        birthdate: birthdateStr,
-      },
-      {
-        onSuccess: (res) => {
-          setSuccessMessage(
-            res.message ||
-              "Solicitud enviada exitosamente. Sigue el flujo definido por la institución educativa para continuar.",
-          );
-        },
-        onError: (err) => {
-          if (err.errors) {
-            Object.entries(err.errors).forEach(([field, messages]) => {
-              setError(field as keyof RecoverFormValues, {
-                type: "manual",
-                message: messages[0],
-              });
-            });
-          }
-        },
-      },
-    );
-  };
-
-  const isSubmitting = recoverMutation.isPending;
+  const { register, control, onSubmit, errors, isSubmitting, successMessage, clearSuccessMessage } =
+    useRecoverForm();
 
   return (
     <div className="bg-background relative flex min-h-screen w-full flex-col justify-between px-6 py-8 sm:px-12 lg:px-16">
@@ -105,36 +55,41 @@ export function RecoverForm() {
               I.E. Carmelitas · Lircay
             </span>
             <h1 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
-              Recuperar contraseña
+              Recuperar acceso
             </h1>
             <p className="text-muted-foreground text-xs">
-              Ingresa tu código o usuario institucional y tu fecha de nacimiento registrada.
+              Valida tu identidad institucional con tu código y fecha de nacimiento.
             </p>
           </div>
         </div>
 
-        {/* Mensaje de Éxito si ya fue enviado */}
+        {/* Estado de Éxito / Instrucciones */}
         {successMessage ? (
-          <div className="space-y-6">
-            <div className="space-y-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 text-center">
-              <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-6" />
-              </div>
-              <h2 className="text-foreground text-sm font-bold">Solicitud Recibida</h2>
+          <div className="border-primary/20 bg-primary/5 space-y-4 rounded-2xl border p-5 text-center shadow-xs">
+            <div className="bg-primary/10 text-primary mx-auto flex size-12 items-center justify-center rounded-full">
+              <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-6" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-foreground text-sm font-bold">Solicitud procesada</h3>
               <p className="text-muted-foreground text-xs leading-relaxed">{successMessage}</p>
             </div>
-
-            <Button asChild className="h-11 w-full rounded-full font-bold">
-              <Link href="/login">Regresar a Iniciar Sesión</Link>
-            </Button>
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                onClick={clearSuccessMessage}
+                className="h-10 w-full rounded-full text-xs font-semibold"
+              >
+                Volver a consultar
+              </Button>
+            </div>
           </div>
         ) : (
           /* Formulario */
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Campo Usuario / Código */}
+          <form onSubmit={onSubmit} className="space-y-4" noValidate>
+            {/* Campo Usuario o Código */}
             <div className="space-y-1.5">
               <Label htmlFor="username" className="text-foreground text-xs font-semibold">
-                Código o Usuario Institucional *
+                Usuario, DNI o Código Modular *
               </Label>
               <div className="relative">
                 <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2">
@@ -145,7 +100,7 @@ export function RecoverForm() {
                   type="text"
                   autoComplete="username"
                   disabled={isSubmitting}
-                  placeholder="Ej: CARM-2026 o DNI"
+                  placeholder="Ej: 74839201 o docente01"
                   {...register("username")}
                   className={`bg-background placeholder:text-muted-foreground/60 focus:ring-primary/30 focus:border-primary h-11 w-full rounded-full border pr-4 pl-10 text-sm transition-all outline-none focus:ring-2 disabled:opacity-50 ${
                     errors.username
@@ -161,21 +116,23 @@ export function RecoverForm() {
               )}
             </div>
 
-            {/* Campo Fecha de Nacimiento */}
-            <div className="flex flex-col space-y-1.5">
+            {/* Campo Fecha de Nacimiento con DatePicker */}
+            <div className="space-y-1.5">
               <Label htmlFor="birthdate" className="text-foreground text-xs font-semibold">
-                Fecha de Nacimiento *
+                Fecha de nacimiento *
               </Label>
               <Controller
-                name="birthdate"
                 control={control}
+                name="birthdate"
                 render={({ field }) => (
                   <DatePicker
                     date={field.value}
                     onSelect={field.onChange}
-                    placeholder="Día / Mes / Año"
                     disabled={isSubmitting}
-                    className="border-input h-11 w-full rounded-full"
+                    placeholder="Selecciona tu fecha de nacimiento"
+                    className={
+                      errors.birthdate ? "border-destructive ring-destructive/20 ring-1" : ""
+                    }
                   />
                 )}
               />
@@ -186,19 +143,16 @@ export function RecoverForm() {
               )}
             </div>
 
-            {/* Alerta de Ayuda */}
-            <div className="bg-muted/60 text-muted-foreground border-border/50 flex items-start gap-2.5 rounded-xl border p-3 text-xs">
-              <HugeiconsIcon
-                icon={HelpCircleIcon}
-                className="text-primary mt-0.5 size-4 shrink-0"
-              />
-              <span>
-                La fecha de nacimiento debe coincidir con la registrada en el sistema de matrícula o
-                legajo institucional.
-              </span>
+            {/* Aviso informativo */}
+            <div className="bg-muted/40 text-muted-foreground flex items-start gap-2.5 rounded-xl p-3 text-xs">
+              <HugeiconsIcon icon={HelpCircleIcon} className="mt-0.5 size-4 shrink-0" />
+              <p className="leading-relaxed">
+                Tu fecha de nacimiento valida tu identidad en el registro institucional. Si tus
+                datos no coinciden, comunícate con la secretaría de la I.E. Carmelitas.
+              </p>
             </div>
 
-            {/* Botón Solicitar */}
+            {/* Botón Solicitar Recuperación */}
             <div className="pt-2">
               <Button
                 type="submit"
@@ -211,26 +165,19 @@ export function RecoverForm() {
                     <span>Verificando datos...</span>
                   </>
                 ) : (
-                  <span>Solicitar recuperación</span>
+                  <span>Recuperar contraseña</span>
                 )}
               </Button>
-            </div>
-
-            <div className="pt-2 text-center">
-              <Link href="/login" className="text-primary text-xs font-semibold hover:underline">
-                ¿Ya recuerdas tus credenciales? Inicia sesión
-              </Link>
             </div>
           </form>
         )}
       </div>
 
-      {/* Pie de página con soporte institucional */}
+      {/* Pie de página */}
       <div className="text-muted-foreground space-y-1 text-center text-xs">
-        <p>¿Necesitas ayuda? Central de soporte: Lunes a Viernes de 8:00am a 5:30pm</p>
+        <p>¿Problemas para acceder? Dirígete a la coordinación académica de la I.E.</p>
         <p className="text-[11px] opacity-75">
-          © {new Date().getFullYear()} I.E. Carmelitas · Lircay, Huancavelica. Todos los derechos
-          reservados.
+          © {new Date().getFullYear()} I.E. Carmelitas · Lircay, Huancavelica.
         </p>
       </div>
     </div>
