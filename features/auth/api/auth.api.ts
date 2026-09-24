@@ -1,13 +1,21 @@
 import { apiClient } from "@/lib/api-client";
-import type { AuthResponse, LoginCredentials } from "../types/auth.types";
+import type { AuthResponse, ForgotPasswordPayload, LoginCredentials } from "../types/auth.types";
 
-export const authService = {
+export const authApi = {
   /**
    * Envía credenciales de autenticación al backend.
    * Las cookies HttpOnly son almacenadas automáticamente por el navegador vía withCredentials.
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const { data } = await apiClient.post<AuthResponse>("/auth/login", credentials);
+    return data;
+  },
+
+  /**
+   * Solicita recuperación de credenciales mediante usuario/código y fecha de nacimiento.
+   */
+  async forgotPassword(payload: ForgotPasswordPayload): Promise<{ message?: string }> {
+    const { data } = await apiClient.post<{ message?: string }>("/auth/forgot-password", payload);
     return data;
   },
 

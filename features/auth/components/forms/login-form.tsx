@@ -3,13 +3,10 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormValues } from "../../schemas/login.schema";
-import { authService } from "../../services/auth.service";
-import { ApiClientError } from "@/lib/api-client";
-import { toast } from "@/lib/toast";
+import { useLoginMutation } from "../../hooks/use-login-mutation";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -47,58 +44,52 @@ function getInitialLoginValues(): LoginFormValues {
 }
 
 export function LoginForm() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = React.useState(false);
-
   const initialValues = React.useMemo(() => getInitialLoginValues(), []);
   const [rememberUser, setRememberUser] = React.useState(initialValues.rememberUser);
+
+  const loginMutation = useLoginMutation();
 
   const {
     register,
     handleSubmit,
     setValue,
     setError,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: initialValues,
   });
 
-  const onSubmit = async (values: LoginFormValues) => {
-    try {
-      if (values.rememberUser) {
-        localStorage.setItem("sga_remembered_username", values.username);
-      } else {
-        localStorage.removeItem("sga_remembered_username");
-      }
+  const onSubmit = (values: LoginFormValues) => {
+    if (values.rememberUser) {
+      localStorage.setItem("sga_remembered_username", values.username);
+    } else {
+      localStorage.removeItem("sga_remembered_username");
+    }
 
-      const response = await authService.login({
+    loginMutation.mutate(
+      {
         username: values.username,
         password: values.password,
         rememberMe: values.rememberUser,
-      });
-
-      toast.success(response.message || "Bienvenido al sistema");
-
-      // Redirección al panel del dashboard
-      router.push("/dashboard");
-      router.refresh();
-    } catch (err: unknown) {
-      if (err instanceof ApiClientError) {
-        if (err.errors) {
-          Object.entries(err.errors).forEach(([field, messages]) => {
-            setError(field as keyof LoginFormValues, {
-              type: "manual",
-              message: messages[0],
+      },
+      {
+        onError: (err) => {
+          if (err.errors) {
+            Object.entries(err.errors).forEach(([field, messages]) => {
+              setError(field as keyof LoginFormValues, {
+                type: "manual",
+                message: messages[0],
+              });
             });
-          });
-        }
-        toast.error(err.message || "Credenciales incorrectas");
-      } else {
-        toast.error("Ocurrió un error inesperado al conectar con el servidor.");
-      }
-    }
+          }
+        },
+      },
+    );
   };
+
+  const isSubmitting = loginMutation.isPending;
 
   return (
     <div className="bg-background relative flex min-h-screen w-full flex-col justify-between px-6 py-8 sm:px-12 lg:px-16">
@@ -143,7 +134,7 @@ export function LoginForm() {
           {/* Campo Usuario */}
           <div className="space-y-1.5">
             <Label htmlFor="username" className="text-foreground text-xs font-semibold">
-              Usuario *
+              Usuario o Código *
             </Label>
             <div className="relative">
               <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2">
@@ -228,7 +219,7 @@ export function LoginForm() {
             </div>
 
             <Link
-              href="/auth/forgot-password"
+              href="/recover"
               className="text-foreground/80 decoration-muted-foreground/40 hover:text-primary text-xs font-medium underline underline-offset-4 transition-colors"
             >
               He olvidado mi contraseña

@@ -4,6 +4,11 @@ export interface LoginCredentials {
   rememberMe?: boolean;
 }
 
+export interface ForgotPasswordPayload {
+  username: string;
+  birthdate: string; // formato YYYY-MM-DD
+}
+
 export interface CurrentUser {
   id: string;
   username: string;

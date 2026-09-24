@@ -7,6 +7,18 @@ const nextConfig: NextConfig = {
         source: "/auth/login",
         destination: "/login",
       },
+      {
+        source: "/auth/recover",
+        destination: "/recover",
+      },
+      {
+        source: "/auth/forgot-password",
+        destination: "/recover",
+      },
+      {
+        source: "/forgot-password",
+        destination: "/recover",
+      },
     ];
   },
 };
