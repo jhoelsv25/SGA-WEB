@@ -1,6 +1,5 @@
 import * as React from "react";
-import { PortalNavbar } from "./components/portal-navbar";
-import { PortalFooter } from "./components/portal-footer";
+import { PortalNavbar, PortalFooter } from "@/features/portal";
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -5,14 +5,16 @@ import Link from "next/link";
 import { Brand } from "@/components/common/brand";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { siteConfig } from "@/config";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { LogInIcon, Time02Icon, Menu01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 
 const NAV_LINKS = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Módulos de Acceso", href: "#modulos" },
-  { label: "Características", href: "#caracteristicas" },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Inicio", href: "/#inicio" },
+  { label: "Módulos", href: "/#modulos" },
+  { label: "Características", href: "/#caracteristicas" },
+  { label: "Normativa y Privacidad", href: siteConfig.routes.privacy },
+  { label: "Contacto", href: "/#contacto" },
 ];
 
 export function PortalNavbar() {
@@ -40,7 +42,7 @@ export function PortalNavbar() {
         <Brand
           href="/"
           size="md"
-          title="SGA"
+          title={siteConfig.acronym}
           subtitle="Portal Institucional"
           className="hover:opacity-95"
         />
@@ -48,9 +50,9 @@ export function PortalNavbar() {
         {/* Desktop Navigation Links */}
         <nav className="text-muted-foreground hidden items-center gap-6 text-sm font-medium md:flex">
           {NAV_LINKS.map((link) => (
-            <a key={link.href} href={link.href} className="hover:text-primary transition-colors">
+            <Link key={link.href} href={link.href} className="hover:text-primary transition-colors">
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -71,7 +73,7 @@ export function PortalNavbar() {
           </Button>
 
           <Button asChild size="sm" className="gap-2 font-semibold shadow-xs">
-            <Link href="/login">
+            <Link href={siteConfig.routes.login}>
               <HugeiconsIcon icon={LogInIcon} className="size-4" />
               <span>Iniciar Sesión</span>
             </Link>
@@ -97,14 +99,14 @@ export function PortalNavbar() {
         <div className="border-border bg-background/95 animate-in slide-in-from-top-2 border-b px-4 py-5 backdrop-blur-md duration-200 md:hidden">
           <div className="flex flex-col space-y-3">
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-foreground hover:bg-muted rounded-lg px-3 py-2 text-base font-medium"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className="border-border flex flex-col gap-2.5 border-t pt-3">
               <Button
@@ -123,7 +125,7 @@ export function PortalNavbar() {
                 className="w-full justify-center gap-2 font-semibold"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Link href="/login">
+                <Link href={siteConfig.routes.login}>
                   <HugeiconsIcon icon={LogInIcon} className="size-4" />
                   <span>Iniciar Sesión</span>
                 </Link>
