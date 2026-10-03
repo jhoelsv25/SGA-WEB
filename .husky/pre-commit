@@ -1,1 +1,6 @@
-bunx lint-staged
+# En Git de Windows (SourceTree) bun no existe: se omite lint-staged en vez de bloquear el commit
+if command -v bun >/dev/null 2>&1; then
+  bunx lint-staged
+else
+  echo "husky: bun no encontrado, se omite lint-staged (ejecuta 'bun run lint' desde WSL)"
+fi
