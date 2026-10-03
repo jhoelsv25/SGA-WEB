@@ -65,7 +65,7 @@ export function AnnouncementModal() {
       aria-modal="true"
       aria-labelledby="announcement-title"
       aria-describedby="announcement-desc"
-      className={`fixed inset-0 z-[999] flex items-center justify-center p-4 transition-all duration-300 sm:p-6 ${
+      className={`fixed inset-0 z-999 flex items-center justify-center p-4 transition-all duration-300 sm:p-6 ${
         isClosing ? "opacity-0" : "opacity-100"
       }`}
     >
