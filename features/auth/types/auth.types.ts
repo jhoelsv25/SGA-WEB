@@ -9,6 +9,11 @@ export interface ForgotPasswordPayload {
   birthdate: string; // formato YYYY-MM-DD
 }
 
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface CurrentUser {
   id: string;
   username: string;
@@ -19,6 +24,7 @@ export interface CurrentUser {
   institutionId?: string;
   institutionName?: string;
   avatarUrl?: string;
+  mustChangePassword?: boolean;
 }
 
 export interface AuthModule {

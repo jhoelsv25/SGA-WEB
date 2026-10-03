@@ -59,6 +59,7 @@ export const siteConfig = {
     home: "/",
     login: "/login",
     recover: "/recover",
+    changePassword: "/change-password",
     dashboard: "/dashboard",
     terms: "/terms",
     privacy: "/privacy",

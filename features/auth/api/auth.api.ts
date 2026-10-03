@@ -1,5 +1,10 @@
 import { apiClient, handleApiError } from "@/lib/api-client";
-import type { AuthResponse, ForgotPasswordPayload, LoginCredentials } from "../types/auth.types";
+import type {
+  AuthResponse,
+  ChangePasswordPayload,
+  ForgotPasswordPayload,
+  LoginCredentials,
+} from "../types/auth.types";
 
 export const authApi = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -20,6 +25,15 @@ export const authApi = {
         error,
         "No se pudo procesar la solicitud. Verifica el usuario y tu fecha de nacimiento.",
       );
+    }
+  },
+
+  async changePassword(payload: ChangePasswordPayload): Promise<{ message?: string }> {
+    try {
+      const { data } = await apiClient.post<{ message?: string }>("/auth/change-password", payload);
+      return data;
+    } catch (error) {
+      handleApiError(error, "No se pudo actualizar la contraseña. Verifica los datos ingresados.");
     }
   },
 

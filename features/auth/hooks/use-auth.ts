@@ -3,7 +3,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { authApi } from "../api/auth.api";
-import type { LoginCredentials, AuthResponse, ForgotPasswordPayload } from "../types/auth.types";
+import type {
+  AuthResponse,
+  ChangePasswordPayload,
+  ForgotPasswordPayload,
+  LoginCredentials,
+} from "../types/auth.types";
 import type { ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
 
@@ -16,6 +21,7 @@ export interface UseLoginOptions {
 /**
  * Hook para inicio de sesión institucional.
  * Expone la mutación con mutate, isPending, y error real del servidor.
+ * Redirige a /change-password si la cuenta requiere cambio obligatorio.
  */
 export function useLogin(options?: UseLoginOptions) {
   const router = useRouter();
@@ -28,7 +34,15 @@ export function useLogin(options?: UseLoginOptions) {
       options?.onSuccess?.(data);
       toast.success(data.message || "Bienvenido al sistema");
       queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
-      router.push(options?.redirectTo || "/dashboard");
+
+      if (data.user?.mustChangePassword) {
+        toast.info(
+          "Por seguridad institucional, debes actualizar tu contraseña antes de continuar.",
+        );
+        router.push("/change-password");
+      } else {
+        router.push(options?.redirectTo || "/dashboard");
+      }
       router.refresh();
     },
     onError: (error) => {
@@ -56,6 +70,37 @@ export function useRecover(options?: UseRecoverOptions) {
       toast.success(
         data.message || "Solicitud procesada. Revisa las instrucciones de tu institución.",
       );
+    },
+    onError: (error) => {
+      options?.onError?.(error);
+      toast.error(error.message);
+    },
+  });
+}
+
+export interface UseChangePasswordOptions {
+  onSuccess?: (data: { message?: string }) => void;
+  onError?: (error: ApiClientError) => void;
+  redirectTo?: string;
+}
+
+/**
+ * Hook para cambio de contraseña institucional (HU2).
+ * Guarda la nueva clave, desmarca la obligatoriedad y revoca demás sesiones.
+ */
+export function useChangePassword(options?: UseChangePasswordOptions) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  return useMutation<{ message?: string }, ApiClientError, ChangePasswordPayload>({
+    mutationKey: ["auth", "change-password"],
+    mutationFn: (payload) => authApi.changePassword(payload),
+    onSuccess: (data) => {
+      options?.onSuccess?.(data);
+      toast.success(data.message || "Contraseña actualizada exitosamente.");
+      queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
+      router.push(options?.redirectTo || "/dashboard");
+      router.refresh();
     },
     onError: (error) => {
       options?.onError?.(error);
