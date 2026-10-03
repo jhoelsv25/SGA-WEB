@@ -5,5 +5,6 @@ export * from "./components/sections/modules-section";
 export * from "./components/sections/features-section";
 export * from "./components/sections/faq-section";
 export * from "./components/sections/cta-section";
+export * from "./components/sections/announcement-modal";
 export * from "./components/legal/privacy-content";
 export * from "./components/legal/terms-content";
