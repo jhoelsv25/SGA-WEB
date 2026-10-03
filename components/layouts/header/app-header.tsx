@@ -183,7 +183,7 @@ function HeaderMonitoringPopover() {
 
         {/* Footer del Popover con enlace */}
         <div className="bg-muted/20 border-border/50 flex items-center justify-between border-t px-3.5 py-2.5">
-          <span className="text-muted-foreground text-[10.5px]">I.E. Carmelitas · 2026</span>
+          <span className="text-muted-foreground text-[10.5px]">I.E. Carmelinas · 2026</span>
           <Link
             href="/dashboard/principal/analytics"
             className="text-primary inline-flex items-center gap-1 text-[11px] font-semibold hover:underline"

@@ -5,10 +5,10 @@ import { DashboardLayout, DashboardRoleProvider } from "@/components/layouts";
 export const metadata: Metadata = {
   title: {
     default: "Panel Principal",
-    template: "%s | SGA Carmelitas",
+    template: "%s | SGA Carmelinas",
   },
   description:
-    "Panel de Control y Gestión Académica de la Institución Educativa Carmelitas de Lircay, Huancavelica.",
+    "Panel de Control y Gestión Académica de la Institución Educativa Carmelinas de Lircay, Huancavelica.",
   robots: {
     index: false,
     follow: false,

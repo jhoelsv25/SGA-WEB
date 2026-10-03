@@ -26,7 +26,6 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [query, setQuery] = React.useState("");
 
-  // Aplanar todos los items y subitems para búsqueda instantánea
   const allItems = React.useMemo(() => {
     const list: Array<NavItem & { sectionTitle?: string }> = [];
 
@@ -84,7 +83,6 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
 
   return (
     <>
-      {/* Botón trigger en el Sidebar moderno y estilizado */}
       <button
         type="button"
         onClick={() => setOpenDialog(true)}
@@ -147,7 +145,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
           </div>
 
           {/* Resultados de la búsqueda */}
-          <div className="max-h-[320px] overflow-y-auto p-2">
+          <div className="max-h-80 overflow-y-auto p-2">
             {filteredItems.length === 0 ? (
               <div className="text-muted-foreground py-8 text-center text-sm">
                 No se encontraron módulos con &ldquo;{query}&rdquo;
@@ -189,7 +187,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
 
           {/* Footer de navegación rápida */}
           <div className="border-border/60 bg-muted/30 text-muted-foreground flex items-center justify-between border-t px-4 py-2 text-[11px]">
-            <span>Navegación Institucional · I.E. Carmelitas</span>
+            <span>Navegación Institucional · I.E. Carmelinas</span>
             <span>Presiona ESC para salir</span>
           </div>
         </DialogContent>

@@ -30,7 +30,7 @@ export interface HeaderUserMenuProps {
 
 const DEFAULT_USER: UserProfileData = {
   name: "Usuario Institucional",
-  email: "usuario@carmelitas.edu.pe",
+  email: "usuario@carmelinas.edu.pe",
   roleLabel: "Docente / Directivo",
 };
 
@@ -60,10 +60,10 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
           </Avatar>
 
           <div className="hidden text-left leading-none md:flex md:flex-col">
-            <span className="text-foreground max-w-[120px] truncate text-[12.5px] font-semibold lg:max-w-[150px]">
+            <span className="text-foreground max-w-30 truncate text-[12.5px] font-semibold lg:max-w-38">
               {user.name}
             </span>
-            <span className="text-muted-foreground/90 max-w-[120px] truncate text-[10.5px] font-medium lg:max-w-[150px]">
+            <span className="text-muted-foreground/90 max-w-30 truncate text-[10.5px] font-medium lg:max-w-38">
               {user.roleLabel || user.email}
             </span>
           </div>
@@ -101,7 +101,7 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
 
         <div className="bg-muted/50 text-muted-foreground/90 my-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px]">
           <HugeiconsIcon icon={School01Icon} className="text-primary size-3.5 shrink-0" />
-          <span className="truncate font-semibold">I.E. Carmelitas · Lircay</span>
+          <span className="truncate font-semibold">I.E. Carmelinas · Lircay</span>
         </div>
 
         <DropdownMenuGroup className="space-y-0.5">

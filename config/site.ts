@@ -6,17 +6,17 @@
 export const siteConfig = {
   // Identidad del Sistema
   name: "SGA · Sistema de Gestión Académica",
-  shortName: "SGA Carmelitas",
+  shortName: "SGA Carmelinas",
   acronym: "SGA",
   description:
-    "Plataforma integral de gestión pedagógica, control escolar, asistencia, calificaciones y comunicación de la Institución Educativa Carmelitas de Lircay, Huancavelica.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://sga.carmelitas.edu.pe",
+    "Plataforma integral de gestión pedagógica, control escolar, asistencia, calificaciones y comunicación de la Institución Educativa Carmelinas de Lircay, Huancavelica.",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://sga.carmelinas.edu.pe",
 
   // Datos Institucionales de la Entidad
   institution: {
-    name: "Institución Educativa Carmelitas",
-    shortName: "I.E. Carmelitas",
-    badge: "I.E. Carmelitas · Lircay",
+    name: "Institución Educativa Carmelinas",
+    shortName: "I.E. Carmelinas",
+    badge: "I.E. Carmelinas · Lircay",
     motto: "Excelencia en la Gestión Educativa y Formación Integral",
     modularCode: "0342918", // Código modular de referencia
     address: "Jr. Los Estudiantes s/n, Lircay, Angaraes, Huancavelica, Perú",
@@ -35,8 +35,8 @@ export const siteConfig = {
     contact: {
       phone: "+51 967 123 456",
       supportPhone: "(067) 456-789",
-      email: "contacto@carmelitas.edu.pe",
-      supportEmail: "soporte@carmelitas.edu.pe",
+      email: "contacto@carmelinas.edu.pe",
+      supportEmail: "soporte@carmelinas.edu.pe",
       schedule: "Lunes a Viernes de 8:00am a 5:30pm",
     },
   },
@@ -59,6 +59,7 @@ export const siteConfig = {
     home: "/",
     login: "/login",
     recover: "/recover",
+    changePassword: "/change-password",
     dashboard: "/dashboard",
     terms: "/terms",
     privacy: "/privacy",
@@ -68,11 +69,11 @@ export const siteConfig = {
   seo: {
     keywords: [
       "SGA",
-      "I.E. Carmelitas",
-      "Carmelitas Lircay",
+      "I.E. Carmelinas",
+      "Carmelinas Lircay",
       "Sistema de Gestión Académica",
       "Control Escolar Lircay",
-      "Colegio Carmelitas Huancavelica",
+      "Colegio Carmelinas Huancavelica",
       "Intranet Escolar",
       "Asistencia y Calificaciones",
       "Educación Lircay Angaraes",

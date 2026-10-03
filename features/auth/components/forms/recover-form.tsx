@@ -149,7 +149,7 @@ export function RecoverForm() {
         <HugeiconsIcon icon={HelpCircleIcon} className="mt-0.5 size-4 shrink-0" />
         <p className="leading-relaxed">
           Tu fecha de nacimiento valida tu identidad en el registro institucional. Si tus datos no
-          coinciden, comunícate con la secretaría de la I.E. Carmelitas.
+          coinciden, comunícate con la secretaría de la I.E. Carmelinas.
         </p>
       </div>
 
