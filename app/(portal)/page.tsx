@@ -1,7 +1,13 @@
 import * as React from "react";
 import type { Metadata } from "next";
 import { siteConfig } from "@/config";
-import { HeroSection, ModulesSection, FeaturesSection, CtaSection } from "@/features/portal";
+import {
+  HeroSection,
+  ModulesSection,
+  FeaturesSection,
+  FaqSection,
+  CtaSection,
+} from "@/features/portal";
 
 export const metadata: Metadata = {
   title: `Portal Institucional · ${siteConfig.institution.shortName}`,
@@ -33,6 +39,7 @@ export default function PortalPage() {
       <HeroSection />
       <ModulesSection />
       <FeaturesSection />
+      <FaqSection />
       <CtaSection />
     </div>
   );
