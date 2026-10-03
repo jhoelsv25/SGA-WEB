@@ -60,10 +60,10 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
           </Avatar>
 
           <div className="hidden text-left leading-none md:flex md:flex-col">
-            <span className="text-foreground max-w-[120px] truncate text-[12.5px] font-semibold lg:max-w-[150px]">
+            <span className="text-foreground max-w-30 truncate text-[12.5px] font-semibold lg:max-w-38">
               {user.name}
             </span>
-            <span className="text-muted-foreground/90 max-w-[120px] truncate text-[10.5px] font-medium lg:max-w-[150px]">
+            <span className="text-muted-foreground/90 max-w-30 truncate text-[10.5px] font-medium lg:max-w-38">
               {user.roleLabel || user.email}
             </span>
           </div>
