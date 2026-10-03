@@ -18,7 +18,7 @@ export function HeroSection() {
   return (
     <section className="border-border from-background via-muted/30 to-background relative overflow-hidden border-b bg-linear-to-b py-16 sm:py-24 lg:py-28">
       {/* Luces y resplandores de fondo */}
-      <div className="bg-primary/10 pointer-events-none absolute -top-32 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-3xl" />
+      <div className="bg-primary/10 pointer-events-none absolute -top-32 left-1/2 -z-10 h-125 w-125 -translate-x-1/2 rounded-full blur-3xl" />
       <div className="bg-primary/5 pointer-events-none absolute top-1/3 -right-24 -z-10 h-80 w-80 rounded-full blur-3xl" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -116,7 +116,7 @@ export function HeroSection() {
                     <span className="size-3 rounded-full bg-emerald-500/80" />
                   </div>
                   <span className="text-muted-foreground font-mono text-[11px] font-medium">
-                    sga.carmelitas.edu.pe
+                    sga.carmelinas.edu.pe
                   </span>
                   <div className="text-primary flex items-center gap-1 text-[10px] font-semibold">
                     <span className="size-2 animate-pulse rounded-full bg-emerald-500" />

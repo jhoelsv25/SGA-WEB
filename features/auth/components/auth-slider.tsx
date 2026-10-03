@@ -22,7 +22,7 @@ const SLIDES: SlideData[] = [
     tagline: "Formación Integral y Valores",
     prefix: "Bienvenido a",
     highlight: "I.E.",
-    title: "Carmelitas",
+    title: "Carmelinas",
     description:
       "Institución emblemática comprometida con la excelencia pedagógica, la disciplina y el futuro de nuestros estudiantes en Lircay, Huancavelica.",
     badge: "Lircay · Angaraes · Huancavelica",
@@ -117,12 +117,12 @@ export function AuthSlider() {
       {/* Composición Artística 3D con Pétalos y Ondas de Seda Carmesí */}
       <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
         {/* Glow cálido ambiental */}
-        <div className="bg-primary/20 dark:bg-primary/30 absolute -bottom-24 -left-24 size-[520px] rounded-full blur-3xl" />
+        <div className="bg-primary/20 dark:bg-primary/30 absolute -bottom-24 -left-24 size-130 rounded-full blur-3xl" />
         <div className="absolute top-1/3 -right-20 size-80 rounded-full bg-amber-500/10 blur-2xl" />
 
         {/* Formas orgánicas de ondas fluidas (Carmesí / Seda 3D) */}
         <motion.svg
-          className="absolute -right-16 -bottom-16 h-[85%] w-[110%] max-w-none opacity-90 sm:h-[90%] sm:w-[100%]"
+          className="absolute -right-16 -bottom-16 h-[85%] w-[110%] max-w-none opacity-90 sm:h-[90%] sm:w-full"
           viewBox="0 0 800 700"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

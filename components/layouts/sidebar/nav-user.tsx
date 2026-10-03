@@ -41,7 +41,7 @@ export interface NavUserProps {
 
 const DEFAULT_USER: UserProfileData = {
   name: "Usuario Institucional",
-  email: "usuario@carmelitas.edu.pe",
+  email: "usuario@carmelinas.edu.pe",
   roleLabel: "Docente / Directivo",
 };
 

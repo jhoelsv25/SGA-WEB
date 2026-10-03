@@ -7,27 +7,27 @@ import type { UserProfileData } from "./sidebar/nav-user";
 export const ROLE_PROFILES: Record<UserRole, UserProfileData> = {
   teacher: {
     name: "Prof. Juan Carlos Pérez",
-    email: "jperez@carmelitas.edu.pe",
+    email: "jperez@carmelinas.edu.pe",
     roleLabel: "Docente de Matemática y C.T.",
   },
   student: {
     name: "Alexia Ramos Quispe",
-    email: "aramos@carmelitas.edu.pe",
+    email: "aramos@carmelinas.edu.pe",
     roleLabel: "Estudiante · 4° de Secundaria",
   },
   principal: {
     name: "Mg. Carmen Rosa Huamán",
-    email: "chuaman@carmelitas.edu.pe",
+    email: "chuaman@carmelinas.edu.pe",
     roleLabel: "Directora General I.E.",
   },
   director: {
     name: "Mg. Carmen Rosa Huamán",
-    email: "chuaman@carmelitas.edu.pe",
+    email: "chuaman@carmelinas.edu.pe",
     roleLabel: "Directora General I.E.",
   },
   admin: {
     name: "Ing. Roberto Alarcón",
-    email: "admin@carmelitas.edu.pe",
+    email: "admin@carmelinas.edu.pe",
     roleLabel: "Administrador de Sistemas SGA",
   },
   parent: {
