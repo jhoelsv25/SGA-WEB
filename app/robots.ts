@@ -6,12 +6,18 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: [siteConfig.routes.home, siteConfig.routes.login],
+        allow: [
+          siteConfig.routes.home,
+          siteConfig.routes.login,
+          siteConfig.routes.privacy,
+          siteConfig.routes.terms,
+        ],
         disallow: [
           "/api/",
           `${siteConfig.routes.dashboard}/`,
           "/admin/",
           siteConfig.routes.recover,
+          siteConfig.routes.changePassword,
         ],
       },
     ],

@@ -10,6 +10,16 @@ import { ArrowLeft01Icon, Calendar03Icon, Shield01Icon } from "@hugeicons/core-f
 export const metadata: Metadata = {
   title: "Políticas de Privacidad y Protección de Datos",
   description: `Políticas institucionales de privacidad y protección de datos personales escolares de la ${siteConfig.institution.name} conforme a la Ley N° 29733.`,
+  keywords: [
+    "política de privacidad",
+    "protección de datos personales",
+    "ley 29733 perú",
+    "privacidad escolar",
+    "derechos arco",
+    siteConfig.institution.name,
+    siteConfig.institution.shortName,
+    ...siteConfig.seo.keywords,
+  ],
   alternates: {
     canonical: siteConfig.routes.privacy,
   },
@@ -20,6 +30,20 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     locale: siteConfig.seo.locale,
     type: "website",
+    images: [
+      {
+        url: siteConfig.branding.logo,
+        width: 800,
+        height: 600,
+        alt: `Políticas de Privacidad - ${siteConfig.institution.name}`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: `Políticas de Privacidad · ${siteConfig.acronym}`,
+    description: `Tratamiento seguro de datos escolares en ${siteConfig.institution.shortName}.`,
+    images: [siteConfig.branding.logo],
   },
   robots: {
     index: true,

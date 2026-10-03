@@ -10,6 +10,16 @@ import { ArrowLeft01Icon, Calendar03Icon, FileCheckIcon } from "@hugeicons/core-
 export const metadata: Metadata = {
   title: "Términos y Condiciones de Uso",
   description: `Términos y condiciones oficiales para el acceso y uso del ${siteConfig.name} en la ${siteConfig.institution.name}.`,
+  keywords: [
+    "términos y condiciones",
+    "reglamento interno escolar",
+    "normativa sga",
+    "condiciones de uso",
+    "seguridad académica",
+    siteConfig.institution.name,
+    siteConfig.institution.shortName,
+    ...siteConfig.seo.keywords,
+  ],
   alternates: {
     canonical: siteConfig.routes.terms,
   },
@@ -20,6 +30,20 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     locale: siteConfig.seo.locale,
     type: "website",
+    images: [
+      {
+        url: siteConfig.branding.logo,
+        width: 800,
+        height: 600,
+        alt: `Términos y Condiciones - ${siteConfig.institution.name}`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: `Términos y Condiciones · ${siteConfig.acronym}`,
+    description: `Condiciones de uso de la plataforma académica institucional de la ${siteConfig.institution.shortName}.`,
+    images: [siteConfig.branding.logo],
   },
   robots: {
     index: true,
