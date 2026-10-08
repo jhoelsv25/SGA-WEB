@@ -92,7 +92,7 @@ export function TableRowActions<TStatus extends string = string>({
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground/70 hover:border-border/60 hover:bg-muted/80 hover:text-foreground focus-visible:ring-ring data-[state=open]:bg-muted data-[state=open]:text-foreground size-8 rounded-lg transition-all duration-150 focus-visible:ring-1"
+              className="text-muted-foreground/70 hover:border-border/60 hover:bg-muted/80 hover:text-foreground focus-visible:ring-ring data-[state=open]:bg-muted data-[state=open]:text-foreground size-8 rounded-full transition-all duration-150 focus-visible:ring-1"
             >
               <span className="sr-only">{triggerAriaLabel}</span>
               <HugeiconsIcon icon={MoreHorizontalIcon} size={18} strokeWidth={2} />

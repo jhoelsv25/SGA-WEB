@@ -104,20 +104,20 @@ export function DataTable<TData, TValue>({
         </div>
       )}
 
-      <div className="border-border/50 bg-card shadow-primary/5 ring-primary/5 w-full max-w-full min-w-0 overflow-hidden rounded-3xl shadow-lg ring-1 backdrop-blur-xs transition-all">
+      <div className="border-border/80 bg-card w-full max-w-full min-w-0 overflow-hidden rounded-2xl border shadow-xs transition-all">
         <div className="max-w-full overflow-x-auto">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/40 border-border/70 border-b">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
                   {headerGroup.headers.map((header) => {
                     const isActions = header.column.id === "actions";
                     return (
                       <TableHead
                         key={header.id}
                         className={cn(
-                          isActions &&
-                            "bg-card/95 sticky right-0 z-10 w-14 pr-5 text-right shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.08)] backdrop-blur-sm",
+                          "text-muted-foreground h-11 px-4 text-left align-middle text-xs font-semibold",
+                          isActions && "bg-muted/40 sticky right-0 z-10 w-14 px-4 text-right",
                         )}
                       >
                         {header.isPlaceholder
@@ -133,13 +133,19 @@ export function DataTable<TData, TValue>({
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={`loading-row-${index}`}>
+                  <TableRow
+                    key={`loading-row-${index}`}
+                    className="border-border/40 border-b last:border-b-0"
+                  >
                     {columns.map((col, colIndex) => {
                       const isActions = (col as { id?: string }).id === "actions";
                       return (
                         <TableCell
                           key={`loading-cell-${colIndex}`}
-                          className={cn(isActions && "bg-card sticky right-0 w-14 pr-5 text-right")}
+                          className={cn(
+                            "px-4 py-3.5",
+                            isActions && "bg-card sticky right-0 w-14 px-4 text-right",
+                          )}
                         >
                           <div className="flex items-center gap-2.5 py-1">
                             <Skeleton
@@ -157,7 +163,7 @@ export function DataTable<TData, TValue>({
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      className="group"
+                      className="group hover:bg-muted/30 border-border/40 border-b transition-colors last:border-b-0"
                     >
                       {row.getVisibleCells().map((cell) => {
                         const isActions = cell.column.id === "actions";
@@ -165,8 +171,8 @@ export function DataTable<TData, TValue>({
                           <TableCell
                             key={cell.id}
                             className={cn(
-                              isActions &&
-                                "bg-card sticky right-0 z-10 w-14 pr-5 text-right shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.08)]",
+                              "px-4 py-3.5 align-middle text-sm",
+                              isActions && "bg-card sticky right-0 z-10 w-14 px-4 text-right",
                             )}
                           >
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -218,12 +224,12 @@ export function DataTable<TData, TValue>({
         </div>
 
         {cursorPagination ? (
-          <div className="border-border/60 bg-muted/20 border-t px-4 py-1.5">
+          <div className="border-border/70 bg-muted/25 border-t px-4 py-2">
             <DataTableCursorPagination {...cursorPagination} />
           </div>
         ) : (
           isOffsetPaginationActive && (
-            <div className="border-border/60 bg-muted/20 border-t px-4 py-1.5">
+            <div className="border-border/70 bg-muted/25 border-t px-4 py-2">
               <DataTablePagination
                 table={table}
                 pageSizeOptions={paginationOptions.pageSizeOptions}

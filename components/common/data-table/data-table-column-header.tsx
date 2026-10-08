@@ -1,5 +1,4 @@
 import { Column } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowUp01Icon, ArrowDown01Icon, UnfoldMoreIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
@@ -15,28 +14,47 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>;
+    return (
+      <span className={cn("text-muted-foreground text-xs font-semibold", className)}>{title}</span>
+    );
   }
 
   const isSorted = column.getIsSorted();
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="data-[state=open]:bg-accent -ml-3 h-8"
+    <div className={cn("flex items-center", className)}>
+      <button
+        type="button"
         onClick={() => column.toggleSorting(isSorted === "asc")}
+        className={cn(
+          "group text-muted-foreground hover:bg-muted/70 hover:text-foreground -ml-1.5 inline-flex cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-xs font-semibold transition-colors select-none",
+          isSorted && "text-foreground font-bold",
+        )}
       >
         <span>{title}</span>
         {isSorted === "desc" ? (
-          <HugeiconsIcon icon={ArrowDown01Icon} size={14} strokeWidth={2} />
+          <HugeiconsIcon
+            icon={ArrowDown01Icon}
+            size={13}
+            strokeWidth={2.5}
+            className="text-primary shrink-0"
+          />
         ) : isSorted === "asc" ? (
-          <HugeiconsIcon icon={ArrowUp01Icon} size={14} strokeWidth={2} />
+          <HugeiconsIcon
+            icon={ArrowUp01Icon}
+            size={13}
+            strokeWidth={2.5}
+            className="text-primary shrink-0"
+          />
         ) : (
-          <HugeiconsIcon icon={UnfoldMoreIcon} size={14} strokeWidth={2} className="opacity-50" />
+          <HugeiconsIcon
+            icon={UnfoldMoreIcon}
+            size={13}
+            strokeWidth={2}
+            className="shrink-0 opacity-35 transition-opacity group-hover:opacity-90"
+          />
         )}
-      </Button>
+      </button>
     </div>
   );
 }

@@ -49,7 +49,7 @@ export function getUserColumns({
       accessorKey: "nombreUsuario",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Usuario" />,
       cell: ({ row }) => (
-        <span className="text-foreground font-mono text-xs font-semibold">
+        <span className="text-foreground/90 bg-muted/60 border-border/60 rounded-md border px-2 py-0.5 font-mono text-xs font-semibold">
           {row.original.nombreUsuario}
         </span>
       ),
@@ -62,8 +62,13 @@ export function getUserColumns({
         const rol = row.original.rol;
         return (
           <Badge
-            variant={rol.esSistema ? "default" : "secondary"}
-            className="rounded-full px-2.5 py-0.5 text-xs font-medium"
+            variant="outline"
+            className={cn(
+              "rounded-full px-2.5 py-0.5 text-xs font-semibold",
+              rol.esSistema
+                ? "border-primary/20 bg-primary/10 text-primary dark:bg-primary/20"
+                : "border-border/80 bg-muted/60 text-muted-foreground",
+            )}
           >
             {rol.nombre}
           </Badge>
@@ -90,9 +95,12 @@ export function getUserColumns({
       header: ({ column }) => <DataTableColumnHeader column={column} title="Último Acceso" />,
       cell: ({ row }) => {
         const lastAccess = row.original.ultimoAcceso;
+        if (!lastAccess) {
+          return <span className="text-muted-foreground/60 text-xs italic">Sin ingresos</span>;
+        }
         return (
-          <span className="text-muted-foreground text-xs">
-            {lastAccess ? formatDate(lastAccess, "dd/MM/yyyy HH:mm") : "Sin ingresos"}
+          <span className="text-muted-foreground text-xs font-medium">
+            {formatDate(lastAccess, "dd/MM/yyyy HH:mm")}
           </span>
         );
       },

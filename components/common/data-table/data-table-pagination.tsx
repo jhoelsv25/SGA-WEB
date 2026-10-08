@@ -92,33 +92,27 @@ export function DataTablePagination<TData>({
   };
 
   return (
-    <div className="flex flex-col items-center justify-between gap-4 px-3 py-3 sm:flex-row">
-      <div className="text-muted-foreground flex items-center gap-2 text-xs">
-        <span className="border-border/70 bg-background text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium shadow-2xs">
-          <span className="bg-primary size-1.5 rounded-full" />
+    <div className="flex flex-col items-center justify-between gap-3 px-1 py-0.5 sm:flex-row">
+      <div className="text-muted-foreground text-xs font-medium">
+        {selectedCount > 0 ? (
           <span>
-            {selectedCount > 0 ? (
-              <>
-                <strong className="text-foreground font-bold">{selectedCount}</strong> de{" "}
-                <strong className="text-foreground font-bold">{total}</strong> fila(s)
-                seleccionada(s)
-              </>
-            ) : showTotal && typeof total === "number" ? (
-              <>
-                Total: <strong className="text-foreground font-bold">{total}</strong> registro(s)
-              </>
-            ) : null}
+            <strong className="text-foreground font-semibold">{selectedCount}</strong> de{" "}
+            <strong className="text-foreground font-semibold">{total}</strong> fila(s)
+            seleccionada(s)
           </span>
-        </span>
+        ) : showTotal && typeof total === "number" ? (
+          <span>
+            Total: <strong className="text-foreground font-semibold">{total}</strong>{" "}
+            {total === 1 ? "registro" : "registros"}
+          </span>
+        ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-        <div className="border-border/70 bg-background text-muted-foreground inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium shadow-2xs">
-          <span>Página</span>
-          <strong className="text-foreground font-bold">{currentPage}</strong>
-          <span>de</span>
-          <strong className="text-foreground font-bold">{totalPages || 1}</strong>
-        </div>
+      <div className="flex items-center gap-3">
+        <span className="text-muted-foreground text-xs font-medium">
+          Página <strong className="text-foreground font-semibold">{currentPage}</strong> de{" "}
+          <strong className="text-foreground font-semibold">{totalPages || 1}</strong>
+        </span>
 
         <div className="flex items-center gap-1">
           {isLoadingNextPage && (
@@ -126,52 +120,52 @@ export function DataTablePagination<TData>({
               icon={Loading03Icon}
               size={14}
               strokeWidth={2}
-              className="text-muted-foreground mr-2 animate-spin"
+              className="text-muted-foreground mr-1.5 animate-spin"
             />
           )}
 
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon-xs"
             onClick={handleFirstPage}
             disabled={!canPrevious || isLoadingNextPage}
             aria-label="Ir a la primera página"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-muted text-muted-foreground hover:text-foreground size-7.5 rounded-full border transition-all disabled:opacity-30"
           >
-            <HugeiconsIcon icon={ArrowLeftDoubleIcon} size={15} strokeWidth={2} />
+            <HugeiconsIcon icon={ArrowLeftDoubleIcon} size={14} strokeWidth={2} />
           </Button>
 
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon-xs"
             onClick={handlePreviousPage}
             disabled={!canPrevious || isLoadingNextPage}
             aria-label="Página anterior"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-muted text-muted-foreground hover:text-foreground size-7.5 rounded-full border transition-all disabled:opacity-30"
           >
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={15} strokeWidth={2} />
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={14} strokeWidth={2} />
           </Button>
 
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon-xs"
             onClick={handleNextPage}
             disabled={!canNext || isLoadingNextPage}
             aria-label="Página siguiente"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-muted text-muted-foreground hover:text-foreground size-7.5 rounded-full border transition-all disabled:opacity-30"
           >
-            <HugeiconsIcon icon={ArrowRight01Icon} size={15} strokeWidth={2} />
+            <HugeiconsIcon icon={ArrowRight01Icon} size={14} strokeWidth={2} />
           </Button>
 
           <Button
             variant="outline"
-            size="icon-sm"
+            size="icon-xs"
             onClick={handleLastPage}
             disabled={!canNext || isLoadingNextPage}
             aria-label="Ir a la última página"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-muted text-muted-foreground hover:text-foreground size-7.5 rounded-full border transition-all disabled:opacity-30"
           >
-            <HugeiconsIcon icon={ArrowRightDoubleIcon} size={15} strokeWidth={2} />
+            <HugeiconsIcon icon={ArrowRightDoubleIcon} size={14} strokeWidth={2} />
           </Button>
         </div>
       </div>
