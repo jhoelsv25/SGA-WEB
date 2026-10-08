@@ -12,6 +12,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { EquiposActions } from "./equipos-actions";
 import { TIPO_EQUIPO_META, PROPOSITO_EQUIPO_META } from "../../../consts";
+import { parseUsuariosPermitidos } from "../../../utils";
 import type { Equipo } from "../../../types";
 
 interface GetEquiposColumnsOptions {
@@ -96,7 +97,7 @@ export function getEquiposColumns({
         <DataTableColumnHeader column={column} title="Usuarios Autorizados" />
       ),
       cell: ({ row }) => {
-        const usuarios = row.original.usuariosPermitidos || [];
+        const usuarios = parseUsuariosPermitidos(row.original.usuariosPermitidos);
         return (
           <div className="flex flex-wrap gap-1">
             {usuarios.map((u) => (
@@ -116,7 +117,9 @@ export function getEquiposColumns({
       header: ({ column }) => <DataTableColumnHeader column={column} title="Autorización" />,
       cell: ({ row }) => {
         const equipo = row.original;
-        const isAutorizado = Boolean(equipo.tokenAutorizado || equipo.autorizadoEn);
+        const isAutorizado = Boolean(
+          equipo.tokenAutorizado || equipo.autorizado || equipo.autorizadoEn,
+        );
 
         return isAutorizado ? (
           <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">

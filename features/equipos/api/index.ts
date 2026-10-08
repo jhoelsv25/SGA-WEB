@@ -25,12 +25,26 @@ export async function getEquipoById(id: string): Promise<Equipo> {
 }
 
 export async function createEquipo(payload: CreateEquipoPayload): Promise<Equipo> {
-  const response = await apiClient.post<Equipo>("/equipos", payload);
+  const body = {
+    ...payload,
+    usuariosPermitidos: Array.isArray(payload.usuariosPermitidos)
+      ? payload.usuariosPermitidos.join(",")
+      : payload.usuariosPermitidos,
+  };
+  const response = await apiClient.post<Equipo>("/equipos", body);
   return response.data;
 }
 
 export async function updateEquipo(id: string, payload: UpdateEquipoPayload): Promise<Equipo> {
-  const response = await apiClient.patch<Equipo>(`/equipos/${id}`, payload);
+  const body = {
+    ...payload,
+    ...(payload.usuariosPermitidos !== undefined && {
+      usuariosPermitidos: Array.isArray(payload.usuariosPermitidos)
+        ? payload.usuariosPermitidos.join(",")
+        : payload.usuariosPermitidos,
+    }),
+  };
+  const response = await apiClient.patch<Equipo>(`/equipos/${id}`, body);
   return response.data;
 }
 

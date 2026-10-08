@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/common/spinner";
 import { KIOSK_TOKEN_STORAGE_KEY } from "@/features/equipos/consts";
+import { parseUsuariosPermitidos } from "@/features/equipos";
 import { useValidarKioskoQuery } from "@/features/equipos/hooks";
 import { useInstitucionQuery } from "@/features/institucion/hooks";
 
@@ -251,7 +252,7 @@ function KioskoContent() {
         {/* Columna Izquierda: Gran Reloj Digital y Mensaje de Bienvenida */}
         <div className="space-y-6 text-center lg:col-span-6 lg:text-left">
           <div className="space-y-2">
-            <span className="text-sm font-semibold tracking-wider text-blue-400 capitalize uppercase">
+            <span className="text-sm font-semibold tracking-wider text-blue-400 uppercase">
               {formattedDate}
             </span>
             <div className="font-mono text-6xl font-black tracking-tight text-white tabular-nums drop-shadow-md sm:text-7xl lg:text-8xl">
@@ -267,22 +268,29 @@ function KioskoContent() {
               />
               {isSesiones ? "Firma de Sesión de Clase" : "Registro de Asistencia Escolar"}
             </h2>
-            <p className="text-xs leading-relaxed text-slate-400">
-              {isSesiones
-                ? "Profesores: Ingrese su documento de identidad y PIN de seguridad para firmar el inicio o cierre de su clase programada."
-                : `Estudiantes y personal habilitado (${equipo.usuariosPermitidos.join(", ")}): Digite su código o pase su tarjeta de identificación.`}
-            </p>
+            {(() => {
+              const usuarios = parseUsuariosPermitidos(equipo.usuariosPermitidos);
+              return (
+                <>
+                  <p className="text-xs leading-relaxed text-slate-400">
+                    {isSesiones
+                      ? "Profesores: Ingrese su documento de identidad y PIN de seguridad para firmar el inicio o cierre de su clase programada."
+                      : `Estudiantes y personal habilitado (${usuarios.join(", ")}): Digite su código o pase su tarjeta de identificación.`}
+                  </p>
 
-            <div className="flex flex-wrap justify-center gap-1.5 pt-2 lg:justify-start">
-              {equipo.usuariosPermitidos.map((u) => (
-                <span
-                  key={u}
-                  className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-0.5 text-[11px] font-semibold text-slate-300 capitalize"
-                >
-                  ✓ {u}
-                </span>
-              ))}
-            </div>
+                  <div className="flex flex-wrap justify-center gap-1.5 pt-2 lg:justify-start">
+                    {usuarios.map((u) => (
+                      <span
+                        key={u}
+                        className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-0.5 text-[11px] font-semibold text-slate-300 capitalize"
+                      >
+                        ✓ {u}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
 

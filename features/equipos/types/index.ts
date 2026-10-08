@@ -8,14 +8,18 @@ export interface Equipo {
   ubicacion: string;
   tipo: TipoEquipo;
   proposito: PropositoEquipo;
-  usuariosPermitidos: UsuarioPermitido[];
+  usuariosPermitidos: UsuarioPermitido[] | string;
   numeroSerie?: string | null;
   activo: boolean;
-  tokenAutorizado: boolean;
+  autorizado?: boolean;
+  tokenAutorizado?: boolean;
   autorizadoEn?: string | null;
   autorizadoPor?: string | null;
+  autorizadoPorId?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 export interface CreateEquipoPayload {
@@ -23,7 +27,7 @@ export interface CreateEquipoPayload {
   ubicacion: string;
   tipo: TipoEquipo;
   proposito: PropositoEquipo;
-  usuariosPermitidos: UsuarioPermitido[];
+  usuariosPermitidos: UsuarioPermitido[] | string;
   numeroSerie?: string | null;
   activo?: boolean;
 }
@@ -33,7 +37,7 @@ export interface UpdateEquipoPayload {
   ubicacion?: string;
   tipo?: TipoEquipo;
   proposito?: PropositoEquipo;
-  usuariosPermitidos?: UsuarioPermitido[];
+  usuariosPermitidos?: UsuarioPermitido[] | string;
   numeroSerie?: string | null;
   activo?: boolean;
 }
@@ -48,13 +52,14 @@ export interface AutorizarEquipoResponse {
 
 export interface ValidarEquipoResponse {
   valido: boolean;
-  mensaje: string;
+  mensaje?: string;
+  message?: string;
   equipo?: {
     id: string;
     nombre: string;
     ubicacion: string;
     tipo: TipoEquipo;
     proposito: PropositoEquipo;
-    usuariosPermitidos: UsuarioPermitido[];
+    usuariosPermitidos: UsuarioPermitido[] | string;
   };
 }

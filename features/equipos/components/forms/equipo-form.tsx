@@ -16,6 +16,7 @@ import {
   PROPOSITO_EQUIPO_OPTIONS,
   USUARIOS_PERMITIDOS_OPTIONS,
 } from "../../consts";
+import { parseUsuariosPermitidos } from "../../utils";
 import { equipoSchema, type EquipoFormValues } from "../../schemas";
 import type { Equipo, UsuarioPermitido } from "../../types";
 
@@ -34,6 +35,10 @@ export function EquipoForm({
 }: EquipoFormProps) {
   const isEditing = Boolean(initialEquipo);
 
+  const initialUsuarios: UsuarioPermitido[] = initialEquipo?.usuariosPermitidos
+    ? parseUsuariosPermitidos(initialEquipo.usuariosPermitidos)
+    : ["estudiantes"];
+
   const {
     register,
     handleSubmit,
@@ -47,7 +52,7 @@ export function EquipoForm({
       ubicacion: initialEquipo?.ubicacion || "",
       tipo: initialEquipo?.tipo || "kiosko",
       proposito: initialEquipo?.proposito || "marcacion",
-      usuariosPermitidos: initialEquipo?.usuariosPermitidos || ["estudiantes"],
+      usuariosPermitidos: initialUsuarios.length > 0 ? initialUsuarios : ["estudiantes"],
       numeroSerie: initialEquipo?.numeroSerie || "",
       activo: initialEquipo?.activo ?? true,
     },
