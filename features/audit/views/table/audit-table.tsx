@@ -163,9 +163,31 @@ export function AuditTable() {
   const fechaFin = getParam("fechaFin", todayStr);
   const accion = getParam("accion", "all");
   const entidad = getParam("entidad", "all");
-  const pageStr = getParam("page", "1");
-  const page = Math.max(1, parseInt(pageStr, 10) || 1);
   const limit = 50;
+
+  // Navegación por cursor en frontend con pila de historial
+  const [cursorHistory, setCursorHistory] = React.useState<(string | null)[]>([null]);
+  const [pageIndex, setPageIndex] = React.useState<number>(0);
+
+  const currentCursor = cursorHistory[pageIndex] ?? null;
+
+  // Reiniciar historial de cursores cuando cambian los filtros
+  const [prevAuditFilters, setPrevAuditFilters] = React.useState({
+    fechaInicio,
+    fechaFin,
+    accion,
+    entidad,
+  });
+  if (
+    prevAuditFilters.fechaInicio !== fechaInicio ||
+    prevAuditFilters.fechaFin !== fechaFin ||
+    prevAuditFilters.accion !== accion ||
+    prevAuditFilters.entidad !== entidad
+  ) {
+    setPrevAuditFilters({ fechaInicio, fechaFin, accion, entidad });
+    setCursorHistory([null]);
+    setPageIndex(0);
+  }
 
   // Estado de búsqueda por usuario con debounce para actualización suave de URL
   const urlUser = getParam("usuario", "");
@@ -278,14 +300,14 @@ export function AuditTable() {
     return null;
   }, [fechaInicio, fechaFin]);
 
-  // Consulta al Backend con React Query
+  // Consulta al Backend con React Query y cursor
   const {
     data: response,
     isLoading,
     refetch,
     isFetching,
   } = useAuditQuery({
-    page,
+    cursor: currentCursor,
     limit,
     fechaInicio: !validationError ? fechaInicio : undefined,
     fechaFin: !validationError ? fechaFin : undefined,
@@ -295,6 +317,19 @@ export function AuditTable() {
   });
 
   const auditLogs = response?.data ?? [];
+
+  const handleNextPage = () => {
+    if (response?.nextCursor) {
+      setCursorHistory((prev) => [...prev.slice(0, pageIndex + 1), response.nextCursor]);
+      setPageIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (pageIndex > 0) {
+      setPageIndex((prev) => prev - 1);
+    }
+  };
 
   // Modal de Detalle
   const [selectedAuditId, setSelectedAuditId] = React.useState<number | null>(null);
@@ -311,8 +346,10 @@ export function AuditTable() {
   );
 
   const handleResetFilters = () => {
-    removeParams(["usuario", "fechaInicio", "fechaFin", "accion", "entidad", "page"]);
+    removeParams(["usuario", "fechaInicio", "fechaFin", "accion", "entidad"]);
     setSearchInput("");
+    setCursorHistory([null]);
+    setPageIndex(0);
   };
 
   const hasActiveFilters = Boolean(
@@ -320,8 +357,7 @@ export function AuditTable() {
     accion !== "all" ||
     entidad !== "all" ||
     getParam("fechaInicio") ||
-    getParam("fechaFin") ||
-    getParam("page"),
+    getParam("fechaFin"),
   );
 
   return (
@@ -541,7 +577,7 @@ export function AuditTable() {
           </span>
         </div>
         <span>
-          Total de eventos: <strong className="text-foreground">{response?.total ?? 0}</strong>
+          Página: <strong className="text-foreground">{pageIndex + 1}</strong>
         </span>
       </div>
 
@@ -552,21 +588,14 @@ export function AuditTable() {
           data={validationError ? [] : auditLogs}
           isLoading={isLoading}
           emptyMessage="No hay registros de auditoría para los filtros seleccionados."
-          pagination={
-            response
-              ? {
-                  page,
-                  totalPages: response.totalPages,
-                  total: response.total,
-                  onNextPage: () => setParam("page", Math.min(page + 1, response.totalPages)),
-                  onPreviousPage: () => setParam("page", Math.max(page - 1, 1)),
-                  onFirstPage: () => setParam("page", 1),
-                  onLastPage: () => setParam("page", response.totalPages),
-                  canNextPage: page < response.totalPages,
-                  canPreviousPage: page > 1,
-                }
-              : false
-          }
+          cursorPagination={{
+            hasNextPage: Boolean(response?.hasMore && response?.nextCursor),
+            hasPreviousPage: pageIndex > 0,
+            onNextPage: handleNextPage,
+            onPreviousPage: handlePreviousPage,
+            isLoading: isFetching,
+            loadedCount: auditLogs.length,
+          }}
         />
       </div>
 

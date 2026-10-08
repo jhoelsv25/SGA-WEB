@@ -38,14 +38,14 @@ export interface QueryAuditParams {
   usuario?: string;
   accion?: string;
   entidad?: string;
-  page?: number;
+  cursor?: string | null;
   limit?: number;
 }
 
 export interface PaginatedAuditResponse {
   data: AuditLogItem[];
-  total: number;
-  page: number;
+  nextCursor: string | null;
+  hasMore: boolean;
   limit: number;
-  totalPages: number;
+  mensaje?: string;
 }

@@ -32,10 +32,10 @@ export interface UserItem {
 
 export interface PaginatedUsersResponse {
   data: UserItem[];
-  total: number;
-  page: number;
+  nextCursor: string | null;
+  hasMore: boolean;
   limit: number;
-  totalPages: number;
+  mensaje?: string;
 }
 
 export type EligiblePersona = UserPersona;
@@ -65,7 +65,7 @@ export interface UpdateUsernameInput {
 }
 
 export interface UserQueryParams {
-  page?: number;
+  cursor?: string | null;
   limit?: number;
   rolId?: string;
   estado?: UserStatus;

@@ -8,7 +8,7 @@ export const auditApi = {
   async getAuditLogs(params: QueryAuditParams = {}): Promise<PaginatedAuditResponse> {
     const cleanParams: Record<string, unknown> = {};
 
-    if (params.page) cleanParams.page = params.page;
+    if (params.cursor) cleanParams.cursor = params.cursor;
     if (params.limit) cleanParams.limit = params.limit;
     if (params.fechaInicio) cleanParams.fechaInicio = params.fechaInicio;
     if (params.fechaFin) cleanParams.fechaFin = params.fechaFin;
