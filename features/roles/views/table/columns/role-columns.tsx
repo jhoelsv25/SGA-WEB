@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
 import { RoleActions } from "./role-actions";
 import { ROLE_BADGE_VARIANTS } from "../../../consts/roles.consts";
@@ -47,7 +48,7 @@ export function getRoleColumns({
       cell: ({ row }) => {
         const count = row.original.usuariosCount;
         return (
-          <Badge variant="secondary" className="font-mono text-xs">
+          <Badge variant="secondary" className="rounded-full px-2.5 py-0.5 font-mono text-xs">
             {count} {count === 1 ? "cuenta" : "cuentas"}
           </Badge>
         );
@@ -61,13 +62,20 @@ export function getRoleColumns({
         return (
           <Badge
             variant="outline"
-            className={
+            className={cn(
+              "gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold",
               active
                 ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                : "border-muted bg-muted text-muted-foreground"
-            }
+                : "border-muted bg-muted/60 text-muted-foreground",
+            )}
           >
-            {active ? "Activo" : "Inactivo"}
+            <span
+              className={cn(
+                "size-1.5 shrink-0 rounded-full",
+                active ? "animate-pulse bg-emerald-500" : "bg-muted-foreground/60",
+              )}
+            />
+            <span>{active ? "Activo" : "Inactivo"}</span>
           </Badge>
         );
       },

@@ -55,7 +55,7 @@ export function DataTableCursorPagination({
             onClick={onPreviousPage}
             disabled={!hasPreviousPage || isLoading}
             aria-label="Página anterior"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-xl transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={15} strokeWidth={2} />
           </Button>
@@ -66,7 +66,7 @@ export function DataTableCursorPagination({
             onClick={onNextPage}
             disabled={!hasNextPage || isLoading}
             aria-label="Página siguiente"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-xl transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
           >
             <HugeiconsIcon icon={ArrowRight01Icon} size={15} strokeWidth={2} />
           </Button>

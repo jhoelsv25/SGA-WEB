@@ -6,7 +6,7 @@ import { RolesTable } from "./views/table/roles-table";
 
 export function RolesPage() {
   return (
-    <div className="space-y-6">
+    <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
         title="Roles y Permisos"
         description="Administra los perfiles de acceso y la matriz de privilegios del sistema."

@@ -28,7 +28,7 @@ import { DataTableCursorPagination } from "./data-table-cursor-pagination";
 
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Search01Icon, FileValidationIcon, Loading03Icon } from "@hugeicons/core-free-icons";
+import { Search01Icon, Loading03Icon } from "@hugeicons/core-free-icons";
 
 export function DataTable<TData, TValue>({
   columns,
@@ -194,15 +194,18 @@ export function DataTable<TData, TValue>({
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-64 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center gap-3">
-                      <div className="bg-muted/60 text-muted-foreground shadow-primary/5 ring-primary/5 flex size-12 items-center justify-center rounded-2xl shadow-sm ring-1">
-                        <HugeiconsIcon icon={FileValidationIcon} size={22} strokeWidth={2} />
+                    <div className="flex flex-col items-center justify-center gap-3.5">
+                      <div className="border-border/70 bg-muted/40 text-muted-foreground relative flex size-14 items-center justify-center rounded-full border shadow-2xs">
+                        <HugeiconsIcon icon={Search01Icon} size={24} strokeWidth={2} />
+                        <span className="bg-primary/10 text-primary border-primary/20 absolute -right-0.5 -bottom-0.5 flex size-4 items-center justify-center rounded-full border text-[9px]">
+                          ✕
+                        </span>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-foreground text-sm font-bold">
-                          No se encontraron registros
+                        <p className="text-foreground text-sm font-bold tracking-tight">
+                          No se encontraron registros coincidentes
                         </p>
-                        <p className="text-muted-foreground mx-auto max-w-sm text-xs">
+                        <p className="text-muted-foreground mx-auto max-w-sm text-xs leading-relaxed">
                           {emptyMessage}
                         </p>
                       </div>

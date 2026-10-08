@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/common/user-avatar";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
 import { formatDate } from "@/lib/formatters/date";
+import { cn } from "@/lib/utils";
 import { UserActions } from "./user-actions";
 import { USER_STATUS_CONFIG } from "../../../consts/users.consts";
 import type { TempPasswordResetResponse, UserItem } from "../../../types/users.types";
@@ -60,7 +61,10 @@ export function getUserColumns({
       cell: ({ row }) => {
         const rol = row.original.rol;
         return (
-          <Badge variant={rol.esSistema ? "default" : "secondary"} className="text-xs">
+          <Badge
+            variant={rol.esSistema ? "default" : "secondary"}
+            className="rounded-full px-2.5 py-0.5 text-xs font-medium"
+          >
             {rol.nombre}
           </Badge>
         );
@@ -74,8 +78,9 @@ export function getUserColumns({
         const config = USER_STATUS_CONFIG[estado] ?? USER_STATUS_CONFIG.inactivo;
 
         return (
-          <Badge variant={config.variant} className={config.className}>
-            {config.label}
+          <Badge variant={config.variant} className={cn("text-xs font-semibold", config.className)}>
+            <span className={cn("size-1.5 shrink-0 rounded-full", config.dotClass)} />
+            <span>{config.label}</span>
           </Badge>
         );
       },

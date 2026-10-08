@@ -113,7 +113,7 @@ export function DataTablePagination<TData>({
       </div>
 
       <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-        <div className="border-border/70 bg-background text-muted-foreground inline-flex items-center gap-1 rounded-xl border px-2.5 py-1 text-xs font-medium shadow-2xs">
+        <div className="border-border/70 bg-background text-muted-foreground inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium shadow-2xs">
           <span>Página</span>
           <strong className="text-foreground font-bold">{currentPage}</strong>
           <span>de</span>
@@ -136,7 +136,7 @@ export function DataTablePagination<TData>({
             onClick={handleFirstPage}
             disabled={!canPrevious || isLoadingNextPage}
             aria-label="Ir a la primera página"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-xl transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
           >
             <HugeiconsIcon icon={ArrowLeftDoubleIcon} size={15} strokeWidth={2} />
           </Button>
@@ -147,7 +147,7 @@ export function DataTablePagination<TData>({
             onClick={handlePreviousPage}
             disabled={!canPrevious || isLoadingNextPage}
             aria-label="Página anterior"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-xl transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={15} strokeWidth={2} />
           </Button>
@@ -158,7 +158,7 @@ export function DataTablePagination<TData>({
             onClick={handleNextPage}
             disabled={!canNext || isLoadingNextPage}
             aria-label="Página siguiente"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-xl transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
           >
             <HugeiconsIcon icon={ArrowRight01Icon} size={15} strokeWidth={2} />
           </Button>
@@ -169,7 +169,7 @@ export function DataTablePagination<TData>({
             onClick={handleLastPage}
             disabled={!canNext || isLoadingNextPage}
             aria-label="Ir a la última página"
-            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-xl transition-all disabled:opacity-30"
+            className="border-border/70 bg-background hover:bg-primary/10 hover:text-primary hover:border-primary/40 h-8 w-8 rounded-full transition-all disabled:opacity-30"
           >
             <HugeiconsIcon icon={ArrowRightDoubleIcon} size={15} strokeWidth={2} />
           </Button>

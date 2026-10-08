@@ -8,7 +8,7 @@ import { Spinner } from "@/components/common/spinner";
 
 export function AuditPage() {
   return (
-    <div className="space-y-6">
+    <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
         title="Bitácora de Auditoría"
         description="Trazabilidad inmutable de eventos críticos, accesos y modificaciones en el sistema institucional."

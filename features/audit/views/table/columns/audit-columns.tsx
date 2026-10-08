@@ -75,28 +75,50 @@ export function getAuditColumns({
         const getBadgeStyle = () => {
           switch (action.toLowerCase()) {
             case "crear":
-              return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+              return {
+                style:
+                  "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+                dot: "bg-emerald-500",
+              };
             case "actualizar":
-              return "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20";
+              return {
+                style: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+                dot: "bg-sky-500",
+              };
             case "eliminar":
-              return "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20";
+              return {
+                style: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+                dot: "bg-rose-500",
+              };
             case "iniciar_sesion":
-              return "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20";
+              return {
+                style: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
+                dot: "bg-violet-500 animate-pulse",
+              };
             case "cerrar_sesion":
-              return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
+              return {
+                style: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+                dot: "bg-amber-500",
+              };
             default:
-              return "bg-muted text-muted-foreground border-border";
+              return {
+                style: "bg-muted text-muted-foreground border-border",
+                dot: "bg-muted-foreground/60",
+              };
           }
         };
+
+        const config = getBadgeStyle();
 
         return (
           <span
             className={cn(
-              "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-bold capitalize",
-              getBadgeStyle(),
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-bold capitalize",
+              config.style,
             )}
           >
-            {action.replace("_", " ")}
+            <span className={cn("size-1.5 shrink-0 rounded-full", config.dot)} />
+            <span>{action.replace("_", " ")}</span>
           </span>
         );
       },

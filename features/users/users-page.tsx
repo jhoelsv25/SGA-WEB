@@ -8,7 +8,7 @@ import { Spinner } from "@/components/common/spinner";
 
 export function UsersPage() {
   return (
-    <div className="space-y-6">
+    <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
         title="Gestión de Usuarios"
         description="Administra las cuentas de usuario, asignación de roles y estados de acceso al sistema."
