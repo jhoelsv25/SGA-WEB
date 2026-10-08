@@ -40,14 +40,14 @@ export function useCalendarioQuery(
   });
 }
 
-const PERMISO_REGISTRAR_CALENDARIO = "calendario:registrar";
+const MENU_CALENDARIO = "/admin/calendario";
 
 export function usePuedeRegistrarCalendario(): boolean {
   const { data } = useSession();
-  const permisos = data?.user.permissions;
-  if (permisos) return permisos.includes(PERMISO_REGISTRAR_CALENDARIO);
-  const rol = (data?.user.activeProfileName ?? data?.user.roles?.[0] ?? "").toLowerCase();
-  return rol.includes("admin") || rol.includes("direct");
+  const rol =
+    data?.user.activeRoleName ?? data?.user.activeProfileName ?? data?.user.roles?.[0] ?? "";
+  if (rol === "Administrador") return true;
+  return data?.user.menuRoutes?.includes(MENU_CALENDARIO) ?? false;
 }
 
 export function useEsAdministrador(): boolean {

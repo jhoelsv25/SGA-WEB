@@ -38,16 +38,17 @@ export function PlanEstudiosTable({
   onSelectGrado,
 }: PlanEstudiosTableProps) {
   const currentGrado = grados.find((g) => g.id === selectedGradoId) ?? grados[0];
+  const effectiveGradoId = currentGrado?.id ?? "";
 
   // Queries
-  const { data: planData, isLoading: isLoadingPlan } = usePlanEstudioQuery(currentGrado?.id);
+  const { data: planData, isLoading: isLoadingPlan } = usePlanEstudioQuery(effectiveGradoId);
   const { data: allCursos = [] } = useCursosQuery({ estado: "activo" });
 
   // Mutations
-  const addMutation = useAddCursoPlanMutation(currentGrado?.id);
-  const updateHorasMutation = useUpdateHorasPlanMutation(currentGrado?.id);
-  const removeMutation = useRemoveCursoPlanMutation(currentGrado?.id);
-  const copyMutation = useCopyPlanMutation(currentGrado?.id);
+  const addMutation = useAddCursoPlanMutation(effectiveGradoId);
+  const updateHorasMutation = useUpdateHorasPlanMutation(effectiveGradoId);
+  const removeMutation = useRemoveCursoPlanMutation(effectiveGradoId);
+  const copyMutation = useCopyPlanMutation(effectiveGradoId);
 
   // Modals state
   const [addModalOpen, setAddModalOpen] = React.useState(false);
@@ -128,7 +129,7 @@ export function PlanEstudiosTable({
           </div>
           <div>
             <h2 className="text-foreground text-base font-bold tracking-tight">
-              Plan de Estudios — {currentGrado?.nombre}
+              {currentGrado ? `Plan de Estudios — ${currentGrado.nombre}` : "Plan de Estudios"}
             </h2>
             <p className="text-muted-foreground text-xs">
               Asignaturas curriculares oficiales y horas pedagógicas semanales.

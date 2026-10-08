@@ -35,8 +35,9 @@ export interface CurrentUser {
   profiles?: AuthProfile[];
   activeProfileId?: string;
   activeProfileName?: string;
-  /** Códigos del perfil activo, por ejemplo `calendario:registrar`. */
-  permissions?: string[];
+  activeRoleName?: string;
+  /** Rutas de menú del rol activo. Registrar en el calendario exige `/admin/calendario`. */
+  menuRoutes?: string[];
 }
 
 export interface AuthModule {
