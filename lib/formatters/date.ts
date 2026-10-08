@@ -12,7 +12,21 @@ import { es } from "date-fns/locale";
 
 function toValidDate(value: Date | string | number | null | undefined): Date | null {
   if (!value) return null;
-  const date = typeof value === "string" ? parseISO(value) : new Date(value);
+  if (value instanceof Date) return isValid(value) ? value : null;
+  if (typeof value === "number") {
+    const d = new Date(value);
+    return isValid(d) ? d : null;
+  }
+  let str = value.trim();
+  // Si la fecha viene como timestamp SQL sin indicador de zona horaria (ej. "2026-10-07 23:54:20"),
+  // dado que el backend/DB almacena en UTC, añadimos "Z" para que date-fns/navegador
+  // la convierta fielmente a la hora local del usuario (ej. Lima GMT-5 -> 18:54).
+  if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?/.test(str)) {
+    if (!str.endsWith("Z") && !str.includes("+") && !/-\d{2}:\d{2}$/.test(str)) {
+      str = str.replace(" ", "T") + "Z";
+    }
+  }
+  const date = parseISO(str);
   return isValid(date) ? date : null;
 }
 
