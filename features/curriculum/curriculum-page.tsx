@@ -6,8 +6,9 @@ import { Book02Icon, BookOpen01Icon, School01Icon } from "@hugeicons/core-free-i
 import { PageHeader } from "@/components/common/page-header";
 import { Spinner } from "@/components/common/spinner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PlanEstudiosTable, CursosTable, GradosView } from "./views";
-import { useGradosQuery } from "./hooks";
+import { GradosView, useGradosQuery } from "@/features/grados";
+import { CursosTable } from "@/features/cursos";
+import { PlanEstudiosTable } from "@/features/plan-estudios";
 
 type ActiveTab = "plan" | "cursos" | "grados";
 
