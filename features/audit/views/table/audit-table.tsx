@@ -23,10 +23,17 @@ import {
   RefreshIcon,
   ShieldCheckIcon,
 } from "@hugeicons/core-free-icons";
-import { subDays, format, differenceInCalendarDays, parseISO, isValid } from "date-fns";
+import { subDays, addDays, format, differenceInCalendarDays, parseISO, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
+import { DatePicker } from "@/components/common/date-picker";
 
 export function AuditTable() {
+  // Límite superior: hoy a fin de día
+  const today = React.useMemo(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  }, []);
+
   // Rango de fechas por defecto: últimos 7 días
   const todayStr = React.useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
   const defaultStartStr = React.useMemo(() => format(subDays(new Date(), 7), "yyyy-MM-dd"), []);
@@ -38,6 +45,66 @@ export function AuditTable() {
   const [entidad, setEntidad] = React.useState<string>("all");
   const [page, setPage] = React.useState<number>(1);
   const limit = 50;
+
+  const parsedStartDate = React.useMemo(() => {
+    if (!fechaInicio) return undefined;
+    const [y, m, d] = fechaInicio.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }, [fechaInicio]);
+
+  const parsedEndDate = React.useMemo(() => {
+    if (!fechaFin) return undefined;
+    const [y, m, d] = fechaFin.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }, [fechaFin]);
+
+  // Regla de negocio de la bitácora: rango máx 31 días y fechas cronológicas
+  const handleFechaDesdeChange = (newDate: Date | undefined) => {
+    if (!newDate) {
+      setFechaInicio("");
+      setPage(1);
+      return;
+    }
+    const newStr = format(newDate, "yyyy-MM-dd");
+    setFechaInicio(newStr);
+    setPage(1);
+
+    if (parsedEndDate) {
+      if (parsedEndDate < newDate) {
+        setFechaFin(newStr);
+      } else {
+        const diff = differenceInCalendarDays(parsedEndDate, newDate);
+        if (diff > 31) {
+          const maxAllowed = addDays(newDate, 31);
+          const capped = maxAllowed > today ? today : maxAllowed;
+          setFechaFin(format(capped, "yyyy-MM-dd"));
+        }
+      }
+    }
+  };
+
+  const handleFechaHastaChange = (newDate: Date | undefined) => {
+    if (!newDate) {
+      setFechaFin("");
+      setPage(1);
+      return;
+    }
+    const newStr = format(newDate, "yyyy-MM-dd");
+    setFechaFin(newStr);
+    setPage(1);
+
+    if (parsedStartDate) {
+      if (parsedStartDate > newDate) {
+        setFechaInicio(newStr);
+      } else {
+        const diff = differenceInCalendarDays(newDate, parsedStartDate);
+        if (diff > 31) {
+          const minAllowed = subDays(newDate, 31);
+          setFechaInicio(format(minAllowed, "yyyy-MM-dd"));
+        }
+      }
+    }
+  };
 
   // Validación de Rango de Fechas (Gherkin Scenarios)
   const validationError = React.useMemo(() => {
@@ -169,14 +236,14 @@ export function AuditTable() {
             <span className="text-muted-foreground px-1 text-[11px] font-semibold">
               Fecha Desde
             </span>
-            <Input
-              type="date"
-              value={fechaInicio}
-              onChange={(e) => {
-                setFechaInicio(e.target.value);
-                setPage(1);
-              }}
-              className="h-10 text-xs"
+            <DatePicker
+              date={parsedStartDate}
+              onSelect={handleFechaDesdeChange}
+              maxDate={today}
+              dateFormat="dd/MM/yyyy"
+              placeholder="dd/mm/aaaa"
+              clearable={false}
+              className="h-10 w-full rounded-full text-xs"
             />
           </div>
 
@@ -185,14 +252,21 @@ export function AuditTable() {
             <span className="text-muted-foreground px-1 text-[11px] font-semibold">
               Fecha Hasta
             </span>
-            <Input
-              type="date"
-              value={fechaFin}
-              onChange={(e) => {
-                setFechaFin(e.target.value);
-                setPage(1);
-              }}
-              className="h-10 text-xs"
+            <DatePicker
+              date={parsedEndDate}
+              onSelect={handleFechaHastaChange}
+              minDate={parsedStartDate}
+              maxDate={
+                parsedStartDate
+                  ? addDays(parsedStartDate, 31) > today
+                    ? today
+                    : addDays(parsedStartDate, 31)
+                  : today
+              }
+              dateFormat="dd/MM/yyyy"
+              placeholder="dd/mm/aaaa"
+              clearable={false}
+              className="h-10 w-full rounded-full text-xs"
             />
           </div>
 

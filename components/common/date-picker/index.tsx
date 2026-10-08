@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar03Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
+import type { Matcher } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -18,6 +19,9 @@ export interface DatePickerProps {
   clearable?: boolean;
   className?: string;
   dateFormat?: string;
+  minDate?: Date;
+  maxDate?: Date;
+  disabledDays?: Matcher | Matcher[];
 }
 
 export function DatePicker({
@@ -28,6 +32,9 @@ export function DatePicker({
   clearable = true,
   className,
   dateFormat = "PPP",
+  minDate,
+  maxDate,
+  disabledDays,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -35,6 +42,20 @@ export function DatePicker({
     e.stopPropagation();
     onSelect?.(undefined);
   };
+
+  const calendarDisabled = React.useMemo<Matcher | Matcher[] | undefined>(() => {
+    const matchers: Matcher[] = [];
+    if (minDate) matchers.push({ before: minDate });
+    if (maxDate) matchers.push({ after: maxDate });
+    if (disabledDays) {
+      if (Array.isArray(disabledDays)) {
+        matchers.push(...disabledDays);
+      } else {
+        matchers.push(disabledDays);
+      }
+    }
+    return matchers.length > 0 ? matchers : undefined;
+  }, [minDate, maxDate, disabledDays]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -86,11 +107,13 @@ export function DatePicker({
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
+          defaultMonth={date}
           selected={date}
           onSelect={(newDate) => {
             onSelect?.(newDate);
             setOpen(false);
           }}
+          disabled={calendarDisabled}
           locale={es}
         />
       </PopoverContent>
