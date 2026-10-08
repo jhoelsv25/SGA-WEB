@@ -14,8 +14,8 @@ export interface ChangePasswordPayload {
   newPassword: string;
 }
 
-/** Perfil (acceso) del usuario. RF-001 V2: un usuario puede tener varios. */
-export interface AuthProfile {
+/** Rol (acceso) del usuario. RF-001 V2: un usuario puede tener varios. */
+export interface AuthRole {
   id: string;
   name: string;
   isPrincipal: boolean;
@@ -32,11 +32,9 @@ export interface CurrentUser {
   institutionName?: string;
   avatarUrl?: string;
   mustChangePassword?: boolean;
-  profiles?: AuthProfile[];
-  activeProfileId?: string;
-  activeProfileName?: string;
-  /** Códigos del perfil activo, por ejemplo `calendario:registrar`. */
-  permissions?: string[];
+  userRoles?: AuthRole[];
+  activeRoleId?: string;
+  activeRoleName?: string;
 }
 
 export interface AuthModule {

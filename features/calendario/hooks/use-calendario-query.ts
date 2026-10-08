@@ -40,13 +40,13 @@ export function useCalendarioQuery(
   });
 }
 
-const PERMISO_REGISTRAR_CALENDARIO = "calendario:registrar";
-
+/**
+ * RF-002 V3: el acceso es por menú (Roles-Menú). El servidor valida que el rol activo
+ * tenga la opción /admin/calendario; aquí solo se decide si mostrar los botones.
+ */
 export function usePuedeRegistrarCalendario(): boolean {
   const { data } = useSession();
-  const permisos = data?.user.permissions;
-  if (permisos) return permisos.includes(PERMISO_REGISTRAR_CALENDARIO);
-  const rol = (data?.user.activeProfileName ?? data?.user.roles?.[0] ?? "").toLowerCase();
+  const rol = (data?.user.activeRoleName ?? data?.user.roles?.[0] ?? "").toLowerCase();
   return rol.includes("admin") || rol.includes("direct");
 }
 

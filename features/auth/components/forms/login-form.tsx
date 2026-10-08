@@ -6,13 +6,22 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormValues } from "../../schemas/login.schema";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useLogin, useSession } from "../../hooks/use-auth";
+import { useLogin, useLogout, useSelectRole, useSession } from "../../hooks/use-auth";
+import type { AuthResponse } from "../../types/auth.types";
 import { getInitialLoginValues, saveRememberedUsername } from "../../utils/auth-storage.utils";
 import { getAccessToken } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -22,7 +31,98 @@ import {
   ViewOffSlashIcon,
   LogInIcon,
   AlertCircleIcon,
+  UserSwitchIcon,
+  ArrowLeft01Icon,
 } from "@hugeicons/core-free-icons";
+
+/**
+ * RF-001 V3: segundo paso del inicio de sesión. Siempre se elige el rol con el que se
+ * ingresa (aunque tenga uno solo); viene marcado el rol principal.
+ */
+function SeleccionRol({
+  session,
+  redirectTo,
+  onVolver,
+}: {
+  session: AuthResponse;
+  redirectTo: string;
+  onVolver: () => void;
+}) {
+  const roles = session.user?.userRoles ?? [];
+  const principal = roles.find((r) => r.isPrincipal) ?? roles[0];
+  const [rolId, setRolId] = React.useState(session.user?.activeRoleId ?? principal?.id ?? "");
+  const { mutate: seleccionar, isPending: isSelecting } = useSelectRole({ redirectTo });
+  // Volver descarta la sesión abierta en el paso 1 para pedir de nuevo las credenciales
+  const { mutate: logout, isPending: isLoggingOut } = useLogout({ onSuccess: onVolver });
+  const isPending = isSelecting || isLoggingOut;
+
+  const ingresar = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (rolId) seleccionar(rolId);
+  };
+
+  return (
+    <form onSubmit={ingresar} className="space-y-4" noValidate>
+      <div className="space-y-1">
+        <p className="text-sm font-semibold">
+          Hola, {session.user?.firstName ?? session.user?.username}
+        </p>
+        <p className="text-muted-foreground text-xs">
+          Seleccione el rol con el que desea ingresar.
+        </p>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="rol">Rol *</Label>
+        <Select value={rolId} onValueChange={setRolId} disabled={isPending}>
+          <SelectTrigger id="rol" className="w-full">
+            <SelectValue placeholder="Seleccione un rol" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {roles.map((rol) => (
+                <SelectItem key={rol.id} value={rol.id}>
+                  {rol.name}
+                  {rol.isPrincipal ? " (principal)" : ""}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-2 pt-2">
+        <Button
+          type="submit"
+          disabled={isPending || !rolId}
+          className="shadow-primary/20 h-11 w-full gap-2 rounded-full text-sm font-bold shadow-md transition-all hover:shadow-lg"
+        >
+          {isPending ? (
+            <>
+              <Spinner size="sm" />
+              <span>Ingresando...</span>
+            </>
+          ) : (
+            <>
+              <HugeiconsIcon icon={UserSwitchIcon} className="size-4.5" />
+              <span>Ingresar</span>
+            </>
+          )}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={isPending}
+          onClick={() => logout()}
+          className="h-9 gap-2 rounded-full text-xs"
+        >
+          <HugeiconsIcon icon={ArrowLeft01Icon} className="size-4" />
+          <span>Volver</span>
+        </Button>
+      </div>
+    </form>
+  );
+}
 
 function LoginFormInner() {
   const router = useRouter();
@@ -31,17 +131,19 @@ function LoginFormInner() {
   const isExpired = searchParams.get("expired") === "true";
 
   const { data: session, isLoading: isCheckingSession } = useSession();
+  // RF-001 V3: tras validar las credenciales, sigue el paso de selección de rol
+  const [autenticado, setAutenticado] = React.useState<AuthResponse | null>(null);
 
   // Si ya existe sesión institucional activa y no está expirada, redirigir automáticamente
   React.useEffect(() => {
-    if (!isExpired && session?.user) {
+    if (!autenticado && !isExpired && session?.user) {
       if (session.user.mustChangePassword) {
         router.replace("/change-password");
       } else {
         router.replace(redirectTo);
       }
     }
-  }, [session, isExpired, redirectTo, router]);
+  }, [autenticado, session, isExpired, redirectTo, router]);
 
   const [showPassword, setShowPassword] = React.useState(false);
   const initialValues = React.useMemo(() => getInitialLoginValues(), []);
@@ -57,7 +159,11 @@ function LoginFormInner() {
     defaultValues: initialValues,
   });
 
-  const { mutate: login, isPending: isSubmitting, error } = useLogin({ redirectTo });
+  const {
+    mutate: login,
+    isPending: isSubmitting,
+    error,
+  } = useLogin({ redirectTo, redirect: false, onSuccess: setAutenticado });
 
   const onSubmit = (values: LoginFormValues) => {
     saveRememberedUsername(values.username, values.rememberUser);
@@ -67,6 +173,16 @@ function LoginFormInner() {
       rememberMe: values.rememberUser,
     });
   };
+
+  if (autenticado) {
+    return (
+      <SeleccionRol
+        session={autenticado}
+        redirectTo={redirectTo}
+        onVolver={() => setAutenticado(null)}
+      />
+    );
+  }
 
   if (!isExpired && isCheckingSession && !!getAccessToken()) {
     return (
