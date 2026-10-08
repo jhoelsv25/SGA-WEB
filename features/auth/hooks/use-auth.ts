@@ -126,6 +126,34 @@ export function useChangePassword(options?: UseChangePasswordOptions) {
   });
 }
 
+/**
+ * Hook para cambiar el perfil activo (RF-001 V2) sin volver a pedir la contraseña.
+ * Guarda el nuevo token, refresca la sesión y descarta los datos del perfil anterior.
+ */
+export function useSwitchProfile() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  return useMutation<AuthResponse, ApiClientError, string>({
+    mutationKey: ["auth", "switch-profile"],
+    mutationFn: (roleId) => authApi.switchProfile(roleId),
+    onSuccess: (data) => {
+      if (data.accessToken) {
+        setAccessToken(data.accessToken);
+      }
+      // El menú, los permisos y los datos cargados dependen del perfil activo
+      queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      queryClient.setQueryData(["auth", "session"], data);
+      toast.success(data.message || "Perfil cambiado.");
+      router.push("/admin/dashboard");
+      router.refresh();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
 export interface UseLogoutOptions {
   onSuccess?: () => void;
   onError?: (error: ApiClientError) => void;

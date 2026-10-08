@@ -45,6 +45,16 @@ export const authApi = {
     }
   },
 
+  /** RF-001 V2: cambia el perfil activo sin volver a iniciar sesión. */
+  async switchProfile(roleId: string): Promise<AuthResponse> {
+    try {
+      const { data } = await apiClient.post<AuthResponse>("/auth/switch-profile", { roleId });
+      return data;
+    } catch (error) {
+      handleApiError(error, "No se pudo cambiar de perfil.");
+    }
+  },
+
   async checkToken(): Promise<AuthResponse> {
     try {
       const { data } = await apiClient.get<AuthResponse>("/auth/check-token");

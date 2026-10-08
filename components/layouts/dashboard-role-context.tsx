@@ -99,9 +99,11 @@ export function DashboardRoleProvider({
   const { data: session, isLoading } = useSession();
   const [selectedRoleOverride, setSelectedRoleOverride] = React.useState<UserRole | null>(null);
 
+  // RF-001 V2: el perfil activo de la sesión (puede tener varios perfiles)
+  const activeProfileName = session?.user?.activeProfileName ?? session?.user?.roles?.[0];
   const activeRole: UserRole =
     selectedRoleOverride ??
-    (session?.user?.roles?.[0] ? mapRoleNameToUserRole(session.user.roles[0]) : initialRole);
+    (activeProfileName ? mapRoleNameToUserRole(activeProfileName) : initialRole);
 
   const setRole = React.useCallback((newRole: UserRole) => {
     setSelectedRoleOverride(newRole);
@@ -115,7 +117,7 @@ export function DashboardRoleProvider({
           sessionUser.username,
         email: sessionUser.email || `${sessionUser.username}@carmelinas.edu.pe`,
         avatar: sessionUser.avatarUrl,
-        roleLabel: sessionUser.roles?.[0] || "Administrador",
+        roleLabel: activeProfileName || "Administrador",
       }
     : ROLE_PROFILES[activeRole] || ROLE_PROFILES.admin;
 

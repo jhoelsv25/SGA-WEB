@@ -9,8 +9,12 @@ import {
   Notification01Icon,
   Logout01Icon,
   School01Icon,
+  Tick02Icon,
+  UserSwitchIcon,
 } from "@hugeicons/core-free-icons";
-import { useLogout } from "@/features/auth";
+import { useLogout, useSwitchProfile } from "@/features/auth";
+import { Spinner } from "@/components/common/spinner";
+import { useOptionalDashboardRole } from "../dashboard-role-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -36,6 +40,17 @@ const DEFAULT_USER: UserProfileData = {
 
 export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
+  // RF-001 V2: perfiles del usuario; "Cambiar perfil" solo si tiene más de uno
+  const dashboard = useOptionalDashboardRole();
+  const profiles = dashboard?.currentUser?.profiles ?? [];
+  const activeProfileId = dashboard?.currentUser?.activeProfileId;
+  const activeProfileName = dashboard?.currentUser?.activeProfileName;
+  const canSwitchProfile = profiles.length > 1;
+  const {
+    mutate: switchProfile,
+    isPending: isSwitching,
+    variables: switchingTo,
+  } = useSwitchProfile();
 
   const initials = user.name
     .split(" ")
@@ -64,7 +79,7 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
               {user.name}
             </span>
             <span className="text-muted-foreground/90 max-w-30 truncate text-[10.5px] font-medium lg:max-w-38">
-              {user.roleLabel || user.email}
+              {activeProfileName ? `Perfil: ${activeProfileName}` : user.roleLabel || user.email}
             </span>
           </div>
         </Button>
@@ -98,6 +113,46 @@ export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
         </DropdownMenuLabel>
 
         <DropdownMenuSeparator className="bg-border/60 my-1.5" />
+
+        {canSwitchProfile && (
+          <>
+            <DropdownMenuLabel className="text-muted-foreground flex items-center gap-2 px-2.5 py-1 text-[11px] font-semibold">
+              <HugeiconsIcon icon={UserSwitchIcon} className="size-3.5 shrink-0" />
+              Cambiar perfil
+            </DropdownMenuLabel>
+            <DropdownMenuGroup className="space-y-0.5">
+              {profiles.map((profile) => {
+                const isActive = profile.id === activeProfileId;
+                const isLoading = isSwitching && switchingTo === profile.id;
+                return (
+                  <DropdownMenuItem
+                    key={profile.id}
+                    disabled={isActive || isSwitching}
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      switchProfile(profile.id);
+                    }}
+                    className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium"
+                  >
+                    {isLoading ? (
+                      <Spinner size="xs" />
+                    ) : (
+                      <HugeiconsIcon
+                        icon={Tick02Icon}
+                        className={`size-4 shrink-0 ${isActive ? "text-primary" : "opacity-0"}`}
+                      />
+                    )}
+                    <span className="flex-1 truncate">{profile.name}</span>
+                    {profile.isPrincipal && (
+                      <span className="text-muted-foreground text-[10px]">Principal</span>
+                    )}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator className="bg-border/60 my-1.5" />
+          </>
+        )}
 
         <div className="bg-muted/50 text-muted-foreground/90 my-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px]">
           <HugeiconsIcon icon={School01Icon} className="text-primary size-3.5 shrink-0" />
