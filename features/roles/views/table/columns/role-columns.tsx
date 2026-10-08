@@ -27,7 +27,13 @@ export function getRoleColumns({
 
         return (
           <div className="flex items-center gap-2">
-            <span className="text-foreground font-semibold">{role.nombre}</span>
+            <button
+              type="button"
+              onClick={() => onAssignPermissions(role)}
+              className="text-foreground hover:text-primary cursor-pointer text-left font-semibold transition-colors hover:underline"
+            >
+              {role.nombre}
+            </button>
             <Badge variant="outline" className={variant.className}>
               {variant.label}
             </Badge>

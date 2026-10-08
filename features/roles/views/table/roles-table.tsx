@@ -1,39 +1,39 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/common/data-table";
 import { Button } from "@/components/ui/button";
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { getRoleColumns } from "./columns/role-columns";
 import { RoleModal } from "../../components/modals/role-modal";
-import { AssignPermissionsModal } from "../../components/modals/assign-permissions-modal";
 import { useRolesQuery } from "../../hooks/use-roles-query";
 import type { RoleItem } from "../../types/roles.types";
 
 export function RolesTable() {
+  const router = useRouter();
   const { data: roles = [], isLoading } = useRolesQuery();
 
   const [roleModalOpen, setRoleModalOpen] = React.useState(false);
   const [roleToEdit, setRoleToEdit] = React.useState<RoleItem | null>(null);
-
-  const [permissionsModalOpen, setPermissionsModalOpen] = React.useState(false);
-  const [roleForPermissions, setRoleForPermissions] = React.useState<RoleItem | null>(null);
 
   const handleCreate = () => {
     setRoleToEdit(null);
     setRoleModalOpen(true);
   };
 
-  const handleEdit = (role: RoleItem) => {
+  const handleEdit = React.useCallback((role: RoleItem) => {
     setRoleToEdit(role);
     setRoleModalOpen(true);
-  };
+  }, []);
 
-  const handleAssignPermissions = (role: RoleItem) => {
-    setRoleForPermissions(role);
-    setPermissionsModalOpen(true);
-  };
+  const handleAssignPermissions = React.useCallback(
+    (role: RoleItem) => {
+      router.push(`/admin/roles/${role.id}/permissions`);
+    },
+    [router],
+  );
 
   const columns = React.useMemo(
     () =>
@@ -41,7 +41,7 @@ export function RolesTable() {
         onEdit: handleEdit,
         onAssignPermissions: handleAssignPermissions,
       }),
-    [],
+    [handleEdit, handleAssignPermissions],
   );
 
   return (
@@ -61,12 +61,6 @@ export function RolesTable() {
       />
 
       <RoleModal open={roleModalOpen} onOpenChange={setRoleModalOpen} roleToEdit={roleToEdit} />
-
-      <AssignPermissionsModal
-        open={permissionsModalOpen}
-        onOpenChange={setPermissionsModalOpen}
-        role={roleForPermissions}
-      />
     </>
   );
 }
