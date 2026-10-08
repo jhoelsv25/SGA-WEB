@@ -4,16 +4,16 @@ import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Edit01Icon, InformationCircleIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
-import { EditGradoModal } from "./modals/edit-grado-modal";
-import { useUpdateGradoMutation } from "../hooks";
-import type { Grado } from "../types";
-import type { UpdateGradoFormValues } from "../schemas";
+import { EditGradoModal } from "../../components/modals/edit-grado-modal";
+import { useUpdateGradoMutation } from "../../hooks";
+import type { Grado } from "../../types";
+import type { UpdateGradoFormValues } from "../../schemas";
 
-interface GradosTabProps {
+interface GradosViewProps {
   grados: Grado[];
 }
 
-export function GradosTab({ grados }: GradosTabProps) {
+export function GradosView({ grados }: GradosViewProps) {
   const [selectedGrado, setSelectedGrado] = React.useState<Grado | null>(null);
   const updateMutation = useUpdateGradoMutation();
 

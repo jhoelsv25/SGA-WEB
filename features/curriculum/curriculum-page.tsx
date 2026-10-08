@@ -6,9 +6,7 @@ import { Book02Icon, BookOpen01Icon, School01Icon } from "@hugeicons/core-free-i
 import { PageHeader } from "@/components/common/page-header";
 import { Spinner } from "@/components/common/spinner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PlanEstudiosTab } from "./components/plan-estudios-tab";
-import { CursosTab } from "./components/cursos-tab";
-import { GradosTab } from "./components/grados-tab";
+import { PlanEstudiosTable, CursosTable, GradosView } from "./views";
 import { useGradosQuery } from "./hooks";
 
 type ActiveTab = "plan" | "cursos" | "grados";
@@ -76,7 +74,7 @@ export function CurriculumPage() {
           </TabsList>
 
           <TabsContent value="plan" className="pt-2 outline-none">
-            <PlanEstudiosTab
+            <PlanEstudiosTable
               grados={grados}
               selectedGradoId={activeGradoId}
               onSelectGrado={setSelectedGradoId}
@@ -84,11 +82,11 @@ export function CurriculumPage() {
           </TabsContent>
 
           <TabsContent value="cursos" className="pt-2 outline-none">
-            <CursosTab />
+            <CursosTable />
           </TabsContent>
 
           <TabsContent value="grados" className="pt-2 outline-none">
-            <GradosTab grados={grados} />
+            <GradosView grados={grados} />
           </TabsContent>
         </Tabs>
       )}
