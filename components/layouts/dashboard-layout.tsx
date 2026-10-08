@@ -29,9 +29,9 @@ export function DashboardLayout({
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar role={activeRole} />
-      <SidebarInset className="flex h-screen flex-col overflow-hidden">
+      <SidebarInset className="dark:bg-background flex h-screen flex-col overflow-hidden bg-white">
         <AppHeader user={activeUser} />
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-6 lg:p-8">
+        <div className="dark:bg-background min-h-0 flex-1 overflow-y-auto overscroll-contain bg-white p-4 md:p-6 lg:p-8">
           {children}
         </div>
       </SidebarInset>

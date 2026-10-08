@@ -1,6 +1,6 @@
 import * as React from "react";
 import type { Metadata } from "next";
-import { DashboardLayout, DashboardRoleProvider } from "@/components/layouts";
+import { AdminGuard, DashboardLayout, DashboardRoleProvider } from "@/components/layouts";
 
 export const metadata: Metadata = {
   title: {
@@ -17,8 +17,10 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <DashboardRoleProvider initialRole="teacher">
-      <DashboardLayout>{children}</DashboardLayout>
+    <DashboardRoleProvider initialRole="admin">
+      <AdminGuard>
+        <DashboardLayout>{children}</DashboardLayout>
+      </AdminGuard>
     </DashboardRoleProvider>
   );
 }

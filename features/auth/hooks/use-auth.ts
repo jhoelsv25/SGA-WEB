@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { authApi } from "../api/auth.api";
 import type {
@@ -9,13 +9,26 @@ import type {
   ForgotPasswordPayload,
   LoginCredentials,
 } from "../types/auth.types";
-import type { ApiClientError } from "@/lib/api-client";
+import { type ApiClientError, setAccessToken } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
 
 export interface UseLoginOptions {
   onSuccess?: (data: AuthResponse) => void;
   onError?: (error: ApiClientError) => void;
   redirectTo?: string;
+}
+
+/**
+ * Hook para consultar y sincronizar la sesión institucional activa (GET /auth/check-token).
+ */
+export function useSession() {
+  return useQuery<AuthResponse, ApiClientError>({
+    queryKey: ["auth", "session"],
+    queryFn: () => authApi.checkToken(),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 }
 
 /**
@@ -31,8 +44,12 @@ export function useLogin(options?: UseLoginOptions) {
     mutationKey: ["auth", "login"],
     mutationFn: (credentials) => authApi.login(credentials),
     onSuccess: (data) => {
+      if (data.accessToken) {
+        setAccessToken(data.accessToken);
+      }
       options?.onSuccess?.(data);
       toast.success(data.message || "Bienvenido al sistema");
+      queryClient.setQueryData(["auth", "session"], data);
       queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
 
       if (data.user?.mustChangePassword) {
@@ -41,7 +58,7 @@ export function useLogin(options?: UseLoginOptions) {
         );
         router.push("/change-password");
       } else {
-        router.push(options?.redirectTo || "/dashboard");
+        router.push(options?.redirectTo || "/admin/dashboard");
       }
       router.refresh();
     },
@@ -99,7 +116,7 @@ export function useChangePassword(options?: UseChangePasswordOptions) {
       options?.onSuccess?.(data);
       toast.success(data.message || "Contraseña actualizada exitosamente.");
       queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
-      router.push(options?.redirectTo || "/dashboard");
+      router.push(options?.redirectTo || "/admin/dashboard");
       router.refresh();
     },
     onError: (error) => {
@@ -125,6 +142,7 @@ export function useLogout(options?: UseLogoutOptions) {
     mutationKey: ["auth", "logout"],
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
+      setAccessToken(null);
       options?.onSuccess?.();
       queryClient.clear();
       router.push("/login");

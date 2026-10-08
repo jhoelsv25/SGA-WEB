@@ -4,6 +4,9 @@ import * as React from "react";
 import type { UserRole } from "@/config";
 import type { UserProfileData } from "./sidebar/nav-user";
 
+import type { AuthModule, CurrentUser } from "@/features/auth";
+import { useSession } from "@/features/auth";
+
 export const ROLE_PROFILES: Record<UserRole, UserProfileData> = {
   teacher: {
     name: "Prof. Juan Carlos Pérez",
@@ -30,6 +33,26 @@ export const ROLE_PROFILES: Record<UserRole, UserProfileData> = {
     email: "admin@carmelinas.edu.pe",
     roleLabel: "Administrador de Sistemas SGA",
   },
+  secretary: {
+    name: "Sra. Maritza Ramos Valeriano",
+    email: "secretaria@carmelinas.edu.pe",
+    roleLabel: "Secretaría General I.E.",
+  },
+  secretaria: {
+    name: "Sra. Maritza Ramos Valeriano",
+    email: "secretaria@carmelinas.edu.pe",
+    roleLabel: "Secretaría General I.E.",
+  },
+  docente: {
+    name: "Prof. Juan Carlos Pérez",
+    email: "jperez@carmelinas.edu.pe",
+    roleLabel: "Docente de Matemática y C.T.",
+  },
+  estudiante: {
+    name: "Alexia Ramos Quispe",
+    email: "aramos@carmelinas.edu.pe",
+    roleLabel: "Estudiante · 4° de Secundaria",
+  },
   parent: {
     name: "Sra. María Elena Quispe",
     email: "mquispe@gmail.com",
@@ -42,26 +65,72 @@ export const ROLE_PROFILES: Record<UserRole, UserProfileData> = {
   },
 };
 
-interface DashboardRoleContextType {
+export function mapRoleNameToUserRole(roleName?: string): UserRole {
+  if (!roleName) return "admin";
+  const lower = roleName.toLowerCase();
+  if (lower.includes("admin")) return "admin";
+  if (lower.includes("direct")) return "principal";
+  if (lower.includes("secretar")) return "secretary";
+  if (lower.includes("docent") || lower.includes("profesor")) return "teacher";
+  if (lower.includes("estudiant") || lower.includes("alumn")) return "student";
+  if (lower.includes("apoderad") || lower.includes("padre")) return "parent";
+  return "admin";
+}
+
+export interface DashboardRoleContextType {
   role: UserRole;
   setRole: (role: UserRole) => void;
   user: UserProfileData;
+  currentUser?: CurrentUser;
+  modules?: AuthModule[];
+  isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
 const DashboardRoleContext = React.createContext<DashboardRoleContextType | null>(null);
 
 export function DashboardRoleProvider({
   children,
-  initialRole = "teacher",
+  initialRole = "admin",
 }: {
   children: React.ReactNode;
   initialRole?: UserRole;
 }) {
-  const [role, setRole] = React.useState<UserRole>(initialRole);
-  const user = React.useMemo(() => ROLE_PROFILES[role] || ROLE_PROFILES.teacher, [role]);
+  const { data: session, isLoading } = useSession();
+  const [selectedRoleOverride, setSelectedRoleOverride] = React.useState<UserRole | null>(null);
+
+  const activeRole: UserRole =
+    selectedRoleOverride ??
+    (session?.user?.roles?.[0] ? mapRoleNameToUserRole(session.user.roles[0]) : initialRole);
+
+  const setRole = React.useCallback((newRole: UserRole) => {
+    setSelectedRoleOverride(newRole);
+  }, []);
+
+  const sessionUser = session?.user;
+  const user: UserProfileData = sessionUser
+    ? {
+        name:
+          [sessionUser.firstName, sessionUser.lastName].filter(Boolean).join(" ").trim() ||
+          sessionUser.username,
+        email: sessionUser.email || `${sessionUser.username}@carmelinas.edu.pe`,
+        avatar: sessionUser.avatarUrl,
+        roleLabel: sessionUser.roles?.[0] || "Administrador",
+      }
+    : ROLE_PROFILES[activeRole] || ROLE_PROFILES.admin;
 
   return (
-    <DashboardRoleContext.Provider value={{ role, setRole, user }}>
+    <DashboardRoleContext.Provider
+      value={{
+        role: activeRole,
+        setRole,
+        user,
+        currentUser: session?.user,
+        modules: session?.modules,
+        isLoading,
+        isAuthenticated: Boolean(session?.user),
+      }}
+    >
       {children}
     </DashboardRoleContext.Provider>
   );

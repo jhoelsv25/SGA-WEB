@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { recoverSchema, type RecoverFormValues } from "../../schemas/recover.schema";
 import { useRecover } from "../../hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/common/date-picker";
 import { Spinner } from "@/components/common/spinner";
@@ -95,25 +96,17 @@ export function RecoverForm() {
 
       {/* Campo Usuario o Código */}
       <div className="space-y-1.5">
-        <Label htmlFor="username" className="text-foreground text-xs font-semibold">
-          Usuario, DNI o Código Modular *
-        </Label>
-        <div className="relative">
-          <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2">
-            <HugeiconsIcon icon={UserIcon} className="size-4" />
-          </div>
-          <input
-            id="username"
-            type="text"
-            autoComplete="username"
-            disabled={isSubmitting}
-            placeholder="Ej: 74839201 o docente01"
-            {...register("username")}
-            className={`bg-background placeholder:text-muted-foreground/60 focus:ring-primary/30 focus:border-primary h-11 w-full rounded-full border pr-4 pl-10 text-sm transition-all outline-none focus:ring-2 disabled:opacity-50 ${
-              errors.username ? "border-destructive ring-destructive/20 ring-1" : "border-input"
-            }`}
-          />
-        </div>
+        <Label htmlFor="username">Usuario, DNI o Código Modular *</Label>
+        <Input
+          id="username"
+          type="text"
+          autoComplete="username"
+          disabled={isSubmitting}
+          placeholder="Ej: 74839201 o docente01"
+          startIcon={<HugeiconsIcon icon={UserIcon} className="size-4" />}
+          {...register("username")}
+          aria-invalid={!!errors.username}
+        />
         {errors.username && (
           <p className="text-destructive px-2 text-[11px] font-medium">{errors.username.message}</p>
         )}

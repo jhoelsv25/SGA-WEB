@@ -16,6 +16,9 @@ import {
   InformationCircleIcon,
   HelpCircleIcon,
   Loading03Icon,
+  Cancel01Icon,
+  CheckmarkCircle02Icon,
+  Delete02Icon,
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
 import { ConfirmDialogProps, ConfirmVariant } from "./types";
@@ -128,9 +131,10 @@ export function ConfirmDialog({
             variant="outline"
             onClick={handleCancel}
             disabled={loading}
-            className="border-border/70 text-foreground hover:bg-muted h-9 cursor-pointer rounded-xl px-4 text-xs font-medium sm:text-sm"
+            className="border-border/70 text-foreground hover:bg-muted h-9.5 cursor-pointer gap-1.5 rounded-full px-4.5 text-xs font-semibold"
           >
-            {cancelText}
+            <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+            <span>{cancelText}</span>
           </Button>
 
           <Button
@@ -138,19 +142,24 @@ export function ConfirmDialog({
             onClick={handleConfirm}
             disabled={loading}
             className={cn(
-              "h-9 cursor-pointer rounded-xl px-4 text-xs font-semibold transition-all active:scale-[0.98] sm:text-sm",
+              "h-9.5 cursor-pointer gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md transition-all active:scale-[0.98]",
               currentVariant.buttonClass,
             )}
           >
-            {loading && (
+            {loading ? (
               <HugeiconsIcon
                 icon={Loading03Icon}
                 size={15}
                 strokeWidth={2}
-                className="mr-1.5 animate-spin"
+                className="animate-spin"
+              />
+            ) : (
+              <HugeiconsIcon
+                icon={variant === "danger" ? Delete02Icon : CheckmarkCircle02Icon}
+                className="size-3.5"
               />
             )}
-            {confirmText}
+            <span>{confirmText}</span>
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -7,8 +7,10 @@ import {
   changePasswordSchema,
   type ChangePasswordFormValues,
 } from "../../schemas/change-password.schema";
-import { useChangePassword } from "../../hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { useChangePassword, useSession } from "../../hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -22,6 +24,15 @@ import {
 } from "@hugeicons/core-free-icons";
 
 export function ChangePasswordForm() {
+  const router = useRouter();
+  const { data: session, isLoading: isCheckingSession, isError } = useSession();
+
+  React.useEffect(() => {
+    if (!isCheckingSession && (isError || !session?.user)) {
+      router.replace("/login?redirectTo=/change-password");
+    }
+  }, [isCheckingSession, isError, session, router]);
+
   const [showCurrentPassword, setShowCurrentPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
@@ -61,6 +72,15 @@ export function ChangePasswordForm() {
     });
   };
 
+  if (isCheckingSession) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-8">
+        <Spinner size="md" className="text-primary" />
+        <p className="text-muted-foreground text-xs font-medium">Verificando sesión...</p>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {/* Alerta de Error del Servidor */}
@@ -76,39 +96,32 @@ export function ChangePasswordForm() {
 
       {/* Contraseña Actual */}
       <div className="space-y-1.5">
-        <Label htmlFor="currentPassword" className="text-foreground text-xs font-semibold">
-          Contraseña Actual *
-        </Label>
-        <div className="relative">
-          <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2">
-            <HugeiconsIcon icon={LockIcon} className="size-4" />
-          </div>
-          <input
-            id="currentPassword"
-            type={showCurrentPassword ? "text" : "password"}
-            autoComplete="current-password"
-            disabled={isSubmitting}
-            placeholder="Ingresa tu contraseña actual"
-            {...register("currentPassword")}
-            className={`bg-background placeholder:text-muted-foreground/60 focus:ring-primary/30 focus:border-primary h-11 w-full rounded-full border pr-10 pl-10 text-sm transition-all outline-none focus:ring-2 disabled:opacity-50 ${
-              errors.currentPassword
-                ? "border-destructive ring-destructive/20 ring-1"
-                : "border-input"
-            }`}
-          />
-          <button
-            type="button"
-            onClick={() => setShowCurrentPassword((prev) => !prev)}
-            tabIndex={-1}
-            disabled={isSubmitting}
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
-          >
-            <HugeiconsIcon
-              icon={showCurrentPassword ? ViewOffSlashIcon : ViewIcon}
-              className="size-4"
-            />
-          </button>
-        </div>
+        <Label htmlFor="currentPassword">Contraseña Actual *</Label>
+        <Input
+          id="currentPassword"
+          type={showCurrentPassword ? "text" : "password"}
+          autoComplete="current-password"
+          disabled={isSubmitting}
+          placeholder="Ingresa tu contraseña actual"
+          startIcon={<HugeiconsIcon icon={LockIcon} className="size-4" />}
+          endIcon={
+            <button
+              type="button"
+              onClick={() => setShowCurrentPassword((prev) => !prev)}
+              tabIndex={-1}
+              disabled={isSubmitting}
+              className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              aria-label={showCurrentPassword ? "Ocultar contraseña" : "Ver contraseña"}
+            >
+              <HugeiconsIcon
+                icon={showCurrentPassword ? ViewOffSlashIcon : ViewIcon}
+                className="size-4"
+              />
+            </button>
+          }
+          {...register("currentPassword")}
+          aria-invalid={!!errors.currentPassword}
+        />
         {errors.currentPassword && (
           <p className="text-destructive animate-in fade-in pl-1 text-[11px] font-medium duration-150">
             {errors.currentPassword.message}
@@ -118,37 +131,32 @@ export function ChangePasswordForm() {
 
       {/* Nueva Contraseña */}
       <div className="space-y-1.5">
-        <Label htmlFor="newPassword" className="text-foreground text-xs font-semibold">
-          Nueva Contraseña *
-        </Label>
-        <div className="relative">
-          <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2">
-            <HugeiconsIcon icon={LockIcon} className="size-4" />
-          </div>
-          <input
-            id="newPassword"
-            type={showNewPassword ? "text" : "password"}
-            autoComplete="new-password"
-            disabled={isSubmitting}
-            placeholder="Mínimo 8 caracteres con letras y números"
-            {...register("newPassword")}
-            className={`bg-background placeholder:text-muted-foreground/60 focus:ring-primary/30 focus:border-primary h-11 w-full rounded-full border pr-10 pl-10 text-sm transition-all outline-none focus:ring-2 disabled:opacity-50 ${
-              errors.newPassword ? "border-destructive ring-destructive/20 ring-1" : "border-input"
-            }`}
-          />
-          <button
-            type="button"
-            onClick={() => setShowNewPassword((prev) => !prev)}
-            tabIndex={-1}
-            disabled={isSubmitting}
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
-          >
-            <HugeiconsIcon
-              icon={showNewPassword ? ViewOffSlashIcon : ViewIcon}
-              className="size-4"
-            />
-          </button>
-        </div>
+        <Label htmlFor="newPassword">Nueva Contraseña *</Label>
+        <Input
+          id="newPassword"
+          type={showNewPassword ? "text" : "password"}
+          autoComplete="new-password"
+          disabled={isSubmitting}
+          placeholder="Mínimo 8 caracteres con letras y números"
+          startIcon={<HugeiconsIcon icon={LockIcon} className="size-4" />}
+          endIcon={
+            <button
+              type="button"
+              onClick={() => setShowNewPassword((prev) => !prev)}
+              tabIndex={-1}
+              disabled={isSubmitting}
+              className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              aria-label={showNewPassword ? "Ocultar contraseña" : "Ver contraseña"}
+            >
+              <HugeiconsIcon
+                icon={showNewPassword ? ViewOffSlashIcon : ViewIcon}
+                className="size-4"
+              />
+            </button>
+          }
+          {...register("newPassword")}
+          aria-invalid={!!errors.newPassword}
+        />
         {errors.newPassword && (
           <p className="text-destructive animate-in fade-in pl-1 text-[11px] font-medium duration-150">
             {errors.newPassword.message}
@@ -157,7 +165,7 @@ export function ChangePasswordForm() {
       </div>
 
       {/* Checklist de Requisitos de Seguridad */}
-      <div className="bg-muted/50 space-y-1 rounded-xl p-2.5 text-[11px]">
+      <div className="bg-muted/50 space-y-1 rounded-2xl p-3 text-[11px]">
         <p className="text-muted-foreground font-semibold">Requisitos de la nueva contraseña:</p>
         <div className="grid grid-cols-1 gap-1 text-[11px] sm:grid-cols-2">
           <span
@@ -201,39 +209,32 @@ export function ChangePasswordForm() {
 
       {/* Confirmar Nueva Contraseña */}
       <div className="space-y-1.5">
-        <Label htmlFor="confirmPassword" className="text-foreground text-xs font-semibold">
-          Confirmar Nueva Contraseña *
-        </Label>
-        <div className="relative">
-          <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2">
-            <HugeiconsIcon icon={LockIcon} className="size-4" />
-          </div>
-          <input
-            id="confirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            autoComplete="new-password"
-            disabled={isSubmitting}
-            placeholder="Repite tu nueva contraseña"
-            {...register("confirmPassword")}
-            className={`bg-background placeholder:text-muted-foreground/60 focus:ring-primary/30 focus:border-primary h-11 w-full rounded-full border pr-10 pl-10 text-sm transition-all outline-none focus:ring-2 disabled:opacity-50 ${
-              errors.confirmPassword
-                ? "border-destructive ring-destructive/20 ring-1"
-                : "border-input"
-            }`}
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword((prev) => !prev)}
-            tabIndex={-1}
-            disabled={isSubmitting}
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
-          >
-            <HugeiconsIcon
-              icon={showConfirmPassword ? ViewOffSlashIcon : ViewIcon}
-              className="size-4"
-            />
-          </button>
-        </div>
+        <Label htmlFor="confirmPassword">Confirmar Nueva Contraseña *</Label>
+        <Input
+          id="confirmPassword"
+          type={showConfirmPassword ? "text" : "password"}
+          autoComplete="new-password"
+          disabled={isSubmitting}
+          placeholder="Repite tu nueva contraseña"
+          startIcon={<HugeiconsIcon icon={LockIcon} className="size-4" />}
+          endIcon={
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              tabIndex={-1}
+              disabled={isSubmitting}
+              className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              aria-label={showConfirmPassword ? "Ocultar contraseña" : "Ver contraseña"}
+            >
+              <HugeiconsIcon
+                icon={showConfirmPassword ? ViewOffSlashIcon : ViewIcon}
+                className="size-4"
+              />
+            </button>
+          }
+          {...register("confirmPassword")}
+          aria-invalid={!!errors.confirmPassword}
+        />
         {errors.confirmPassword && (
           <p className="text-destructive animate-in fade-in pl-1 text-[11px] font-medium duration-150">
             {errors.confirmPassword.message}

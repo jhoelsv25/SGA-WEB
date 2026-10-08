@@ -2,10 +2,26 @@ import type * as React from "react";
 import type { IconSvgElement } from "@hugeicons/react";
 
 /**
- * Roles del sistema SGA institucional (estándar en inglés con alias en español).
+ * Roles del sistema SGA institucional (basado en roles del modelo DB v3.2 / 0000_init.sql)
+ * - Administrador: Acceso total al sistema
+ * - Director: Seguimiento docente, supervisión de sesiones y reportes
+ * - Secretaria: Matrícula, estudiantes y apoderados
+ * - Docente: Sesiones de clase, libretas y aula virtual de sus cursos
+ * - Estudiante: Aula virtual, libretas y asistencia propias
+ * - Apoderado: Consulta de libretas, asistencia y comunicados de sus hijos
  */
 export type UserRole =
-  "admin" | "principal" | "teacher" | "student" | "parent" | "director" | "apoderado";
+  | "admin"
+  | "principal"
+  | "director"
+  | "secretary"
+  | "secretaria"
+  | "teacher"
+  | "docente"
+  | "student"
+  | "estudiante"
+  | "parent"
+  | "apoderado";
 
 /**
  * Variante de color visual para el badge indicador del menú.

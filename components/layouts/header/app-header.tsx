@@ -6,7 +6,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/common/theme-toggle";
-import { BreadcrumbNav } from "./breadcrumb-nav";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Notification01Icon,
@@ -39,14 +38,9 @@ export function AppHeader({ user }: AppHeaderProps) {
 
   return (
     <header className="border-border/60 bg-background/95 sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-2 border-b px-3 backdrop-blur-md transition-[width,height] ease-linear md:px-4">
-      {/* Lado Izquierdo: Trigger del Sidebar + Separador + Breadcrumb */}
+      {/* Lado Izquierdo: Trigger del Sidebar */}
       <div className="flex min-w-0 items-center gap-2">
         <SidebarTrigger className="text-muted-foreground hover:text-foreground -ml-1 shrink-0" />
-        <Separator
-          orientation="vertical"
-          className="mr-1 shrink-0 data-[orientation=vertical]:h-4"
-        />
-        <BreadcrumbNav />
       </div>
 
       {/* Lado Derecho: Reloj + Selector de Año Lectivo + Popover de Monitoreo + Notificaciones + ThemeToggle + HeaderUserMenu */}

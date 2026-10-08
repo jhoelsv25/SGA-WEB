@@ -214,6 +214,39 @@ function RoleMetricsGrid({ role }: { role: UserRole }) {
     );
   }
 
+  if (role === "secretary" || role === "secretaria") {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          title="Matrículas Registradas"
+          value="642"
+          subtitle="Año lectivo 2026 vigente"
+          icon={School01Icon}
+        />
+        <MetricCard
+          title="Padrón de Estudiantes"
+          value="680"
+          subtitle="Secundaria regular"
+          icon={UserGroupIcon}
+        />
+        <MetricCard
+          title="Nóminas SIAGIE"
+          value="18 / 20"
+          subtitle="Generadas y oficiales"
+          icon={CheckmarkCircle02Icon}
+          badgeText="90%"
+        />
+        <MetricCard
+          title="Traslados en Proceso"
+          value="3"
+          subtitle="Pendientes de validación"
+          icon={File01Icon}
+          badgeText="Atención"
+        />
+      </div>
+    );
+  }
+
   if (role === "parent" || role === "apoderado") {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -25,6 +25,30 @@ type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
+const TOKEN_STORAGE_KEY = "sga_access_token";
+
+export function getAccessToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setAccessToken(token: string | null): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (token) {
+      localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    } else {
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+    }
+  } catch {
+    // Almacenamiento local restringido o lleno
+  }
+}
+
 /**
  * Cliente centralizado de Axios para la comunicación con el Backend.
  * withCredentials: true asegura el envío/recepción de cookies HttpOnly (sesión, refresh token).
@@ -37,6 +61,15 @@ export const apiClient: AxiosInstance = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
+});
+
+// Interceptor de solicitudes para inyectar Bearer token si existe en storage
+apiClient.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 let refreshPromise: Promise<boolean> | null = null;
@@ -88,10 +121,11 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         }
 
-        // Si falló el refresh y estamos en el cliente, redirigir a login
-        if (typeof window !== "undefined" && !window.location.pathname.startsWith("/auth")) {
+        // Si falló el refresh y estamos en el cliente, limpiar token y redirigir a login
+        setAccessToken(null);
+        if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
           // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-          window.location.href = `/auth/login?expired=true&redirectTo=${encodeURIComponent(
+          window.location.href = `/login?expired=true&redirectTo=${encodeURIComponent(
             window.location.pathname,
           )}`;
         }

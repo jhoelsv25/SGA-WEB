@@ -47,7 +47,7 @@ export function PortalNavbar() {
           : "border-border/30 bg-background/50 border-b backdrop-blur-md"
       }`}
     >
-      <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-17 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* ── Brand ── */}
         <Brand
           href="/"
@@ -146,7 +146,7 @@ export function PortalNavbar() {
       {/* ── Mobile Menu ── */}
       <div
         className={`border-border/60 bg-background/98 overflow-hidden border-b backdrop-blur-xl transition-all duration-300 lg:hidden ${
-          mobileMenuOpen ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0"
+          mobileMenuOpen ? "max-h-120 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">

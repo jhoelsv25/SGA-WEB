@@ -181,7 +181,7 @@ export function SelectOption<T extends string = string>({
           aria-expanded={open}
           disabled={disabled}
           className={cn(
-            "border-border/80 bg-background text-foreground hover:border-ring/30 hover:bg-background focus-visible:border-ring focus-visible:ring-ring/25 aria-expanded:border-ring aria-expanded:ring-ring/25 dark:border-border/70 dark:bg-card/40 dark:hover:bg-card/50 dark:focus-visible:ring-ring/35 dark:aria-expanded:ring-ring/35 h-10 w-full min-w-0 justify-between rounded-xl border px-3.5 py-2 text-sm font-normal shadow-2xs transition-all duration-150 outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-expanded:ring-2",
+            "border-border/80 bg-background text-foreground hover:border-ring/30 hover:bg-background focus-visible:border-primary focus-visible:ring-primary/20 aria-expanded:border-primary aria-expanded:ring-primary/20 dark:border-border/70 dark:bg-card/40 dark:hover:bg-card/50 h-11 w-full min-w-0 justify-between rounded-full border px-4 py-2 text-sm font-normal shadow-2xs transition-all duration-150 outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-expanded:ring-2",
             !triggerLabel && "text-muted-foreground/60 dark:text-muted-foreground/50",
             className,
           )}

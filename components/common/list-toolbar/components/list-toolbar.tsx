@@ -207,7 +207,7 @@ export function ListToolbar({
             placeholder={resolvedSearchPlaceholder}
             value={resolvedSearchValue}
             onChange={(e) => resolvedOnSearchChange(e.target.value)}
-            className="h-10 rounded-xl pr-9 pl-9.5 text-xs shadow-2xs"
+            className="h-11 rounded-full pr-9 pl-9.5 text-xs shadow-2xs"
           />
           {resolvedSearchValue ? (
             <button

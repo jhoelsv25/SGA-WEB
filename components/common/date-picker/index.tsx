@@ -43,7 +43,7 @@ export function DatePicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            "w-full justify-between text-left font-normal",
+            "border-input bg-background/90 h-11 w-full justify-between rounded-full px-4 text-left font-normal transition-all",
             !className?.includes("w-") && "sm:w-65",
             !date && "text-muted-foreground",
             className,

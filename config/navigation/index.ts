@@ -1,10 +1,11 @@
 import type { NavSection, UserRole } from "./types";
 import { defaultNavigation } from "./default";
-import { studentNavigation } from "./student";
-import { teacherNavigation } from "./teacher";
+import { studentNavigation, estudianteNavigation } from "./student";
+import { teacherNavigation, docenteNavigation } from "./teacher";
 import { principalNavigation, directorNavigation } from "./principal";
 import { adminNavigation } from "./admin";
 import { parentNavigation, apoderadoNavigation } from "./parent";
+import { secretaryNavigation, secretariaNavigation } from "./secretary";
 
 export * from "./types";
 export * from "./default";
@@ -13,16 +14,28 @@ export * from "./teacher";
 export * from "./principal";
 export * from "./admin";
 export * from "./parent";
+export * from "./secretary";
 
 /**
- * Mapa centralizado de navegaciones indexadas por rol institucional en inglés (con alias en español).
+ * Mapa centralizado de navegaciones indexadas por rol institucional
+ * Basado en las 6 definiciones de roles del modelo DB v3.2 (0000_init.sql):
+ * 1. Administrador (admin)
+ * 2. Director (principal, director)
+ * 3. Secretaria (secretary, secretaria)
+ * 4. Docente (teacher, docente)
+ * 5. Estudiante (student, estudiante)
+ * 6. Apoderado (parent, apoderado)
  */
 export const roleNavigations: Record<UserRole, NavSection[]> = {
   admin: adminNavigation,
   principal: principalNavigation,
   director: directorNavigation,
+  secretary: secretaryNavigation,
+  secretaria: secretariaNavigation,
   teacher: teacherNavigation,
+  docente: docenteNavigation,
   student: studentNavigation,
+  estudiante: estudianteNavigation,
   parent: parentNavigation,
   apoderado: apoderadoNavigation,
 };
