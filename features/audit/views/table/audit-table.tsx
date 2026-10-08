@@ -12,6 +12,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -22,10 +23,86 @@ import {
   AlertCircleIcon,
   RefreshIcon,
   ShieldCheckIcon,
+  PlusSignIcon,
+  PencilEdit02Icon,
+  Delete02Icon,
+  Login01Icon,
+  Logout01Icon,
+  UserIcon,
+  UserGroupIcon,
+  Menu01Icon,
+  Building01Icon,
+  Layers01Icon,
 } from "@hugeicons/core-free-icons";
 import { subDays, addDays, format, differenceInCalendarDays, parseISO, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
 import { DatePicker } from "@/components/common/date-picker";
+
+const ACCIONES_OPTIONS = [
+  {
+    value: "crear",
+    label: "Crear",
+    icon: PlusSignIcon,
+    badgeStyle: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+  },
+  {
+    value: "actualizar",
+    label: "Actualizar",
+    icon: PencilEdit02Icon,
+    badgeStyle: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+  },
+  {
+    value: "eliminar",
+    label: "Eliminar",
+    icon: Delete02Icon,
+    badgeStyle: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+  },
+  {
+    value: "iniciar_sesion",
+    label: "Inicio de sesión",
+    icon: Login01Icon,
+    badgeStyle: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
+  },
+  {
+    value: "cerrar_sesion",
+    label: "Cierre de sesión",
+    icon: Logout01Icon,
+    badgeStyle: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+  },
+] as const;
+
+const ENTIDADES_OPTIONS = [
+  {
+    value: "usuarios",
+    label: "Usuarios",
+    icon: UserIcon,
+    badgeStyle: "bg-primary/10 text-primary border-primary/20",
+  },
+  {
+    value: "roles",
+    label: "Roles",
+    icon: ShieldCheckIcon,
+    badgeStyle: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+  },
+  {
+    value: "menus",
+    label: "Menús",
+    icon: Menu01Icon,
+    badgeStyle: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+  },
+  {
+    value: "personas",
+    label: "Personas",
+    icon: UserGroupIcon,
+    badgeStyle: "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20",
+  },
+  {
+    value: "institucion",
+    label: "Institución",
+    icon: Building01Icon,
+    badgeStyle: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+  },
+] as const;
 
 export function AuditTable() {
   // Límite superior: hoy a fin de día
@@ -280,16 +357,45 @@ export function AuditTable() {
                 setPage(1);
               }}
             >
-              <SelectTrigger className="h-10 rounded-full text-xs">
+              <SelectTrigger className="h-10 rounded-full px-3 text-xs">
                 <SelectValue placeholder="Todas las acciones" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las acciones</SelectItem>
-                <SelectItem value="crear">Crear</SelectItem>
-                <SelectItem value="actualizar">Actualizar</SelectItem>
-                <SelectItem value="eliminar">Eliminar</SelectItem>
-                <SelectItem value="iniciar_sesion">Inicio de sesión</SelectItem>
-                <SelectItem value="cerrar_sesion">Cierre de sesión</SelectItem>
+              <SelectContent
+                position="popper"
+                sideOffset={6}
+                className="border-border/80 min-w-56 rounded-2xl p-1.5 shadow-xl backdrop-blur-xl"
+              >
+                <SelectItem
+                  value="all"
+                  className="hover:bg-accent/80 cursor-pointer rounded-xl py-2 pr-8 pl-2 text-xs transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="border-primary/20 bg-primary/10 text-primary flex size-6 shrink-0 items-center justify-center rounded-lg border">
+                      <HugeiconsIcon icon={FilterIcon} className="size-3.5" />
+                    </div>
+                    <span className="text-foreground font-semibold">Todas las acciones</span>
+                  </div>
+                </SelectItem>
+                <SelectSeparator className="my-1" />
+                {ACCIONES_OPTIONS.map((item) => (
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    className="hover:bg-accent/80 cursor-pointer rounded-xl py-2 pr-8 pl-2 text-xs transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={cn(
+                          "flex size-6 shrink-0 items-center justify-center rounded-lg border",
+                          item.badgeStyle,
+                        )}
+                      >
+                        <HugeiconsIcon icon={item.icon} className="size-3.5" />
+                      </div>
+                      <span className="text-foreground font-semibold">{item.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -304,16 +410,45 @@ export function AuditTable() {
                 setPage(1);
               }}
             >
-              <SelectTrigger className="h-10 rounded-full text-xs">
+              <SelectTrigger className="h-10 rounded-full px-3 text-xs">
                 <SelectValue placeholder="Todas las entidades" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las entidades</SelectItem>
-                <SelectItem value="usuarios">Usuarios</SelectItem>
-                <SelectItem value="roles">Roles</SelectItem>
-                <SelectItem value="menus">Menús</SelectItem>
-                <SelectItem value="personas">Personas</SelectItem>
-                <SelectItem value="institucion">Institución</SelectItem>
+              <SelectContent
+                position="popper"
+                sideOffset={6}
+                className="border-border/80 min-w-56 rounded-2xl p-1.5 shadow-xl backdrop-blur-xl"
+              >
+                <SelectItem
+                  value="all"
+                  className="hover:bg-accent/80 cursor-pointer rounded-xl py-2 pr-8 pl-2 text-xs transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="border-primary/20 bg-primary/10 text-primary flex size-6 shrink-0 items-center justify-center rounded-lg border">
+                      <HugeiconsIcon icon={Layers01Icon} className="size-3.5" />
+                    </div>
+                    <span className="text-foreground font-semibold">Todas las entidades</span>
+                  </div>
+                </SelectItem>
+                <SelectSeparator className="my-1" />
+                {ENTIDADES_OPTIONS.map((item) => (
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    className="hover:bg-accent/80 cursor-pointer rounded-xl py-2 pr-8 pl-2 text-xs transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={cn(
+                          "flex size-6 shrink-0 items-center justify-center rounded-lg border",
+                          item.badgeStyle,
+                        )}
+                      >
+                        <HugeiconsIcon icon={item.icon} className="size-3.5" />
+                      </div>
+                      <span className="text-foreground font-semibold">{item.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
