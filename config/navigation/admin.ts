@@ -11,8 +11,8 @@ import {
   Award01Icon,
   File01Icon,
   Notification01Icon,
-  Settings02Icon,
   CheckmarkCircle02Icon,
+  ComputerIcon,
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
@@ -171,11 +171,29 @@ export const adminNavigation: NavSection[] = [
       {
         id: "admin-institution",
         label: "Datos Institucionales",
-        link: "/admin/institution",
+        link: "/admin/institucion",
         icon: School01Icon,
-        permissions: ["admin:institution:manage"],
+        permissions: ["institucion:ver", "admin:institution:manage"],
         roles: ["admin"],
-        description: "Información de la I.E., geocerca y turnos escolares",
+        description: "Información de la I.E., dirección, contacto y logo oficial",
+      },
+      {
+        id: "admin-turnos",
+        label: "Turnos y Horarios",
+        link: "/admin/turnos",
+        icon: Clock01Icon,
+        permissions: ["turnos:ver"],
+        roles: ["admin"],
+        description: "Horarios oficiales de entrada, salida y tolerancias",
+      },
+      {
+        id: "admin-equipos",
+        label: "Equipos Autorizados",
+        link: "/admin/equipos",
+        icon: ComputerIcon,
+        permissions: ["equipos:ver"],
+        roles: ["admin"],
+        description: "Terminales kiosko de marcación, firma y biométricos",
       },
       {
         id: "admin-academic-years",
@@ -194,15 +212,6 @@ export const adminNavigation: NavSection[] = [
         permissions: ["admin:announcements:manage"],
         roles: ["admin"],
         description: "Comunicados, circulares e incidencias de convivencia",
-      },
-      {
-        id: "admin-settings",
-        label: "Parámetros y Kioskos",
-        link: "/admin/settings",
-        icon: Settings02Icon,
-        permissions: ["admin:settings:manage"],
-        roles: ["admin"],
-        description: "Equipos autorizados para marcación y parámetros globales",
       },
     ],
   },
