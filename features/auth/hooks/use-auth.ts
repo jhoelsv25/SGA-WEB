@@ -16,6 +16,13 @@ export interface UseLoginOptions {
   onSuccess?: (data: AuthResponse) => void;
   onError?: (error: ApiClientError) => void;
   redirectTo?: string;
+  /** RF-001 V3: false cuando después de las credenciales sigue la selección de rol. */
+  redirect?: boolean;
+}
+
+/** Destino tras ingresar: cambio obligatorio de contraseña o la página pedida. */
+function destinoTrasIngresar(data: AuthResponse, redirectTo?: string): string {
+  return data.user?.mustChangePassword ? "/change-password" : redirectTo || "/admin/dashboard";
 }
 
 /**
@@ -51,6 +58,8 @@ export function useLogin(options?: UseLoginOptions) {
       toast.success(data.message || "Bienvenido al sistema");
       queryClient.setQueryData(["auth", "session"], data);
       queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
+
+      if (options?.redirect === false) return;
 
       if (data.user?.mustChangePassword) {
         toast.info(
@@ -126,26 +135,30 @@ export function useChangePassword(options?: UseChangePasswordOptions) {
   });
 }
 
+export interface UseSelectRoleOptions {
+  redirectTo?: string;
+}
+
 /**
- * Hook para cambiar el perfil activo (RF-001 V2) sin volver a pedir la contraseña.
- * Guarda el nuevo token, refresca la sesión y descarta los datos del perfil anterior.
+ * RF-001 V3: segundo paso del inicio de sesión. Fija el rol con el que se ingresa
+ * (el servidor emite el token definitivo, aunque sea el principal) y entra al sistema.
+ * Dentro del sistema no se cambia de rol: para usar otro, se vuelve a iniciar sesión.
  */
-export function useSwitchProfile() {
+export function useSelectRole(options?: UseSelectRoleOptions) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   return useMutation<AuthResponse, ApiClientError, string>({
-    mutationKey: ["auth", "switch-profile"],
-    mutationFn: (roleId) => authApi.switchProfile(roleId),
+    mutationKey: ["auth", "select-role"],
+    mutationFn: (roleId) => authApi.switchRole(roleId),
     onSuccess: (data) => {
       if (data.accessToken) {
         setAccessToken(data.accessToken);
       }
-      // El menú, los permisos y los datos cargados dependen del perfil activo
+      // El menú y los datos cargados dependen del rol elegido
       queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
       queryClient.setQueryData(["auth", "session"], data);
-      toast.success(data.message || "Perfil cambiado.");
-      router.push("/admin/dashboard");
+      router.push(destinoTrasIngresar(data, options?.redirectTo));
       router.refresh();
     },
     onError: (error) => {

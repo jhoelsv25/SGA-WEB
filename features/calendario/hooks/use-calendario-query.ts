@@ -42,10 +42,10 @@ export function useCalendarioQuery(
 
 const MENU_CALENDARIO = "/admin/calendario";
 
+/** RF-002 V3: el acceso es por menú (Roles-Menú); el servidor también lo valida. */
 export function usePuedeRegistrarCalendario(): boolean {
   const { data } = useSession();
-  const rol =
-    data?.user.activeRoleName ?? data?.user.activeProfileName ?? data?.user.roles?.[0] ?? "";
+  const rol = data?.user.activeRoleName ?? data?.user.roles?.[0] ?? "";
   if (rol === "Administrador") return true;
   return data?.user.menuRoutes?.includes(MENU_CALENDARIO) ?? false;
 }
