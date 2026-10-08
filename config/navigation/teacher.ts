@@ -119,6 +119,14 @@ export const teacherNavigation: NavSection[] = [
         roles: ["teacher", "docente"],
         description: "Registro de incidencias de conducta y circulares",
       },
+      {
+        id: "teacher-calendar",
+        label: "Calendario escolar",
+        link: "/admin/calendario",
+        icon: Calendar03Icon,
+        roles: ["teacher", "docente"],
+        description: "Feriados, suspensiones y días sin clases",
+      },
     ],
   },
 ];

@@ -107,6 +107,14 @@ export const studentNavigation: NavSection[] = [
         roles: ["student", "estudiante"],
         description: "Avisos del colegio, circulares y eventos",
       },
+      {
+        id: "student-calendar",
+        label: "Calendario escolar",
+        link: "/admin/calendario",
+        icon: Calendar03Icon,
+        roles: ["student", "estudiante"],
+        description: "Feriados, suspensiones y días sin clases",
+      },
     ],
   },
 ];

@@ -13,6 +13,7 @@ import {
   Notification01Icon,
   CheckmarkCircle02Icon,
   ComputerIcon,
+  Settings02Icon,
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
@@ -196,6 +197,15 @@ export const adminNavigation: NavSection[] = [
         description: "Terminales kiosko de marcación, firma y biométricos",
       },
       {
+        id: "admin-variables",
+        label: "Variables del Sistema",
+        link: "/admin/variables",
+        icon: Settings02Icon,
+        permissions: ["variables:ver", "parametros:ver"],
+        roles: ["admin"],
+        description: "Parámetros configurables, tolerancias de sesión y ponderaciones",
+      },
+      {
         id: "admin-academic-years",
         label: "Años Lectivos y Periodos",
         link: "/admin/academic-years",
@@ -203,6 +213,14 @@ export const adminNavigation: NavSection[] = [
         permissions: ["admin:academic-years:manage"],
         roles: ["admin"],
         description: "Apertura de año escolar, bimestres y fechas límite",
+      },
+      {
+        id: "admin-calendario",
+        label: "Calendario escolar",
+        link: "/admin/calendario",
+        icon: Calendar03Icon,
+        roles: ["admin"],
+        description: "Feriados, suspensiones y días sin clases del año en curso",
       },
       {
         id: "admin-communications",

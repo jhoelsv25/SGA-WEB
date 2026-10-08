@@ -9,6 +9,7 @@ import {
   Notification01Icon,
   CheckmarkCircle02Icon,
   Invoice01Icon,
+  Calendar03Icon,
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
@@ -136,6 +137,14 @@ export const secretaryNavigation: NavSection[] = [
         permissions: ["announcements:manage"],
         roles: ["secretary", "secretaria"],
         description: "Difusión de avisos a docentes, estudiantes y familias",
+      },
+      {
+        id: "secretary-calendar",
+        label: "Calendario escolar",
+        link: "/admin/calendario",
+        icon: Calendar03Icon,
+        roles: ["secretary", "secretaria"],
+        description: "Feriados, suspensiones y días sin clases",
       },
     ],
   },

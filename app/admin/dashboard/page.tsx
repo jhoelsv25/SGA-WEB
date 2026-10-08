@@ -636,7 +636,7 @@ function UpcomingEventsCard() {
             size="sm"
             className="text-primary w-full justify-between p-0 text-xs font-semibold hover:bg-transparent"
           >
-            <Link href="/dashboard/calendar">
+            <Link href="/admin/calendario">
               <span>Ver calendario completo</span>
               <HugeiconsIcon icon={ArrowRight01Icon} className="size-3.5" />
             </Link>

@@ -148,7 +148,7 @@ export const principalNavigation: NavSection[] = [
       {
         id: "principal-calendar",
         label: "Calendario Cívico Escolar",
-        link: "/dashboard/principal/calendar",
+        link: "/admin/calendario",
         icon: Calendar03Icon,
         permissions: ["principal:calendar:manage", "director:calendar:manage"],
         roles: ["principal", "director"],

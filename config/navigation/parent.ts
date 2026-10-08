@@ -98,6 +98,14 @@ export const parentNavigation: NavSection[] = [
         roles: ["parent", "apoderado"],
         description: "Ficha de matrícula escolar y solicitud de constancias",
       },
+      {
+        id: "parent-calendar",
+        label: "Calendario escolar",
+        link: "/admin/calendario",
+        icon: Calendar03Icon,
+        roles: ["parent", "apoderado"],
+        description: "Feriados, suspensiones y días sin clases",
+      },
     ],
   },
 ];
