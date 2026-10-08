@@ -31,6 +31,10 @@ export function usePermissionsCatalogQuery() {
   return useQuery({
     queryKey: rolesKeys.permissions(),
     queryFn: () => rolesApi.getPermissionsCatalog(),
-    staleTime: 1000 * 60 * 15, // Catálogo relativamente estático
+    staleTime: 1000 * 60 * 60 * 24, // 24 horas (catálogo cuasi-estático)
+    gcTime: 1000 * 60 * 60 * 24, // 24 horas en caché de memoria
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 }
