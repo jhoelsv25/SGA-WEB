@@ -22,15 +22,15 @@ Esta skill **no ejecuta ningún comando git que cambie algo**, aunque haya permi
 y sea cual sea el modo de permisos activo. Su resultado es **siempre texto** para que el usuario
 lo copie y ejecute por su cuenta.
 
-| Permitido (solo lectura)                                  | Prohibido (modifica el repo o el remoto)                        |
-| --------------------------------------------------------- | --------------------------------------------------------------- |
-| `git status`                                              | `git commit`, `git commit --amend`                              |
-| `git diff`, `git diff --staged`                           | `git add`, `git rm`, `git mv`, `git restore`, `git reset`       |
-| `git branch --show-current`                               | `git branch <nombre>`, `-m`, `-d`, `-D`                         |
-| `git branch -a` / `git branch -r` (para ver convenciones) | `git checkout`, `git switch`                                    |
-| `git log --oneline -n 20` (para ver el estilo del repo)   | `git push`, `git pull`, `git fetch`                             |
-| `git show <hash>`                                         | `git merge`, `git rebase`, `git cherry-pick`, `git revert`      |
-| Leer archivos del repo                                    | `git stash`, `git tag`, `git clean`, cualquier otro que escriba |
+| Permitido (solo lectura) | Prohibido (modifica el repo o el remoto) |
+|---|---|
+| `git status` | `git commit`, `git commit --amend` |
+| `git diff`, `git diff --staged` | `git add`, `git rm`, `git mv`, `git restore`, `git reset` |
+| `git branch --show-current` | `git branch <nombre>`, `-m`, `-d`, `-D` |
+| `git branch -a` / `git branch -r` (para ver convenciones) | `git checkout`, `git switch` |
+| `git log --oneline -n 20` (para ver el estilo del repo) | `git push`, `git pull`, `git fetch` |
+| `git show <hash>` | `git merge`, `git rebase`, `git cherry-pick`, `git revert` |
+| Leer archivos del repo | `git stash`, `git tag`, `git clean`, cualquier otro que escriba |
 
 Si el usuario pide ejecutar alguno de los prohibidos dentro de esta skill, se le entrega el
 comando **como texto** para que lo ejecute él.
@@ -102,12 +102,12 @@ Si la descripción mezcla trabajos independientes (ej. una feature y un bug ajen
 
 Si la rama actual tiene la forma `<tipo>/<nombre>`, el commit **hereda ambos**:
 
-| Rama                         | Cabecera del commit              |
-| ---------------------------- | -------------------------------- |
-| `feat/nombre_a`              | `feat(nombre_a): …`              |
-| `fix/calculo_interes`        | `fix(calculo_interes): …`        |
+| Rama | Cabecera del commit |
+|---|---|
+| `feat/nombre_a` | `feat(nombre_a): …` |
+| `fix/calculo_interes` | `fix(calculo_interes): …` |
 | `refactor/validators_cobros` | `refactor(validators_cobros): …` |
-| `hotfix/login_caido`         | `fix(login_caido): …`            |
+| `hotfix/login_caido` | `fix(login_caido): …` |
 
 - El **scope es el `<nombre>` de la rama, copiado idéntico** (mismos `_` o `-`, mismo orden). No se traduce, no se abrevia, no se cambia de formato.
 - El **tipo es el de la rama**.
@@ -127,26 +127,26 @@ trabajar en una rama `<tipo>/<nombre>` (sugiriéndole el nombre).
 5. La **descripción** va inmediatamente después de `: ` y es un resumen corto de los cambios.
 6. Un **cuerpo** más extenso puede ir después de la descripción, separado por **una línea en blanco**. Es de formato libre.
 7. Una o más **notas de pie** pueden ir una línea en blanco después del cuerpo, con formato `Token: valor` o `Token #valor` (ej. `Refs: #123`, `Reviewed-by: Nombre`). Los tokens usan `-` en lugar de espacios, excepto `BREAKING CHANGE`.
-8. Un **cambio incompatible** (_breaking change_) se indica con `!` antes de los `:` en la cabecera, o con la nota de pie `BREAKING CHANGE: <descripción>` (en mayúsculas), o con ambos.
+8. Un **cambio incompatible** (*breaking change*) se indica con `!` antes de los `:` en la cabecera, o con la nota de pie `BREAKING CHANGE: <descripción>` (en mayúsculas), o con ambos.
 9. Después de `BREAKING CHANGE: ` **siempre** va una descripción de qué cambió y qué debe hacer quien lo usa.
 10. Las notas de pie contienen solo `BREAKING CHANGE`, referencias a tickets y metainformación (revisores, coautores).
 11. Se pueden usar tipos distintos de `feat` y `fix` (ver tabla).
 
 ### Tipos
 
-| Tipo       | Cuándo usarlo                                                                                       | SemVer |
-| ---------- | --------------------------------------------------------------------------------------------------- | ------ |
-| `feat`     | Nueva funcionalidad visible para el usuario o el consumidor de la API                               | MINOR  |
-| `fix`      | Corrección de un error                                                                              | PATCH  |
-| `refactor` | Cambio de código que no agrega funcionalidad ni corrige errores (reestructurar, renombrar, limpiar) | —      |
-| `perf`     | Mejora de rendimiento                                                                               | —      |
-| `docs`     | Solo documentación                                                                                  | —      |
-| `style`    | Formato sin cambio de lógica (espacios, indentación, punto y coma)                                  | —      |
-| `test`     | Agregar o corregir pruebas, sin tocar código de producción                                          | —      |
-| `build`    | Sistema de build o dependencias (archivos de proyecto, paquetes, gestores de dependencias)          | —      |
-| `ci`       | Configuración o scripts de integración continua                                                     | —      |
-| `chore`    | Mantenimiento que no encaja en los anteriores                                                       | —      |
-| `revert`   | Revierte un commit anterior (cuerpo: `This reverts commit <hash>.`)                                 | —      |
+| Tipo | Cuándo usarlo | SemVer |
+|---|---|---|
+| `feat` | Nueva funcionalidad visible para el usuario o el consumidor de la API | MINOR |
+| `fix` | Corrección de un error | PATCH |
+| `refactor` | Cambio de código que no agrega funcionalidad ni corrige errores (reestructurar, renombrar, limpiar) | — |
+| `perf` | Mejora de rendimiento | — |
+| `docs` | Solo documentación | — |
+| `style` | Formato sin cambio de lógica (espacios, indentación, punto y coma) | — |
+| `test` | Agregar o corregir pruebas, sin tocar código de producción | — |
+| `build` | Sistema de build o dependencias (archivos de proyecto, paquetes, gestores de dependencias) | — |
+| `ci` | Configuración o scripts de integración continua | — |
+| `chore` | Mantenimiento que no encaja en los anteriores | — |
+| `revert` | Revierte un commit anterior (cuerpo: `This reverts commit <hash>.`) | — |
 
 Cualquier tipo con `!` o `BREAKING CHANGE:` equivale a **MAJOR**.
 
@@ -168,7 +168,6 @@ Cualquier tipo con `!` o `BREAKING CHANGE:` equivale a **MAJOR**.
 ### Scope sin rama
 
 Solo cuando la rama no es `<tipo>/<nombre>`:
-
 - Por funcionalidad o módulo si el cambio es acotado: `(registro_personas)`, `(auth)`.
 - Por capa si el cambio es transversal: `(backend)`, `(frontend)`, `(bd)`.
 - Mismo separador que usen las ramas del repo.
@@ -184,14 +183,12 @@ Solo cuando la rama no es `<tipo>/<nombre>`:
 ## Pasos de ejecución
 
 **Para sugerir una rama:**
-
 1. Leer la descripción del usuario (y opcionalmente `git branch -a` para ver la convención del repo).
 2. Elegir el tipo por el propósito principal.
 3. Construir el nombre con las reglas de formato.
 4. Entregar la opción principal, las alternativas y el comando como texto.
 
 **Para redactar un commit:**
-
 1. `git branch --show-current` → ¿es `<tipo>/<nombre>`? Si lo es, fijar tipo y scope heredados.
 2. `git status` y `git diff --staged` (si no hay nada en staging, `git diff` y avisar que no hay cambios preparados).
 3. Opcional: `git log --oneline -n 20` para ver el idioma y estilo del repo.

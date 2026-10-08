@@ -7,3 +7,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Seguimiento de requerimientos (obligatorio)
+
+- Las skills del proyecto están en `.agents/skills/` y las reglas en `.agents/rules/`. Léelas cuando la tarea lo requiera.
+- Al terminar o avanzar cualquier tarea que implemente un Requerimiento Funcional (RF), sigue **`.agents/skills/actualizar-backlog-rf/SKILL.md`** y actualiza el avance en el backlog vivo: `../SGA-API/docs/00-Plan-y-Backlog-RF.md`.
+- Los RF (escenarios Gherkin) están en `../SGA-API/docs/requerimientos/` y las dudas abiertas en `../SGA-API/docs/requerimientos/PENDIENTES.md`. No inventes reglas de negocio: si falta una, agrégala como pendiente.
