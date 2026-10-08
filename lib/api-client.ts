@@ -132,9 +132,23 @@ apiClient.interceptors.response.use(
       }
 
       const data = axiosError.response?.data;
+      let detailedMessage =
+        data?.message || axiosError.message || "Ocurrió un error inesperado en la solicitud.";
+
+      if (Array.isArray(data?.errors) && data.errors.length > 0) {
+        const errorsList = data.errors.filter(Boolean).join(", ");
+        if (errorsList && !detailedMessage.includes(errorsList)) {
+          detailedMessage = `${detailedMessage}: ${errorsList}`;
+        }
+      } else if (typeof data?.errors === "object" && data.errors !== null) {
+        const errorStrings = Object.values(data.errors).flat().filter(Boolean).join(", ");
+        if (errorStrings && !detailedMessage.includes(errorStrings)) {
+          detailedMessage = `${detailedMessage}: ${errorStrings}`;
+        }
+      }
+
       const normalizedError = new ApiClientError({
-        message:
-          data?.message || axiosError.message || "Ocurrió un error inesperado en la solicitud.",
+        message: detailedMessage,
         statusCode: status,
         errors: data?.errors,
         code: data?.code,

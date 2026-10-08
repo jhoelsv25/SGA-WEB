@@ -17,11 +17,19 @@ export function InstitucionPage() {
   const uploadLogoMutation = useUploadLogoMutation();
 
   const handleSubmit = async (values: UpdateInstitucionFormValues) => {
-    await updateMutation.mutateAsync(values);
+    try {
+      await updateMutation.mutateAsync(values);
+    } catch {
+      // Error manejado en onError del mutation hook
+    }
   };
 
   const handleUploadLogo = async (file: File) => {
-    await uploadLogoMutation.mutateAsync(file);
+    try {
+      await uploadLogoMutation.mutateAsync(file);
+    } catch {
+      // Error manejado en onError del mutation hook
+    }
   };
 
   return (
