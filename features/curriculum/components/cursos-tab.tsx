@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Spinner } from "@/components/common/spinner";
 import { EmptyState } from "@/components/common/empty-state";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
@@ -116,28 +117,22 @@ export function CursosTab() {
           </div>
 
           {/* Selector de Estado */}
-          <div className="border-border/60 bg-muted/30 flex items-center rounded-xl border p-1">
-            {(
-              [
-                { id: "todos", label: "Todos" },
-                { id: "activo", label: "Activos" },
-                { id: "inactivo", label: "Inactivos" },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setStatusFilter(tab.id)}
-                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
-                  statusFilter === tab.id
-                    ? "bg-background text-foreground font-semibold shadow-2xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          <Tabs
+            value={statusFilter}
+            onValueChange={(val) => setStatusFilter(val as "todos" | "activo" | "inactivo")}
+          >
+            <TabsList className="bg-muted/40 h-9 rounded-xl p-1">
+              <TabsTrigger value="todos" className="rounded-lg px-3 text-xs font-medium">
+                Todos
+              </TabsTrigger>
+              <TabsTrigger value="activo" className="rounded-lg px-3 text-xs font-medium">
+                Activos
+              </TabsTrigger>
+              <TabsTrigger value="inactivo" className="rounded-lg px-3 text-xs font-medium">
+                Inactivos
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Botón Nuevo Curso */}

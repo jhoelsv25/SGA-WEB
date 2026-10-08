@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Book02Icon, BookOpen01Icon, School01Icon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { Spinner } from "@/components/common/spinner";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PlanEstudiosTab } from "./components/plan-estudios-tab";
 import { CursosTab } from "./components/cursos-tab";
 import { GradosTab } from "./components/grados-tab";
@@ -34,69 +35,62 @@ export function CurriculumPage() {
         ]}
       />
 
-      {/* Navegación por Pestañas Principales */}
-      <div className="border-border/80 flex border-b">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setActiveTab("plan")}
-            className={`flex items-center gap-2 border-b-2 px-4 py-3 text-xs font-semibold transition-all ${
-              activeTab === "plan"
-                ? "border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground border-transparent"
-            }`}
-          >
-            <HugeiconsIcon icon={BookOpen01Icon} className="size-4" />
-            <span>Plan de Estudios</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("cursos")}
-            className={`flex items-center gap-2 border-b-2 px-4 py-3 text-xs font-semibold transition-all ${
-              activeTab === "cursos"
-                ? "border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground border-transparent"
-            }`}
-          >
-            <HugeiconsIcon icon={Book02Icon} className="size-4" />
-            <span>Catálogo de Cursos</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("grados")}
-            className={`flex items-center gap-2 border-b-2 px-4 py-3 text-xs font-semibold transition-all ${
-              activeTab === "grados"
-                ? "border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground border-transparent"
-            }`}
-          >
-            <HugeiconsIcon icon={School01Icon} className="size-4" />
-            <span>Grados de Secundaria</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Contenido según pestaña activa */}
+      {/* Navegación y Contenido con Tabs de shadcn */}
       {isLoadingGrados ? (
         <div className="flex h-64 items-center justify-center">
           <Spinner className="size-8" />
         </div>
       ) : (
-        <div>
-          {activeTab === "plan" && (
+        <Tabs
+          value={activeTab}
+          onValueChange={(val) => setActiveTab(val as ActiveTab)}
+          className="w-full gap-6"
+        >
+          <TabsList
+            variant="line"
+            className="border-border/80 h-auto w-full justify-start gap-4 rounded-none border-b p-0"
+          >
+            <TabsTrigger
+              value="plan"
+              className="data-active:border-primary data-active:text-primary gap-2 rounded-none px-3 py-2.5 text-xs font-semibold"
+            >
+              <HugeiconsIcon icon={BookOpen01Icon} className="size-4" />
+              <span>Plan de Estudios</span>
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="cursos"
+              className="data-active:border-primary data-active:text-primary gap-2 rounded-none px-3 py-2.5 text-xs font-semibold"
+            >
+              <HugeiconsIcon icon={Book02Icon} className="size-4" />
+              <span>Catálogo de Cursos</span>
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="grados"
+              className="data-active:border-primary data-active:text-primary gap-2 rounded-none px-3 py-2.5 text-xs font-semibold"
+            >
+              <HugeiconsIcon icon={School01Icon} className="size-4" />
+              <span>Grados de Secundaria</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="plan" className="pt-2 outline-none">
             <PlanEstudiosTab
               grados={grados}
               selectedGradoId={activeGradoId}
               onSelectGrado={setSelectedGradoId}
             />
-          )}
+          </TabsContent>
 
-          {activeTab === "cursos" && <CursosTab />}
+          <TabsContent value="cursos" className="pt-2 outline-none">
+            <CursosTab />
+          </TabsContent>
 
-          {activeTab === "grados" && <GradosTab grados={grados} />}
-        </div>
+          <TabsContent value="grados" className="pt-2 outline-none">
+            <GradosTab grados={grados} />
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );

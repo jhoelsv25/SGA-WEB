@@ -12,6 +12,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/common/empty-state";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { Spinner } from "@/components/common/spinner";
@@ -95,24 +96,19 @@ export function PlanEstudiosTab({ grados, selectedGradoId, onSelectGrado }: Plan
   return (
     <div className="space-y-6">
       {/* Selector de Grados (Pestañas 1.° a 5.° de secundaria) */}
-      <div className="border-border/60 flex flex-wrap items-center gap-2 border-b pb-3">
-        {grados.map((g) => {
-          const isSelected = g.id === currentGrado?.id;
-          return (
-            <button
+      <Tabs value={currentGrado?.id} onValueChange={onSelectGrado} className="w-full">
+        <TabsList className="bg-muted/50 h-10 w-fit rounded-xl p-1">
+          {grados.map((g) => (
+            <TabsTrigger
               key={g.id}
-              onClick={() => onSelectGrado(g.id)}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-all ${
-                isSelected
-                  ? "bg-primary text-primary-foreground shadow-primary/25 font-semibold shadow-sm"
-                  : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
+              value={g.id}
+              className="rounded-lg px-4 text-xs font-medium data-active:font-semibold"
             >
-              <span>{g.nombre}</span>
-            </button>
-          );
-        })}
-      </div>
+              {g.nombre}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
       {/* Header del Grado Seleccionado */}
       <div className="border-border/80 bg-card/60 flex flex-col gap-4 rounded-2xl border p-4 shadow-xs backdrop-blur-xs sm:flex-row sm:items-center sm:justify-between">
