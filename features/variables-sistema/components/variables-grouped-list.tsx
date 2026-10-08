@@ -29,7 +29,7 @@ const MODULO_CONFIG: Record<
   string,
   {
     label: string;
-    icon: IconSvgElement | React.ComponentType<{ className?: string }>;
+    icon: IconSvgElement;
     color: string;
   }
 > = {

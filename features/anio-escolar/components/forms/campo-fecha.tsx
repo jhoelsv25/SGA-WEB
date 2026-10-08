@@ -3,12 +3,13 @@
 import { Controller, type Control, type FieldPath, type FieldValues } from "react-hook-form";
 import { DatePicker } from "@/components/common/date-picker";
 import { Label } from "@/components/ui/label";
-import { fechaDeIso, isoDeFecha } from "../utils";
+import { fechaDeIso, isoDeFecha } from "../../utils";
 
 interface CampoFechaProps<T extends FieldValues> {
   control: Control<T>;
   name: FieldPath<T>;
   label: string;
+  hint?: string;
   error?: string;
   disabled?: boolean;
 }
@@ -17,12 +18,13 @@ export function CampoFecha<T extends FieldValues>({
   control,
   name,
   label,
+  hint,
   error,
   disabled = false,
 }: CampoFechaProps<T>) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label>{label}</Label>
+    <div className="space-y-1.5">
+      <Label className="text-sm font-medium">{label}</Label>
       <Controller
         control={control}
         name={name}
@@ -38,7 +40,8 @@ export function CampoFecha<T extends FieldValues>({
           />
         )}
       />
-      {error ? <p className="text-destructive text-xs">{error}</p> : null}
+      {hint ? <p className="text-muted-foreground text-xs">{hint}</p> : null}
+      {error ? <p className="text-destructive text-xs font-medium">{error}</p> : null}
     </div>
   );
 }

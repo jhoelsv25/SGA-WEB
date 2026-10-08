@@ -9,8 +9,8 @@ import type { EventoCalendario, GuardarEventoPayload } from "../types";
 
 export const calendarioKeys = {
   all: ["calendario"] as const,
-  mes: (anio?: number, mes?: number) =>
-    [...calendarioKeys.all, anio ?? "vigente", mes ?? "mes"] as const,
+  mes: (anio?: number, mes?: number, anioAcademicoId?: string) =>
+    [...calendarioKeys.all, anioAcademicoId ?? "vigente", anio ?? "vigente", mes ?? "mes"] as const,
 };
 
 function mensaje(error: unknown, fallback: string): string {
@@ -26,17 +26,27 @@ function avisarEvento(evento: EventoCalendario, fallback: string) {
   toast.success(fallback);
 }
 
-export function useCalendarioQuery(mes?: number, anio?: number) {
+export function useCalendarioQuery(
+  mes?: number,
+  anio?: number,
+  anioAcademicoId?: string,
+  enabled = true,
+) {
   return useQuery({
-    queryKey: calendarioKeys.mes(anio, mes),
+    queryKey: calendarioKeys.mes(anio, mes, anioAcademicoId),
     queryFn: () => getCalendario(mes, anio),
+    enabled,
     retry: false,
   });
 }
 
+const PERMISO_REGISTRAR_CALENDARIO = "calendario:registrar";
+
 export function usePuedeRegistrarCalendario(): boolean {
   const { data } = useSession();
-  const rol = (data?.user.roles?.[0] ?? "").toLowerCase();
+  const permisos = data?.user.permissions;
+  if (permisos) return permisos.includes(PERMISO_REGISTRAR_CALENDARIO);
+  const rol = (data?.user.activeProfileName ?? data?.user.roles?.[0] ?? "").toLowerCase();
   return rol.includes("admin") || rol.includes("direct");
 }
 

@@ -6,8 +6,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/common/spinner";
-import { NOMBRES_BIMESTRE, type AnioAcademico } from "../types";
-import { bimestresSchema, type BimestresFormValues } from "../schemas";
+import { NOMBRES_BIMESTRE, type AnioAcademico } from "../../types";
+import { bimestresSchema, type BimestresFormValues } from "../../schemas";
 import { CampoFecha } from "./campo-fecha";
 
 interface BimestresFormProps {

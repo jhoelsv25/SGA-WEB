@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CalendarioPage } from "@/features/anio-escolar";
+import { CalendarioPage } from "@/features/calendario";
 
 export const metadata: Metadata = {
   title: "Calendario escolar",

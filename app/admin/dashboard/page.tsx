@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { siteConfig, type UserRole } from "@/config";
 import { useDashboardRole } from "@/components/layouts";
+import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +40,11 @@ const ROLE_OPTIONS: RoleOption[] = [
 
 export default function DashboardPage() {
   const { role, setRole, user } = useDashboardRole();
+  const { anio: anioVigente } = useAnioLectivo();
+  const bimestreEnCurso = anioVigente?.bimestres.find((bimestre) => bimestre.estado === "en_curso");
+  const etiquetaAnio = anioVigente
+    ? `Año Lectivo ${anioVigente.anio}${bimestreEnCurso ? ` · Bimestre ${bimestreEnCurso.nombre}` : ""}`
+    : null;
 
   return (
     <div className="space-y-6">
@@ -50,9 +56,11 @@ export default function DashboardPage() {
               <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-widest uppercase">
                 {siteConfig.institution.badge}
               </span>
-              <Badge variant="outline" className="text-[10px] font-semibold">
-                Año Lectivo 2026 · Bimestre I
-              </Badge>
+              {etiquetaAnio ? (
+                <Badge variant="outline" className="text-[10px] font-semibold">
+                  {etiquetaAnio}
+                </Badge>
+              ) : null}
             </div>
             <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
               ¡Bienvenido, {user.name}!

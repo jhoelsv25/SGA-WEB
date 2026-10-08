@@ -1,2 +1,2 @@
 export * from "./use-anios-query";
-export * from "./use-calendario-query";
+export { useAnioLectivo } from "../anio-lectivo-context";

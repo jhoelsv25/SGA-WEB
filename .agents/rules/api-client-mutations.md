@@ -5,6 +5,7 @@
 - **Prohibido `fetch` nativo sin configurar**:
   - Toda llamada al backend SGA debe realizarse exclusivamente a través de la instancia `apiClient` exportada en `@/lib/api-client`.
   - `apiClient` ya incluye configuración de `baseURL`, timeout, `withCredentials: true` (cookies HttpOnly) e interceptores para refresco automático de sesión (`refreshSessionTokens`).
+  - Cada petición lleva el año lectivo de trabajo en el header `x-anio-academico-id` cuando hay uno elegido. No lo agregues en cada llamada: lo pone el interceptor desde `idAnioLectivoActivo()`.
 
 ## 2. Manejo de Errores con `ApiClientError`
 

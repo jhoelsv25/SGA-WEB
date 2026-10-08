@@ -55,26 +55,10 @@ export const reabrirSchema = z.object({
   fechaLimite: z.string().regex(FECHA, REAPERTURA_INCOMPLETA),
 });
 
-export const eventoSchema = z
-  .object({
-    titulo: z.string().trim().min(1, "Indique el título del evento.").max(150),
-    descripcion: z.string().max(500).optional(),
-    tipo: z.enum(["feriado", "suspension", "jornada_pedagogica", "reunion", "actividad", "examen"]),
-    fechaInicio: z.string().regex(FECHA, FECHA_INVALIDA),
-    fechaFin: z.string().regex(FECHA, FECHA_INVALIDA),
-    suspendeClases: z.boolean(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.fechaFin < data.fechaInicio) {
-      ctx.addIssue({ code: "custom", path: ["fechaFin"], message: FECHAS_INVERTIDAS });
-    }
-  });
-
 export type AnioFormValues = z.infer<typeof anioSchema>;
 export type FechasAnioFormValues = z.infer<typeof fechasAnioSchema>;
 export type BimestresFormValues = z.infer<typeof bimestresSchema>;
 export type ReabrirFormValues = z.infer<typeof reabrirSchema>;
-export type EventoFormValues = z.infer<typeof eventoSchema>;
 
 function validarBimestres(
   data: {

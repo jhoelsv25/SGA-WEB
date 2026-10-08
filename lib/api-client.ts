@@ -1,4 +1,8 @@
 import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from "axios";
+import {
+  HEADER_ANIO_ACADEMICO,
+  idAnioLectivoActivo,
+} from "@/features/anio-escolar/anio-lectivo-activo";
 
 export interface ApiErrorPayload {
   message: string;
@@ -68,6 +72,10 @@ apiClient.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  const anioId = idAnioLectivoActivo();
+  if (anioId) {
+    config.headers[HEADER_ANIO_ACADEMICO] = anioId;
   }
   return config;
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "@/features/auth";
 import { ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
 import {
@@ -31,6 +32,12 @@ export const anioKeys = {
 function mensaje(error: unknown, fallback: string): string {
   if (error instanceof ApiClientError && error.message) return error.message;
   return fallback;
+}
+
+export function useEsAdministrador(): boolean {
+  const { data } = useSession();
+  const rol = (data?.user.roles?.[0] ?? "").toLowerCase();
+  return rol.includes("admin");
 }
 
 export function useAniosQuery(enabled = true) {

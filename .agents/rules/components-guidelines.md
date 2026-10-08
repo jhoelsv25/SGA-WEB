@@ -6,8 +6,10 @@ Toda nueva funcionalidad o vista debe consumir los componentes compartidos estan
 
 ### Catálogo de Componentes Obligatorios:
 
-- **Modales:** `@/components/common/modal` (`<Modal title="..." description="...">`)
+- **Modales:** `@/components/common/modal` (`<Modal title="..." description="..." icon={...}>`)
   - Usar siempre como contenedor envolvente para formularios o vistas emergentes.
+  - El icono, el título y el detalle van en el `Modal`, no repetidos como cabecera dentro del formulario.
+  - El formulario sigue el patrón de `features/users/components/forms/create-user-form.tsx`. Ver `.agents/skills/formularios-ui/SKILL.md`.
 - **Diálogos de Confirmación:** `@/components/common/confirm-dialog` (`<ConfirmDialog />`)
   - Para acciones destructivas (eliminar, cancelar, resetear estados).
 - **Acciones de Fila en Tablas:** `@/components/common/row-actions` (`<TableRowActions />`)

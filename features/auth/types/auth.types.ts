@@ -35,6 +35,8 @@ export interface CurrentUser {
   profiles?: AuthProfile[];
   activeProfileId?: string;
   activeProfileName?: string;
+  /** Códigos del perfil activo, por ejemplo `calendario:registrar`. */
+  permissions?: string[];
 }
 
 export interface AuthModule {

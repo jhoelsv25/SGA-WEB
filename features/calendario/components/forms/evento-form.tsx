@@ -18,23 +18,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { Spinner } from "@/components/common/spinner";
-import { eventoSchema, type EventoFormValues } from "../schemas";
+import { ETIQUETAS_EVENTO } from "../../consts";
+import { eventoSchema, type EventoFormValues } from "../../schemas";
 import { CampoFecha } from "./campo-fecha";
 import {
   TIPOS_EVENTO,
   TIPOS_SUSPENDEN_POR_DEFECTO,
   type EventoCalendario,
   type TipoEvento,
-} from "../types";
-
-const ETIQUETAS: Record<TipoEvento, string> = {
-  feriado: "Feriado",
-  suspension: "Suspensión",
-  jornada_pedagogica: "Jornada pedagógica",
-  reunion: "Reunión",
-  actividad: "Actividad",
-  examen: "Examen",
-};
+} from "../../types";
 
 interface EventoFormProps {
   evento?: EventoCalendario | null;
@@ -58,25 +50,35 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
 
   return (
     <form
-      className="flex flex-col gap-4"
+      className="space-y-4"
+      noValidate
       onSubmit={form.handleSubmit(async (values) => {
         await onSubmit(values);
       })}
     >
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="titulo">Título</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="titulo" className="text-sm font-medium">
+          Título
+        </Label>
         <Input
           id="titulo"
+          placeholder="Nombre del evento"
+          disabled={isSubmitting}
           aria-invalid={Boolean(form.formState.errors.titulo)}
           {...form.register("titulo")}
         />
+        <p className="text-muted-foreground text-xs">Nombre con el que se ve en el calendario.</p>
         {form.formState.errors.titulo ? (
-          <p className="text-destructive text-xs">{form.formState.errors.titulo.message}</p>
+          <p className="text-destructive text-xs font-medium">
+            {form.formState.errors.titulo.message}
+          </p>
         ) : null}
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="tipo">Tipo</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="tipo" className="text-sm font-medium">
+          Tipo
+        </Label>
         <Controller
           control={form.control}
           name="tipo"
@@ -96,7 +98,7 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
                 <SelectGroup>
                   {TIPOS_EVENTO.map((tipo) => (
                     <SelectItem key={tipo} value={tipo}>
-                      {ETIQUETAS[tipo]}
+                      {ETIQUETAS_EVENTO[tipo]}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -104,6 +106,10 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
             </Select>
           )}
         />
+        <p className="text-muted-foreground text-xs">
+          Feriado, suspensión y jornada pedagógica suspenden clases. Reunión, actividad y examen no,
+          salvo que lo marques.
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -111,38 +117,53 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
           control={form.control}
           name="fechaInicio"
           label="Inicio"
+          hint="La fecha de fin puede ser el mismo día."
+          disabled={isSubmitting}
           error={form.formState.errors.fechaInicio?.message}
         />
         <CampoFecha
           control={form.control}
           name="fechaFin"
           label="Fin"
+          disabled={isSubmitting}
           error={form.formState.errors.fechaFin?.message}
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <Controller
-          control={form.control}
-          name="suspendeClases"
-          render={({ field }) => (
-            <Checkbox
-              id="suspende"
-              checked={field.value}
-              onCheckedChange={(marcado) => field.onChange(marcado === true)}
-            />
-          )}
-        />
-        <Label htmlFor="suspende">Suspende clases</Label>
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-2">
+          <Controller
+            control={form.control}
+            name="suspendeClases"
+            render={({ field }) => (
+              <Checkbox
+                id="suspende"
+                checked={field.value}
+                disabled={isSubmitting}
+                onCheckedChange={(marcado) => field.onChange(marcado === true)}
+              />
+            )}
+          />
+          <Label htmlFor="suspende" className="text-sm font-medium">
+            Suspende clases
+          </Label>
+        </div>
+        <p className="text-muted-foreground text-xs">
+          Esos días no cuentan como sesión. Las sesiones ya firmadas se conservan.
+        </p>
       </div>
-      <p className="text-muted-foreground text-xs">
-        Feriados, suspensiones y jornadas pedagógicas suspenden clases. Una reunión o actividad no,
-        salvo que lo marques.
-      </p>
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="descripcion">Descripción</Label>
-        <Textarea id="descripcion" rows={3} {...form.register("descripcion")} />
+      <div className="space-y-1.5">
+        <Label htmlFor="descripcion" className="text-sm font-medium">
+          Descripción (Opcional)
+        </Label>
+        <Textarea
+          id="descripcion"
+          rows={3}
+          placeholder="Detalle del evento"
+          disabled={isSubmitting}
+          {...form.register("descripcion")}
+        />
       </div>
 
       <div className="flex justify-end gap-2.5 pt-3">
@@ -172,5 +193,3 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
     </form>
   );
 }
-
-export { ETIQUETAS as ETIQUETAS_EVENTO };
