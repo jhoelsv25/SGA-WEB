@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useUrlFilters } from "@/hooks/use-url-filters";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Search01Icon,
@@ -142,6 +143,11 @@ const ENTIDADES_OPTIONS = [
 ] as const;
 
 export function AuditTable() {
+  const { getParam, setParam, setParams, removeParams } = useUrlFilters({
+    resetPageOnFilter: true,
+    pageParamKey: "page",
+  });
+
   // Límite superior: hoy a fin de día
   const today = React.useMemo(() => {
     const now = new Date();
@@ -152,13 +158,36 @@ export function AuditTable() {
   const todayStr = React.useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
   const defaultStartStr = React.useMemo(() => format(subDays(new Date(), 7), "yyyy-MM-dd"), []);
 
-  const [fechaInicio, setFechaInicio] = React.useState<string>(defaultStartStr);
-  const [fechaFin, setFechaFin] = React.useState<string>(todayStr);
-  const [searchUser, setSearchUser] = React.useState<string>("");
-  const [accion, setAccion] = React.useState<string>("all");
-  const [entidad, setEntidad] = React.useState<string>("all");
-  const [page, setPage] = React.useState<number>(1);
+  // Parámetros leídos de la URL con valores predeterminados seguros
+  const fechaInicio = getParam("fechaInicio", defaultStartStr);
+  const fechaFin = getParam("fechaFin", todayStr);
+  const accion = getParam("accion", "all");
+  const entidad = getParam("entidad", "all");
+  const pageStr = getParam("page", "1");
+  const page = Math.max(1, parseInt(pageStr, 10) || 1);
   const limit = 50;
+
+  // Estado de búsqueda por usuario con debounce para actualización suave de URL
+  const urlUser = getParam("usuario", "");
+  const [searchInput, setSearchInput] = React.useState(urlUser);
+  const [prevUrlUser, setPrevUrlUser] = React.useState(urlUser);
+
+  if (prevUrlUser !== urlUser) {
+    setPrevUrlUser(urlUser);
+    setSearchInput(urlUser);
+  }
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      const next = searchInput.trim();
+      const current = urlUser.trim();
+      if (next !== current) {
+        setParam("usuario", next || null);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchInput, urlUser, setParam]);
 
   const parsedStartDate = React.useMemo(() => {
     if (!fechaInicio) return undefined;
@@ -172,52 +201,58 @@ export function AuditTable() {
     return new Date(y, m - 1, d);
   }, [fechaFin]);
 
-  // Regla de negocio de la bitácora: rango máx 31 días y fechas cronológicas
+  // Regla de negocio de la bitácora: rango máx 31 días y fechas cronológicas sincronizadas con URL
   const handleFechaDesdeChange = (newDate: Date | undefined) => {
     if (!newDate) {
-      setFechaInicio("");
-      setPage(1);
+      setParam("fechaInicio", null);
       return;
     }
     const newStr = format(newDate, "yyyy-MM-dd");
-    setFechaInicio(newStr);
-    setPage(1);
 
     if (parsedEndDate) {
       if (parsedEndDate < newDate) {
-        setFechaFin(newStr);
-      } else {
-        const diff = differenceInCalendarDays(parsedEndDate, newDate);
-        if (diff > 31) {
-          const maxAllowed = addDays(newDate, 31);
-          const capped = maxAllowed > today ? today : maxAllowed;
-          setFechaFin(format(capped, "yyyy-MM-dd"));
-        }
+        setParams({ fechaInicio: newStr, fechaFin: newStr });
+        return;
+      }
+      const diff = differenceInCalendarDays(parsedEndDate, newDate);
+      if (diff > 31) {
+        const maxAllowed = addDays(newDate, 31);
+        const capped = maxAllowed > today ? today : maxAllowed;
+        setParams({ fechaInicio: newStr, fechaFin: format(capped, "yyyy-MM-dd") });
+        return;
       }
     }
+    setParam("fechaInicio", newStr);
   };
 
   const handleFechaHastaChange = (newDate: Date | undefined) => {
     if (!newDate) {
-      setFechaFin("");
-      setPage(1);
+      setParam("fechaFin", null);
       return;
     }
     const newStr = format(newDate, "yyyy-MM-dd");
-    setFechaFin(newStr);
-    setPage(1);
 
     if (parsedStartDate) {
       if (parsedStartDate > newDate) {
-        setFechaInicio(newStr);
-      } else {
-        const diff = differenceInCalendarDays(newDate, parsedStartDate);
-        if (diff > 31) {
-          const minAllowed = subDays(newDate, 31);
-          setFechaInicio(format(minAllowed, "yyyy-MM-dd"));
-        }
+        setParams({ fechaInicio: newStr, fechaFin: newStr });
+        return;
+      }
+      const diff = differenceInCalendarDays(newDate, parsedStartDate);
+      if (diff > 31) {
+        const minAllowed = subDays(newDate, 31);
+        setParams({ fechaInicio: format(minAllowed, "yyyy-MM-dd"), fechaFin: newStr });
+        return;
       }
     }
+    setParam("fechaFin", newStr);
+  };
+
+  const handleAccionChange = (val: string) => {
+    setParam("accion", val === "all" ? null : val);
+  };
+
+  const handleEntidadChange = (val: string) => {
+    setParam("entidad", val === "all" ? null : val);
   };
 
   // Validación de Rango de Fechas (Gherkin Scenarios)
@@ -254,7 +289,7 @@ export function AuditTable() {
     limit,
     fechaInicio: !validationError ? fechaInicio : undefined,
     fechaFin: !validationError ? fechaFin : undefined,
-    usuario: searchUser.trim() ? searchUser.trim() : undefined,
+    usuario: urlUser.trim() ? urlUser.trim() : undefined,
     accion: accion !== "all" ? accion : undefined,
     entidad: entidad !== "all" ? entidad : undefined,
   });
@@ -276,13 +311,18 @@ export function AuditTable() {
   );
 
   const handleResetFilters = () => {
-    setFechaInicio(defaultStartStr);
-    setFechaFin(todayStr);
-    setSearchUser("");
-    setAccion("all");
-    setEntidad("all");
-    setPage(1);
+    removeParams(["usuario", "fechaInicio", "fechaFin", "accion", "entidad", "page"]);
+    setSearchInput("");
   };
+
+  const hasActiveFilters = Boolean(
+    urlUser.trim() ||
+    accion !== "all" ||
+    entidad !== "all" ||
+    getParam("fechaInicio") ||
+    getParam("fechaFin") ||
+    getParam("page"),
+  );
 
   return (
     <div className="space-y-4">
@@ -307,7 +347,8 @@ export function AuditTable() {
               variant="outline"
               size="sm"
               onClick={handleResetFilters}
-              className="text-muted-foreground hover:text-foreground h-9 rounded-full px-3.5 text-xs"
+              disabled={!hasActiveFilters}
+              className="text-muted-foreground hover:text-foreground h-9 rounded-full px-3.5 text-xs transition-opacity disabled:opacity-40"
             >
               Restablecer
             </Button>
@@ -335,11 +376,8 @@ export function AuditTable() {
             <span className="text-muted-foreground px-1 text-[11px] font-semibold">Usuario</span>
             <Input
               placeholder="admin, Sistema..."
-              value={searchUser}
-              onChange={(e) => {
-                setSearchUser(e.target.value);
-                setPage(1);
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               startIcon={<HugeiconsIcon icon={Search01Icon} className="size-4" />}
               className="h-10 text-xs"
             />
@@ -387,13 +425,7 @@ export function AuditTable() {
           {/* Filtro Acción */}
           <div className="space-y-1">
             <span className="text-muted-foreground px-1 text-[11px] font-semibold">Acción</span>
-            <Select
-              value={accion}
-              onValueChange={(val) => {
-                setAccion(val);
-                setPage(1);
-              }}
-            >
+            <Select value={accion} onValueChange={handleAccionChange}>
               <SelectTrigger className="h-10 rounded-full px-3 text-xs">
                 <SelectValue placeholder="Todas las acciones" />
               </SelectTrigger>
@@ -440,13 +472,7 @@ export function AuditTable() {
           {/* Filtro Módulo / Entidad */}
           <div className="space-y-1">
             <span className="text-muted-foreground px-1 text-[11px] font-semibold">Módulo</span>
-            <Select
-              value={entidad}
-              onValueChange={(val) => {
-                setEntidad(val);
-                setPage(1);
-              }}
-            >
+            <Select value={entidad} onValueChange={handleEntidadChange}>
               <SelectTrigger className="h-10 rounded-full px-3 text-xs">
                 <SelectValue placeholder="Todos los módulos" />
               </SelectTrigger>
@@ -526,7 +552,21 @@ export function AuditTable() {
           data={validationError ? [] : auditLogs}
           isLoading={isLoading}
           emptyMessage="No hay registros de auditoría para los filtros seleccionados."
-          pagination={true}
+          pagination={
+            response
+              ? {
+                  page,
+                  totalPages: response.totalPages,
+                  total: response.total,
+                  onNextPage: () => setParam("page", Math.min(page + 1, response.totalPages)),
+                  onPreviousPage: () => setParam("page", Math.max(page - 1, 1)),
+                  onFirstPage: () => setParam("page", 1),
+                  onLastPage: () => setParam("page", response.totalPages),
+                  canNextPage: page < response.totalPages,
+                  canPreviousPage: page > 1,
+                }
+              : false
+          }
         />
       </div>
 
