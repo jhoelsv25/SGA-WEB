@@ -7,7 +7,11 @@ export async function getInstitucion(): Promise<Institucion> {
 }
 
 export async function updateInstitucion(payload: UpdateInstitucionPayload): Promise<Institucion> {
-  const response = await apiClient.patch<Institucion>("/institucion", payload);
+  const body = {
+    ...payload,
+    correo: payload.correo ? payload.correo.trim() : undefined,
+  };
+  const response = await apiClient.patch<Institucion>("/institucion", body);
   return response.data;
 }
 
@@ -15,16 +19,16 @@ export async function uploadInstitucionLogo(
   file: File,
 ): Promise<{ logoUrl: string; message: string }> {
   const formData = new FormData();
+  formData.append("logo", file);
   formData.append("file", file);
 
-  const response = await apiClient.post<{ logoUrl: string; message: string }>(
-    "/institucion/logo",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  const response = await apiClient.post<Institucion>("/institucion/logo", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
-  );
-  return response.data;
+  });
+  return {
+    logoUrl: response.data.logoUrl || "",
+    message: "Logo actualizado exitosamente.",
+  };
 }
