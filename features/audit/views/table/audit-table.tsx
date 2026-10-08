@@ -432,7 +432,7 @@ export function AuditTable() {
               <SelectContent
                 position="popper"
                 sideOffset={6}
-                className="border-border/80 min-w-56 rounded-2xl p-1.5 shadow-xl backdrop-blur-xl"
+                className="border-border/80 max-h-64 min-h-24 min-w-56 overflow-y-auto rounded-2xl p-1.5 shadow-xl backdrop-blur-xl"
               >
                 <SelectItem
                   value="all"
@@ -479,7 +479,7 @@ export function AuditTable() {
               <SelectContent
                 position="popper"
                 sideOffset={6}
-                className="border-border/80 min-w-64 rounded-2xl p-1.5 shadow-xl backdrop-blur-xl"
+                className="border-border/80 max-h-72 min-h-32 min-w-64 overflow-y-auto rounded-2xl p-1.5 shadow-xl backdrop-blur-xl"
               >
                 <SelectItem
                   value="all"
