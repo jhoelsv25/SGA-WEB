@@ -14,34 +14,34 @@ interface FAQItem {
 
 const FAQS: FAQItem[] = [
   {
-    category: "Acceso y Credenciales",
-    question: "¿Cómo accedo a mi cuenta por primera vez o si olvidé mi contraseña?",
+    category: "Acceso",
+    question: "¿Cómo ingreso por primera vez o si olvidé mi contraseña?",
     answer:
-      "Las cuentas son creadas por la Dirección o Secretaría del colegio. Al ingresar por primera vez, el sistema exige por seguridad cambiar la clave temporal por una personalizada (mínimo 8 caracteres, con letras y números). Si olvidaste tu contraseña, puedes recuperarla en la sección '¿Olvidaste tu contraseña?' ingresando tu usuario y tu fecha de nacimiento registrada en tu matrícula.",
+      "La cuenta la crea el colegio y te entrega una contraseña temporal. Al ingresar por primera vez debes cambiarla por una propia (mínimo 8 caracteres, con letras y números). Si la olvidaste, usa «¿Olvidaste tu contraseña?» en el inicio de sesión con tu usuario y tu fecha de nacimiento.",
   },
   {
-    category: "Portería y Asistencia",
-    question: "¿Cómo opera la terminal de marcado escolar (Kiosco) en portería?",
+    category: "Asistencia",
+    question: "¿Cómo funciona el kiosko de marcación?",
     answer:
-      "El Kiosco está instalado en el acceso principal de la institución educativa. Cada estudiante o docente marca su ingreso acercando su carné con código de barras o ingresando su DNI en el teclado numérico. El sistema valida la foto, registra la hora exacta, aplica la tolerancia configurada y emite alertas de tardanza en tiempo real.",
+      "El kiosko está en equipos autorizados dentro del colegio. Cada persona marca su ingreso y salida con su código personal; el sistema registra la hora y calcula la tardanza según el turno y su tolerancia.",
   },
   {
-    category: "Calificaciones y CNEB",
-    question: "¿Cómo se ingresan y calculan las notas en el sistema?",
+    category: "Libretas",
+    question: "¿Dónde veo las notas y la libreta?",
     answer:
-      "El sistema está 100% adaptado al Currículo Nacional de la Educación Básica (CNEB). Los docentes evalúan por competencias y capacidades utilizando la escala oficial (AD, A, B, C) o numérica según el nivel. El sistema genera automáticamente los consolidados bimestrales y actas finales sin necesidad de cálculos manuales.",
+      "La libreta oficial es la del SIAGIE: el colegio la carga en PDF y el estudiante y su apoderado pueden descargarla. Las únicas notas que se registran en el sistema son las del aula virtual de reforzamiento.",
   },
   {
-    category: "Seguridad y Privacidad",
-    question: "¿Cómo se garantiza la seguridad y privacidad de los datos escolares?",
+    category: "Privacidad",
+    question: "¿Cómo se protegen los datos de los estudiantes?",
     answer:
-      "Toda la información viaja bajo protocolo seguro HTTPS con cookies blindadas (HttpOnly y SameSite). Las contraseñas están cifradas con algoritmo bcrypt y las operaciones quedan registradas en una bitácora de auditoría inmutable (RF-003). Cumplimos estrictamente con la Ley N° 29733 de Protección de Datos Personales del Perú.",
+      "El acceso es por rol, las contraseñas se guardan cifradas y los cambios importantes quedan en la bitácora de auditoría. Los datos se tratan conforme a la Ley N.° 29733 de Protección de Datos Personales.",
   },
   {
-    category: "Dispositivos y Requisitos",
-    question: "¿Puedo consultar mis notas o asistencia desde mi teléfono móvil?",
+    category: "Dispositivos",
+    question: "¿Puedo usarlo desde el celular?",
     answer:
-      "Sí. El SGA está desarrollado con tecnología web moderna y responsive. Funciona de manera fluida desde cualquier navegador moderno (Chrome, Edge, Safari, Firefox) tanto en computadoras de escritorio como en tablets y smartphones.",
+      "Sí. Funciona en el navegador del celular, la tablet o la computadora, sin instalar nada.",
   },
 ];
 
@@ -83,11 +83,10 @@ export function FaqSection() {
                   onClick={() => toggleItem(index)}
                   className="hover:bg-muted/40 flex w-full items-center justify-between p-5 text-left transition-colors"
                   aria-expanded={isOpen}
+                  aria-controls={`faq-respuesta-${index}`}
                 >
-                  <div className="flex items-center gap-3 pr-4">
-                    <span className="text-primary text-[10px] font-bold tracking-wider uppercase">
-                      {faq.category}
-                    </span>
+                  <div className="flex flex-col gap-1 pr-4">
+                    <span className="text-primary text-xs font-semibold">{faq.category}</span>
                     <span className="text-foreground text-sm font-bold sm:text-base">
                       {faq.question}
                     </span>
@@ -99,7 +98,10 @@ export function FaqSection() {
                 </button>
 
                 {isOpen && (
-                  <div className="border-border/40 text-muted-foreground animate-in fade-in-50 border-t px-5 py-4 text-xs leading-relaxed duration-200 sm:text-sm">
+                  <div
+                    id={`faq-respuesta-${index}`}
+                    className="border-border/40 text-muted-foreground animate-in fade-in-50 border-t px-5 py-4 text-sm leading-relaxed duration-200"
+                  >
                     {faq.answer}
                   </div>
                 )}

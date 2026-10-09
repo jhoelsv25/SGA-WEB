@@ -128,9 +128,9 @@ export function TermsContent() {
           <p className="text-muted-foreground m-0">
             Con el fin de garantizar la veracidad y transparencia de las calificaciones, asistencias
             y movimientos escolares, el sistema cuenta con un{" "}
-            <strong className="text-foreground">módulo de bitácora de auditoría inmutable</strong>{" "}
-            que registra cada inicio de sesión, cambio de notas, justificación y exportación, junto
-            con el usuario responsable, dirección IP y marca de tiempo del servidor.
+            <strong className="text-foreground">bitácora de auditoría</strong> que registra cada
+            inicio de sesión, cambio de notas, justificación y exportación, junto con el usuario
+            responsable, dirección IP y marca de tiempo del servidor.
           </p>
         </div>
       </section>

@@ -86,7 +86,7 @@ export default function TermsPage() {
 
           <div className="text-muted-foreground mt-4 flex items-center gap-2 text-xs font-medium">
             <HugeiconsIcon icon={Calendar03Icon} className="size-4" />
-            <span>Vigencia: Período Académico 2026 · V.1.0</span>
+            <span>Versión 1.0</span>
           </div>
         </header>
 

@@ -18,8 +18,8 @@ export const siteConfig = {
     shortName: "I.E. Carmelinas",
     badge: "I.E. Carmelinas · Lircay",
     motto: "Excelencia en la Gestión Educativa y Formación Integral",
-    modularCode: "0342918", // Código modular de referencia
-    address: "Jr. Los Estudiantes s/n, Lircay, Angaraes, Huancavelica, Perú",
+    modularCode: "0342918", // EJEMPLO: reemplazar por el código modular real
+    address: "Jr. Los Estudiantes s/n, Lircay, Angaraes, Huancavelica, Perú", // EJEMPLO
     location: {
       district: "Lircay",
       province: "Angaraes",
@@ -32,6 +32,7 @@ export const siteConfig = {
       dre: "DRE Huancavelica",
       levels: ["Educación Secundaria"],
     },
+    // EJEMPLO: todos los datos de contacto son de prueba hasta tener los reales
     contact: {
       phone: "+51 967 123 456",
       supportPhone: "(067) 456-789",

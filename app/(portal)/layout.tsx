@@ -1,5 +1,5 @@
 import * as React from "react";
-import { PortalNavbar, PortalFooter, AnnouncementModal } from "@/features/portal";
+import { PortalNavbar, PortalFooter } from "@/features/portal";
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,7 +7,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       <PortalNavbar />
       <main className="flex-1">{children}</main>
       <PortalFooter />
-      <AnnouncementModal />
     </div>
   );
 }
