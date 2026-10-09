@@ -1,26 +1,43 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Alert02Icon,
-  CheckmarkCircle02Icon,
-  RefreshIcon,
-  SecurityLockIcon,
-  ShieldCheckIcon,
-  UserCheck01Icon,
-  School01Icon,
-  Key01Icon,
-} from "@hugeicons/core-free-icons";
-import { Button } from "@/components/ui/button";
+import { Key01Icon, UserCheck01Icon, ShieldCheckIcon } from "@hugeicons/core-free-icons";
 import { Spinner } from "@/components/common/spinner";
 import { KIOSK_TOKEN_STORAGE_KEY } from "@/features/equipos/consts";
 import { parseUsuariosPermitidos } from "@/features/equipos";
 import { useValidarKioskoQuery } from "@/features/equipos/hooks";
 import { useInstitucionQuery } from "@/features/institucion/hooks";
+import {
+  KioskoAvisoResultado,
+  KioskoEntradaCodigo,
+  KioskoFooter,
+  KioskoHeader,
+  KioskoPantallaCarga,
+  KioskoPantallaDesconectado,
+  KioskoPantallaNoAutorizado,
+  KioskoReloj,
+  KioskoSelectorTipo,
+  KioskoTeclado,
+  LONGITUD_CODIGO_DEFECTO,
+  LONGITUD_CODIGO_MAXIMA,
+  LONGITUD_PIN_DEFECTO,
+  MarcacionNoDisponibleError,
+  TIEMPO_AUTO_CIERRE_AVISO_MS,
+  TIEMPO_AUTO_LIMPIEZA_ERROR_MS,
+  detectarTurnoSugerido,
+  kioskoAudio,
+  locutarMarcacionRegistrada,
+  locutarNombrePersona,
+  servicioMarcacion,
+  useConexionRed,
+  useInactividad,
+  useRelojDigital,
+  type AvisoKiosko,
+  type PersonaMarcacion,
+  type TipoMarcacion,
+} from "@/features/kiosko";
 
 function getLocalStorageKioskToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -44,247 +61,399 @@ function KioskoContent() {
 
   const effectiveToken = tokenFromUrl || storedToken || "";
 
-  // Consulta de validación con TanStack Query
+  // Estado real de conectividad del dispositivo
+  const { estaEnLinea } = useConexionRed();
+
+  // Validación de seguridad del equipo con TanStack Query
   const {
     data: validationResult,
     isLoading: isValidating,
+    isError: hasValidationError,
     refetch: checkToken,
   } = useValidarKioskoQuery(effectiveToken || undefined);
 
-  // Reloj en tiempo real
-  const [currentTime, setCurrentTime] = React.useState<Date | null>(null);
+  // Reloj digital en tiempo real sincronizado
+  const { fechaActual, horaFormateada, fechaFormateada } = useRelojDigital();
 
-  // Teclado numérico / Entrada de código PIN de marcación
-  const [pinValue, setPinValue] = React.useState("");
-
-  // Datos de la institución
+  // Datos institucionales oficiales
   const { data: institucion } = useInstitucionQuery();
 
-  // Efecto del reloj con intervalo asíncrono
+  // Preferencia de audio y síntesis de voz (activado por defecto)
+  const [sonidoHabilitado, setSonidoHabilitado] = React.useState<boolean>(true);
+
+  // Entrada de código / PIN y flujo de marcación
+  const [paso, setPaso] = React.useState<"codigo" | "pin">("codigo");
+  const [codigoValor, setCodigoValor] = React.useState<string>("");
+  const [pinValor, setPinValor] = React.useState<string>("");
+  const [personaResuelta, setPersonaResuelta] = React.useState<PersonaMarcacion | null>(null);
+  const [procesando, setProcesando] = React.useState<boolean>(false);
+
+  // Aviso flotante de resultado o error con temporizador automático
+  const [aviso, setAviso] = React.useState<AvisoKiosko | null>(null);
+
+  // Turno detectado automáticamente y selección manual
+  const turnoInfo = React.useMemo(() => detectarTurnoSugerido(fechaActual), [fechaActual]);
+  const [tipoManual, setTipoManual] = React.useState<TipoMarcacion | null>(null);
+  const tipoEfectivo: TipoMarcacion = tipoManual ?? turnoInfo.tipoSugerido;
+
+  // Referencia al input físico para mantener foco permanente
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const timerAvisoRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Enfocar input al cargar y cada vez que se cierre un aviso
+  const enfocarEntrada = React.useCallback(() => {
+    if (typeof window !== "undefined") {
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
+    }
+  }, []);
+
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setCurrentTime(new Date());
-    }, 0);
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    enfocarEntrada();
+  }, [enfocarEntrada]);
+
+  // Limpiar temporizadores al desmontar
+  React.useEffect(() => {
     return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
+      if (timerAvisoRef.current) {
+        clearTimeout(timerAvisoRef.current);
+      }
     };
   }, []);
 
-  const handleKeypadPress = (val: string) => {
-    if (pinValue.length < 12) {
-      setPinValue((prev) => prev + val);
+  // Cerrar aviso y devolver el foco a la entrada
+  const cerrarAviso = React.useCallback(() => {
+    if (timerAvisoRef.current) {
+      clearTimeout(timerAvisoRef.current);
+      timerAvisoRef.current = null;
+    }
+    setAviso(null);
+    enfocarEntrada();
+  }, [enfocarEntrada]);
+
+  const mostrarAvisoConTiempo = React.useCallback(
+    (nuevoAviso: AvisoKiosko, duracionMs: number) => {
+      if (timerAvisoRef.current) {
+        clearTimeout(timerAvisoRef.current);
+      }
+      setAviso(nuevoAviso);
+      timerAvisoRef.current = setTimeout(() => {
+        setAviso(null);
+        enfocarEntrada();
+      }, duracionMs);
+    },
+    [enfocarEntrada],
+  );
+
+  // Borrado automático por inactividad tras 20 segundos sin uso
+  useInactividad({
+    activo: Boolean(codigoValor || pinValor || personaResuelta),
+    onInactividad: () => {
+      setCodigoValor("");
+      setPinValor("");
+      setPaso("codigo");
+      setPersonaResuelta(null);
+      enfocarEntrada();
+    },
+  });
+
+  // Alternar sonido y voz
+  const handleAlternarSonido = () => {
+    setSonidoHabilitado((prev) => !prev);
+    enfocarEntrada();
+  };
+
+  // Restablecer el formulario completo
+  const reiniciarFormulario = React.useCallback(() => {
+    setCodigoValor("");
+    setPinValor("");
+    setPaso("codigo");
+    setPersonaResuelta(null);
+    enfocarEntrada();
+  }, [enfocarEntrada]);
+
+  // Ejecución del flujo de resolución y marcación
+  const procesarMarcacion = React.useCallback(
+    async (codigoAProcesar: string, pinAProcesar = "") => {
+      if (!codigoAProcesar.trim() || procesando) return;
+
+      setProcesando(true);
+
+      try {
+        if (paso === "codigo") {
+          // Fase 1: Resolver código de identificación
+          const resolucion = await servicioMarcacion.resolverCodigo(codigoAProcesar.trim());
+
+          // Momento 1: Locutar nombre en voz alta si el servicio resolvió a la persona
+          locutarNombrePersona(resolucion.persona.nombre, sonidoHabilitado);
+
+          if (resolucion.requierePin) {
+            setPersonaResuelta(resolucion.persona);
+            setPaso("pin");
+            setPinValor("");
+            setProcesando(false);
+            enfocarEntrada();
+            return;
+          }
+
+          // Si no requiere PIN, registrar marcación directa
+          const resultado = await servicioMarcacion.registrarMarcacion({
+            codigo: codigoAProcesar.trim(),
+            tipo: tipoEfectivo,
+            equipoId: validationResult?.equipo?.id,
+          });
+
+          // Momento 2: Locutar confirmación según género
+          locutarMarcacionRegistrada(resultado.persona.genero, sonidoHabilitado);
+          kioskoAudio.reproducirExito(sonidoHabilitado);
+
+          mostrarAvisoConTiempo(
+            {
+              tipo: "exito",
+              titulo: "Marcación Registrada",
+              mensaje: resultado.mensaje || "Asistencia registrada correctamente.",
+              persona: resultado.persona,
+              tipoMarcacion: resultado.tipo,
+              estado: resultado.estado,
+              hora: resultado.hora,
+            },
+            TIEMPO_AUTO_CIERRE_AVISO_MS,
+          );
+
+          reiniciarFormulario();
+        } else {
+          // Fase 2: Registrar con PIN de seguridad
+          const resultado = await servicioMarcacion.registrarMarcacion({
+            codigo: codigoAProcesar.trim(),
+            pin: pinAProcesar.trim(),
+            tipo: tipoEfectivo,
+            equipoId: validationResult?.equipo?.id,
+          });
+
+          locutarMarcacionRegistrada(resultado.persona.genero, sonidoHabilitado);
+          kioskoAudio.reproducirExito(sonidoHabilitado);
+
+          mostrarAvisoConTiempo(
+            {
+              tipo: "exito",
+              titulo: "Marcación Registrada",
+              mensaje: resultado.mensaje || "Firma y asistencia registradas con éxito.",
+              persona: resultado.persona,
+              tipoMarcacion: resultado.tipo,
+              estado: resultado.estado,
+              hora: resultado.hora,
+            },
+            TIEMPO_AUTO_CIERRE_AVISO_MS,
+          );
+
+          reiniciarFormulario();
+        }
+      } catch (err: unknown) {
+        // Manejo amigable sin alert()
+        kioskoAudio.reproducirError(sonidoHabilitado);
+
+        const mensajeError =
+          err instanceof MarcacionNoDisponibleError
+            ? err.message
+            : err instanceof Error && err.message
+              ? err.message
+              : "El registro de asistencia todavía no está habilitado en este equipo.";
+
+        mostrarAvisoConTiempo(
+          {
+            tipo: "error",
+            titulo: "Servicio no disponible",
+            mensaje: mensajeError,
+          },
+          TIEMPO_AUTO_LIMPIEZA_ERROR_MS,
+        );
+
+        reiniciarFormulario();
+      } finally {
+        setProcesando(false);
+      }
+    },
+    [
+      paso,
+      procesando,
+      sonidoHabilitado,
+      tipoEfectivo,
+      validationResult,
+      mostrarAvisoConTiempo,
+      reiniciarFormulario,
+      enfocarEntrada,
+    ],
+  );
+
+  // Manejo de cambios en el input físico o lector
+  const handleCambioEntrada = (nuevoValor: string) => {
+    kioskoAudio.reproducirTecla(sonidoHabilitado);
+
+    if (paso === "codigo") {
+      const recortado = nuevoValor.slice(0, LONGITUD_CODIGO_MAXIMA);
+      setCodigoValor(recortado);
+
+      // Auto-procesamiento al alcanzar longitud estándar configurada (ej. 8 dígitos de DNI)
+      if (recortado.length === LONGITUD_CODIGO_DEFECTO) {
+        void procesarMarcacion(recortado);
+      }
+    } else {
+      const recortado = nuevoValor.slice(0, LONGITUD_PIN_DEFECTO);
+      setPinValor(recortado);
+
+      // Auto-envío al completar el PIN
+      if (recortado.length === LONGITUD_PIN_DEFECTO) {
+        void procesarMarcacion(codigoValor, recortado);
+      }
     }
   };
 
-  const handleClearPin = () => {
-    setPinValue("");
+  // Manejo de pulsaciones del teclado virtual táctil
+  const handlePulsarNumeroVirtual = (digito: string) => {
+    if (procesando) return;
+
+    if (paso === "codigo") {
+      if (codigoValor.length < LONGITUD_CODIGO_MAXIMA) {
+        const siguiente = codigoValor + digito;
+        handleCambioEntrada(siguiente);
+      }
+    } else {
+      if (pinValor.length < LONGITUD_PIN_DEFECTO) {
+        const siguiente = pinValor + digito;
+        handleCambioEntrada(siguiente);
+      }
+    }
+    enfocarEntrada();
   };
 
-  const handleDeleteDigit = () => {
-    setPinValue((prev) => prev.slice(0, -1));
+  const handleBorrarTodoVirtual = () => {
+    kioskoAudio.reproducirTecla(sonidoHabilitado);
+    if (paso === "codigo") {
+      setCodigoValor("");
+    } else {
+      setPinValor("");
+    }
+    enfocarEntrada();
   };
 
-  // Pantalla de Carga
+  const handleBorrarUltimoVirtual = () => {
+    kioskoAudio.reproducirTecla(sonidoHabilitado);
+    if (paso === "codigo") {
+      setCodigoValor((prev) => prev.slice(0, -1));
+    } else {
+      setPinValor((prev) => prev.slice(0, -1));
+    }
+    enfocarEntrada();
+  };
+
+  const handleEnterEntrada = () => {
+    if (paso === "codigo") {
+      if (codigoValor.trim().length >= 3) {
+        void procesarMarcacion(codigoValor);
+      }
+    } else {
+      if (pinValor.trim().length >= 1) {
+        void procesarMarcacion(codigoValor, pinValor);
+      }
+    }
+  };
+
+  // PANTALLA 1: Verificando equipo y seguridad
   if (isValidating) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
-        <div className="mb-4 rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-2xl">
-          <Spinner className="h-10 w-10 text-blue-500" />
-        </div>
-        <h2 className="text-lg font-bold tracking-tight text-slate-200">
-          Iniciando Terminal SGA...
-        </h2>
-        <p className="mt-1 text-xs text-slate-400">
-          Verificando autorización y seguridad del dispositivo
-        </p>
-      </div>
-    );
+    return <KioskoPantallaCarga />;
   }
 
-  // Escenario Gherkin: Equipo NO Autorizado o Desactivado
+  // PANTALLA 2: Sin conexión a internet o al servidor de la institución
+  if (!estaEnLinea || hasValidationError) {
+    return <KioskoPantallaDesconectado onReintentar={() => void checkToken()} />;
+  }
+
+  // PANTALLA 3: Equipo no autorizado (respuesta válida de la API con valido: false o sin token)
   if (!effectiveToken || !validationResult?.valido || !validationResult.equipo) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 p-6 text-center">
-        <div className="relative w-full max-w-md space-y-6 rounded-3xl border border-rose-500/30 bg-slate-900/90 p-8 shadow-2xl">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border border-rose-500/20 bg-rose-500/10 text-rose-500 shadow-inner">
-            <HugeiconsIcon icon={SecurityLockIcon} className="h-10 w-10 stroke-[1.8]" />
-          </div>
-
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/15 px-3 py-1 text-xs font-semibold text-rose-400">
-              <HugeiconsIcon icon={Alert02Icon} className="h-3.5 w-3.5" />
-              Terminal No Habilitada
-            </span>
-            <h1 className="text-xl font-extrabold tracking-tight text-white">
-              Este equipo no está autorizado. Comuníquese con el área de TI.
-            </h1>
-            <p className="pt-1 text-xs leading-relaxed text-slate-400">
-              Para operar este kiosko de asistencia o firma de sesiones, el personal de Soporte TI
-              debe registrar y autorizar este navegador desde el panel de administración.
-            </p>
-          </div>
-
-          <div className="space-y-1.5 rounded-xl border border-slate-800 bg-slate-950/60 p-3.5 text-left font-mono text-xs text-slate-400">
-            <div className="flex justify-between">
-              <span>Estado clave local:</span>
-              <span className={effectiveToken ? "text-amber-400" : "text-rose-400"}>
-                {effectiveToken ? "Token presente pero no activo" : "Sin clave configurada"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Hora del sistema:</span>
-              <span>{currentTime ? currentTime.toLocaleTimeString("es-PE") : "—"}</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => checkToken()}
-              className="w-full gap-2 border-slate-700 bg-slate-800 text-xs text-slate-200 hover:bg-slate-700"
-            >
-              <HugeiconsIcon icon={RefreshIcon} className="h-3.5 w-3.5" />
-              Reintentar Verificación
-            </Button>
-            <Button
-              asChild
-              variant="ghost"
-              className="w-full text-xs text-slate-400 hover:text-slate-200"
-            >
-              <Link href="/login">Acceso para Soporte TI y Administrador</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
+      <KioskoPantallaNoAutorizado
+        tieneTokenLocal={Boolean(effectiveToken)}
+        horaActual={horaFormateada}
+        onReintentar={() => void checkToken()}
+      />
     );
   }
 
-  // Escenario Gherkin: Equipo AUTORIZADO (Libre uso de marcación o sesiones)
+  // PANTALLA 4: Terminal AUTORIZADO y OPERATIVO
   const equipo = validationResult.equipo;
-  const isSesiones = equipo.proposito === "sesiones";
-
-  const formattedDate = currentTime
-    ? new Intl.DateTimeFormat("es-PE", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }).format(currentTime)
-    : "";
-
-  const formattedTime = currentTime
-    ? currentTime.toLocaleTimeString("es-PE", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      })
-    : "";
+  const esSesiones = equipo.proposito === "sesiones";
+  const valorActual = paso === "codigo" ? codigoValor : pinValor;
+  const puedeEnviar = paso === "codigo" ? codigoValor.length >= 3 : pinValor.length >= 1;
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-between p-6">
-      {/* Cabecera Superior del Kiosko */}
-      <header className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-        <div className="flex items-center gap-4">
-          {institucion?.logoUrl ? (
-            <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-700/60 bg-white/5 p-2">
-              <Image
-                src={
-                  institucion.logoUrl.startsWith("http")
-                    ? institucion.logoUrl
-                    : `${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:3000"}${institucion.logoUrl}`
-                }
-                alt="Logo"
-                width={56}
-                height={56}
-                className="max-h-full max-w-full object-contain"
-                unoptimized
-              />
-            </div>
-          ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/30 bg-blue-600/20 text-blue-400">
-              <HugeiconsIcon icon={School01Icon} className="h-7 w-7" />
-            </div>
-          )}
+    <div
+      onClick={enfocarEntrada}
+      className="mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-between p-4 sm:p-6 lg:p-8"
+    >
+      {/* Aviso flotante grande para resultados o alertas */}
+      <KioskoAvisoResultado aviso={aviso} onCerrar={cerrarAviso} />
 
-          <div>
-            <h1 className="text-base font-bold tracking-wide text-white">
-              {institucion?.nombre || "Colegio Carmelinas — SGA"}
-            </h1>
-            <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-400">
-              <span className="font-medium text-slate-200">{equipo.nombre}</span>
-              <span>•</span>
-              <span>{equipo.ubicacion}</span>
-            </div>
-          </div>
-        </div>
+      {/* Cabecera del terminal */}
+      <KioskoHeader
+        institucion={institucion}
+        equipo={equipo}
+        sonidoHabilitado={sonidoHabilitado}
+        onAlternarSonido={handleAlternarSonido}
+      />
 
-        {/* Estado Operativo y Propósito */}
-        <div className="flex items-center gap-3">
-          <div
-            className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-semibold ${
-              isSesiones
-                ? "border-purple-500/30 bg-purple-500/10 text-purple-300"
-                : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-            }`}
-          >
-            <span
-              className={`h-2 w-2 animate-ping rounded-full ${
-                isSesiones ? "bg-purple-400" : "bg-emerald-400"
-              }`}
-            />
-            {isSesiones ? "Kiosko de Sesiones Docentes" : "Kiosko de Marcación"}
-          </div>
+      {/* Cuerpo principal del kiosko */}
+      <main className="my-auto grid grid-cols-1 items-center gap-8 py-6 lg:grid-cols-12 lg:gap-12">
+        {/* Columna Izquierda: Gran reloj y estado de turnos */}
+        <div className="space-y-6 lg:col-span-6">
+          <KioskoReloj hora={horaFormateada} fecha={fechaFormateada} />
 
-          <div className="hidden items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs text-slate-400 sm:flex">
-            <HugeiconsIcon icon={ShieldCheckIcon} className="h-4 w-4 text-emerald-400" />
-            <span>Terminal Autorizada</span>
-          </div>
-        </div>
-      </header>
+          {/* Selector de Entrada / Salida con sugerencia inteligente */}
+          <KioskoSelectorTipo
+            tipo={tipoEfectivo}
+            onCambiarTipo={(t) => {
+              kioskoAudio.reproducirTecla(sonidoHabilitado);
+              setTipoManual(t);
+              enfocarEntrada();
+            }}
+            turnoInfo={turnoInfo}
+          />
 
-      {/* Cuerpo Central: Reloj y Pad de Marcación */}
-      <main className="my-auto grid grid-cols-1 items-center gap-8 py-6 lg:grid-cols-12">
-        {/* Columna Izquierda: Gran Reloj Digital y Mensaje de Bienvenida */}
-        <div className="space-y-6 text-center lg:col-span-6 lg:text-left">
-          <div className="space-y-2">
-            <span className="text-sm font-semibold tracking-wider text-blue-400 uppercase">
-              {formattedDate}
-            </span>
-            <div className="font-mono text-6xl font-black tracking-tight text-white tabular-nums drop-shadow-md sm:text-7xl lg:text-8xl">
-              {formattedTime}
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-3xl border border-slate-800/80 bg-slate-900/60 p-5">
-            <h2 className="flex items-center justify-center gap-2 text-lg font-bold text-slate-100 lg:justify-start">
+          {/* Tarjeta de instrucciones y usuarios autorizados */}
+          <div className="border-border/80 bg-card/60 space-y-3 rounded-3xl border p-5 shadow-2xs backdrop-blur-xs">
+            <h2 className="text-foreground flex items-center gap-2 text-base font-bold sm:text-lg">
               <HugeiconsIcon
-                icon={isSesiones ? Key01Icon : UserCheck01Icon}
-                className="h-5 w-5 text-blue-400"
+                icon={esSesiones ? Key01Icon : UserCheck01Icon}
+                className="text-primary size-5"
+                aria-hidden="true"
               />
-              {isSesiones ? "Firma de Sesión de Clase" : "Registro de Asistencia Escolar"}
+              <span>
+                {esSesiones ? "Firma de Sesión Docente" : "Control de Asistencia Escolar"}
+              </span>
             </h2>
+
             {(() => {
               const usuarios = parseUsuariosPermitidos(equipo.usuariosPermitidos);
               return (
                 <>
-                  <p className="text-xs leading-relaxed text-slate-400">
-                    {isSesiones
-                      ? "Profesores: Ingrese su documento de identidad y PIN de seguridad para firmar el inicio o cierre de su clase programada."
-                      : `Estudiantes y personal habilitado (${usuarios.join(", ")}): Digite su código o pase su tarjeta de identificación.`}
+                  <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
+                    {esSesiones
+                      ? "Docentes: Ingrese su documento de identidad y PIN de seguridad para firmar el inicio o cierre de su clase programada."
+                      : "Estudiantes y personal autorizado: Digite su código en el teclado, use el teclado físico o pase su tarjeta de identificación por el lector."}
                   </p>
 
-                  <div className="flex flex-wrap justify-center gap-1.5 pt-2 lg:justify-start">
+                  <div className="flex flex-wrap gap-1.5 pt-1">
                     {usuarios.map((u) => (
                       <span
                         key={u}
-                        className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-0.5 text-[11px] font-semibold text-slate-300 capitalize"
+                        className="border-border/80 bg-muted/70 text-muted-foreground inline-flex items-center gap-1 rounded-lg border px-2.5 py-0.5 text-xs font-semibold capitalize"
                       >
-                        ✓ {u}
+                        <HugeiconsIcon
+                          icon={ShieldCheckIcon}
+                          className="text-primary size-3.5"
+                          aria-hidden="true"
+                        />
+                        {u}
                       </span>
                     ))}
                   </div>
@@ -294,91 +463,57 @@ function KioskoContent() {
           </div>
         </div>
 
-        {/* Columna Derecha: Teclado Numérico y Entrada de Código */}
+        {/* Columna Derecha: Entrada y Teclado Táctil */}
         <div className="mx-auto w-full max-w-md lg:col-span-6">
-          <div className="space-y-5 rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-2xl">
-            {/* Pantalla del Código ingresado */}
-            <div className="space-y-1.5">
-              <label className="block text-center text-xs font-semibold text-slate-400">
-                {isSesiones ? "Código de Docente o DNI" : "Código de Estudiante / DNI"}
-              </label>
-              <div className="flex h-14 items-center justify-center rounded-2xl border border-slate-800 bg-slate-950 px-4 font-mono text-2xl font-bold tracking-widest text-blue-400 shadow-inner">
-                {pinValue ? (
-                  pinValue
-                ) : (
-                  <span className="text-sm font-normal tracking-normal text-slate-600">
-                    Ingrese número o use el teclado...
-                  </span>
-                )}
+          <div className="border-border/80 bg-card space-y-5 rounded-3xl border p-6 shadow-xl sm:p-7">
+            {/* Si ya se resolvió la persona y pide PIN, mostrar su nombre */}
+            {paso === "pin" && personaResuelta && (
+              <div className="border-primary/20 bg-primary/10 text-primary flex items-center justify-between rounded-2xl border p-3.5 text-sm font-bold">
+                <span>Hola, {personaResuelta.nombre}</span>
+                <span className="text-muted-foreground text-xs font-normal">Ingrese su PIN</span>
               </div>
-            </div>
+            )}
 
-            {/* Teclado táctil numérico */}
-            <div className="grid grid-cols-3 gap-2.5">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => handleKeypadPress(num.toString())}
-                  className="h-14 rounded-2xl bg-slate-800 text-xl font-bold text-slate-100 shadow-xs transition-colors hover:bg-slate-700 active:scale-95 active:bg-blue-600"
-                >
-                  {num}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={handleClearPin}
-                className="h-14 rounded-2xl bg-slate-800/60 text-xs font-bold text-rose-400 transition-colors hover:bg-rose-950/40 hover:text-rose-300"
-              >
-                BORRAR
-              </button>
-              <button
-                type="button"
-                onClick={() => handleKeypadPress("0")}
-                className="h-14 rounded-2xl bg-slate-800 text-xl font-bold text-slate-100 transition-colors hover:bg-slate-700 active:bg-blue-600"
-              >
-                0
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteDigit}
-                aria-label="Borrar último dígito"
-                className="h-14 rounded-2xl bg-slate-800/60 text-xs font-bold text-slate-300 transition-colors hover:bg-slate-700"
-              >
-                ⌫
-              </button>
-            </div>
+            {/* Entrada accesible conectada a teclado físico y lector */}
+            <KioskoEntradaCodigo
+              valor={valorActual}
+              onCambiar={handleCambioEntrada}
+              onEnter={handleEnterEntrada}
+              inputRef={inputRef}
+              deshabilitado={procesando}
+              esModoPin={paso === "pin"}
+              etiqueta={
+                paso === "pin"
+                  ? "PIN de Seguridad"
+                  : esSesiones
+                    ? "Código de Docente o DNI"
+                    : "Código de Estudiante o DNI"
+              }
+              placeholder={paso === "pin" ? "••••" : "Digite o pase su tarjeta..."}
+            />
 
-            {/* Botón de Confirmación / Enviar */}
-            <Button
-              disabled={!pinValue}
-              onClick={() => {
-                alert(
-                  isSesiones
-                    ? `[RF-011] Código recibido: ${pinValue}. Conectando con módulo de firma de sesiones de clase...`
-                    : `[RF-010] Código recibido: ${pinValue}. Conectando con módulo de marcación y asistencia...`,
-                );
-                setPinValue("");
-              }}
-              className="h-12 w-full gap-2 rounded-xl bg-blue-600 text-sm font-bold text-white shadow-lg shadow-blue-600/30 hover:bg-blue-500"
-            >
-              <HugeiconsIcon icon={CheckmarkCircle02Icon} className="h-5 w-5" />
-              Continuar Marcación
-            </Button>
+            {/* Teclado numérico táctil ergonómico */}
+            <KioskoTeclado
+              onPulsarNumero={handlePulsarNumeroVirtual}
+              onBorrarTodo={handleBorrarTodoVirtual}
+              onBorrarUltimo={handleBorrarUltimoVirtual}
+              onEnviar={handleEnterEntrada}
+              deshabilitado={procesando}
+              puedeEnviar={puedeEnviar}
+              textoBoton={
+                procesando
+                  ? "Verificando..."
+                  : paso === "pin"
+                    ? "Confirmar PIN"
+                    : "Continuar Marcación"
+              }
+            />
           </div>
         </div>
       </main>
 
-      {/* Pie de Página del Kiosko */}
-      <footer className="flex items-center justify-between border-t border-slate-800/80 pt-4 text-xs text-slate-500">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-emerald-500" />
-          <span>Servicio en línea • Conectado a SGA API</span>
-        </div>
-        <div>
-          <span>Soporte TI: {institucion?.telefono || "Anexo 101"}</span>
-        </div>
-      </footer>
+      {/* Pie de página con estado de conexión real y soporte */}
+      <KioskoFooter institucion={institucion} estaEnLinea={estaEnLinea} />
     </div>
   );
 }
@@ -387,8 +522,8 @@ export default function KioskoPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center text-sm text-slate-400">
-          <Spinner className="mr-2 h-6 w-6 text-blue-500" />
+        <div className="bg-background text-muted-foreground flex min-h-screen items-center justify-center text-sm">
+          <Spinner className="text-primary mr-2 size-6" />
           Cargando entorno Kiosko...
         </div>
       }
