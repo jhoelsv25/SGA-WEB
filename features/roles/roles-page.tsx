@@ -9,11 +9,11 @@ export function RolesPage() {
     <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
         title="Roles y Permisos"
-        description="Administra los perfiles de acceso y la matriz de privilegios del sistema."
+        description="Administra los roles del sistema y su matriz de permisos."
         icon={ShieldCheckIcon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Administración", href: "#" },
+          { label: "Inicio", href: "/admin/dashboard" },
+          { label: "Administración" },
           { label: "Roles y Permisos" },
         ]}
       />

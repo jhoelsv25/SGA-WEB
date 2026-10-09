@@ -23,12 +23,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/common/spinner";
+import { PasswordInput } from "../password-input";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   UserIcon,
-  LockIcon,
-  ViewIcon,
-  ViewOffSlashIcon,
   LogInIcon,
   AlertCircleIcon,
   UserSwitchIcon,
@@ -67,16 +65,14 @@ function SeleccionRol({
         <p className="text-sm font-semibold">
           Hola, {session.user?.firstName ?? session.user?.username}
         </p>
-        <p className="text-muted-foreground text-xs">
-          Seleccione el rol con el que desea ingresar.
-        </p>
+        <p className="text-muted-foreground text-xs">Elige el rol con el que quieres ingresar.</p>
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="rol">Rol *</Label>
         <Select value={rolId} onValueChange={setRolId} disabled={isPending}>
           <SelectTrigger id="rol" className="w-full">
-            <SelectValue placeholder="Seleccione un rol" />
+            <SelectValue placeholder="Elige un rol" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -145,7 +141,6 @@ function LoginFormInner() {
     }
   }, [autenticado, session, isExpired, redirectTo, router]);
 
-  const [showPassword, setShowPassword] = React.useState(false);
   const initialValues = React.useMemo(() => getInitialLoginValues(), []);
   const [rememberUser, setRememberUser] = React.useState(initialValues.rememberUser);
 
@@ -197,13 +192,16 @@ function LoginFormInner() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      {/* Alerta de Sesión Expirada */}
+      {/* Alerta de Sesión Expirada con tokens del tema */}
       {isExpired && !error && (
-        <div className="animate-in fade-in flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs font-medium text-amber-600 duration-200 dark:text-amber-400">
+        <div
+          role="status"
+          className="border-warning/20 bg-warning/10 text-warning-text animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200"
+        >
           <HugeiconsIcon icon={AlertCircleIcon} className="mt-0.5 size-4 shrink-0" />
           <div className="flex-1 space-y-0.5">
             <p className="leading-tight font-semibold">Sesión finalizada</p>
-            <p className="text-[11px] leading-relaxed opacity-90">
+            <p className="text-xs leading-relaxed opacity-90">
               Tu sesión ha expirado o debes autenticarte para continuar.
             </p>
           </div>
@@ -212,18 +210,21 @@ function LoginFormInner() {
 
       {/* Alerta de Error del Servidor */}
       {error && (
-        <div className="bg-destructive/10 border-destructive/20 text-destructive animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200">
+        <div
+          role="alert"
+          className="bg-destructive/10 border-destructive/20 text-destructive animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200"
+        >
           <HugeiconsIcon icon={AlertCircleIcon} className="mt-0.5 size-4 shrink-0" />
           <div className="flex-1 space-y-0.5">
             <p className="leading-tight font-semibold">Error de autenticación</p>
-            <p className="text-[11px] leading-relaxed opacity-90">{error.message}</p>
+            <p className="text-xs leading-relaxed opacity-90">{error.message}</p>
           </div>
         </div>
       )}
 
-      {/* Campo Usuario */}
+      {/* Campo Usuario con id y aria-describedby */}
       <div className="space-y-1.5">
-        <Label htmlFor="username">Usuario o Código *</Label>
+        <Label htmlFor="username">Usuario o DNI *</Label>
         <Input
           id="username"
           type="text"
@@ -233,37 +234,31 @@ function LoginFormInner() {
           startIcon={<HugeiconsIcon icon={UserIcon} className="size-4" />}
           {...register("username")}
           aria-invalid={!!errors.username}
+          aria-describedby={errors.username ? "username-error" : undefined}
         />
         {errors.username && (
-          <p className="text-destructive px-2 text-[11px] font-medium">{errors.username.message}</p>
+          <p id="username-error" className="text-destructive px-2 text-xs font-medium">
+            {errors.username.message}
+          </p>
         )}
       </div>
 
-      {/* Campo Contraseña */}
+      {/* Campo Contraseña con PasswordInput accesible */}
       <div className="space-y-1.5">
         <Label htmlFor="password">Contraseña *</Label>
-        <Input
+        <PasswordInput
           id="password"
-          type={showPassword ? "text" : "password"}
           autoComplete="current-password"
           disabled={isSubmitting}
           placeholder="Contraseña"
-          startIcon={<HugeiconsIcon icon={LockIcon} className="size-4" />}
-          endIcon={
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="text-muted-foreground hover:text-foreground cursor-pointer p-0.5 transition-colors focus:outline-hidden"
-              aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
-            >
-              <HugeiconsIcon icon={showPassword ? ViewOffSlashIcon : ViewIcon} className="size-4" />
-            </button>
-          }
           {...register("password")}
           aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? "password-error" : undefined}
         />
         {errors.password && (
-          <p className="text-destructive px-2 text-[11px] font-medium">{errors.password.message}</p>
+          <p id="password-error" className="text-destructive px-2 text-xs font-medium">
+            {errors.password.message}
+          </p>
         )}
       </div>
 
@@ -289,9 +284,9 @@ function LoginFormInner() {
 
         <Link
           href="/recover"
-          className="text-foreground/80 decoration-muted-foreground/40 hover:text-primary text-xs font-medium underline underline-offset-4 transition-colors"
+          className="text-foreground/80 decoration-muted-foreground/40 hover:text-primary focus-visible:ring-ring/40 rounded-sm text-xs font-medium underline underline-offset-4 transition-colors outline-none focus-visible:ring-2"
         >
-          He olvidado mi contraseña
+          ¿Olvidaste tu contraseña?
         </Link>
       </div>
 

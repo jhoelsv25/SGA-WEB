@@ -8,7 +8,7 @@ import {
   RefreshIcon,
   SquareLock01Icon,
 } from "@hugeicons/core-free-icons";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { BimestresFormValues, FechasAnioFormValues } from "../../schemas";
@@ -16,7 +16,7 @@ import type { AnioAcademico } from "../../types";
 import { formatoFecha } from "../../utils";
 import { BimestresForm } from "../forms/bimestres-form";
 import { FechasAnioForm } from "../forms/fechas-anio-form";
-import { ESTADO_ANIO, ESTADO_BIMESTRE } from "./estados";
+import { ESTADO_ANIO, ESTADO_BIMESTRE, TONO_ESTADO_ANIO, TONO_ESTADO_BIMESTRE } from "./estados";
 
 interface AnioDetalleProps {
   anio: AnioAcademico;
@@ -52,7 +52,9 @@ export function AnioDetalle({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3">
           <CardTitle>Año {anio.anio}</CardTitle>
-          <Badge>{ESTADO_ANIO[anio.estado]}</Badge>
+          <StatusBadge tone={TONO_ESTADO_ANIO[anio.estado]} dot={anio.estado === "en_curso"}>
+            {ESTADO_ANIO[anio.estado]}
+          </StatusBadge>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {anio.estado === "reabierto" ? (
@@ -101,12 +103,17 @@ export function AnioDetalle({
               key={bimestre.id}
               className="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2"
             >
-              <div>
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2.5">
                 <p className="text-sm font-semibold">
                   {bimestre.nombre} · {formatoFecha(bimestre.fechaInicio)} –{" "}
                   {formatoFecha(bimestre.fechaFin)}
                 </p>
-                <p className="text-muted-foreground text-xs">{ESTADO_BIMESTRE[bimestre.estado]}</p>
+                <StatusBadge
+                  tone={TONO_ESTADO_BIMESTRE[bimestre.estado]}
+                  dot={bimestre.estado === "en_curso"}
+                >
+                  {ESTADO_BIMESTRE[bimestre.estado]}
+                </StatusBadge>
               </div>
               {abierto && bimestre.estado === "planificado" ? (
                 <Button

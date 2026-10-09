@@ -106,7 +106,7 @@ export function CursoForm({ curso, onSubmit, isLoading, onCancel }: CursoFormPro
 
       {/* Color Identificador */}
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium">Color Identificador</Label>
+        <Label className="text-sm font-medium">Color identificador</Label>
         <div className="flex flex-wrap items-center gap-2 pt-1">
           {COLOR_PRESETS.map((preset) => (
             <button
@@ -114,22 +114,26 @@ export function CursoForm({ curso, onSubmit, isLoading, onCancel }: CursoFormPro
               type="button"
               disabled={isLoading}
               onClick={() => setValue("colorHex", preset.hex, { shouldValidate: true })}
-              className="relative size-8 rounded-full border border-black/10 transition-transform hover:scale-110 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-white/10"
+              className="border-foreground/10 focus-visible:ring-ring relative size-8 rounded-full border transition-transform outline-none hover:scale-110 focus-visible:ring-2 focus-visible:ring-offset-2"
               style={{ backgroundColor: preset.hex }}
               title={preset.label}
               aria-label={preset.label}
             >
               {selectedColor?.toUpperCase() === preset.hex.toUpperCase() && (
-                <span className="absolute inset-0 flex items-center justify-center text-white drop-shadow-md">
+                <span className="text-primary-foreground absolute inset-0 flex items-center justify-center drop-shadow-md">
                   <HugeiconsIcon icon={Tick02Icon} className="size-4" strokeWidth={3} />
                 </span>
               )}
             </button>
           ))}
           <div className="flex items-center gap-2 pl-2">
+            <label htmlFor="colorPicker" className="sr-only">
+              Color personalizado
+            </label>
             <input
               type="color"
               id="colorPicker"
+              aria-label="Color personalizado"
               value={selectedColor || "#2563EB"}
               onChange={(e) =>
                 setValue("colorHex", e.target.value.toUpperCase(), { shouldValidate: true })

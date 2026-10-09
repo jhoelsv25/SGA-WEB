@@ -1,0 +1,26 @@
+{
+  "tarea": "T14",
+  "validador": "VAL-3",
+  "veredicto": "APROBADA",
+  "criterios": {
+    "total": 5,
+    "pasan": 5
+  },
+  "pruebas": {
+    "corridas": 6,
+    "fallan": 0,
+    "nuevas": 0
+  },
+  "hallazgos": [
+    {
+      "severidad": "baja",
+      "archivo": "features/kiosko/cola/use-cola-marcaciones.ts:113",
+      "detalle": "La dependencia totalPendientes en el useEffect de retransmisión aborta y reinicia el efecto con cada marcación vaciada en vez de permitir que el bucle drene de forma continua."
+    },
+    {
+      "severidad": "baja",
+      "archivo": "features/kiosko/cola/gestor-cola.ts:71",
+      "detalle": "En la función esperar(), el listener de abort no se desuscribe explícitamente si el setTimeout expira de forma normal."
+    }
+  ]
+}

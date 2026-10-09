@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { VariablesPage } from "@/features/variables-sistema";
 
 export const metadata: Metadata = {
-  title: "Variables del Sistema | SGA",
+  title: "Variables del Sistema",
   description: "Parámetros configurables, tolerancias de asistencia, plazos y límites.",
 };
 

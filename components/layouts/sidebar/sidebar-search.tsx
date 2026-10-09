@@ -96,6 +96,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
             : "h-9.5 rounded-full px-3 text-left",
         )}
         title="Buscar módulo o función (Ctrl + K)"
+        aria-label="Buscar módulo o función (Ctrl + K)"
       >
         <HugeiconsIcon
           icon={Search01Icon}
@@ -107,8 +108,8 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
             <span className="text-muted-foreground/80 group-hover/search:text-foreground flex-1 truncate text-xs font-normal">
               Buscar en el portal...
             </span>
-            <kbd className="border-border/80 bg-background/80 text-muted-foreground pointer-events-none hidden h-5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-[9.5px] font-semibold select-none sm:inline-flex">
-              <span className="text-[10px]">⌘</span>K
+            <kbd className="border-border/80 bg-background/80 text-muted-foreground pointer-events-none hidden h-5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-xs font-semibold select-none sm:inline-flex">
+              <span className="text-xs">⌘</span>K
             </kbd>
           </>
         )}
@@ -142,6 +143,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
                 onClick={() => setQuery("")}
                 className="text-muted-foreground hover:text-foreground rounded-full p-1 transition-colors"
                 title="Limpiar"
+                aria-label="Limpiar búsqueda"
               >
                 <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
               </button>
@@ -171,7 +173,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
                         {item.label}
                       </div>
                       {item.sectionTitle && (
-                        <div className="text-muted-foreground/80 truncate text-[11px]">
+                        <div className="text-muted-foreground/80 truncate text-xs">
                           {item.sectionTitle}
                         </div>
                       )}
@@ -188,9 +190,9 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
           </div>
 
           {/* Footer de navegación rápida */}
-          <div className="border-border/60 bg-muted/40 text-muted-foreground flex items-center justify-between border-t px-4 py-2.5 text-[11px]">
+          <div className="border-border/60 bg-muted/40 text-muted-foreground flex items-center justify-between border-t px-4 py-2.5 text-xs">
             <span className="font-medium">Navegación Institucional · I.E. Carmelinas</span>
-            <span className="font-mono text-[10.5px]">ESC para salir</span>
+            <span className="font-mono text-xs">ESC para salir</span>
           </div>
         </DialogContent>
       </Dialog>

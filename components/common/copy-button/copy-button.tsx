@@ -94,7 +94,7 @@ export function CopyButton({
         className={cn(
           "focus-visible:ring-primary/40 inline-flex size-6 cursor-pointer items-center justify-center rounded-md transition-colors outline-none focus:outline-none focus-visible:ring-1",
           "hover:bg-muted text-muted-foreground hover:text-foreground",
-          copied && "text-emerald-500 hover:text-emerald-500",
+          copied && "text-success hover:text-success",
           className,
         )}
         {...props}
@@ -103,7 +103,7 @@ export function CopyButton({
           icon={copied ? CheckmarkCircle02Icon : Copy01Icon}
           size={13}
           strokeWidth={2}
-          className={cn(copied && "text-emerald-500")}
+          className={cn(copied && "text-success")}
         />
       </button>
     );
@@ -119,8 +119,7 @@ export function CopyButton({
         className={cn(
           "focus-visible:ring-primary/40 inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-0.5 font-mono text-xs transition-all outline-none focus:outline-none focus-visible:ring-1",
           "border-border/60 bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground",
-          copied &&
-            "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+          copied && "border-success/30 bg-success/10 text-success",
           className,
         )}
         {...props}
@@ -130,7 +129,7 @@ export function CopyButton({
         <HugeiconsIcon
           icon={copied ? CheckmarkCircle02Icon : Copy01Icon}
           size={11}
-          className={cn(copied ? "text-emerald-500" : "opacity-60")}
+          className={cn(copied ? "text-success" : "opacity-60")}
         />
       </button>
     );
@@ -146,7 +145,7 @@ export function CopyButton({
         className={cn(
           "focus-visible:ring-primary/40 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition-all outline-none focus:outline-none focus-visible:ring-1",
           "border-border/60 bg-background hover:bg-muted text-foreground",
-          copied && "border-emerald-500/40 text-emerald-600 dark:text-emerald-400",
+          copied && "border-success/40 text-success",
           className,
         )}
         {...props}
@@ -156,7 +155,7 @@ export function CopyButton({
         <HugeiconsIcon
           icon={copied ? CheckmarkCircle02Icon : Copy01Icon}
           size={12}
-          className={cn(copied ? "text-emerald-500" : "text-muted-foreground")}
+          className={cn(copied ? "text-success" : "text-muted-foreground")}
         />
       </button>
     );
@@ -172,7 +171,7 @@ export function CopyButton({
       className={cn(
         "group focus-visible:ring-primary/40 inline-flex cursor-pointer items-center gap-1 rounded-xs font-mono text-xs transition-colors outline-none focus:outline-none focus-visible:ring-1",
         "text-muted-foreground hover:text-foreground",
-        copied && "font-semibold text-emerald-500 hover:text-emerald-500",
+        copied && "text-success hover:text-success font-semibold",
         className,
       )}
       {...props}
@@ -184,7 +183,7 @@ export function CopyButton({
         size={11}
         className={cn(
           "transition-opacity",
-          copied ? "text-emerald-500 opacity-100" : "opacity-60 group-hover:opacity-100",
+          copied ? "text-success opacity-100" : "opacity-60 group-hover:opacity-100",
         )}
       />
     </button>

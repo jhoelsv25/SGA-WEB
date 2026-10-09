@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/common/user-avatar";
+import { StatusBadge } from "@/components/common/status-badge";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
 import { formatDate } from "@/lib/formatters/date";
 import { cn } from "@/lib/utils";
@@ -83,16 +84,15 @@ export function getUserColumns({
         const config = USER_STATUS_CONFIG[estado] ?? USER_STATUS_CONFIG.inactivo;
 
         return (
-          <Badge variant={config.variant} className={cn("text-xs font-semibold", config.className)}>
-            <span className={cn("size-1.5 shrink-0 rounded-full", config.dotClass)} />
-            <span>{config.label}</span>
-          </Badge>
+          <StatusBadge tone={config.tone} dot size="sm">
+            {config.label}
+          </StatusBadge>
         );
       },
     },
     {
       accessorKey: "ultimoAcceso",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Último Acceso" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Último acceso" />,
       cell: ({ row }) => {
         const lastAccess = row.original.ultimoAcceso;
         if (!lastAccess) {

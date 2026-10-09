@@ -22,7 +22,7 @@ export function UserAvatar({ name, avatar, className }: UserAvatarProps): React.
       )}
     >
       {avatar ? <AvatarImage src={avatar} alt={name} /> : null}
-      <AvatarFallback className="text-primary bg-primary/10 text-[11px] font-bold">
+      <AvatarFallback className="text-primary bg-primary/10 text-xs font-bold">
         {getInitials(name)}
       </AvatarFallback>
     </Avatar>

@@ -3,12 +3,15 @@
 import * as React from "react";
 import { DataTable } from "@/components/common/data-table";
 import { ListToolbar } from "@/components/common/list-toolbar";
+import { StatusBadge } from "@/components/common/status-badge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { cursoFilterDefs } from "../config/filters";
 import { getCursoColumns } from "./columns/curso-columns";
+import { CursoActions } from "./columns/curso-actions";
 import { CursoModal } from "../components/modals/curso-modal";
 import {
   useCreateCursoMutation,
@@ -30,10 +33,15 @@ export function CursosTable() {
   const estado: "todos" | "activo" | "inactivo" =
     estadoRaw && estadoRaw !== "all" ? (estadoRaw as "activo" | "inactivo") : "todos";
 
+  const hasActiveFilters = Boolean(
+    search || (areaRaw && areaRaw !== "all") || (estadoRaw && estadoRaw !== "all"),
+  );
+
   // Queries & Mutations
   const {
     data: cursos = [],
     isLoading,
+    isError,
     refetch,
     isFetching,
   } = useCursosQuery({
@@ -98,6 +106,49 @@ export function CursosTable() {
     [handleOpenEdit, handleDeactivate, handleReactivate, desactivarMutation.isPending],
   );
 
+  const renderCursoMobileCard = React.useCallback(
+    (curso: Curso) => {
+      return (
+        <div className="border-border/70 bg-card space-y-3 rounded-xl border p-4 shadow-2xs">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1">
+              <div className="flex items-center gap-2">
+                <span
+                  className="size-3 shrink-0 rounded-full border border-black/10 dark:border-white/10"
+                  style={{ backgroundColor: curso.colorHex || "#2563EB" }}
+                  title={`Color: ${curso.colorHex || "#2563EB"}`}
+                />
+                <span className="text-foreground font-mono text-xs font-bold">{curso.codigo}</span>
+              </div>
+              <p className="text-foreground truncate text-sm font-semibold">{curso.nombre}</p>
+            </div>
+            <CursoActions
+              curso={curso}
+              onEdit={handleOpenEdit}
+              onDeactivate={handleDeactivate}
+              onReactivate={handleReactivate}
+              isDeactivating={desactivarMutation.isPending}
+            />
+          </div>
+
+          {curso.descripcion && (
+            <p className="text-muted-foreground line-clamp-2 text-xs">{curso.descripcion}</p>
+          )}
+
+          <div className="border-border/50 flex flex-wrap items-center justify-between gap-2 border-t pt-2.5 text-xs">
+            <Badge variant="secondary" className="rounded-lg px-2.5 py-0.5 text-xs font-medium">
+              {curso.areaCurricularNombre}
+            </Badge>
+            <StatusBadge tone={curso.activo ? "success" : "neutral"} dot size="sm">
+              {curso.activo ? "Activo" : "Inactivo"}
+            </StatusBadge>
+          </div>
+        </div>
+      );
+    },
+    [handleOpenEdit, handleDeactivate, handleReactivate, desactivarMutation.isPending],
+  );
+
   return (
     <div className="space-y-4">
       {/* Barra de herramientas y filtros estandarizados */}
@@ -113,7 +164,7 @@ export function CursosTable() {
             className="shadow-primary/20 h-9 gap-1.5 rounded-full px-4 text-xs font-semibold shadow-xs"
           >
             <HugeiconsIcon icon={PlusSignIcon} className="size-3.5" />
-            <span>Nuevo Curso</span>
+            <span>Nuevo curso</span>
           </Button>
         }
       />
@@ -123,7 +174,12 @@ export function CursosTable() {
         columns={columns}
         data={cursos}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => void refetch()}
+        hasActiveFilters={hasActiveFilters}
         pagination={false}
+        caption="Catálogo institucional de asignaturas curriculares y talleres"
+        mobileCard={renderCursoMobileCard}
         emptyMessage="No se encontraron cursos en el catálogo con los filtros aplicados."
       />
 

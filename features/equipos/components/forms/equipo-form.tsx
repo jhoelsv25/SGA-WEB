@@ -4,7 +4,11 @@ import * as React from "react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CheckmarkCircle02Icon, InformationCircleIcon } from "@hugeicons/core-free-icons";
+import {
+  CheckmarkCircle02Icon,
+  Cancel01Icon,
+  InformationCircleIcon,
+} from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -93,7 +97,7 @@ export function EquipoForm({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="nombre" className="text-xs font-semibold">
-              Nombre del Equipo <span className="text-destructive">*</span>
+              Nombre del equipo <span className="text-destructive">*</span>
             </Label>
             <Input
               id="nombre"
@@ -106,7 +110,7 @@ export function EquipoForm({
 
           <div className="space-y-1.5">
             <Label htmlFor="ubicacion" className="text-xs font-semibold">
-              Ubicación Física <span className="text-destructive">*</span>
+              Ubicación física <span className="text-destructive">*</span>
             </Label>
             <Input
               id="ubicacion"
@@ -124,7 +128,7 @@ export function EquipoForm({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="proposito" className="text-xs font-semibold">
-              Propósito Operativo <span className="text-destructive">*</span>
+              Propósito operativo <span className="text-destructive">*</span>
             </Label>
             <Controller
               control={control}
@@ -146,7 +150,7 @@ export function EquipoForm({
 
           <div className="space-y-1.5">
             <Label htmlFor="tipo" className="text-xs font-semibold">
-              Tipo de Dispositivo <span className="text-destructive">*</span>
+              Tipo de dispositivo <span className="text-destructive">*</span>
             </Label>
             <Controller
               control={control}
@@ -167,9 +171,9 @@ export function EquipoForm({
 
         {/* Número de Serie (si es biométrico) */}
         {watchTipo === "biometrico" && (
-          <div className="space-y-1.5 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
+          <div className="border-warning/20 bg-warning/10 space-y-1.5 rounded-xl border p-3">
             <Label htmlFor="numeroSerie" className="text-foreground text-xs font-semibold">
-              Número de Serie del Reloj Biométrico
+              Número de serie del reloj biométrico (Opcional)
             </Label>
             <Input
               id="numeroSerie"
@@ -177,7 +181,7 @@ export function EquipoForm({
               {...register("numeroSerie")}
               disabled={isSubmitting}
             />
-            <p className="text-muted-foreground text-[11px]">
+            <p className="text-muted-foreground text-xs">
               Identificador de hardware para sincronización de huellas en versiones futuras.
             </p>
             {errors.numeroSerie && (
@@ -202,14 +206,15 @@ export function EquipoForm({
                   type="button"
                   onClick={() => toggleUsuarioPermitido(opt.value)}
                   disabled={isSubmitting || isLocked}
-                  className={`flex items-center gap-2 rounded-lg border p-2.5 text-xs font-medium transition-all ${
+                  aria-pressed={isChecked}
+                  className={`focus-visible:ring-primary/40 flex min-h-[44px] items-center gap-2 rounded-lg border p-2.5 text-xs font-medium transition-all outline-none focus-visible:ring-2 ${
                     isChecked
                       ? "bg-primary/10 border-primary/40 text-primary font-semibold"
                       : "bg-background border-border text-muted-foreground hover:bg-muted/60"
                   } ${isLocked ? "cursor-not-allowed opacity-80" : ""}`}
                 >
                   <span
-                    className={`flex h-4 w-4 items-center justify-center rounded border text-[10px] ${
+                    className={`flex h-4 w-4 items-center justify-center rounded border text-xs ${
                       isChecked
                         ? "bg-primary text-primary-foreground border-primary"
                         : "border-muted-foreground/40 bg-background"
@@ -223,7 +228,7 @@ export function EquipoForm({
             })}
           </div>
           {watchProposito === "sesiones" && (
-            <p className="pt-1 text-[11px] font-medium text-purple-700 dark:text-purple-300">
+            <p className="text-info pt-1 text-xs font-medium">
               * Para firma de sesiones, el kiosko está reservado exclusivamente para Docentes.
             </p>
           )}
@@ -236,9 +241,9 @@ export function EquipoForm({
         <div className="bg-muted/20 flex items-center justify-between rounded-xl border p-3.5">
           <div className="space-y-0.5">
             <Label htmlFor="activo" className="text-xs font-semibold">
-              Equipo Activo
+              Equipo activo
             </Label>
-            <p className="text-muted-foreground text-[11px]">
+            <p className="text-muted-foreground text-xs">
               Al desactivarlo, la pantalla del kiosko dejará de permitir marcaciones de inmediato.
             </p>
           </div>
@@ -257,10 +262,10 @@ export function EquipoForm({
         </div>
 
         {/* Nota explicativa de autorización */}
-        <div className="flex items-start gap-2.5 rounded-lg border border-blue-500/20 bg-blue-500/10 p-3 text-xs text-blue-900 dark:text-blue-200">
+        <div className="border-info/20 bg-info/10 text-foreground flex items-start gap-2.5 rounded-lg border p-3 text-xs">
           <HugeiconsIcon
             icon={InformationCircleIcon}
-            className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400"
+            className="text-info mt-0.5 h-4 w-4 shrink-0"
           />
           <p>
             <strong>Paso posterior:</strong> Tras guardar este registro, un miembro de Soporte TI o
@@ -271,22 +276,28 @@ export function EquipoForm({
       </div>
 
       {/* Botones de acción */}
-      <div className="flex items-center justify-end gap-3 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          Cancelar
+      <div className="flex items-center justify-end gap-2.5 pt-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="h-10 gap-1.5 rounded-full px-4.5 text-xs font-semibold"
+        >
+          <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+          <span>Cancelar</span>
         </Button>
-        <Button type="submit" disabled={isSubmitting} className="gap-2 px-5">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="shadow-primary/20 h-10 gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md"
+        >
           {isSubmitting ? (
-            <>
-              <Spinner className="h-4 w-4" />
-              Guardando equipo...
-            </>
+            <Spinner className="size-3.5" />
           ) : (
-            <>
-              <HugeiconsIcon icon={CheckmarkCircle02Icon} className="h-4 w-4" />
-              {isEditing ? "Guardar Cambios" : "Registrar Equipo"}
-            </>
+            <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5" />
           )}
+          <span>{isEditing ? "Guardar cambios" : "Registrar equipo"}</span>
         </Button>
       </div>
     </form>

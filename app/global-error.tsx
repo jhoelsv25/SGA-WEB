@@ -17,9 +17,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
   return (
     <html lang="es" className="h-full">
-      <body className="flex min-h-full flex-col items-center justify-center bg-neutral-50 p-6 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-50">
+      <body className="bg-background text-foreground flex min-h-full flex-col items-center justify-center p-6 antialiased">
         <div className="flex max-w-md flex-col items-center text-center">
-          <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-rose-100 p-2 shadow-sm dark:bg-rose-950/50">
+          <div className="bg-destructive/10 text-destructive mb-4 flex size-16 items-center justify-center rounded-2xl p-2 shadow-sm">
             <Image
               src={siteConfig.branding.logo}
               alt={`Logo ${siteConfig.institution.shortName}`}
@@ -29,7 +29,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             />
           </div>
 
-          <span className="mb-3 rounded-full border border-rose-200 bg-rose-50 px-3 py-0.5 text-xs font-bold tracking-widest text-rose-700 uppercase dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-400">
+          <span className="border-destructive/20 bg-destructive/10 text-destructive mb-3 rounded-full border px-3 py-0.5 text-xs font-bold tracking-widest uppercase">
             Error Crítico Global
           </span>
 
@@ -37,13 +37,13 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             Interrupción en el servicio
           </h1>
 
-          <p className="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+          <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
             Se ha producido un error crítico a nivel raíz en la plataforma. Por favor, intenta
             recargar la aplicación.
           </p>
 
           {error.digest && (
-            <p className="mt-3 rounded-md bg-neutral-200/70 px-2 py-1 font-mono text-[11px] text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+            <p className="bg-muted text-muted-foreground mt-3 rounded-md px-2 py-1 font-mono text-xs">
               Código de rastreo: {error.digest}
             </p>
           )}
@@ -72,7 +72,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             </Button>
           </div>
 
-          <p className="mt-8 text-xs text-neutral-500 dark:text-neutral-500">
+          <p className="text-muted-foreground mt-8 text-xs">
             {siteConfig.acronym} · {siteConfig.institution.badge}
           </p>
         </div>

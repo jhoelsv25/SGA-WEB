@@ -18,8 +18,8 @@ export function EmptyState({
         className,
       )}
     >
-      <div className="bg-muted/80 text-muted-foreground flex size-12 scale-105 animate-pulse items-center justify-center rounded-xl duration-300 hover:scale-100">
-        <HugeiconsIcon icon={icon} size={24} strokeWidth={2} />
+      <div className="bg-muted/80 text-muted-foreground flex size-12 items-center justify-center rounded-xl">
+        <HugeiconsIcon icon={icon} size={24} strokeWidth={2} aria-hidden="true" />
       </div>
 
       <h3 className="text-foreground mt-4 text-base font-semibold">{title}</h3>

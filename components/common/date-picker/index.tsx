@@ -22,6 +22,11 @@ export interface DatePickerProps {
   minDate?: Date;
   maxDate?: Date;
   disabledDays?: Matcher | Matcher[];
+  /** "dropdown" muestra selectores de mes y año (útil para fechas lejanas). */
+  captionLayout?: "label" | "dropdown";
+  /** Primer y último mes navegables; necesarios con captionLayout="dropdown". */
+  startMonth?: Date;
+  endMonth?: Date;
 }
 
 export function DatePicker({
@@ -35,10 +40,13 @@ export function DatePicker({
   minDate,
   maxDate,
   disabledDays,
+  captionLayout = "label",
+  startMonth,
+  endMonth,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
-  const handleClear = (e: React.MouseEvent) => {
+  const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     onSelect?.(undefined);
   };
@@ -59,55 +67,62 @@ export function DatePicker({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          disabled={disabled}
-          className={cn(
-            "border-input bg-background/90 h-11 w-full justify-between rounded-full px-4 text-left font-normal transition-all",
-            !className?.includes("w-") && "sm:w-65",
-            !date && "text-muted-foreground",
-            className,
-          )}
-        >
-          <div className="flex items-center gap-2 truncate">
-            <HugeiconsIcon
-              icon={Calendar03Icon}
-              size={16}
-              strokeWidth={2}
-              className="text-muted-foreground shrink-0"
-            />
-            <span className="truncate">
-              {date ? format(date, dateFormat, { locale: es }) : placeholder}
-            </span>
-          </div>
-
-          {clearable && date && !disabled && (
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={handleClear}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  handleClear(e as unknown as React.MouseEvent);
-                }
-              }}
-              className="hover:bg-muted ml-2 rounded-full p-0.5"
-            >
+      <div
+        className={cn(
+          "relative flex w-full min-w-0 items-center",
+          !className?.includes("w-") && "sm:w-65",
+        )}
+      >
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            disabled={disabled}
+            className={cn(
+              "border-input bg-background/90 h-11 w-full justify-between rounded-full px-4 text-left font-normal transition-all",
+              !date && "text-muted-foreground",
+              clearable && date && !disabled && "pr-10",
+              className,
+            )}
+          >
+            <div className="flex items-center gap-2 truncate">
               <HugeiconsIcon
-                icon={Cancel01Icon}
-                size={14}
+                icon={Calendar03Icon}
+                size={16}
                 strokeWidth={2}
-                className="opacity-50 hover:opacity-100"
+                className="text-muted-foreground shrink-0"
               />
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
+              <span className="truncate">
+                {date ? format(date, dateFormat, { locale: es }) : placeholder}
+              </span>
+            </div>
+          </Button>
+        </PopoverTrigger>
+
+        {clearable && date && !disabled ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            onClick={handleClear}
+            aria-label="Limpiar fecha"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1.5 -translate-y-1/2 rounded-full pointer-coarse:size-11"
+          >
+            <HugeiconsIcon
+              icon={Cancel01Icon}
+              size={14}
+              strokeWidth={2}
+              className="opacity-60 hover:opacity-100"
+            />
+          </Button>
+        ) : null}
+      </div>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          defaultMonth={date}
+          defaultMonth={date ?? endMonth}
+          captionLayout={captionLayout}
+          startMonth={startMonth}
+          endMonth={endMonth}
           selected={date}
           onSelect={(newDate) => {
             onSelect?.(newDate);

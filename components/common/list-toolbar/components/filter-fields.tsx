@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 import { SelectOption } from "@/components/common/select";
 import { DatePicker } from "@/components/common/date-picker";
 import { DateRangePicker } from "@/components/common/date-range-picker";
@@ -8,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type {
   ListFilterController,
   ListFilterDef,
+  ListFilterChipsDef,
   ListFilterDateDef,
   ListFilterDateRangeDef,
   ListFilterMultiSelectDef,
@@ -32,7 +34,7 @@ function FilterFieldShell({
   }
   return (
     <label className={cn("flex w-full min-w-0 flex-col gap-1.5", className)}>
-      <span className="text-muted-foreground px-0.5 text-[11px] leading-none font-semibold">
+      <span className="text-muted-foreground px-0.5 text-xs leading-none font-semibold">
         {label}
       </span>
       {children}
@@ -174,6 +176,66 @@ function FilterDateRangeField({
   );
 }
 
+function FilterChipsField({
+  def,
+  controller,
+  layout,
+}: {
+  def: ListFilterChipsDef;
+  controller: ListFilterController;
+  layout: FilterFieldLayout;
+}) {
+  const allValue = getSelectAllValue(def);
+  const raw = controller.values[def.key];
+  const currentValue = typeof raw === "string" && raw ? raw : allValue;
+  const isStacked = layout === "stack";
+
+  return (
+    <FilterFieldShell
+      label={isStacked ? def.label : undefined}
+      className={isStacked ? "w-full" : cn("max-w-full min-w-0", def.className)}
+    >
+      <div
+        role="group"
+        aria-label={def.label ?? "Filtro de opciones"}
+        className={cn(
+          "flex scrollbar-none items-center gap-1.5 overflow-x-auto py-0.5",
+          isStacked ? "flex-wrap overflow-x-visible" : "max-w-full",
+        )}
+      >
+        {def.options.map((option) => {
+          const isSelected = currentValue === option.value;
+          return (
+            <Button
+              key={String(option.value)}
+              type="button"
+              variant={isSelected ? "default" : "outline"}
+              size="xs"
+              aria-pressed={isSelected}
+              disabled={option.disabled}
+              onClick={() => {
+                if (isSelected) {
+                  if (option.value === allValue) return;
+                  controller.setFilter(def.key, null);
+                } else {
+                  controller.setFilter(def.key, option.value === allValue ? null : option.value);
+                }
+              }}
+              className={cn(
+                "shrink-0 rounded-full text-xs font-medium whitespace-nowrap transition-colors pointer-coarse:min-h-11",
+                isSelected && "shadow-2xs",
+              )}
+            >
+              {option.icon}
+              <span>{option.label}</span>
+            </Button>
+          );
+        })}
+      </div>
+    </FilterFieldShell>
+  );
+}
+
 /**
  * Renderiza los filtros del listado, excepto la búsqueda.
  * `stack` muestra la etiqueta de cada filtro y ocupa el ancho del popover.
@@ -204,6 +266,10 @@ export function ListToolbarFilterFields({
                 controller={controller}
                 layout={layout}
               />
+            );
+          case "chips":
+            return (
+              <FilterChipsField key={def.key} def={def} controller={controller} layout={layout} />
             );
           case "date":
             return (

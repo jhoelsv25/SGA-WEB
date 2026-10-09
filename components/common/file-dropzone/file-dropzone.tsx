@@ -130,7 +130,7 @@ export function FileDropzone({
           onDragLeave={handleDragLeave}
           onClick={() => !disabled && inputRef.current?.click()}
           className={cn(
-            "relative flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-dashed p-6 text-center transition-all duration-150 outline-none",
+            "focus-visible:ring-primary/40 focus-visible:border-primary relative flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-dashed p-6 text-center transition-all duration-150 outline-none focus-visible:ring-2",
             isDragging
               ? "border-primary bg-primary/10 scale-[1.005]"
               : "border-border/70 bg-muted/20 hover:border-primary/50 hover:bg-muted/30",
@@ -155,7 +155,7 @@ export function FileDropzone({
 
           <div className="space-y-0.5">
             <p className="text-foreground text-xs font-semibold">{title}</p>
-            <p className="text-muted-foreground text-[11px]">
+            <p className="text-muted-foreground text-xs">
               {description} (hasta {formatBytes(maxSizeBytes)})
             </p>
           </div>
@@ -165,7 +165,7 @@ export function FileDropzone({
               {acceptedFormats.map((fmt) => (
                 <span
                   key={fmt}
-                  className="border-border/70 bg-background text-muted-foreground rounded-md border px-2 py-0.5 font-mono text-[9px] font-bold"
+                  className="border-border/70 bg-background text-muted-foreground rounded-md border px-2 py-0.5 font-mono text-xs font-bold"
                 >
                   {fmt}
                 </span>
@@ -181,10 +181,10 @@ export function FileDropzone({
             </div>
             <div className="min-w-0">
               <p className="text-foreground truncate text-xs font-semibold">{file.name}</p>
-              <div className="flex items-center gap-2 text-[11px]">
+              <div className="flex items-center gap-2 text-xs">
                 <span className="text-muted-foreground font-mono">{formatBytes(file.size)}</span>
                 <span className="text-muted-foreground/60">•</span>
-                <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+                <span className="text-success inline-flex items-center gap-1 font-medium">
                   <HugeiconsIcon icon={CheckmarkCircle02Icon} size={12} />
                   Archivo cargado
                 </span>
@@ -199,6 +199,7 @@ export function FileDropzone({
             onClick={handleRemove}
             className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive size-8 shrink-0 rounded-lg"
             title="Quitar archivo"
+            aria-label="Quitar archivo"
           >
             <HugeiconsIcon icon={Delete02Icon} size={16} />
           </Button>

@@ -28,7 +28,7 @@ export function EquipoFormModal({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title={isEditing ? `Editar Equipo: ${equipo?.nombre}` : "Registrar Nuevo Equipo Autorizado"}
+      title={isEditing ? `Editar equipo: ${equipo?.nombre}` : "Registrar nuevo equipo autorizado"}
       description="Configura los terminales kiosko y biométricos habilitados para el colegio."
       icon={ComputerIcon}
       size="2xl"

@@ -65,10 +65,7 @@ export default function TermsPage() {
             <span>Volver al portal principal</span>
           </Link>
 
-          <Badge
-            variant="outline"
-            className="border-primary/20 bg-primary/5 text-primary text-[11px]"
-          >
+          <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-xs">
             <HugeiconsIcon icon={FileCheckIcon} className="mr-1 size-3.5" />
             Normativa Escolar
           </Badge>
@@ -86,7 +83,7 @@ export default function TermsPage() {
 
           <div className="text-muted-foreground mt-4 flex items-center gap-2 text-xs font-medium">
             <HugeiconsIcon icon={Calendar03Icon} className="size-4" />
-            <span>Vigencia: Período Académico 2026 · V.1.0</span>
+            <span>Versión 1.0</span>
           </div>
         </header>
 

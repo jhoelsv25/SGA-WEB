@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { getNavigationForRole, type UserRole } from "@/config";
+import { menuDelUsuario } from "@/config";
+import { useSession } from "@/features/auth";
 import {
   Sidebar,
   SidebarContent,
@@ -14,12 +15,16 @@ import { NavMain } from "./nav-main";
 import { SidebarSearch } from "./sidebar-search";
 import { SidebarQuickFooter } from "./sidebar-quick-footer";
 
-export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  role?: UserRole;
-}
+export type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
 
-export function AppSidebar({ role = "teacher", ...props }: AppSidebarProps) {
-  const sections = React.useMemo(() => getNavigationForRole(role), [role]);
+export function AppSidebar(props: AppSidebarProps) {
+  const { data: session } = useSession();
+  const rolActivo = session?.user.activeRoleName ?? session?.user.roles?.[0] ?? "";
+  const menuRoutes = session?.user.menuRoutes;
+  const sections = React.useMemo(
+    () => menuDelUsuario({ esAdministrador: rolActivo === "Administrador", menuRoutes }),
+    [rolActivo, menuRoutes],
+  );
 
   return (
     <Sidebar

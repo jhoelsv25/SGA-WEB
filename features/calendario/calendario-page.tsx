@@ -3,10 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AlertCircleIcon, Calendar03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { Calendar03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { PageHeader } from "@/components/common/page-header";
-import { Spinner } from "@/components/common/spinner";
+import { PageState } from "@/components/common/page-state";
 import { Button } from "@/components/ui/button";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { useListFilters } from "@/hooks/use-list-filters";
@@ -50,8 +50,8 @@ export function CalendarioPage() {
         title="Calendario escolar"
         description={
           anioLectivo
-            ? `Eventos del año lectivo ${anioLectivo.anio}. Los días sin clases quedan marcados y no cuentan como sesión.`
-            : "Eventos del año lectivo. Los días sin clases quedan marcados y no cuentan como sesión."
+            ? `Eventos del año académico ${anioLectivo.anio}. Los días sin clases quedan marcados y no cuentan como sesión.`
+            : "Eventos del año académico. Los días sin clases quedan marcados y no cuentan como sesión."
         }
         icon={Calendar03Icon}
         breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Calendario" }]}
@@ -65,59 +65,64 @@ export function CalendarioPage() {
         }
       />
 
-      {cargandoAnio || consulta.isLoading ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <Spinner className="text-primary size-8" />
-          <p className="text-muted-foreground text-xs">Cargando el calendario...</p>
-        </div>
-      ) : consulta.isError ? (
-        <div className="border-destructive/20 bg-destructive/5 flex h-64 flex-col items-center justify-center gap-3 rounded-xl border p-8 text-center">
-          <HugeiconsIcon icon={AlertCircleIcon} className="text-destructive size-10" />
-          <p className="text-sm">
-            {(consulta.error as Error)?.message || "No hay un año escolar en curso."}
-          </p>
-          {esAdmin ? (
-            <Button asChild>
-              <Link href="/admin/academic-years">Ir al año escolar</Link>
-            </Button>
-          ) : null}
-        </div>
-      ) : data && anioVisible && mesVisible ? (
-        <CalendarioDelMes
-          anioVisible={anioVisible}
-          mesVisible={mesVisible}
-          anioEscolar={data.anio}
-          desde={data.desde}
-          hasta={data.hasta}
-          eventos={data.eventos}
-          busqueda={listFilters.getString("q")}
-          tipo={listFilters.getString("tipo")}
-          clases={listFilters.getString("clases")}
-          listFilters={listFilters}
-          isRefreshing={consulta.isFetching}
-          onRefresh={() => {
-            void consulta.refetch();
-          }}
-          puedeRegistrar={puedeRegistrar}
-          onMesAnterior={() => {
-            if (!anioId) return;
-            setCursores((actual) => ({
-              ...actual,
-              [anioId]: desplazarMes(anioVisible, mesVisible, -1),
-            }));
-          }}
-          onMesSiguiente={() => {
-            if (!anioId) return;
-            setCursores((actual) => ({
-              ...actual,
-              [anioId]: desplazarMes(anioVisible, mesVisible, 1),
-            }));
-          }}
-          onSeleccionarDia={puedeRegistrar ? (dia) => setFormulario({ dia }) : undefined}
-          onEditar={(evento) => setFormulario({ evento })}
-          onEliminar={setAEliminar}
-        />
-      ) : null}
+      <PageState
+        isLoading={cargandoAnio || consulta.isLoading}
+        isError={consulta.isError}
+        error={consulta.error}
+        onRetry={() => void consulta.refetch()}
+        errorTitle="No se pudo cargar el calendario"
+        errorProps={{
+          description: (
+            <div className="space-y-3">
+              <p>{(consulta.error as Error)?.message || "No hay un año académico en curso."}</p>
+              {esAdmin ? (
+                <div>
+                  <Button asChild size="sm">
+                    <Link href="/admin/academic-years">Ir al año académico</Link>
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          ),
+        }}
+      >
+        {data && anioVisible && mesVisible ? (
+          <CalendarioDelMes
+            anioVisible={anioVisible}
+            mesVisible={mesVisible}
+            anioEscolar={data.anio}
+            desde={data.desde}
+            hasta={data.hasta}
+            eventos={data.eventos}
+            busqueda={listFilters.getString("q")}
+            tipo={listFilters.getString("tipo")}
+            clases={listFilters.getString("clases")}
+            listFilters={listFilters}
+            isRefreshing={consulta.isFetching}
+            onRefresh={() => {
+              void consulta.refetch();
+            }}
+            puedeRegistrar={puedeRegistrar}
+            onMesAnterior={() => {
+              if (!anioId) return;
+              setCursores((actual) => ({
+                ...actual,
+                [anioId]: desplazarMes(anioVisible, mesVisible, -1),
+              }));
+            }}
+            onMesSiguiente={() => {
+              if (!anioId) return;
+              setCursores((actual) => ({
+                ...actual,
+                [anioId]: desplazarMes(anioVisible, mesVisible, 1),
+              }));
+            }}
+            onSeleccionarDia={puedeRegistrar ? (dia) => setFormulario({ dia }) : undefined}
+            onEditar={(evento) => setFormulario({ evento })}
+            onEliminar={setAEliminar}
+          />
+        ) : null}
+      </PageState>
 
       <EventoModal
         open={formulario !== null}

@@ -46,7 +46,7 @@ export function getPlanColumns({
           <div>
             <p className="text-foreground font-semibold">{curso.nombre}</p>
             {curso.descripcion && (
-              <p className="text-muted-foreground line-clamp-1 text-[11px]">{curso.descripcion}</p>
+              <p className="text-muted-foreground line-clamp-1 text-xs">{curso.descripcion}</p>
             )}
           </div>
         );
@@ -55,9 +55,9 @@ export function getPlanColumns({
     {
       id: "areaCurricular",
       accessorFn: (row) => row.curso.areaCurricularNombre,
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Área Curricular" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Área curricular" />,
       cell: ({ row }) => (
-        <Badge variant="secondary" className="rounded-lg px-2.5 py-0.5 text-[11px] font-medium">
+        <Badge variant="secondary" className="rounded-lg px-2.5 py-0.5 text-xs font-medium">
           {row.original.curso.areaCurricularNombre}
         </Badge>
       ),
@@ -65,13 +65,13 @@ export function getPlanColumns({
     {
       accessorKey: "horasSemanales",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Horas Semanales" className="justify-center" />
+        <DataTableColumnHeader column={column} title="Horas semanales" className="justify-center" />
       ),
       cell: ({ row }) => (
         <div className="flex justify-center">
           <div className="border-border/60 bg-muted/30 inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1">
             <span className="text-foreground text-xs font-bold">{row.original.horasSemanales}</span>
-            <span className="text-muted-foreground text-[10px]">hrs/sem</span>
+            <span className="text-muted-foreground text-xs">hrs/sem</span>
           </div>
         </div>
       ),

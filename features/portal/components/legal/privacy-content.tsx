@@ -100,7 +100,7 @@ export function PrivacyContent() {
             <ul className="text-muted-foreground space-y-1 text-xs">
               <li>• Datos de identificación laboral</li>
               <li>• Especialidad, áreas y asignaturas</li>
-              <li>• Marcaciones de asistencia en kiosco</li>
+              <li>• Marcaciones de asistencia en kiosko</li>
               <li>• Registros pedagógicos y actas</li>
             </ul>
           </div>
@@ -126,7 +126,7 @@ export function PrivacyContent() {
           </li>
           <li>
             • <strong>Control de Asistencia y Puntualidad:</strong> Registro automatizado en
-            portería mediante terminal kiosco para la seguridad de los alumnos.
+            portería mediante terminal kiosko para la seguridad de los alumnos.
           </li>
           <li>
             • <strong>Comunicación Institucional:</strong> Notificaciones directas a las familias

@@ -10,13 +10,13 @@ export function EquiposPage() {
   return (
     <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
-        title="Equipos Autorizados"
+        title="Equipos autorizados"
         description="Gestiona las estaciones de marcación de asistencia (kioskos y biométricos) y firma de sesiones docentes dentro del colegio."
         icon={ComputerIcon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Inicio", href: "/admin/dashboard" },
           { label: "Configuración" },
-          { label: "Equipos Autorizados" },
+          { label: "Equipos autorizados" },
         ]}
       />
 
@@ -25,26 +25,24 @@ export function EquiposPage() {
         <div className="border-primary/20 bg-primary/5 space-y-1.5 rounded-xl border p-4 md:col-span-2">
           <div className="text-primary flex items-center gap-2 text-xs font-semibold">
             <HugeiconsIcon icon={ShieldCheckIcon} className="h-4 w-4" />
-            Control de Acceso Físico sin Dependencia de GPS
+            Control de asistencia en la institución
           </div>
           <p className="text-muted-foreground text-xs leading-relaxed">
-            La validez de las asistencias y firmas de sesiones de clase está estrictamente
-            subordinada a que se realicen en <strong>terminales físicas autorizadas</strong>. El
-            personal de Soporte TI o Administración debe ingresar desde cada PC y presionar{" "}
-            <em>&quot;Autorizar este dispositivo&quot;</em> para instalar su clave criptográfica
-            local.
+            Las asistencias y firmas de sesiones de clase solo son válidas cuando se registran en
+            los <strong>equipos autorizados del colegio</strong>. Desde cada computadora o tableta,
+            un administrador debe presionar <em>&quot;Autorizar este dispositivo&quot;</em> para
+            habilitarlo en la institución.
           </p>
         </div>
 
-        <div className="space-y-1.5 rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-purple-700 dark:text-purple-300">
+        <div className="border-info/20 bg-info/10 space-y-1.5 rounded-xl border p-4">
+          <div className="text-info flex items-center gap-2 text-xs font-semibold">
             <HugeiconsIcon icon={Key01Icon} className="h-4 w-4" />
-            Kiosko de Sesiones
+            Kiosko de sesiones
           </div>
           <p className="text-muted-foreground text-xs leading-relaxed">
-            Los terminales con propósito de <strong>sesiones</strong> están reservados con
-            exclusividad a la firma digital de clases de docentes y operan como kioskos web
-            dedicados.
+            Los equipos con propósito de <strong>sesiones</strong> están reservados para la firma
+            digital de clases de los docentes y operan como kioskos web dedicados.
           </p>
         </div>
       </div>

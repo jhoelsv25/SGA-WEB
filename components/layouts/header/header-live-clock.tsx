@@ -29,7 +29,7 @@ export function HeaderLiveClock() {
       title="Hora local del sistema"
     >
       <HugeiconsIcon icon={Clock01Icon} className="text-muted-foreground/70 size-3.5 shrink-0" />
-      <span className="text-foreground/80 font-mono text-[11.5px] font-medium tracking-tight">
+      <span className="text-foreground/80 font-mono text-xs font-medium tracking-tight">
         {time || "--:--"}
       </span>
     </div>

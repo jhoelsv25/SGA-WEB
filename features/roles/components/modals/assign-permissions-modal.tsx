@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { Modal } from "@/components/common/modal";
+import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/common/spinner";
 import {
   ShieldCheckIcon,
@@ -115,17 +115,19 @@ function AssignPermissionsForm({
 
       <div className="max-h-[55vh] space-y-6 overflow-y-auto pr-1">
         {permissionsByModule.map(({ moduleName, permissions }) => {
-          const allSelected = permissions.every((p) => selectedPermissions.has(p.id));
+          const selectedInModule = permissions.filter((p) => selectedPermissions.has(p.id)).length;
+          const allSelected = permissions.length > 0 && selectedInModule === permissions.length;
 
           return (
             <div key={moduleName} className="bg-card/50 rounded-lg border p-4">
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-foreground font-semibold">{moduleName}</h4>
-                  <Badge variant="outline" className="text-xs">
-                    {permissions.filter((p) => selectedPermissions.has(p.id)).length} /{" "}
-                    {permissions.length}
-                  </Badge>
+                  <h4 className="text-foreground text-sm font-semibold">{moduleName}</h4>
+                  <StatusBadge
+                    tone={allSelected ? "success" : selectedInModule > 0 ? "brand" : "neutral"}
+                  >
+                    {selectedInModule} / {permissions.length}
+                  </StatusBadge>
                 </div>
 
                 {!isAdminRole && (
@@ -144,25 +146,37 @@ function AssignPermissionsForm({
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 {permissions.map((perm) => {
                   const isChecked = isAdminRole || selectedPermissions.has(perm.id);
+                  const permCheckboxId = `modal-perm-${perm.id}`;
+                  const permNameId = `modal-perm-name-${perm.id}`;
+                  const permDescId = perm.descripcion ? `modal-perm-desc-${perm.id}` : undefined;
 
                   return (
                     <label
                       key={perm.id}
-                      className="hover:bg-muted/50 flex cursor-pointer items-start gap-2.5 rounded-md p-2 transition-colors"
+                      htmlFor={permCheckboxId}
+                      className="hover:bg-muted/50 flex cursor-pointer items-start gap-2.5 rounded-md p-2 transition-colors select-none"
                     >
                       <Checkbox
+                        id={permCheckboxId}
                         checked={isChecked}
                         onCheckedChange={() => togglePermission(perm.id)}
                         disabled={isAdminRole}
-                        className="mt-0.5"
+                        aria-labelledby={permNameId}
+                        aria-describedby={permDescId}
+                        className="mt-0.5 shrink-0"
                       />
                       <div className="space-y-0.5">
-                        <p className="text-foreground text-xs leading-none font-medium">
+                        <p
+                          id={permNameId}
+                          className="text-foreground text-xs leading-none font-medium"
+                        >
                           {perm.nombre}
                         </p>
-                        <p className="text-muted-foreground font-mono text-[10px]">{perm.codigo}</p>
+                        <p className="text-muted-foreground font-mono text-xs">{perm.codigo}</p>
                         {perm.descripcion && (
-                          <p className="text-muted-foreground/80 text-[11px]">{perm.descripcion}</p>
+                          <p id={permDescId} className="text-muted-foreground text-xs">
+                            {perm.descripcion}
+                          </p>
                         )}
                       </div>
                     </label>

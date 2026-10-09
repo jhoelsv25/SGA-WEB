@@ -2,11 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/common/page-header";
+import { PageState } from "@/components/common/page-state";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
+import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -21,7 +24,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { usePermissionsCatalogQuery, useRoleDetailQuery } from "../hooks/use-roles-query";
 import { useAssignPermissionsMutation } from "../hooks/use-roles-mutations";
-import { ROLE_BADGE_VARIANTS } from "../consts/roles.consts";
 import type { PermissionCatalogItem, RoleDetail } from "../types/roles.types";
 import { cn } from "@/lib/utils";
 
@@ -30,47 +32,50 @@ export interface RolePermissionsPageProps {
 }
 
 export function RolePermissionsPage({ roleId }: RolePermissionsPageProps) {
-  const { data: catalog = [], isLoading: isLoadingCatalog } = usePermissionsCatalogQuery();
-  const { data: roleDetail, isLoading: isLoadingRole } = useRoleDetailQuery(roleId);
+  const {
+    data: catalog = [],
+    isLoading: isLoadingCatalog,
+    isError: isErrorCatalog,
+    refetch: refetchCatalog,
+  } = usePermissionsCatalogQuery();
+  const {
+    data: roleDetail,
+    isLoading: isLoadingRole,
+    isError: isErrorRole,
+    refetch: refetchRole,
+  } = useRoleDetailQuery(roleId);
 
   const isLoading = isLoadingCatalog || isLoadingRole;
+  const isError = isErrorCatalog || isErrorRole;
 
-  if (isLoading) {
-    return (
-      <div className="animate-in fade-in space-y-6 duration-200">
-        <div className="flex items-center gap-3">
-          <div className="bg-muted/60 size-10 animate-pulse rounded-xl" />
-          <div className="space-y-2">
-            <div className="bg-muted/60 h-6 w-64 animate-pulse rounded-md" />
-            <div className="bg-muted/40 h-4 w-96 animate-pulse rounded-md" />
-          </div>
+  return (
+    <PageState
+      isLoading={isLoading}
+      isError={isError}
+      onRetry={() => {
+        if (isErrorCatalog) void refetchCatalog();
+        if (isErrorRole) void refetchRole();
+      }}
+      errorTitle="No se pudo cargar la matriz de permisos"
+      errorProps={{
+        description:
+          "Ocurrió un problema al obtener los datos del rol o el catálogo de permisos. Por favor, vuelve a intentarlo.",
+      }}
+    >
+      {!roleDetail ? (
+        <div className="space-y-4 p-8 text-center">
+          <p className="text-muted-foreground text-sm">
+            El rol solicitado no existe o no se pudo cargar.
+          </p>
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href="/admin/roles">Volver a Roles y Permisos</Link>
+          </Button>
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="border-border/60 bg-card h-56 animate-pulse rounded-2xl border p-5"
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!roleDetail) {
-    return (
-      <div className="space-y-4 p-8 text-center">
-        <p className="text-muted-foreground text-sm">
-          El rol solicitado no existe o no se pudo cargar.
-        </p>
-        <Button asChild variant="outline" className="rounded-full">
-          <Link href="/admin/roles">Volver a Roles y Permisos</Link>
-        </Button>
-      </div>
-    );
-  }
-
-  return <RolePermissionsEditor key={roleDetail.id} roleDetail={roleDetail} catalog={catalog} />;
+      ) : (
+        <RolePermissionsEditor key={roleDetail.id} roleDetail={roleDetail} catalog={catalog} />
+      )}
+    </PageState>
+  );
 }
 
 interface RolePermissionsEditorProps {
@@ -79,12 +84,14 @@ interface RolePermissionsEditorProps {
 }
 
 function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorProps) {
+  const router = useRouter();
   const mutation = useAssignPermissionsMutation();
 
   const [selectedPermissions, setSelectedPermissions] = React.useState<Set<string>>(
     () => new Set(roleDetail.permisos ?? []),
   );
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [confirmLeaveOpen, setConfirmLeaveOpen] = React.useState(false);
 
   const initialPermissions = React.useMemo(
     () => new Set(roleDetail.permisos ?? []),
@@ -92,6 +99,40 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
   );
 
   const isAdminRole = roleDetail.nombre === "Administrador";
+
+  // Detección de cambios sin guardar
+  const hasChanges = React.useMemo(() => {
+    if (isAdminRole) return false;
+    if (selectedPermissions.size !== initialPermissions.size) return true;
+    for (const p of selectedPermissions) {
+      if (!initialPermissions.has(p)) return true;
+    }
+    return false;
+  }, [selectedPermissions, initialPermissions, isAdminRole]);
+
+  // Aviso al intentar cerrar la pestaña o recargar con cambios sin guardar
+  React.useEffect(() => {
+    if (!hasChanges) return;
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hasChanges]);
+
+  // Navegación segura hacia el listado de roles
+  const handleBackToRoles = () => {
+    if (hasChanges) {
+      setConfirmLeaveOpen(true);
+    } else {
+      router.push("/admin/roles");
+    }
+  };
 
   // Agrupar catálogo por módulo
   const permissionsByModule = React.useMemo(() => {
@@ -135,16 +176,6 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
       })
       .filter((mod) => mod.permissions.length > 0);
   }, [permissionsByModule, searchQuery]);
-
-  // Detección de cambios sin guardar
-  const hasChanges = React.useMemo(() => {
-    if (isAdminRole) return false;
-    if (selectedPermissions.size !== initialPermissions.size) return true;
-    for (const p of selectedPermissions) {
-      if (!initialPermissions.has(p)) return true;
-    }
-    return false;
-  }, [selectedPermissions, initialPermissions, isAdminRole]);
 
   // Conmutar un permiso individual
   const togglePermission = (id: string) => {
@@ -196,34 +227,31 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
     });
   };
 
-  const roleBadge = roleDetail.esSistema ? ROLE_BADGE_VARIANTS.system : ROLE_BADGE_VARIANTS.custom;
-
   const coveragePercent =
     catalog.length > 0 ? Math.round((selectedPermissions.size / catalog.length) * 100) : 0;
 
   return (
-    <div className="animate-in fade-in-50 space-y-6 pb-24 duration-300">
+    <div className="animate-in fade-in-50 space-y-6 duration-300">
       {/* Cabecera principal de la página */}
       <PageHeader
         title={`Matriz de Permisos: ${roleDetail.nombre}`}
         description="Asigna y gestiona los privilegios de acceso y operaciones autorizadas en el sistema."
         icon={ShieldCheckIcon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Inicio", href: "/admin/dashboard" },
           { label: "Administración", href: "/admin/roles" },
           { label: "Roles y Permisos", href: "/admin/roles" },
           { label: `Permisos: ${roleDetail.nombre}` },
         ]}
         actions={
           <Button
-            asChild
+            type="button"
             variant="outline"
+            onClick={handleBackToRoles}
             className="h-9 gap-1.5 rounded-full px-4 text-xs font-semibold"
           >
-            <Link href="/admin/roles">
-              <HugeiconsIcon icon={ArrowLeft01Icon} className="size-3.5" />
-              <span>Volver a Roles</span>
-            </Link>
+            <HugeiconsIcon icon={ArrowLeft01Icon} className="size-3.5" />
+            <span>Volver a Roles</span>
           </Button>
         }
       />
@@ -250,9 +278,9 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
         {/* Lado izquierdo: Metadatos del rol y buscador */}
         <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
           <div className="flex shrink-0 items-center gap-2">
-            <Badge variant="outline" className={roleBadge.className}>
-              {roleBadge.label}
-            </Badge>
+            <StatusBadge tone={roleDetail.esSistema ? "brand" : "neutral"}>
+              {roleDetail.esSistema ? "Sistema" : "Adicional"}
+            </StatusBadge>
             <span className="text-muted-foreground font-mono text-xs">
               {roleDetail.usuariosCount}{" "}
               {roleDetail.usuariosCount === 1 ? "usuario asignado" : "usuarios asignados"}
@@ -280,11 +308,11 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
               <span className="text-foreground text-xs font-bold">
                 {selectedPermissions.size} / {catalog.length}
               </span>
-              <span className="text-muted-foreground block text-[10.5px] font-medium">
+              <span className="text-muted-foreground block text-xs font-medium">
                 {coveragePercent}% de permisos
               </span>
             </div>
-            <div className="bg-primary/10 text-primary relative flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold">
+            <div className="bg-primary/10 text-primary relative flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold">
               {coveragePercent}%
             </div>
           </div>
@@ -343,26 +371,20 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                       <h3 className="text-foreground text-sm font-bold tracking-tight">
                         {moduleName}
                       </h3>
-                      <p className="text-muted-foreground text-[11px]">
+                      <p className="text-muted-foreground text-xs">
                         {selectedInModule} de {permissions.length} privilegios activos
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "rounded-full px-2.5 py-0.5 text-xs font-semibold",
-                        allSelectedInModule
-                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          : selectedInModule > 0
-                            ? "border-primary/20 bg-primary/10 text-primary"
-                            : "border-muted bg-muted/60 text-muted-foreground",
-                      )}
+                    <StatusBadge
+                      tone={
+                        allSelectedInModule ? "success" : selectedInModule > 0 ? "brand" : "neutral"
+                      }
                     >
                       {selectedInModule} / {permissions.length}
-                    </Badge>
+                    </StatusBadge>
 
                     {!isAdminRole && (
                       <Button
@@ -382,6 +404,9 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                 <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
                   {permissions.map((perm) => {
                     const isChecked = isAdminRole || selectedPermissions.has(perm.id);
+                    const permInputId = `perm-check-${perm.id}`;
+                    const permLabelId = `perm-label-${perm.id}`;
+                    const permDescId = perm.descripcion ? `perm-desc-${perm.id}` : undefined;
 
                     return (
                       <div
@@ -396,22 +421,33 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                         )}
                       >
                         <Checkbox
+                          id={permInputId}
                           checked={isChecked}
                           onCheckedChange={() => togglePermission(perm.id)}
                           disabled={isAdminRole}
+                          aria-labelledby={permLabelId}
+                          aria-describedby={permDescId}
                           className="mt-0.5 shrink-0"
                         />
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-start justify-between gap-2">
-                            <p className="text-foreground text-xs leading-snug font-bold">
+                            <label
+                              id={permLabelId}
+                              htmlFor={permInputId}
+                              className="text-foreground cursor-pointer text-xs leading-snug font-bold"
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               {perm.nombre}
-                            </p>
+                            </label>
                           </div>
-                          <span className="text-muted-foreground/80 bg-muted/70 border-border/40 inline-block rounded border px-1.5 py-0.5 font-mono text-[9.5px]">
+                          <span className="text-muted-foreground bg-muted/60 border-border/40 inline-block rounded border px-1.5 py-0.5 font-mono text-xs">
                             {perm.codigo}
                           </span>
                           {perm.descripcion && (
-                            <p className="text-muted-foreground/90 line-clamp-2 text-[11px] leading-relaxed">
+                            <p
+                              id={permDescId}
+                              className="text-muted-foreground line-clamp-2 text-xs leading-relaxed"
+                            >
                               {perm.descripcion}
                             </p>
                           )}
@@ -426,34 +462,39 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
         )}
       </div>
 
-      {/* Barra de acción flotante (Sticky Footer) */}
+      {/* Barra de acción pegajosa (Sticky Footer) */}
       {!isAdminRole && (
-        <div className="border-border/80 bg-background/95 fixed right-0 bottom-0 left-0 z-30 border-t px-4 py-3 shadow-2xl backdrop-blur-md">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs">
+        <div className="border-border/80 bg-background/95 sticky bottom-0 z-20 -mx-4 mt-6 -mb-6 border-t p-4 shadow-lg backdrop-blur-md sm:mx-0 sm:mb-0 sm:rounded-2xl sm:border">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
               {hasChanges ? (
-                <div className="flex items-center gap-2 font-medium text-amber-600 dark:text-amber-400">
-                  <span className="size-2 animate-pulse rounded-full bg-amber-500" />
-                  <span>Tienes cambios de permisos sin guardar para este rol.</span>
-                </div>
+                <>
+                  <StatusBadge tone="warning" dot>
+                    Cambios pendientes
+                  </StatusBadge>
+                  <span className="text-foreground text-xs font-medium">
+                    Tienes cambios de permisos sin guardar para este rol.
+                  </span>
+                </>
               ) : (
-                <div className="text-muted-foreground flex items-center gap-2">
-                  <HugeiconsIcon
-                    icon={CheckmarkCircle02Icon}
-                    className="size-3.5 text-emerald-500"
-                  />
-                  <span>Todos los cambios están sincronizados con la base de datos.</span>
-                </div>
+                <>
+                  <StatusBadge tone="success" dot>
+                    Sincronizado
+                  </StatusBadge>
+                  <span className="text-muted-foreground text-xs">
+                    Todos los cambios están sincronizados con la base de datos.
+                  </span>
+                </>
               )}
             </div>
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleReset}
                 disabled={!hasChanges || mutation.isPending}
-                className="h-10 gap-1.5 rounded-full px-4.5 text-xs font-semibold"
+                className="h-10 w-full gap-1.5 rounded-full px-4.5 text-xs font-semibold sm:w-auto"
               >
                 <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
                 <span>Descartar cambios</span>
@@ -463,7 +504,7 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                 type="button"
                 onClick={handleSave}
                 disabled={!hasChanges || mutation.isPending}
-                className="shadow-primary/20 h-10 gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md"
+                className="shadow-primary/20 h-10 w-full gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md sm:w-auto"
               >
                 {mutation.isPending ? (
                   <Spinner className="size-3.5" />
@@ -476,6 +517,21 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
           </div>
         </div>
       )}
+
+      {/* Diálogo de confirmación antes de salir con cambios sin guardar */}
+      <ConfirmDialog
+        open={confirmLeaveOpen}
+        onOpenChange={setConfirmLeaveOpen}
+        title="¿Salir sin guardar cambios?"
+        description="Tienes modificaciones en la matriz de permisos que no han sido guardadas. Si sales ahora, se perderán los cambios."
+        confirmText="Salir sin guardar"
+        cancelText="Continuar editando"
+        variant="warning"
+        onConfirm={() => {
+          setConfirmLeaveOpen(false);
+          router.push("/admin/roles");
+        }}
+      />
     </div>
   );
 }

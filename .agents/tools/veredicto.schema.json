@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["tarea", "validador", "veredicto", "criterios", "hallazgos"],
+  "properties": {
+    "tarea": { "type": "string" },
+    "validador": { "type": "string" },
+    "veredicto": { "enum": ["APROBADA", "RECHAZADA"] },
+    "criterios": {
+      "type": "object",
+      "required": ["total", "pasan"],
+      "properties": { "total": { "type": "integer" }, "pasan": { "type": "integer" } }
+    },
+    "pruebas": {
+      "type": "object",
+      "properties": {
+        "corridas": { "type": "integer" },
+        "fallan": { "type": "integer" },
+        "nuevas": { "type": "integer" }
+      }
+    },
+    "hallazgos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severidad", "archivo", "detalle"],
+        "properties": {
+          "severidad": { "enum": ["alta", "media", "baja"] },
+          "archivo": { "type": "string" },
+          "detalle": { "type": "string" }
+        }
+      }
+    }
+  }
+}

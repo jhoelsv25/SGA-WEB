@@ -103,3 +103,4 @@ export function filterNavigationByPermissions(
     })
     .filter((section) => section.items.length > 0);
 }
+export * from "./menu-del-usuario";

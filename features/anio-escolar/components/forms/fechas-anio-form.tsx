@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/common/spinner";
 import { fechasAnioSchema, type FechasAnioFormValues } from "../../schemas";
 import type { AnioAcademico } from "../../types";
-import { CampoFecha } from "./campo-fecha";
+import { CampoFecha } from "@/components/common/date-field";
 
 interface FechasAnioFormProps {
   anio: AnioAcademico;
@@ -38,20 +38,22 @@ export function FechasAnioForm({ anio, isSubmitting = false, onSubmit }: FechasA
     >
       <div className="space-y-1.5 sm:col-span-3">
         <Label htmlFor="nombre-anio" className="text-sm font-medium">
-          Denominación
+          Denominación (Opcional)
         </Label>
         <Input id="nombre-anio" disabled={!planificado} {...form.register("nombre")} />
       </div>
       <CampoFecha
         control={form.control}
         name="fechaInicio"
-        label="Inicio"
+        label="Inicio *"
+        required
         disabled={!planificado}
       />
       <CampoFecha
         control={form.control}
         name="fechaFin"
-        label="Fin"
+        label="Fin *"
+        required
         disabled={!planificado}
         error={form.formState.errors.fechaFin?.message}
       />

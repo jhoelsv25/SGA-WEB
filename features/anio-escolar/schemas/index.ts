@@ -3,7 +3,7 @@ import { z } from "zod";
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const FECHA_INVALIDA = "Indique una fecha válida (AAAA-MM-DD).";
 const FECHAS_INVERTIDAS = "La fecha de fin debe ser posterior a la fecha de inicio.";
-const BIMESTRE_FUERA = "Las fechas del bimestre deben estar dentro del año escolar.";
+const BIMESTRE_FUERA = "Las fechas del bimestre deben estar dentro del año académico.";
 const BIMESTRES_SUPERPUESTOS = "El bimestre no puede empezar antes de que termine el anterior.";
 const REAPERTURA_INCOMPLETA = "Indique el motivo y la fecha límite de la reapertura.";
 
@@ -15,7 +15,7 @@ const bimestreFechaSchema = z.object({
 
 export const anioSchema = z
   .object({
-    anio: z.number({ message: "Indique el número del año escolar." }).int().min(2000).max(2100),
+    anio: z.number({ message: "Indique el número del año académico." }).int().min(2000).max(2100),
     nombre: z.string().max(150).optional(),
     fechaInicio: z.string().regex(FECHA, FECHA_INVALIDA),
     fechaFin: z.string().regex(FECHA, FECHA_INVALIDA),

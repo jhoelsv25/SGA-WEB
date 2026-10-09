@@ -2,7 +2,7 @@
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Delete02Icon, PencilEdit01Icon } from "@hugeicons/core-free-icons";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ETIQUETAS_EVENTO } from "../../consts";
@@ -47,9 +47,9 @@ export function EventosMes({
                       : ""}
                   </p>
                 </div>
-                <Badge variant={evento.suspendeClases ? "destructive" : "outline"}>
+                <StatusBadge tone={evento.suspendeClases ? "warning" : "neutral"}>
                   {evento.suspendeClases ? "Sin clases" : ETIQUETAS_EVENTO[evento.tipo]}
-                </Badge>
+                </StatusBadge>
               </div>
               {puedeRegistrar ? (
                 <div className="flex gap-2">

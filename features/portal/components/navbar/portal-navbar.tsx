@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Brand } from "@/components/common/brand";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,6 @@ const NAV_LINKS = [
 export function PortalNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
-  const pathname = usePathname();
 
   React.useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 12);
@@ -61,24 +59,13 @@ export function PortalNavbar() {
         <nav className="hidden items-center lg:flex" aria-label="Navegación principal">
           <ul className="flex items-center gap-1">
             {NAV_LINKS.map((link) => {
-              const isActive = pathname === link.href;
               return (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={`group relative inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
-                      isActive
-                        ? "text-primary bg-primary/8"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                    }`}
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/60 inline-flex min-h-11 items-center rounded-lg px-3.5 text-sm font-medium transition-colors"
                   >
                     {link.label}
-                    {/* Underline indicator */}
-                    <span
-                      className={`bg-primary absolute inset-x-3.5 bottom-1 h-px rounded-full transition-all duration-200 ${
-                        isActive ? "opacity-100" : "opacity-0 group-hover:opacity-50"
-                      }`}
-                    />
                   </Link>
                 </li>
               );
@@ -93,20 +80,17 @@ export function PortalNavbar() {
           {/* Divider */}
           <div className="bg-border mx-1 h-5 w-px" />
 
-          {/* Kiosco */}
+          {/* Kiosko */}
           <Button
             asChild
             variant="ghost"
             size="sm"
             className="hover:bg-muted/70 group h-9 gap-2 rounded-full px-4 font-medium"
           >
-            <Link href="/access-control/kiosk">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-              </span>
+            <Link href={siteConfig.routes.kiosk}>
+              <HugeiconsIcon icon={Time02Icon} className="text-primary size-4" />
               <span className="text-muted-foreground group-hover:text-foreground transition-colors">
-                Terminal Kiosco
+                Kiosko de marcación
               </span>
             </Link>
           </Button>
@@ -119,7 +103,7 @@ export function PortalNavbar() {
           >
             <Link href={siteConfig.routes.login}>
               <HugeiconsIcon icon={LogInIcon} className="size-4" />
-              Iniciar Sesión
+              Iniciar sesión
             </Link>
           </Button>
         </div>
@@ -130,10 +114,11 @@ export function PortalNavbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="size-9 rounded-full"
+            className="size-11 rounded-full"
             onClick={() => setMobileMenuOpen((v) => !v)}
             aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={mobileMenuOpen}
+            aria-controls="menu-movil-portal"
           >
             <HugeiconsIcon
               icon={mobileMenuOpen ? Cancel01Icon : Menu01Icon}
@@ -145,6 +130,9 @@ export function PortalNavbar() {
 
       {/* ── Mobile Menu ── */}
       <div
+        id="menu-movil-portal"
+        inert={!mobileMenuOpen}
+        aria-hidden={!mobileMenuOpen}
         className={`border-border/60 bg-background/98 overflow-hidden border-b backdrop-blur-xl transition-all duration-300 lg:hidden ${
           mobileMenuOpen ? "max-h-120 opacity-100" : "max-h-0 opacity-0"
         }`}
@@ -153,22 +141,15 @@ export function PortalNavbar() {
           {/* Nav links */}
           <nav className="mb-4 space-y-0.5" aria-label="Menú móvil">
             {NAV_LINKS.map((link) => {
-              const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                    isActive ? "text-primary bg-primary/8" : "text-foreground hover:bg-muted/60"
-                  }`}
+                  className="text-foreground hover:bg-muted/60 flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors"
                 >
-                  <HugeiconsIcon
-                    icon={link.icon}
-                    className={`size-4 ${isActive ? "text-primary" : "text-muted-foreground"}`}
-                  />
+                  <HugeiconsIcon icon={link.icon} className="text-muted-foreground size-4" />
                   {link.label}
-                  {isActive && <span className="bg-primary ml-auto size-1.5 rounded-full" />}
                 </Link>
               );
             })}
@@ -183,9 +164,9 @@ export function PortalNavbar() {
                 className="h-10 w-full gap-2 rounded-xl font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Link href="/access-control/kiosk">
+                <Link href={siteConfig.routes.kiosk}>
                   <HugeiconsIcon icon={Time02Icon} className="text-primary size-4" />
-                  Terminal Kiosco
+                  Kiosko de marcación
                 </Link>
               </Button>
 
@@ -196,14 +177,14 @@ export function PortalNavbar() {
               >
                 <Link href={siteConfig.routes.login}>
                   <HugeiconsIcon icon={LogInIcon} className="size-4" />
-                  Iniciar Sesión
+                  Iniciar sesión
                 </Link>
               </Button>
             </div>
           </div>
 
           {/* Footer info */}
-          <p className="text-muted-foreground mt-4 text-center text-[11px]">
+          <p className="text-muted-foreground mt-4 text-center text-xs">
             {siteConfig.institution.shortName} · {siteConfig.institution.location.reference}
           </p>
         </div>

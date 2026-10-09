@@ -11,7 +11,7 @@ import { Spinner } from "@/components/common/spinner";
 import { NOMBRES_BIMESTRE } from "../../types";
 import { anioSchema, type AnioFormValues } from "../../schemas";
 import { fechasSugeridas } from "../../utils";
-import { CampoFecha } from "./campo-fecha";
+import { CampoFecha } from "@/components/common/date-field";
 
 interface AnioFormProps {
   onSubmit: (values: AnioFormValues) => Promise<void>;
@@ -51,7 +51,7 @@ export function AnioForm({ onSubmit, onCancel, isSubmitting = false }: AnioFormP
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="anio" className="text-sm font-medium">
-            Año
+            Año *
           </Label>
           <Input
             id="anio"
@@ -80,7 +80,7 @@ export function AnioForm({ onSubmit, onCancel, isSubmitting = false }: AnioFormP
           </Label>
           <Input
             id="nombre"
-            placeholder="Ej. Año escolar 2027"
+            placeholder="Ej. Año académico 2027"
             disabled={isSubmitting}
             {...form.register("nombre")}
           />
@@ -91,7 +91,8 @@ export function AnioForm({ onSubmit, onCancel, isSubmitting = false }: AnioFormP
         <CampoFecha
           control={form.control}
           name="fechaInicio"
-          label="Inicio de clases"
+          label="Inicio de clases *"
+          required
           hint="Primer día del periodo escolar."
           disabled={isSubmitting}
           error={form.formState.errors.fechaInicio?.message}
@@ -99,7 +100,8 @@ export function AnioForm({ onSubmit, onCancel, isSubmitting = false }: AnioFormP
         <CampoFecha
           control={form.control}
           name="fechaFin"
-          label="Fin de clases"
+          label="Fin de clases *"
+          required
           hint="Debe ser posterior al inicio."
           disabled={isSubmitting}
           error={form.formState.errors.fechaFin?.message}
@@ -119,14 +121,16 @@ export function AnioForm({ onSubmit, onCancel, isSubmitting = false }: AnioFormP
             <CampoFecha
               control={form.control}
               name={`bimestres.${indice}.fechaInicio`}
-              label="Inicio"
+              label="Inicio *"
+              required
               disabled={isSubmitting}
               error={form.formState.errors.bimestres?.[indice]?.fechaInicio?.message}
             />
             <CampoFecha
               control={form.control}
               name={`bimestres.${indice}.fechaFin`}
-              label="Fin"
+              label="Fin *"
+              required
               disabled={isSubmitting}
               error={form.formState.errors.bimestres?.[indice]?.fechaFin?.message}
             />

@@ -153,7 +153,7 @@ export function SelectOption<T extends string = string>({
               {item.label}
             </span>
             {item.description && (
-              <span className="text-muted-foreground truncate text-[11px]">{item.description}</span>
+              <span className="text-muted-foreground truncate text-xs">{item.description}</span>
             )}
           </div>
         </div>
@@ -199,7 +199,7 @@ export function SelectOption<T extends string = string>({
               <span className="flex min-w-0 flex-col items-start">
                 <span className="truncate">{selectedItems[0].label}</span>
                 {selectedItems[0].description ? (
-                  <span className="text-muted-foreground truncate text-[11px] font-normal">
+                  <span className="text-muted-foreground truncate text-xs font-normal">
                     {selectedItems[0].description}
                   </span>
                 ) : null}

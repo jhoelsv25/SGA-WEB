@@ -38,7 +38,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       {isDark ? (
         <HugeiconsIcon
           icon={Sun03Icon}
-          className="size-4.5 text-amber-400 transition-transform hover:rotate-45"
+          className="text-warning size-4.5 transition-transform hover:rotate-45"
         />
       ) : (
         <HugeiconsIcon

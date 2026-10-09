@@ -91,8 +91,9 @@ export function TableRowActions<TStatus extends string = string>({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
-              className="text-muted-foreground/70 hover:border-border/60 hover:bg-muted/80 hover:text-foreground focus-visible:ring-ring data-[state=open]:bg-muted data-[state=open]:text-foreground size-8 rounded-full transition-all duration-150 focus-visible:ring-1"
+              size="icon-sm"
+              aria-label={triggerAriaLabel}
+              className="text-muted-foreground/70 hover:border-border/60 hover:bg-muted/80 hover:text-foreground focus-visible:ring-ring data-[state=open]:bg-muted data-[state=open]:text-foreground transition-all duration-150 focus-visible:ring-1"
             >
               <span className="sr-only">{triggerAriaLabel}</span>
               <HugeiconsIcon icon={MoreHorizontalIcon} size={18} strokeWidth={2} />
@@ -108,7 +109,7 @@ export function TableRowActions<TStatus extends string = string>({
             {header && (
               <>
                 <div className="px-2 py-1">
-                  <p className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+                  <p className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
                     {header.title}
                   </p>
                   {header.subtitle && (
@@ -155,7 +156,7 @@ export function TableRowActions<TStatus extends string = string>({
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="border-border/60 bg-popover/95 w-52 rounded-xl p-1.5 shadow-xl backdrop-blur-md">
                   <div className="border-border/40 mb-1 border-b px-2 py-1">
-                    <p className="text-muted-foreground flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase">
+                    <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
                       <HugeiconsIcon icon={StatusIcon} size={12} />
                       <span>{statusPicker.title || "Actualizar Estado"}</span>
                     </p>
@@ -203,7 +204,7 @@ export function TableRowActions<TStatus extends string = string>({
                 item.variant === "destructive"
                   ? "text-destructive focus:bg-destructive/10 focus:text-destructive"
                   : item.variant === "warning"
-                    ? "text-amber-500 focus:bg-amber-500/10 focus:text-amber-600"
+                    ? "text-warning-text focus:bg-warning/10 focus:text-warning-text"
                     : "focus:bg-primary/10 focus:text-primary";
 
               return (

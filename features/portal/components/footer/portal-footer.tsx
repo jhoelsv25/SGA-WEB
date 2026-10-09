@@ -49,8 +49,11 @@ export function PortalFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/access-control/kiosk" className="hover:text-primary transition-colors">
-                  Terminal de Marcado (Kiosco)
+                <Link
+                  href={siteConfig.routes.kiosk}
+                  className="hover:text-primary transition-colors"
+                >
+                  Kiosko de marcación
                 </Link>
               </li>
               <li>
@@ -89,11 +92,6 @@ export function PortalFooter() {
                 </Link>
               </li>
               <li>
-                <span className="text-muted-foreground/80 block cursor-default">
-                  Lineamientos MINEDU / SIAGIE
-                </span>
-              </li>
-              <li>
                 <a
                   href={`mailto:${siteConfig.institution.contact.supportEmail}`}
                   className="hover:text-primary transition-colors"
@@ -117,15 +115,21 @@ export function PortalFooter() {
                 />
                 <span>{siteConfig.institution.address}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <a
+                href={`tel:${siteConfig.institution.contact.supportPhone.replace(/[^\d+]/g, "")}`}
+                className="hover:text-primary flex items-center gap-2"
+              >
                 <HugeiconsIcon icon={Call02Icon} className="text-primary size-4 shrink-0" />
                 <span>{siteConfig.institution.contact.supportPhone} (Soporte)</span>
-              </div>
-              <div className="flex items-center gap-2">
+              </a>
+              <a
+                href={`mailto:${siteConfig.institution.contact.email}`}
+                className="hover:text-primary flex items-center gap-2"
+              >
                 <HugeiconsIcon icon={Mail01Icon} className="text-primary size-4 shrink-0" />
                 <span>{siteConfig.institution.contact.email}</span>
-              </div>
-              <p className="text-muted-foreground/75 text-[11px]">
+              </a>
+              <p className="text-muted-foreground/75 text-xs">
                 Atención: {siteConfig.institution.contact.schedule}
               </p>
             </div>
@@ -145,10 +149,6 @@ export function PortalFooter() {
             <Link href={siteConfig.routes.terms} className="hover:text-primary transition-colors">
               Términos
             </Link>
-            <span>·</span>
-            <span className="bg-primary/10 border-primary/20 text-primary inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold">
-              Versión Web 1.0
-            </span>
           </div>
         </div>
       </div>

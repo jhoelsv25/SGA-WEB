@@ -1,0 +1,21 @@
+{
+  "tarea": "T15",
+  "validador": "VAL-3",
+  "veredicto": "APROBADA",
+  "criterios": {
+    "total": 4,
+    "pasan": 4
+  },
+  "pruebas": {
+    "corridas": 6,
+    "fallan": 0,
+    "nuevas": 0
+  },
+  "hallazgos": [
+    {
+      "severidad": "baja",
+      "archivo": "features/calendario/views/mes/calendario-mes.tsx:47-56",
+      "detalle": "La función auxiliar `fechaCompletaDeIso` implementa formateo manual con arreglos locales en lugar de usar el helper centralizado `formatDate` de `@/lib/formatters/date` (`components-guidelines.md` §2). No bloquea la entrega."
+    }
+  ]
+}

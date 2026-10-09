@@ -57,7 +57,7 @@ export const adminNavigation: NavSection[] = [
         icon: ShieldCheckIcon,
         permissions: ["admin:roles:manage"],
         roles: ["admin"],
-        description: "Perfiles de acceso del sistema y matriz de permisos",
+        description: "Roles del sistema y matriz de permisos",
       },
       {
         id: "admin-audit",
@@ -235,12 +235,12 @@ export const adminNavigation: NavSection[] = [
       },
       {
         id: "admin-academic-years",
-        label: "Años Lectivos y Periodos",
+        label: "Año académico",
         link: "/admin/academic-years",
         icon: Calendar03Icon,
         permissions: ["admin:academic-years:manage"],
         roles: ["admin"],
-        description: "Apertura de año escolar, bimestres y fechas límite",
+        description: "Apertura de año académico, bimestres y fechas límite",
       },
       {
         id: "admin-calendario",

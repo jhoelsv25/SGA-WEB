@@ -20,7 +20,7 @@ const sizeConfig: Record<
     wordmarkWidth: 70,
     wordmarkHeight: 30,
     titleClass: "text-xs font-bold",
-    subtitleClass: "text-[9px] font-medium tracking-wider",
+    subtitleClass: "text-xs font-medium tracking-wider",
     gapClass: "gap-1.5",
   },
   sm: {
@@ -28,7 +28,7 @@ const sizeConfig: Record<
     wordmarkWidth: 90,
     wordmarkHeight: 40,
     titleClass: "text-sm font-bold",
-    subtitleClass: "text-[10px] font-medium tracking-wider",
+    subtitleClass: "text-xs font-medium tracking-wider",
     gapClass: "gap-2",
   },
   md: {
@@ -36,7 +36,7 @@ const sizeConfig: Record<
     wordmarkWidth: 110,
     wordmarkHeight: 48,
     titleClass: "text-base font-bold",
-    subtitleClass: "text-[11px] font-medium tracking-wider",
+    subtitleClass: "text-xs font-medium tracking-wider",
     gapClass: "gap-2.5",
   },
   lg: {

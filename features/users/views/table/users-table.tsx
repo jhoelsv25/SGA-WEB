@@ -4,14 +4,25 @@ import * as React from "react";
 import { DataTable } from "@/components/common/data-table";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { UserAvatar } from "@/components/common/user-avatar";
+import { StatusBadge } from "@/components/common/status-badge";
+import { Spinner } from "@/components/common/spinner";
 import { UserAdd01Icon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useExportExcel } from "@/hooks/use-export-excel";
+import { toast } from "@/lib/toast";
+import { formatDate } from "@/lib/formatters/date";
+import { cn } from "@/lib/utils";
 import { getUserColumns } from "./columns/user-columns";
+import { UserActions } from "./columns/user-actions";
 import { userFilterDefs } from "../../config/filters";
 import { userExportColumns } from "../../config/export";
+import { USER_STATUS_CONFIG } from "../../consts/users.consts";
 import { useUsersQuery } from "../../hooks/use-users-query";
+import { usersApi } from "../../api/users.api";
+import { useSession } from "../../../auth/hooks/use-auth";
 import { CreateUserModal } from "../../components/modals/create-user-modal";
 import { ChangeRoleModal } from "../../components/modals/change-role-modal";
 import { UpdateUsernameModal } from "../../components/modals/update-username-modal";
@@ -24,6 +35,9 @@ import type {
 } from "../../types/users.types";
 
 export function UsersTable() {
+  const { data: sessionData } = useSession();
+  const currentUserId = sessionData?.user?.id;
+
   const listFilters = useListFilters(userFilterDefs);
   const search = listFilters.getString("search");
   const estadoRaw = listFilters.getString("estado");
@@ -45,6 +59,7 @@ export function UsersTable() {
   const {
     data: response,
     isLoading,
+    isError,
     refetch,
     isFetching,
   } = useUsersQuery({
@@ -69,12 +84,72 @@ export function UsersTable() {
 
   const users = response?.data ?? [];
 
-  // Exportación a Excel
-  const { exportToExcel, isExporting } = useExportExcel<UserItem>({
-    columns: userExportColumns,
-    filenamePrefix: "cuentas-usuarios-sga",
-    sheetName: "Usuarios",
-  });
+  // Exportación a Excel de todas las páginas filtradas recorriendo el cursor
+  const { exportSpreadsheet, isExporting } = useExportExcel<UserItem>();
+  const [isExportingAll, setIsExportingAll] = React.useState(false);
+  const [exportLoadedCount, setExportLoadedCount] = React.useState<number | null>(null);
+
+  const handleExportAll = async () => {
+    if (isExportingAll || isExporting) return;
+    setIsExportingAll(true);
+    setExportLoadedCount(0);
+
+    try {
+      const allUsers: UserItem[] = [];
+      let cursorToFetch: string | null = null;
+      let hasMore = true;
+      const fetchLimit = 50;
+      const seenCursors = new Set<string>();
+
+      while (hasMore) {
+        const pageResult = await usersApi.getUsers({
+          cursor: cursorToFetch,
+          limit: fetchLimit,
+          estado,
+          search: search ? search.trim() : undefined,
+        });
+
+        if (!pageResult || !pageResult.data || pageResult.data.length === 0) {
+          break;
+        }
+
+        allUsers.push(...pageResult.data);
+        setExportLoadedCount(allUsers.length);
+
+        if (
+          pageResult.hasMore &&
+          pageResult.nextCursor &&
+          !seenCursors.has(pageResult.nextCursor)
+        ) {
+          seenCursors.add(pageResult.nextCursor);
+          cursorToFetch = pageResult.nextCursor;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      if (allUsers.length === 0) {
+        toast.info("No hay usuarios para exportar con los filtros seleccionados.");
+        return;
+      }
+
+      const todayStr = new Date().toISOString().split("T")[0];
+      await exportSpreadsheet({
+        data: allUsers,
+        columns: userExportColumns,
+        filename: `cuentas-usuarios-${todayStr}`,
+        sheetName: "Usuarios",
+        format: "xlsx",
+      });
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Error al recopilar usuarios para la exportación.";
+      toast.error("Error al exportar", { description: message });
+    } finally {
+      setIsExportingAll(false);
+      setExportLoadedCount(null);
+    }
+  };
 
   // Estados de modales
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -96,7 +171,7 @@ export function UsersTable() {
     setTempPasswordData({
       username: res.user.nombreUsuario,
       password: res.tempPassword,
-      title: "Cuenta Creada - Contraseña Temporal",
+      title: "Cuenta creada - contraseña temporal",
     });
     setTempPasswordModalOpen(true);
   };
@@ -105,7 +180,7 @@ export function UsersTable() {
     setTempPasswordData({
       username,
       password: data.tempPassword,
-      title: "Contraseña Restablecida",
+      title: "Contraseña restablecida",
     });
     setTempPasswordModalOpen(true);
   };
@@ -123,11 +198,71 @@ export function UsersTable() {
   const columns = React.useMemo(
     () =>
       getUserColumns({
+        currentUserId,
         onChangeRole: handleChangeRole,
         onUpdateUsername: handleUpdateUsername,
         onPasswordReset: handlePasswordReset,
       }),
-    [],
+    [currentUserId],
+  );
+
+  const renderUserMobileCard = React.useCallback(
+    (user: UserItem) => {
+      const p = user.persona;
+      const fullName = `${p.apellidoPaterno} ${p.apellidoMaterno ?? ""}, ${p.nombres}`.trim();
+      const estadoConfig = USER_STATUS_CONFIG[user.estado] ?? USER_STATUS_CONFIG.inactivo;
+
+      return (
+        <div className="border-border/70 bg-card space-y-3 rounded-xl border p-4 shadow-2xs">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <UserAvatar name={fullName} avatar={p.fotoUrl ?? undefined} />
+              <div className="min-w-0">
+                <p className="text-foreground truncate text-sm font-semibold">{fullName}</p>
+                <p className="text-muted-foreground font-mono text-xs">
+                  <span className="uppercase">{p.tipoDocumento}</span>: {p.numeroDocumento}
+                  {p.correo && ` · ${p.correo}`}
+                </p>
+              </div>
+            </div>
+            <UserActions
+              user={user}
+              currentUserId={currentUserId}
+              onChangeRole={handleChangeRole}
+              onUpdateUsername={handleUpdateUsername}
+              onPasswordReset={handlePasswordReset}
+            />
+          </div>
+
+          <div className="border-border/50 flex flex-wrap items-center gap-2 border-t pt-2 text-xs">
+            <span className="text-foreground/90 bg-muted/60 border-border/60 rounded-md border px-2 py-0.5 font-mono font-semibold">
+              {user.nombreUsuario}
+            </span>
+            <Badge
+              variant="outline"
+              className={cn(
+                "rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                user.rol.esSistema
+                  ? "border-primary/20 bg-primary/10 text-primary dark:bg-primary/20"
+                  : "border-border/80 bg-muted/60 text-muted-foreground",
+              )}
+            >
+              {user.rol.nombre}
+            </Badge>
+            <StatusBadge tone={estadoConfig.tone} dot size="sm">
+              {estadoConfig.label}
+            </StatusBadge>
+          </div>
+
+          {user.ultimoAcceso && (
+            <p className="text-muted-foreground text-xs">
+              Último acceso: {formatDate(user.ultimoAcceso, "dd/MM/yyyy HH:mm")}
+            </p>
+          )}
+        </div>
+      );
+    },
+    [currentUserId],
   );
 
   return (
@@ -142,15 +277,25 @@ export function UsersTable() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => exportToExcel(users)}
-              disabled={isExporting || users.length === 0}
+              onClick={handleExportAll}
+              disabled={isExportingAll || isExporting || (users.length === 0 && !response?.hasMore)}
               className="gap-2"
             >
-              <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
-              Exportar Excel
+              {isExportingAll || isExporting ? (
+                <Spinner className="size-4" />
+              ) : (
+                <HugeiconsIcon icon={FileExportIcon} className="size-4" />
+              )}
+              <span>
+                {isExportingAll
+                  ? exportLoadedCount !== null && exportLoadedCount > 0
+                    ? `Exportando (${exportLoadedCount})...`
+                    : "Exportando..."
+                  : "Exportar Excel"}
+              </span>
             </Button>
             <Button size="sm" onClick={() => setCreateModalOpen(true)} className="gap-2">
-              <HugeiconsIcon icon={UserAdd01Icon} className="h-4 w-4" />
+              <HugeiconsIcon icon={UserAdd01Icon} className="size-4" />
               Crear cuenta
             </Button>
           </div>
@@ -161,6 +306,11 @@ export function UsersTable() {
         columns={columns}
         data={users}
         isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+        hasActiveFilters={Boolean(search || estado)}
+        caption="Listado de cuentas de usuario del sistema"
+        mobileCard={renderUserMobileCard}
         cursorPagination={{
           hasNextPage: Boolean(response?.hasMore && response?.nextCursor),
           hasPreviousPage: pageIndex > 0,

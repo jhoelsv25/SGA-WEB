@@ -3,11 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AlertCircleIcon, Calendar03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { Calendar03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { ConfirmDialog, type ConfirmVariant } from "@/components/common/confirm-dialog";
-import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
-import { Spinner } from "@/components/common/spinner";
+import { PageState } from "@/components/common/page-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AnioDetalle } from "./components/anio/anio-detalle";
@@ -53,7 +52,7 @@ export function AniosPage() {
     return (
       <div className="flex flex-col gap-6">
         <PageHeader
-          title="Año escolar"
+          title="Año académico"
           description="La apertura del año y los bimestres las confirma el administrador."
           icon={Calendar03Icon}
         />
@@ -72,13 +71,13 @@ export function AniosPage() {
   return (
     <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
       <PageHeader
-        title="Año escolar"
+        title="Año académico"
         description="Crea el año, completa los cuatro bimestres y controla cuándo está en curso, cerrado o reabierto."
         icon={Calendar03Icon}
         breadcrumbs={[
           { label: "Inicio", href: "/admin/dashboard" },
           { label: "Configuración" },
-          { label: "Año escolar" },
+          { label: "Año académico" },
         ]}
         actions={
           <Button onClick={() => setCrearAbierto(true)}>
@@ -88,29 +87,21 @@ export function AniosPage() {
         }
       />
 
-      {isLoading ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <Spinner className="text-primary size-8" />
-          <p className="text-muted-foreground text-xs">Cargando años escolares...</p>
-        </div>
-      ) : isError ? (
-        <div className="border-destructive/20 bg-destructive/5 flex h-64 flex-col items-center justify-center gap-4 rounded-xl border p-8 text-center">
-          <HugeiconsIcon icon={AlertCircleIcon} className="text-destructive size-10" />
-          <p className="text-muted-foreground text-sm">
-            {(error as Error)?.message || "No se pudieron obtener los años escolares."}
-          </p>
-          <Button variant="outline" onClick={() => refetch()}>
-            Reintentar
-          </Button>
-        </div>
-      ) : anios.length === 0 ? (
-        <EmptyState
-          icon={Calendar03Icon}
-          title="Todavía no hay un año escolar."
-          description="Al crearlo queda en planificado, con los bimestres I al IV, hasta que lo inicies."
-          action={<Button onClick={() => setCrearAbierto(true)}>Crear el primer año</Button>}
-        />
-      ) : (
+      <PageState
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+        onRetry={() => void refetch()}
+        errorTitle="No se pudieron obtener los años académicos"
+        isEmpty={anios.length === 0}
+        empty={{
+          icon: Calendar03Icon,
+          title: "Todavía no hay un año académico.",
+          description:
+            "Al crearlo queda en planificado, con los bimestres I al IV, hasta que lo inicies.",
+          action: <Button onClick={() => setCrearAbierto(true)}>Crear el primer año</Button>,
+        }}
+      >
         <div className="grid gap-4 lg:grid-cols-[16rem_1fr]">
           <AnioLista
             anios={anios}
@@ -137,7 +128,7 @@ export function AniosPage() {
               }}
               onIniciar={() =>
                 setConfirmacion({
-                  titulo: "Iniciar el año escolar",
+                  titulo: "Iniciar el año académico",
                   detalle: "El año pasará a en curso y será el que usen las demás pantallas.",
                   variant: "info",
                   accion: () => iniciar.mutate(seleccionado.id),
@@ -145,7 +136,7 @@ export function AniosPage() {
               }
               onCerrar={() =>
                 setConfirmacion({
-                  titulo: "Cerrar el año escolar",
+                  titulo: "Cerrar el año académico",
                   detalle: "Solo se cierra si los cuatro bimestres ya están cerrados.",
                   variant: "warning",
                   accion: () => cerrar.mutate(seleccionado.id),
@@ -172,7 +163,7 @@ export function AniosPage() {
             />
           ) : null}
         </div>
-      )}
+      </PageState>
 
       <AnioModal open={crearAbierto} onOpenChange={setCrearAbierto} />
       <ReabrirAnioModal

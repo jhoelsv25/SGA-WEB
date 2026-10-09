@@ -1,4 +1,9 @@
-import type { ListFilterDef, ListFilterSelectDef, ListFilterValues } from "./types";
+import type {
+  ListFilterChipsDef,
+  ListFilterDef,
+  ListFilterSelectDef,
+  ListFilterValues,
+} from "./types";
 
 export function collectFilterKeys(defs: readonly ListFilterDef[]): string[] {
   const keys: string[] = [];
@@ -20,7 +25,7 @@ export function getNonSearchDefs(defs: readonly ListFilterDef[]) {
   return defs.filter((d) => d.type !== "search");
 }
 
-export function getSelectAllValue(def: ListFilterSelectDef): string {
+export function getSelectAllValue(def: ListFilterSelectDef | ListFilterChipsDef): string {
   return def.allValue ?? "all";
 }
 
@@ -41,6 +46,7 @@ export function parseFilterValues(
         values[def.key] = getArrayParam(def.key);
         break;
       case "select":
+      case "chips":
         values[def.key] = getParam(def.key) || getSelectAllValue(def);
         break;
       case "dateRange":
@@ -69,7 +75,8 @@ export function countActiveFilters(
     switch (def.type) {
       case "search":
         break;
-      case "select": {
+      case "select":
+      case "chips": {
         const all = getSelectAllValue(def);
         const current = String(values[def.key] ?? "");
         if (current && current !== all) activeCount += 1;
@@ -111,7 +118,7 @@ export function countActiveFilters(
 
 /** Normalize a select write: `allValue` / empty → null (delete from URL). */
 export function serializeSelectValue(
-  def: ListFilterSelectDef,
+  def: ListFilterSelectDef | ListFilterChipsDef,
   value: string | null | undefined,
 ): string | null {
   if (value === null || value === undefined) return null;

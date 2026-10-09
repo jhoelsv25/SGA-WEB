@@ -29,7 +29,7 @@ export function ChangeRoleModal({ open, onOpenChange, user }: ChangeRoleModalPro
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Cambiar Rol de Usuario"
+      title="Cambiar rol de usuario"
       description="El cambio de rol actualizará los permisos y accesos del menú de esta cuenta."
       icon={ShieldCheckIcon}
       size="md"

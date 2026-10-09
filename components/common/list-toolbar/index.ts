@@ -9,6 +9,7 @@ export type {
   ListFilterSearchDef,
   ListFilterSelectDef,
   ListFilterMultiSelectDef,
+  ListFilterChipsDef,
   ListFilterDateDef,
   ListFilterDateRangeDef,
 } from "./filters";

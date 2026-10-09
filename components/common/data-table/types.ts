@@ -26,6 +26,12 @@ export interface CursorPaginationProps {
   loadedCount?: number;
 }
 
+export interface DataTableEmptyState {
+  title?: string;
+  description?: string;
+  action?: ReactNode;
+}
+
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -38,4 +44,17 @@ export interface DataTableProps<TData, TValue> {
   pagination?: DataTablePaginationProps | boolean;
   cursorPagination?: CursorPaginationProps;
   className?: string;
+
+  /** Indica si ocurrió un error al cargar la información. Muestra ErrorState con opción de reintento. */
+  isError?: boolean;
+  /** Función para reintentar la carga en caso de error. */
+  onRetry?: () => void;
+  /** Indica si hay filtros aplicados para ajustar el mensaje de estado vacío. */
+  hasActiveFilters?: boolean;
+  /** Configuración personalizada para el estado vacío cuando no hay registros. */
+  emptyState?: DataTableEmptyState;
+  /** Renderizado alternativo en vista de tarjetas para dispositivos móviles (pantallas menores a md). */
+  mobileCard?: (row: TData) => ReactNode;
+  /** Título accesible oculto para lectores de pantalla (caption de la tabla). */
+  caption?: string;
 }

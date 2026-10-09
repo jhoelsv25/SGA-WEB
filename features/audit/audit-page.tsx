@@ -14,8 +14,8 @@ export function AuditPage() {
         description="Trazabilidad inmutable de eventos críticos, accesos y modificaciones en el sistema institucional."
         icon={Audit01Icon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Seguridad y Accesos", href: "#" },
+          { label: "Inicio", href: "/admin/dashboard" },
+          { label: "Seguridad y Accesos" },
           { label: "Bitácora de Auditoría" },
         ]}
       />

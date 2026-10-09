@@ -31,7 +31,7 @@ export function NavMain({ sections }: NavMainProps) {
       {sections.map((section, idx) => (
         <SidebarGroup key={section.title || `section-${idx}`} className="px-0 py-0">
           {section.title && (
-            <SidebarGroupLabel className="text-muted-foreground/60 px-3 pt-3 pb-1 text-[11px] font-bold tracking-wider uppercase select-none">
+            <SidebarGroupLabel className="text-muted-foreground/60 px-3 pt-3 pb-1 text-xs font-bold tracking-wider uppercase select-none">
               {section.title}
             </SidebarGroupLabel>
           )}
@@ -216,7 +216,7 @@ function RenderNavBadge({
 
   if (isParentActive) {
     return (
-      <span className="bg-primary/20 text-primary border-primary/30 ml-auto inline-flex items-center rounded-full border px-2 py-0.5 text-[9.5px] font-bold">
+      <span className="bg-primary/20 text-primary border-primary/30 ml-auto inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-bold">
         {text}
       </span>
     );
@@ -227,10 +227,9 @@ function RenderNavBadge({
     secondary: "bg-secondary text-secondary-foreground border border-border/50",
     destructive: "bg-destructive/10 text-destructive border border-destructive/20",
     outline: "border border-border/70 text-muted-foreground bg-background/50",
-    success:
-      "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-800 dark:text-amber-400 border border-amber-500/20",
-    info: "bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/20",
+    success: "bg-success/10 text-success border border-success/20",
+    warning: "bg-warning/10 text-warning-text dark:text-warning border border-warning/20",
+    info: "bg-info/10 text-info border border-info/20",
   };
 
   const badgeStyle = variantStyles[variant] || variantStyles.default;
@@ -238,7 +237,7 @@ function RenderNavBadge({
   return (
     <span
       className={cn(
-        "ml-auto inline-flex shrink-0 items-center justify-center rounded-full px-2 py-0.5 text-[9.5px] font-bold tracking-tight shadow-2xs",
+        "ml-auto inline-flex shrink-0 items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold tracking-tight shadow-2xs",
         badgeStyle,
         typeof badge !== "string" && badge.className,
       )}

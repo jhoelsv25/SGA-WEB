@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { EquiposPage } from "@/features/equipos";
 
 export const metadata: Metadata = {
-  title: "Equipos Autorizados | SGA",
+  title: "Equipos Autorizados",
   description:
     "Administración de kioskos y relojes biométricos para marcación y firma de sesiones.",
 };

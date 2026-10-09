@@ -2,6 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,10 +31,10 @@ export function EditGradoForm({ grado, onSubmit, onCancel, isLoading }: EditGrad
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="grado-numero" className="text-xs font-semibold">
-          Nivel y Orden
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      <div className="space-y-1.5">
+        <Label htmlFor="grado-numero" className="text-sm font-medium">
+          Nivel y orden
         </Label>
         <Input
           id="grado-numero"
@@ -40,38 +42,50 @@ export function EditGradoForm({ grado, onSubmit, onCancel, isLoading }: EditGrad
           disabled
           className="bg-muted/50 cursor-not-allowed font-medium"
         />
-        <p className="text-muted-foreground text-[11px]">
+        <p className="text-muted-foreground text-xs">
           El número de grado es una constante del CNEB y no se puede modificar.
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="grado-nombre" className="text-xs font-semibold">
-          Nombre Visible <span className="text-destructive">*</span>
+      <div className="space-y-1.5">
+        <Label htmlFor="grado-nombre" className="text-sm font-medium">
+          Nombre visible *
         </Label>
         <Input
           id="grado-nombre"
-          placeholder="Ej. 1.° de secundaria (Avanzado)"
-          {...register("nombre")}
-          className={errors.nombre ? "border-destructive" : ""}
+          placeholder="Ej. 1.° de secundaria"
+          disabled={isLoading}
+          aria-invalid={!!errors.nombre}
           autoFocus
+          {...register("nombre")}
         />
-        {errors.nombre && <p className="text-destructive text-xs">{errors.nombre.message}</p>}
+        {errors.nombre && (
+          <p className="text-destructive text-xs font-medium">{errors.nombre.message}</p>
+        )}
       </div>
 
-      <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
-          Cancelar
+      <div className="flex justify-end gap-2.5 pt-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isLoading}
+          className="h-10 gap-1.5 rounded-full px-4.5 text-xs font-semibold"
+        >
+          <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+          <span>Cancelar</span>
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="shadow-primary/20 h-10 gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md"
+        >
           {isLoading ? (
-            <>
-              <Spinner className="mr-2 size-4" />
-              Guardando...
-            </>
+            <Spinner className="size-3.5" />
           ) : (
-            "Guardar Cambios"
+            <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5" />
           )}
+          <span>Guardar cambios</span>
         </Button>
       </div>
     </form>

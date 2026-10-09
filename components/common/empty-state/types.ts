@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 
 export interface EmptyStateProps {
   title: string;
-  description?: string;
+  description?: ReactNode;
   icon?: IconSvgElement;
   action?: ReactNode;
   className?: string;

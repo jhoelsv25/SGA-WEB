@@ -79,7 +79,7 @@ function ToolbarFiltersButton({
           {badgeCount > 0 ? (
             <Badge
               variant="secondary"
-              className="ml-0.5 h-5 min-w-5 rounded-full px-1.5 text-[10px] font-semibold"
+              className="ml-0.5 h-5 min-w-5 rounded-full px-1.5 text-xs font-semibold"
             >
               {badgeCount}
             </Badge>
@@ -278,6 +278,7 @@ export function ListToolbar({
             onClick={onRefresh}
             disabled={isRefreshing}
             title={refreshLabel}
+            aria-label={refreshLabel}
             className="border-border/80 bg-background hover:bg-muted dark:border-border/70 dark:bg-card/40 size-10 shrink-0 rounded-xl shadow-2xs"
           >
             <HugeiconsIcon

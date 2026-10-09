@@ -27,7 +27,7 @@ const sizeClasses: Record<ModalSize, string> = {
   "8xl": "sm:max-w-8xl",
   "9xl": "sm:max-w-9xl",
   "10xl": "sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw]",
-  full: "sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw] h-[90vh]",
+  full: "sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw] h-[90dvh]",
 };
 
 export function Modal({
@@ -39,9 +39,9 @@ export function Modal({
   children,
   footer,
   size = "md",
-  showClose = true,
-  className,
   preventClose = false,
+  showClose = !preventClose,
+  className,
   closeOnInteractOutside,
   closeOnEscapeKeyDown,
 }: ModalProps) {
@@ -60,7 +60,7 @@ export function Modal({
     >
       <DialogContent
         showCloseButton={showClose}
-        className={cn(sizeClasses[size], size === "full" && "flex flex-col", className)}
+        className={cn("flex max-h-[90dvh] flex-col", sizeClasses[size], className)}
         onInteractOutside={(e) => {
           if (shouldPreventInteractOutside) {
             e.preventDefault();
@@ -75,7 +75,7 @@ export function Modal({
         {(title || description || icon) && (
           <DialogHeader
             className={cn(
-              "border-border/60 border-b pb-3.5",
+              "border-border/60 shrink-0 border-b pb-3.5",
               icon && "flex flex-row items-start gap-3.5 space-y-0 text-left",
             )}
           >
@@ -99,20 +99,9 @@ export function Modal({
           </DialogHeader>
         )}
 
-        <div
-          className={cn(
-            "pt-2 pb-1",
-            size === "full"
-              ? "flex-1 overflow-y-auto pr-1"
-              : "max-h-[calc(88vh-8rem)] overflow-y-auto pr-1",
-          )}
-        >
-          {children}
-        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">{children}</div>
 
-        {footer && (
-          <DialogFooter className={cn(size === "full" && "mt-auto")}>{footer}</DialogFooter>
-        )}
+        {footer && <DialogFooter className="shrink-0">{footer}</DialogFooter>}
       </DialogContent>
     </Dialog>
   );

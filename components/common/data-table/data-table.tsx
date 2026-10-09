@@ -19,16 +19,47 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableCaption,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { DataTableProps } from "./types";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableCursorPagination } from "./data-table-cursor-pagination";
+import { ErrorState } from "@/components/common/page-state";
 
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Search01Icon, Loading03Icon } from "@hugeicons/core-free-icons";
+import { Search01Icon, Loading03Icon, Folder01Icon } from "@hugeicons/core-free-icons";
+
+function TableEmptyState({
+  isFiltered,
+  title,
+  description,
+  action,
+}: {
+  isFiltered: boolean;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3.5 py-12 text-center">
+      <div className="border-border/70 bg-muted/40 text-muted-foreground flex size-14 items-center justify-center rounded-full border shadow-2xs">
+        <HugeiconsIcon icon={isFiltered ? Search01Icon : Folder01Icon} size={24} strokeWidth={2} />
+      </div>
+      <div className="space-y-1">
+        <p className="text-foreground text-sm font-bold tracking-tight">{title}</p>
+        {description && (
+          <p className="text-muted-foreground mx-auto max-w-sm text-xs leading-relaxed">
+            {description}
+          </p>
+        )}
+      </div>
+      {action && <div className="mt-2">{action}</div>}
+    </div>
+  );
+}
 
 export function DataTable<TData, TValue>({
   columns,
@@ -42,6 +73,12 @@ export function DataTable<TData, TValue>({
   pagination = true,
   cursorPagination,
   className,
+  isError = false,
+  onRetry,
+  hasActiveFilters,
+  emptyState,
+  mobileCard,
+  caption,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -74,7 +111,58 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  const isFiltered = Boolean(
+    hasActiveFilters ??
+    (columnFilters.length > 0 ||
+      Boolean(searchKey && table.getColumn(searchKey)?.getFilterValue())),
+  );
+
+  const emptyTitle = isFiltered
+    ? "No hay resultados con estos filtros"
+    : (emptyState?.title ?? "Todavía no hay registros");
+
+  const emptyDescription = isFiltered
+    ? "Intenta ajustar o limpiar los filtros aplicados para ver más resultados."
+    : (emptyState?.description ??
+      (emptyMessage !== "No se encontraron resultados con los criterios seleccionados."
+        ? emptyMessage
+        : undefined));
+
+  if (isError) {
+    return (
+      <div className={cn("w-full max-w-full min-w-0 space-y-4", className)}>
+        {(searchKey || toolbarActions) && (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {searchKey ? (
+              <div className="w-full sm:max-w-xs">
+                <InputGroup className="border-border/80 bg-card focus-within:border-primary focus-within:ring-primary/20 h-10 rounded-2xl shadow-2xs transition-all focus-within:ring-2">
+                  <InputGroupAddon align="inline-start" className="text-muted-foreground pl-3">
+                    <HugeiconsIcon icon={Search01Icon} size={16} strokeWidth={2} />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    placeholder={searchPlaceholder}
+                    value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+                    onChange={(event) =>
+                      table.getColumn(searchKey)?.setFilterValue(event.target.value)
+                    }
+                    className="placeholder:text-muted-foreground text-xs font-medium"
+                  />
+                </InputGroup>
+              </div>
+            ) : (
+              <div />
+            )}
+
+            {toolbarActions && <div className="flex items-center gap-2">{toolbarActions}</div>}
+          </div>
+        )}
+        <ErrorState onRetry={onRetry} />
+      </div>
+    );
+  }
+
   const paginationOptions = typeof pagination === "object" ? pagination : {};
+  const rows = table.getRowModel().rows ?? [];
 
   return (
     <div className={cn("w-full max-w-full min-w-0 space-y-4", className)}>
@@ -105,8 +193,56 @@ export function DataTable<TData, TValue>({
       )}
 
       <div className="border-border/80 bg-card w-full max-w-full min-w-0 overflow-hidden rounded-2xl border shadow-xs transition-all">
-        <div className="max-w-full overflow-x-auto">
-          <Table>
+        {mobileCard && (
+          <div className="md:hidden">
+            {isLoading ? (
+              <ul role="list" className="space-y-3 p-4">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <li
+                    key={`loading-card-${index}`}
+                    className="border-border/60 bg-muted/20 space-y-2.5 rounded-xl border p-4"
+                  >
+                    <Skeleton className="h-4 w-3/4 rounded-md" />
+                    <Skeleton className="h-3.5 w-1/2 rounded-md" />
+                    <Skeleton className="h-3.5 w-1/3 rounded-md" />
+                  </li>
+                ))}
+              </ul>
+            ) : rows.length ? (
+              <>
+                <ul role="list" className="space-y-3 p-4">
+                  {rows.map((row) => (
+                    <li key={row.id}>{mobileCard(row.original)}</li>
+                  ))}
+                </ul>
+                {isFetchingNextPage && (
+                  <div className="text-muted-foreground flex items-center justify-center gap-2 py-3 text-xs">
+                    <HugeiconsIcon
+                      icon={Loading03Icon}
+                      size={14}
+                      strokeWidth={2}
+                      className="animate-spin"
+                    />
+                    <span>Cargando más registros...</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="px-4">
+                <TableEmptyState
+                  isFiltered={isFiltered}
+                  title={emptyTitle}
+                  description={emptyDescription}
+                  action={emptyState?.action}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className={cn("max-w-full overflow-x-auto", mobileCard && "hidden md:block")}>
+          <Table aria-busy={isLoading}>
+            {caption && <TableCaption className="sr-only">{caption}</TableCaption>}
             <TableHeader className="bg-muted/40 border-border/70 border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
@@ -157,9 +293,9 @@ export function DataTable<TData, TValue>({
                     })}
                   </TableRow>
                 ))
-              ) : table.getRowModel().rows?.length ? (
+              ) : rows.length ? (
                 <>
-                  {table.getRowModel().rows.map((row) => (
+                  {rows.map((row) => (
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
@@ -200,22 +336,12 @@ export function DataTable<TData, TValue>({
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-64 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center gap-3.5">
-                      <div className="border-border/70 bg-muted/40 text-muted-foreground relative flex size-14 items-center justify-center rounded-full border shadow-2xs">
-                        <HugeiconsIcon icon={Search01Icon} size={24} strokeWidth={2} />
-                        <span className="bg-primary/10 text-primary border-primary/20 absolute -right-0.5 -bottom-0.5 flex size-4 items-center justify-center rounded-full border text-[9px]">
-                          ✕
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-foreground text-sm font-bold tracking-tight">
-                          No se encontraron registros coincidentes
-                        </p>
-                        <p className="text-muted-foreground mx-auto max-w-sm text-xs leading-relaxed">
-                          {emptyMessage}
-                        </p>
-                      </div>
-                    </div>
+                    <TableEmptyState
+                      isFiltered={isFiltered}
+                      title={emptyTitle}
+                      description={emptyDescription}
+                      action={emptyState?.action}
+                    />
                   </TableCell>
                 </TableRow>
               )}

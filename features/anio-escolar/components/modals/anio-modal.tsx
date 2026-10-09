@@ -17,7 +17,7 @@ export function AnioModal({ open, onOpenChange }: AnioModalProps) {
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Nuevo año escolar"
+      title="Nuevo año académico"
       description="Queda en planificado hasta que completes los bimestres e inicies el año."
       icon={Calendar03Icon}
       size="2xl"
