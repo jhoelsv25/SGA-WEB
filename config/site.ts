@@ -63,6 +63,7 @@ export const siteConfig = {
     dashboard: "/admin/dashboard",
     terms: "/terms",
     privacy: "/privacy",
+    kiosk: "/kiosko",
   },
 
   // Configuración de SEO y Redes Sociales

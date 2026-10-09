@@ -184,7 +184,7 @@ export function ModulesSection() {
 
             <CardContent className="pt-2">
               <Link
-                href="/access-control/kiosk"
+                href={siteConfig.routes.kiosk}
                 className="text-primary inline-flex items-center gap-1.5 text-xs font-semibold hover:underline"
               >
                 <span>Abrir Terminal de Portería</span>

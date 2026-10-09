@@ -42,7 +42,7 @@ export function CtaSection() {
               size="lg"
               className="border-border hover:bg-muted/80 h-12 w-full gap-2.5 rounded-full px-6 font-medium sm:w-auto"
             >
-              <Link href="/access-control/kiosk">
+              <Link href={siteConfig.routes.kiosk}>
                 <HugeiconsIcon icon={Time02Icon} className="text-primary size-5" />
                 <span>Abrir Marcado en Portería</span>
               </Link>

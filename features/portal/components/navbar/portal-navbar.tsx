@@ -100,7 +100,7 @@ export function PortalNavbar() {
             size="sm"
             className="hover:bg-muted/70 group h-9 gap-2 rounded-full px-4 font-medium"
           >
-            <Link href="/access-control/kiosk">
+            <Link href={siteConfig.routes.kiosk}>
               <span className="relative flex size-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
@@ -183,7 +183,7 @@ export function PortalNavbar() {
                 className="h-10 w-full gap-2 rounded-xl font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Link href="/access-control/kiosk">
+                <Link href={siteConfig.routes.kiosk}>
                   <HugeiconsIcon icon={Time02Icon} className="text-primary size-4" />
                   Terminal Kiosco
                 </Link>

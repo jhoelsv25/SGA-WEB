@@ -49,7 +49,10 @@ export function PortalFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/access-control/kiosk" className="hover:text-primary transition-colors">
+                <Link
+                  href={siteConfig.routes.kiosk}
+                  className="hover:text-primary transition-colors"
+                >
                   Terminal de Marcado (Kiosco)
                 </Link>
               </li>
