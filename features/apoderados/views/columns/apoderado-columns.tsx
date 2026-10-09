@@ -42,9 +42,7 @@ export function getApoderadoColumns({
                 {p.celular && ` · ${p.celular}`}
               </p>
               {p.correo && (
-                <p className="text-muted-foreground max-w-[200px] truncate text-[11px]">
-                  {p.correo}
-                </p>
+                <p className="text-muted-foreground max-w-50 truncate text-[11px]">{p.correo}</p>
               )}
             </div>
           </div>
@@ -64,7 +62,7 @@ export function getApoderadoColumns({
           <div className="space-y-1">
             <p className="text-foreground text-xs font-medium">{ocupacion || "No especificada"}</p>
             {centro && (
-              <p className="text-muted-foreground max-w-[180px] truncate text-[11px]">{centro}</p>
+              <p className="text-muted-foreground max-w-45 truncate text-[11px]">{centro}</p>
             )}
             {grado && (
               <Badge variant="outline" className="bg-muted/40 px-1.5 py-0 text-[10px]">
@@ -91,7 +89,7 @@ export function getApoderadoColumns({
                 key={e.estudianteId}
                 className="bg-muted/60 border-border/60 flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px]"
               >
-                <span className="text-foreground max-w-[150px] truncate font-medium">
+                <span className="text-foreground max-w-37 truncate font-medium">
                   {e.nombreCompleto}
                 </span>
                 <span className="text-muted-foreground text-[10px]">({e.parentesco})</span>

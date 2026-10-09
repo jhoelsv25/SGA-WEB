@@ -48,10 +48,10 @@ export const createApoderadoSchema = z
     gradoInstruccion: gradoInstruccionEnum.optional().or(z.literal("")),
     estudianteId: z.string().optional(),
     parentesco: parentescoEnum.optional().or(z.literal("")),
-    esPrincipal: z.boolean().default(false),
-    viveConEstudiante: z.boolean().default(false),
-    autorizadoRecoger: z.boolean().default(false),
-    contactoEmergencia: z.boolean().default(false),
+    esPrincipal: z.boolean(),
+    viveConEstudiante: z.boolean(),
+    autorizadoRecoger: z.boolean(),
+    contactoEmergencia: z.boolean(),
   })
   .refine((data) => Boolean(data.personaId) || Boolean(data.nuevaPersona), {
     message: "Debe vincular una persona existente o completar los datos para crearla.",

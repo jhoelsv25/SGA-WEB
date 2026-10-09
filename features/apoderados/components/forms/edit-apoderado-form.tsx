@@ -68,7 +68,7 @@ export function EditApoderadoForm({
               <SelectOption
                 options={gradoInstruccionOptions}
                 value={field.value || "universitaria"}
-                onChange={field.onChange}
+                onSelect={(val) => field.onChange(val as GradoInstruccion)}
                 disabled={isLoading}
               />
             )}

@@ -94,7 +94,7 @@ export function VincularApoderadoForm({
             <SelectOption
               options={parentescoOptions}
               value={field.value || "madre"}
-              onChange={field.onChange}
+              onSelect={(val) => field.onChange(val as Parentesco)}
               disabled={isLoading}
             />
           )}

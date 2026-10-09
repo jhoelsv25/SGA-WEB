@@ -74,8 +74,8 @@ export function CreateApoderadoForm({
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const { data: resultadosBusqueda = [], isFetching: isSearching } = useSearchPersonasQuery(
-    debouncedSearch,
+  const { data: searchResult, isFetching: isSearching } = useSearchPersonasQuery(
+    { search: debouncedSearch, destinoFicha: "apoderado" },
     Boolean(debouncedSearch.length >= 3 && !personaVinculada),
   );
 
@@ -137,10 +137,18 @@ export function CreateApoderadoForm({
       celular: "",
       correo: "",
     });
+    setSearchTerm("");
+  };
+
+  const yaTieneFicha = Boolean(searchResult?.yaTieneFicha);
+
+  const handleFormSubmit = async (values: CreateApoderadoFormValues) => {
+    if (searchResult?.yaTieneFicha) return;
+    await onSubmit(values);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6" noValidate>
       {/* 1. Contexto de vinculación escolar */}
       {estudianteNombre && (
         <div className="border-primary/20 bg-primary/5 flex items-center justify-between rounded-xl border p-3.5">
@@ -211,40 +219,37 @@ export function CreateApoderadoForm({
               )}
             </div>
 
-            {resultadosBusqueda.length > 0 && !personaVinculada && (
-              <div className="border-border bg-card divide-border/60 max-h-44 divide-y overflow-y-auto rounded-lg border p-1 shadow-sm">
-                {resultadosBusqueda.map((p) => {
-                  const yaEsApoderado = p.fichas.esApoderado;
-                  return (
-                    <div
-                      key={p.id}
-                      className="hover:bg-muted/50 flex items-center justify-between rounded-md p-2 transition-colors"
-                    >
-                      <div className="space-y-0.5">
-                        <p className="text-foreground text-sm font-medium">{p.nombreCompleto}</p>
-                        <p className="text-muted-foreground font-mono text-xs">
-                          {p.tipoDocumento.toUpperCase()}: {p.numeroDocumento}
-                          {p.fichas.esDocente && " · Docente"}
-                        </p>
-                      </div>
-                      {yaEsApoderado ? (
-                        <span className="rounded bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
-                          Ya es apoderado
-                        </span>
-                      ) : (
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleVincularPersona(p)}
-                          className="h-7 text-xs"
-                        >
-                          Vincular
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })}
+            {searchResult?.encontrada && searchResult.persona && !personaVinculada && (
+              <div
+                className={`flex items-start gap-2.5 rounded-lg border p-3 ${
+                  yaTieneFicha
+                    ? "border-destructive/40 bg-destructive/10 text-destructive"
+                    : "border-emerald-500/40 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300"
+                }`}
+              >
+                <HugeiconsIcon
+                  icon={yaTieneFicha ? Alert02Icon : CheckmarkCircle02Icon}
+                  className="mt-0.5 h-5 w-5 shrink-0"
+                />
+                <div className="flex-1 space-y-0.5">
+                  <p className="text-xs font-semibold">{searchResult.mensaje}</p>
+                  <p className="text-[11px] opacity-90">
+                    {searchResult.persona.nombreCompleto} (
+                    {searchResult.persona.tipoDocumento.toUpperCase()}:{" "}
+                    {searchResult.persona.numeroDocumento})
+                  </p>
+                </div>
+                {!yaTieneFicha && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="h-7 gap-1 px-2.5 text-xs"
+                    onClick={() => handleVincularPersona(searchResult.persona!)}
+                  >
+                    <HugeiconsIcon icon={UserCheck01Icon} className="size-3.5" />
+                    <span>Vincular</span>
+                  </Button>
+                )}
               </div>
             )}
           </div>
@@ -279,7 +284,7 @@ export function CreateApoderadoForm({
                       { value: "pasaporte", label: "Pasaporte" },
                     ]}
                     value={field.value || "dni"}
-                    onChange={field.onChange}
+                    onSelect={(val) => field.onChange(val)}
                     disabled={isLoading}
                   />
                 )}
@@ -367,7 +372,7 @@ export function CreateApoderadoForm({
                       { value: "M", label: "Masculino" },
                     ]}
                     value={field.value || "F"}
-                    onChange={field.onChange}
+                    onSelect={(val) => field.onChange(val as "M" | "F")}
                     disabled={isLoading}
                   />
                 )}
@@ -381,9 +386,14 @@ export function CreateApoderadoForm({
                 name="nuevaPersona.fechaNacimiento"
                 render={({ field }) => (
                   <DatePicker
-                    value={parseIsoDate(field.value)}
-                    onChange={(date) => field.onChange(formatToIsoDate(date))}
+                    date={parseIsoDate(field.value)}
+                    onSelect={(date) => field.onChange(formatToIsoDate(date))}
                     placeholder="dd/mm/aaaa"
+                    disabled={isLoading}
+                    clearable={true}
+                    dateFormat="dd/MM/yyyy"
+                    maxDate={new Date()}
+                    className="w-full"
                   />
                 )}
               />
@@ -453,7 +463,7 @@ export function CreateApoderadoForm({
                 <SelectOption
                   options={gradoInstruccionOptions}
                   value={field.value || "universitaria"}
-                  onChange={field.onChange}
+                  onSelect={(val) => field.onChange(val as GradoInstruccion)}
                   disabled={isLoading}
                 />
               )}
@@ -520,7 +530,7 @@ export function CreateApoderadoForm({
                   <SelectOption
                     options={parentescoOptions}
                     value={field.value || "madre"}
-                    onChange={field.onChange}
+                    onSelect={(val) => field.onChange(val as Parentesco)}
                     disabled={isLoading}
                   />
                 )}
