@@ -70,6 +70,8 @@ export function CalendarioDelMes({
           onMesAnterior={onMesAnterior}
           onMesSiguiente={onMesSiguiente}
           onSeleccionarDia={onSeleccionarDia}
+          onEditar={onEditar}
+          onEliminar={onEliminar}
         />
         <EventosMes
           eventos={visibles}
