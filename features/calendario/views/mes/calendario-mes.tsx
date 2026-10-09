@@ -52,7 +52,7 @@ export function CalendarioMes({
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground mb-3 text-xs">Año escolar {anioEscolar}</p>
+        <p className="text-muted-foreground mb-3 text-xs">Año académico {anioEscolar}</p>
         <div className="grid grid-cols-7 gap-1">
           {DIAS.map((dia) => (
             <div

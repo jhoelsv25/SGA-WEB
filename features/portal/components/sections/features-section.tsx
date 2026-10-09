@@ -132,7 +132,7 @@ export function FeaturesSection() {
             <div className="border-primary-foreground/20 flex shrink-0 items-center gap-6 border-t pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
               <div className="text-center">
                 <p className="text-primary-foreground text-3xl font-extrabold">2026</p>
-                <p className="text-primary-foreground/80 text-[11px]">Año Escolar Activo</p>
+                <p className="text-primary-foreground/80 text-[11px]">Año académico Activo</p>
               </div>
               <div className="text-center">
                 <p className="text-primary-foreground text-3xl font-extrabold">Secundaria</p>

@@ -130,7 +130,7 @@ export function AnnouncementModal() {
             className="border-primary/30 bg-primary/10 text-primary mt-4 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold"
           >
             <HugeiconsIcon icon={Megaphone01Icon} className="size-3.5" />
-            Año Académico 2026 · Inicio de Actividades
+            Año académico 2026 · Inicio de Actividades
           </Badge>
         </div>
 

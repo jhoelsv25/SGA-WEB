@@ -80,7 +80,7 @@ export function AnioForm({ onSubmit, onCancel, isSubmitting = false }: AnioFormP
           </Label>
           <Input
             id="nombre"
-            placeholder="Ej. Año escolar 2027"
+            placeholder="Ej. Año académico 2027"
             disabled={isSubmitting}
             {...form.register("nombre")}
           />

@@ -50,8 +50,8 @@ export function CalendarioPage() {
         title="Calendario escolar"
         description={
           anioLectivo
-            ? `Eventos del año lectivo ${anioLectivo.anio}. Los días sin clases quedan marcados y no cuentan como sesión.`
-            : "Eventos del año lectivo. Los días sin clases quedan marcados y no cuentan como sesión."
+            ? `Eventos del año académico ${anioLectivo.anio}. Los días sin clases quedan marcados y no cuentan como sesión.`
+            : "Eventos del año académico. Los días sin clases quedan marcados y no cuentan como sesión."
         }
         icon={Calendar03Icon}
         breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Calendario" }]}
@@ -74,11 +74,11 @@ export function CalendarioPage() {
         <div className="border-destructive/20 bg-destructive/5 flex h-64 flex-col items-center justify-center gap-3 rounded-xl border p-8 text-center">
           <HugeiconsIcon icon={AlertCircleIcon} className="text-destructive size-10" />
           <p className="text-sm">
-            {(consulta.error as Error)?.message || "No hay un año escolar en curso."}
+            {(consulta.error as Error)?.message || "No hay un año académico en curso."}
           </p>
           {esAdmin ? (
             <Button asChild>
-              <Link href="/admin/academic-years">Ir al año escolar</Link>
+              <Link href="/admin/academic-years">Ir al año académico</Link>
             </Button>
           ) : null}
         </div>

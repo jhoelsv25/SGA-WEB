@@ -67,9 +67,9 @@ export function useCreateAnioMutation() {
     mutationFn: (payload: CreateAnioPayload) => createAnio(payload),
     onSuccess: () => {
       invalidarAnios(queryClient);
-      toast.success("El año escolar quedó en planificado, con sus bimestres.");
+      toast.success("El año académico quedó en planificado, con sus bimestres.");
     },
-    onError: (error: unknown) => toast.error(mensaje(error, "No se pudo crear el año escolar.")),
+    onError: (error: unknown) => toast.error(mensaje(error, "No se pudo crear el año académico.")),
   });
 }
 
@@ -106,7 +106,7 @@ export function useIniciarAnioMutation() {
     mutationFn: (id: string) => iniciarAnio(id),
     onSuccess: () => {
       invalidarAnios(queryClient);
-      toast.success("El año escolar está en curso.");
+      toast.success("El año académico está en curso.");
     },
     onError: (error: unknown) => toast.error(mensaje(error, "No se pudo iniciar el año.")),
   });
@@ -118,7 +118,7 @@ export function useCerrarAnioMutation() {
     mutationFn: (id: string) => cerrarAnio(id),
     onSuccess: () => {
       invalidarAnios(queryClient);
-      toast.success("El año escolar quedó cerrado.");
+      toast.success("El año académico quedó cerrado.");
     },
     onError: (error: unknown) => toast.error(mensaje(error, "No se pudo cerrar el año.")),
   });

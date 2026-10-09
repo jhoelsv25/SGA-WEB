@@ -30,7 +30,7 @@ export function HeroSection() {
               className="border-primary/30 bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 px-3.5 py-1 text-xs font-semibold shadow-xs"
             >
               <span className="bg-primary size-2 animate-ping rounded-full" />
-              Año Académico 2026 · {siteConfig.institution.badge}
+              Año académico 2026 · {siteConfig.institution.badge}
             </Badge>
 
             <h1 className="text-foreground text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.12]">

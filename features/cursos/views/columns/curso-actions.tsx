@@ -50,7 +50,7 @@ export function CursoActions({
           ? {
               label: "Desactivar curso",
               title: "¿Desactivar asignatura del catálogo?",
-              description: `¿Confirmas la desactivación de "${curso.nombre}"? Un curso inactivo no se podrá agregar a nuevos planes ni horarios. Si tiene carga académica activa en el año escolar en curso, el sistema bloqueará la operación.`,
+              description: `¿Confirmas la desactivación de "${curso.nombre}"? Un curso inactivo no se podrá agregar a nuevos planes ni horarios. Si tiene carga académica activa en el año académico en curso, el sistema bloqueará la operación.`,
               confirmText: "Desactivar Curso",
               onConfirm: () => onDeactivate(curso),
               isPending: isDeactivating,

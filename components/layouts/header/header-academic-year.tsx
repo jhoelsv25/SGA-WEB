@@ -50,7 +50,7 @@ function ChipAnioLectivo({ children }: { children: React.ReactNode }) {
 function ResumenAnio({ anio }: { anio: AnioAcademico }) {
   return (
     <div className="flex flex-col text-left">
-      <span className="text-xs font-semibold">Año lectivo {anio.anio}</span>
+      <span className="text-xs font-semibold">Año académico {anio.anio}</span>
       <span className="text-muted-foreground text-[11px] font-normal">{detalleDeAnio(anio)}</span>
     </div>
   );
@@ -72,7 +72,7 @@ export function HeaderAcademicYearSelect() {
         })
         .map((item) => ({
           value: item.id,
-          label: `Año lectivo ${item.anio}`,
+          label: `Año académico ${item.anio}`,
           description: descripcionDeOpcion(item, referencia),
           disabled: !sePuedeElegir(item, referencia),
           group: grupoDe(item, referencia),
@@ -86,7 +86,7 @@ export function HeaderAcademicYearSelect() {
   }
 
   if (!esAdmin) {
-    if (!anio) return <ChipAnioLectivo>Sin año lectivo</ChipAnioLectivo>;
+    if (!anio) return <ChipAnioLectivo>Sin año académico</ChipAnioLectivo>;
     return (
       <ChipAnioLectivo>
         <ResumenAnio anio={anio} />
@@ -100,8 +100,8 @@ export function HeaderAcademicYearSelect() {
       value={anio?.id}
       onSelect={seleccionar}
       placeholder="Sin año en curso"
-      searchPlaceholder="Buscar año lectivo..."
-      emptyMessage="No hay años escolares."
+      searchPlaceholder="Buscar año académico..."
+      emptyMessage="No hay años académicos."
       className="border-border/60 bg-muted/40 hover:bg-muted/70 h-auto w-auto max-w-64 min-w-44 shrink rounded-lg px-2.5 py-1 text-xs font-semibold shadow-none"
     />
   );
