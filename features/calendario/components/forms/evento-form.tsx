@@ -19,8 +19,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { Spinner } from "@/components/common/spinner";
 import { ETIQUETAS_EVENTO } from "../../consts";
+import { CampoFecha } from "@/components/common/date-field";
 import { eventoSchema, type EventoFormValues } from "../../schemas";
-import { CampoFecha } from "./campo-fecha";
 import {
   TIPOS_EVENTO,
   TIPOS_SUSPENDEN_POR_DEFECTO,
@@ -58,7 +58,7 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
     >
       <div className="space-y-1.5">
         <Label htmlFor="titulo" className="text-sm font-medium">
-          Título
+          Título *
         </Label>
         <Input
           id="titulo"
@@ -77,7 +77,7 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
 
       <div className="space-y-1.5">
         <Label htmlFor="tipo" className="text-sm font-medium">
-          Tipo
+          Tipo *
         </Label>
         <Controller
           control={form.control}
@@ -116,7 +116,8 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
         <CampoFecha
           control={form.control}
           name="fechaInicio"
-          label="Inicio"
+          label="Inicio *"
+          required
           hint="La fecha de fin puede ser el mismo día."
           disabled={isSubmitting}
           error={form.formState.errors.fechaInicio?.message}
@@ -124,7 +125,8 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
         <CampoFecha
           control={form.control}
           name="fechaFin"
-          label="Fin"
+          label="Fin *"
+          required
           disabled={isSubmitting}
           error={form.formState.errors.fechaFin?.message}
         />

@@ -1,8 +1,8 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/common/status-badge";
 import type { AnioAcademico } from "../../types";
-import { ESTADO_ANIO } from "./estados";
+import { ESTADO_ANIO, TONO_ESTADO_ANIO } from "./estados";
 
 interface AnioListaProps {
   anios: AnioAcademico[];
@@ -23,9 +23,9 @@ export function AnioLista({ anios, seleccionadoId, onSeleccionar }: AnioListaPro
           }`}
         >
           <span className="text-sm font-semibold">{anio.anio}</span>
-          <Badge variant={anio.estado === "en_curso" ? "default" : "outline"}>
+          <StatusBadge tone={TONO_ESTADO_ANIO[anio.estado]} dot={anio.estado === "en_curso"}>
             {ESTADO_ANIO[anio.estado]}
-          </Badge>
+          </StatusBadge>
         </button>
       ))}
     </div>

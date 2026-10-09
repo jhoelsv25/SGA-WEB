@@ -10,6 +10,31 @@ import { isoDePartes, tituloMes } from "../../utils";
 
 const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
+const DIAS_SEMANA_COMPLETOS = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+];
+
+const MESES = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+];
+
 interface CalendarioMesProps {
   anio: number;
   mes: number;
@@ -38,15 +63,32 @@ export function CalendarioMes({
   const celdas = [...Array<number | null>(offset).fill(null)];
   for (let dia = 1; dia <= cantidad; dia += 1) celdas.push(dia);
 
+  const hoy = new Date();
+  const anioHoy = hoy.getFullYear();
+  const mesHoy = hoy.getMonth() + 1;
+  const diaHoy = hoy.getDate();
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-3">
         <CardTitle>{tituloMes(anio, mes)}</CardTitle>
         <div className="flex gap-1">
-          <Button variant="outline" size="icon" aria-label="Mes anterior" onClick={onMesAnterior}>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Mes anterior"
+            onClick={onMesAnterior}
+            className="size-11 sm:size-9"
+          >
             <HugeiconsIcon icon={ArrowLeft01Icon} className="size-4" />
           </Button>
-          <Button variant="outline" size="icon" aria-label="Mes siguiente" onClick={onMesSiguiente}>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Mes siguiente"
+            onClick={onMesSiguiente}
+            className="size-11 sm:size-9"
+          >
             <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
           </Button>
         </div>
@@ -69,23 +111,53 @@ export function CalendarioMes({
             const delDia = eventos.filter(
               (evento) => evento.fechaInicio <= iso && evento.fechaFin >= iso,
             );
+            const esHoy = anio === anioHoy && mes === mesHoy && dia === diaHoy;
+
+            const fechaDia = new Date(anio, mes - 1, dia);
+            const diaSemanaTexto = DIAS_SEMANA_COMPLETOS[fechaDia.getDay()];
+            const mesTexto = MESES[mes - 1];
+            const partesAria = [`${diaSemanaTexto} ${dia} de ${mesTexto} de ${anio}`];
+            if (marcado) {
+              partesAria.push("sin clases");
+            }
+            if (delDia.length === 1) {
+              partesAria.push("1 evento");
+            } else if (delDia.length > 1) {
+              partesAria.push(`${delDia.length} eventos`);
+            }
+            const ariaLabel = partesAria.join(", ");
+
             return (
               <button
                 key={iso}
                 type="button"
                 onClick={() => onSeleccionarDia?.(iso)}
+                aria-label={ariaLabel}
+                aria-current={esHoy ? "date" : undefined}
                 className={cn(
                   "flex min-h-16 flex-col gap-1 rounded-lg border p-1.5 text-left transition-colors",
                   marcado
-                    ? "border-destructive/40 bg-destructive/10"
+                    ? "border-warning/40 bg-warning/10"
                     : "border-border bg-card hover:bg-muted/60",
+                  esHoy && "ring-primary font-bold ring-2 ring-offset-1",
                 )}
               >
-                <span className={cn("text-xs font-semibold", marcado && "text-destructive")}>
+                <span
+                  className={cn(
+                    "text-xs font-semibold",
+                    esHoy
+                      ? "text-primary font-bold"
+                      : marcado
+                        ? "text-warning-text"
+                        : "text-foreground",
+                  )}
+                >
                   {dia}
                 </span>
                 {marcado ? (
-                  <span className="text-destructive text-[10px] leading-tight">Sin clases</span>
+                  <span className="text-warning-text text-[10px] leading-tight font-medium">
+                    Sin clases
+                  </span>
                 ) : null}
                 {delDia.slice(0, 2).map((evento) => (
                   <span
@@ -95,6 +167,11 @@ export function CalendarioMes({
                     {evento.titulo}
                   </span>
                 ))}
+                {delDia.length > 2 ? (
+                  <span className="text-muted-foreground text-[10px] leading-tight font-medium">
+                    +{delDia.length - 2}
+                  </span>
+                ) : null}
               </button>
             );
           })}

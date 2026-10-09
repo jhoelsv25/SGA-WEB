@@ -3,11 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AlertCircleIcon, Calendar03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { Calendar03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { ConfirmDialog, type ConfirmVariant } from "@/components/common/confirm-dialog";
-import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
-import { Spinner } from "@/components/common/spinner";
+import { PageState } from "@/components/common/page-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AnioDetalle } from "./components/anio/anio-detalle";
@@ -88,29 +87,21 @@ export function AniosPage() {
         }
       />
 
-      {isLoading ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <Spinner className="text-primary size-8" />
-          <p className="text-muted-foreground text-xs">Cargando años académicos...</p>
-        </div>
-      ) : isError ? (
-        <div className="border-destructive/20 bg-destructive/5 flex h-64 flex-col items-center justify-center gap-4 rounded-xl border p-8 text-center">
-          <HugeiconsIcon icon={AlertCircleIcon} className="text-destructive size-10" />
-          <p className="text-muted-foreground text-sm">
-            {(error as Error)?.message || "No se pudieron obtener los años académicos."}
-          </p>
-          <Button variant="outline" onClick={() => refetch()}>
-            Reintentar
-          </Button>
-        </div>
-      ) : anios.length === 0 ? (
-        <EmptyState
-          icon={Calendar03Icon}
-          title="Todavía no hay un año académico."
-          description="Al crearlo queda en planificado, con los bimestres I al IV, hasta que lo inicies."
-          action={<Button onClick={() => setCrearAbierto(true)}>Crear el primer año</Button>}
-        />
-      ) : (
+      <PageState
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+        onRetry={() => void refetch()}
+        errorTitle="No se pudieron obtener los años académicos"
+        isEmpty={anios.length === 0}
+        empty={{
+          icon: Calendar03Icon,
+          title: "Todavía no hay un año académico.",
+          description:
+            "Al crearlo queda en planificado, con los bimestres I al IV, hasta que lo inicies.",
+          action: <Button onClick={() => setCrearAbierto(true)}>Crear el primer año</Button>,
+        }}
+      >
         <div className="grid gap-4 lg:grid-cols-[16rem_1fr]">
           <AnioLista
             anios={anios}
@@ -172,7 +163,7 @@ export function AniosPage() {
             />
           ) : null}
         </div>
-      )}
+      </PageState>
 
       <AnioModal open={crearAbierto} onOpenChange={setCrearAbierto} />
       <ReabrirAnioModal

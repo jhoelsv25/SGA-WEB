@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/common/spinner";
 import { NOMBRES_BIMESTRE, type AnioAcademico } from "../../types";
 import { bimestresSchema, type BimestresFormValues } from "../../schemas";
-import { CampoFecha } from "./campo-fecha";
+import { CampoFecha } from "@/components/common/date-field";
 
 interface BimestresFormProps {
   anio: AnioAcademico;
@@ -49,14 +49,16 @@ export function BimestresForm({ anio, onSubmit, isSubmitting = false }: Bimestre
           <CampoFecha
             control={form.control}
             name={`bimestres.${indice}.fechaInicio`}
-            label="Inicio"
+            label="Inicio *"
+            required
             disabled={bloqueado}
             error={form.formState.errors.bimestres?.[indice]?.fechaInicio?.message}
           />
           <CampoFecha
             control={form.control}
             name={`bimestres.${indice}.fechaFin`}
-            label="Fin"
+            label="Fin *"
+            required
             disabled={bloqueado}
             error={form.formState.errors.bimestres?.[indice]?.fechaFin?.message}
           />

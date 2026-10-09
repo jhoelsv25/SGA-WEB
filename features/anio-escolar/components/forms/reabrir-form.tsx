@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/common/spinner";
 import { reabrirSchema, type ReabrirFormValues } from "../../schemas";
-import { CampoFecha } from "./campo-fecha";
+import { CampoFecha } from "@/components/common/date-field";
 
 interface ReabrirFormProps {
   onSubmit: (values: ReabrirFormValues) => Promise<void>;
@@ -33,7 +33,7 @@ export function ReabrirForm({ onSubmit, onCancel, isSubmitting = false }: Reabri
     >
       <div className="space-y-1.5">
         <Label htmlFor="motivo" className="text-sm font-medium">
-          Motivo
+          Motivo *
         </Label>
         <Input
           id="motivo"
@@ -52,7 +52,8 @@ export function ReabrirForm({ onSubmit, onCancel, isSubmitting = false }: Reabri
       <CampoFecha
         control={form.control}
         name="fechaLimite"
-        label="Fecha límite"
+        label="Fecha límite *"
+        required
         hint="El año sigue abierto hasta ese día. Al día siguiente vuelve a cerrado."
         disabled={isSubmitting}
         error={form.formState.errors.fechaLimite?.message}
