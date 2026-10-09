@@ -199,6 +199,7 @@ export function FileDropzone({
             onClick={handleRemove}
             className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive size-8 shrink-0 rounded-lg"
             title="Quitar archivo"
+            aria-label="Quitar archivo"
           >
             <HugeiconsIcon icon={Delete02Icon} size={16} />
           </Button>

@@ -278,6 +278,7 @@ export function ListToolbar({
             onClick={onRefresh}
             disabled={isRefreshing}
             title={refreshLabel}
+            aria-label={refreshLabel}
             className="border-border/80 bg-background hover:bg-muted dark:border-border/70 dark:bg-card/40 size-10 shrink-0 rounded-xl shadow-2xs"
           >
             <HugeiconsIcon

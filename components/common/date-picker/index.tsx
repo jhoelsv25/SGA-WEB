@@ -22,6 +22,11 @@ export interface DatePickerProps {
   minDate?: Date;
   maxDate?: Date;
   disabledDays?: Matcher | Matcher[];
+  /** "dropdown" muestra selectores de mes y año (útil para fechas lejanas). */
+  captionLayout?: "label" | "dropdown";
+  /** Primer y último mes navegables; necesarios con captionLayout="dropdown". */
+  startMonth?: Date;
+  endMonth?: Date;
 }
 
 export function DatePicker({
@@ -35,6 +40,9 @@ export function DatePicker({
   minDate,
   maxDate,
   disabledDays,
+  captionLayout = "label",
+  startMonth,
+  endMonth,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -107,7 +115,10 @@ export function DatePicker({
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          defaultMonth={date}
+          defaultMonth={date ?? endMonth}
+          captionLayout={captionLayout}
+          startMonth={startMonth}
+          endMonth={endMonth}
           selected={date}
           onSelect={(newDate) => {
             onSelect?.(newDate);

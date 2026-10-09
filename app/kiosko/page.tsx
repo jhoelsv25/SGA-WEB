@@ -342,6 +342,7 @@ function KioskoContent() {
               <button
                 type="button"
                 onClick={handleDeleteDigit}
+                aria-label="Borrar último dígito"
                 className="h-14 rounded-2xl bg-slate-800/60 text-xs font-bold text-slate-300 transition-colors hover:bg-slate-700"
               >
                 ⌫

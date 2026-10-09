@@ -85,7 +85,10 @@ export function RecoverForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {/* Alerta de Error del Servidor */}
       {error && (
-        <div className="bg-destructive/10 border-destructive/20 text-destructive animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200">
+        <div
+          role="alert"
+          className="bg-destructive/10 border-destructive/20 text-destructive animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200"
+        >
           <HugeiconsIcon icon={AlertCircleIcon} className="mt-0.5 size-4 shrink-0" />
           <div className="flex-1 space-y-0.5">
             <p className="leading-tight font-semibold">Error de solicitud</p>
@@ -114,9 +117,7 @@ export function RecoverForm() {
 
       {/* Campo Fecha de Nacimiento con DatePicker */}
       <div className="space-y-1.5">
-        <Label htmlFor="birthdate" className="text-foreground text-xs font-semibold">
-          Fecha de nacimiento *
-        </Label>
+        <Label htmlFor="birthdate">Fecha de nacimiento *</Label>
         <Controller
           control={control}
           name="birthdate"
@@ -126,7 +127,13 @@ export function RecoverForm() {
               onSelect={field.onChange}
               disabled={isSubmitting}
               placeholder="Selecciona tu fecha de nacimiento"
-              className={errors.birthdate ? "border-destructive ring-destructive/20 ring-1" : ""}
+              captionLayout="dropdown"
+              startMonth={new Date(1940, 0)}
+              endMonth={new Date()}
+              maxDate={new Date()}
+              className={
+                errors.birthdate ? "border-destructive ring-destructive/20 w-full ring-1" : "w-full"
+              }
             />
           )}
         />

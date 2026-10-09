@@ -112,7 +112,7 @@ export function FeaturesSection() {
         </div>
 
         {/* Banner de Identidad Institucional */}
-        <div className="from-primary to-primary-700 text-primary-foreground relative mt-16 overflow-hidden rounded-3xl bg-linear-to-r p-8 shadow-2xl sm:p-12">
+        <div className="from-primary to-primary/80 text-primary-foreground relative mt-16 overflow-hidden rounded-3xl bg-linear-to-r p-8 shadow-2xl sm:p-12">
           <div className="absolute top-0 right-0 -mt-12 -mr-12 size-60 rounded-full bg-white/10 blur-3xl" />
 
           <div className="relative z-10 flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">

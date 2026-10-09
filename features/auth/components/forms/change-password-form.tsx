@@ -85,7 +85,10 @@ export function ChangePasswordForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       {/* Alerta de Error del Servidor */}
       {error && (
-        <div className="bg-destructive/10 border-destructive/20 text-destructive animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200">
+        <div
+          role="alert"
+          className="bg-destructive/10 border-destructive/20 text-destructive animate-in fade-in flex items-start gap-2.5 rounded-xl border p-3 text-xs font-medium duration-200"
+        >
           <HugeiconsIcon icon={AlertCircleIcon} className="mt-0.5 size-4 shrink-0" />
           <div className="flex-1 space-y-0.5">
             <p className="leading-tight font-semibold">Error al cambiar contraseña</p>
@@ -108,9 +111,8 @@ export function ChangePasswordForm() {
             <button
               type="button"
               onClick={() => setShowCurrentPassword((prev) => !prev)}
-              tabIndex={-1}
               disabled={isSubmitting}
-              className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/40 -mr-2 flex size-9 cursor-pointer items-center justify-center rounded-full transition-colors outline-none focus-visible:ring-2"
               aria-label={showCurrentPassword ? "Ocultar contraseña" : "Ver contraseña"}
             >
               <HugeiconsIcon
@@ -143,9 +145,8 @@ export function ChangePasswordForm() {
             <button
               type="button"
               onClick={() => setShowNewPassword((prev) => !prev)}
-              tabIndex={-1}
               disabled={isSubmitting}
-              className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/40 -mr-2 flex size-9 cursor-pointer items-center justify-center rounded-full transition-colors outline-none focus-visible:ring-2"
               aria-label={showNewPassword ? "Ocultar contraseña" : "Ver contraseña"}
             >
               <HugeiconsIcon
@@ -221,9 +222,8 @@ export function ChangePasswordForm() {
             <button
               type="button"
               onClick={() => setShowConfirmPassword((prev) => !prev)}
-              tabIndex={-1}
               disabled={isSubmitting}
-              className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/40 -mr-2 flex size-9 cursor-pointer items-center justify-center rounded-full transition-colors outline-none focus-visible:ring-2"
               aria-label={showConfirmPassword ? "Ocultar contraseña" : "Ver contraseña"}
             >
               <HugeiconsIcon
