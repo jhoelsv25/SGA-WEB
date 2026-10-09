@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { TableRowActions } from "@/components/common/row-actions";
-import { UserRemove01Icon } from "@hugeicons/core-free-icons";
+import { BookOpen01Icon, UserRemove01Icon } from "@hugeicons/core-free-icons";
+import type { RowActionCustomItem } from "@/components/common/row-actions/types";
 import type { Docente } from "../../types/docentes.types";
 
 interface DocenteActionsProps {
@@ -12,6 +14,30 @@ interface DocenteActionsProps {
 }
 
 export function DocenteActions({ docente, onEdit, onCesar }: DocenteActionsProps) {
+  const router = useRouter();
+
+  const customItems: RowActionCustomItem[] = [
+    {
+      key: "carga-academica",
+      label: "Carga académica",
+      icon: BookOpen01Icon,
+      href: `/admin/docentes/${docente.id}/carga`,
+      onClick: () => {
+        router.push(`/admin/docentes/${docente.id}/carga`);
+      },
+    },
+    ...(docente.estado !== "cesado"
+      ? [
+          {
+            key: "cesar",
+            label: "Registrar cese laboral",
+            icon: UserRemove01Icon,
+            onClick: () => onCesar(docente),
+          },
+        ]
+      : []),
+  ];
+
   return (
     <TableRowActions
       header={{
@@ -25,18 +51,8 @@ export function DocenteActions({ docente, onEdit, onCesar }: DocenteActionsProps
       }}
       onEdit={() => onEdit(docente)}
       editLabel="Editar ficha docente"
-      items={
-        docente.estado !== "cesado"
-          ? [
-              {
-                key: "cesar",
-                label: "Registrar cese laboral",
-                icon: UserRemove01Icon,
-                onClick: () => onCesar(docente),
-              },
-            ]
-          : []
-      }
+      items={customItems}
+      triggerAriaLabel={`Abrir menú de opciones para ${docente.persona.nombreCompleto}`}
     />
   );
 }
