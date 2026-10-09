@@ -31,7 +31,7 @@ export function CreateUserModal({ open, onOpenChange, onUserCreated }: CreateUse
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Crear Cuenta de Usuario"
+      title="Crear cuenta de usuario"
       description="Vincula una persona registrada en el padrón a un rol y genera su cuenta de acceso."
       icon={UserAdd01Icon}
       size="lg"

@@ -29,7 +29,7 @@ export function UpdateUsernameModal({ open, onOpenChange, user }: UpdateUsername
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Modificar Nombre de Usuario"
+      title="Modificar nombre de usuario"
       description={`Actualiza el identificador de acceso de ${user.persona.nombres} ${user.persona.apellidoPaterno}.`}
       icon={UserEdit01Icon}
       size="md"

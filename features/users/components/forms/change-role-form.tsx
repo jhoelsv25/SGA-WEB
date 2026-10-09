@@ -59,7 +59,7 @@ export function ChangeRoleForm({
 
       <div className="space-y-1.5">
         <Label htmlFor="rolId" className="text-sm font-medium">
-          Nuevo Rol *
+          Nuevo rol *
         </Label>
         <Controller
           control={control}

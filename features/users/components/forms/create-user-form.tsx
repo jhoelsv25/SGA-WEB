@@ -73,7 +73,7 @@ export function CreateUserForm({ onSubmit, isLoading = false, onCancel }: Props)
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="space-y-1.5">
         <Label htmlFor="personaId" className="text-sm font-medium">
-          Persona del Padrón *
+          Persona del padrón *
         </Label>
         <Controller
           control={control}

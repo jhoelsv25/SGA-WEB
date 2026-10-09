@@ -1,11 +1,12 @@
 import type { ExportColumnDef } from "@/lib/export-data";
 import type { UserItem } from "../types/users.types";
 import { formatDate } from "@/lib/formatters/date";
+import { USER_STATUS_CONFIG } from "../consts/users.consts";
 
 export const userExportColumns: ExportColumnDef<UserItem>[] = [
   {
     key: "nombreUsuario",
-    header: "Nombre de Usuario",
+    header: "Nombre de usuario",
   },
   {
     key: "persona",
@@ -27,7 +28,7 @@ export const userExportColumns: ExportColumnDef<UserItem>[] = [
   {
     key: "estado",
     header: "Estado",
-    format: (val) => String(val).toUpperCase(),
+    format: (_, user) => USER_STATUS_CONFIG[user.estado]?.label ?? String(user.estado),
   },
   {
     key: "correo",
@@ -36,12 +37,12 @@ export const userExportColumns: ExportColumnDef<UserItem>[] = [
   },
   {
     key: "ultimoAcceso",
-    header: "Último Acceso",
+    header: "Último acceso",
     format: (val) => (val ? formatDate(String(val), "dd/MM/yyyy HH:mm") : "Nunca"),
   },
   {
     key: "creadoEn",
-    header: "Fecha de Creación",
+    header: "Fecha de creación",
     format: (val) => (val ? formatDate(String(val), "dd/MM/yyyy") : ""),
   },
 ];
