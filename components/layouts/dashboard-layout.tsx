@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import type { UserRole } from "@/config";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./sidebar/app-sidebar";
 import { AppHeader } from "./header/app-header";
@@ -11,29 +10,22 @@ import { useOptionalDashboardRole } from "./dashboard-role-context";
 
 export interface Props {
   children: React.ReactNode;
-  role?: UserRole;
   user?: UserProfileData;
   defaultOpen?: boolean;
 }
 
-export function DashboardLayout({
-  children,
-  role: roleProp,
-  user: userProp,
-  defaultOpen = true,
-}: Props) {
+export function DashboardLayout({ children, user: userProp, defaultOpen = true }: Props) {
   const roleContext = useOptionalDashboardRole();
 
-  const activeRole = roleProp ?? roleContext?.role ?? "teacher";
   const activeUser = userProp ?? roleContext?.user;
 
   return (
     <AnioLectivoProvider>
       <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar role={activeRole} />
-        <SidebarInset className="dark:bg-background flex h-screen flex-col overflow-hidden bg-white">
+        <AppSidebar />
+        <SidebarInset className="bg-background flex h-dvh flex-col overflow-hidden">
           <AppHeader user={activeUser} />
-          <div className="dark:bg-background min-h-0 flex-1 overflow-y-auto overscroll-contain bg-white p-4 md:p-6 lg:p-8">
+          <div className="bg-background min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-6 lg:p-8">
             <div className="animate-in fade-in duration-300">{children}</div>
           </div>
         </SidebarInset>

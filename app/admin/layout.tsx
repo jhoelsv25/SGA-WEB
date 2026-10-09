@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <DashboardRoleProvider initialRole="admin">
+    <DashboardRoleProvider>
       <AdminGuard>
         <DashboardLayout>{children}</DashboardLayout>
       </AdminGuard>

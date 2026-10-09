@@ -36,8 +36,8 @@ function mensaje(error: unknown, fallback: string): string {
 
 export function useEsAdministrador(): boolean {
   const { data } = useSession();
-  const rol = (data?.user.roles?.[0] ?? "").toLowerCase();
-  return rol.includes("admin");
+  const rol = data?.user.activeRoleName ?? data?.user.roles?.[0] ?? "";
+  return rol === "Administrador";
 }
 
 export function useAniosQuery(enabled = true) {
