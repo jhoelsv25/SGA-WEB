@@ -28,31 +28,30 @@ const variantConfig: Record<
   {
     icon: typeof Alert02Icon;
     iconWrapperClass: string;
-    buttonClass: string;
+    buttonVariant: "destructive" | "warning" | "default";
   }
 > = {
   danger: {
     icon: Alert02Icon,
     iconWrapperClass:
       "bg-destructive/10 text-destructive border border-destructive/20 ring-4 ring-destructive/5",
-    buttonClass:
-      "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm font-semibold",
+    buttonVariant: "destructive",
   },
   warning: {
     icon: Alert02Icon,
     iconWrapperClass:
-      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 ring-4 ring-amber-500/5",
-    buttonClass: "bg-amber-600 text-white hover:bg-amber-700 shadow-sm font-semibold",
+      "bg-warning/10 text-warning-text border border-warning/25 ring-4 ring-warning/5",
+    buttonVariant: "warning",
   },
   info: {
     icon: InformationCircleIcon,
     iconWrapperClass: "bg-primary/10 text-primary border border-primary/20 ring-4 ring-primary/5",
-    buttonClass: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm font-semibold",
+    buttonVariant: "default",
   },
   default: {
     icon: HelpCircleIcon,
     iconWrapperClass: "bg-muted text-foreground border border-border ring-4 ring-muted/20",
-    buttonClass: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm font-semibold",
+    buttonVariant: "default",
   },
 };
 
@@ -129,9 +128,10 @@ export function ConfirmDialog({
           <Button
             type="button"
             variant="outline"
+            size="sm"
             onClick={handleCancel}
             disabled={loading}
-            className="border-border/70 text-foreground hover:bg-muted h-9.5 cursor-pointer gap-1.5 rounded-full px-4.5 text-xs font-semibold"
+            className="w-full cursor-pointer sm:w-auto"
           >
             <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
             <span>{cancelText}</span>
@@ -139,12 +139,11 @@ export function ConfirmDialog({
 
           <Button
             type="button"
+            variant={currentVariant.buttonVariant}
+            size="sm"
             onClick={handleConfirm}
             disabled={loading}
-            className={cn(
-              "h-9.5 cursor-pointer gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md transition-all active:scale-[0.98]",
-              currentVariant.buttonClass,
-            )}
+            className="w-full cursor-pointer sm:w-auto"
           >
             {loading ? (
               <HugeiconsIcon

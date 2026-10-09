@@ -91,8 +91,9 @@ export function TableRowActions<TStatus extends string = string>({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
-              className="text-muted-foreground/70 hover:border-border/60 hover:bg-muted/80 hover:text-foreground focus-visible:ring-ring data-[state=open]:bg-muted data-[state=open]:text-foreground size-8 rounded-full transition-all duration-150 focus-visible:ring-1"
+              size="icon-sm"
+              aria-label={triggerAriaLabel}
+              className="text-muted-foreground/70 hover:border-border/60 hover:bg-muted/80 hover:text-foreground focus-visible:ring-ring data-[state=open]:bg-muted data-[state=open]:text-foreground transition-all duration-150 focus-visible:ring-1"
             >
               <span className="sr-only">{triggerAriaLabel}</span>
               <HugeiconsIcon icon={MoreHorizontalIcon} size={18} strokeWidth={2} />
@@ -203,7 +204,7 @@ export function TableRowActions<TStatus extends string = string>({
                 item.variant === "destructive"
                   ? "text-destructive focus:bg-destructive/10 focus:text-destructive"
                   : item.variant === "warning"
-                    ? "text-amber-500 focus:bg-amber-500/10 focus:text-amber-600"
+                    ? "text-warning-text focus:bg-warning/10 focus:text-warning-text"
                     : "focus:bg-primary/10 focus:text-primary";
 
               return (
