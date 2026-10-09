@@ -4,7 +4,7 @@ import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Book02Icon, BookOpen01Icon, School01Icon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
-import { Spinner } from "@/components/common/spinner";
+import { PageState } from "@/components/common/page-state";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { GradosView, useGradosQuery } from "@/features/grados";
 import { CursosTable } from "@/features/cursos";
@@ -25,7 +25,13 @@ export function CurriculumPage() {
 
   const gradoParam = getParam("grado");
 
-  const { data: grados = [], isLoading: isLoadingGrados } = useGradosQuery();
+  const {
+    data: grados = [],
+    isLoading: isLoadingGrados,
+    isError: isErrorGrados,
+    error: errorGrados,
+    refetch: refetchGrados,
+  } = useGradosQuery();
 
   const handleTabChange = React.useCallback(
     (val: string) => {
@@ -43,10 +49,11 @@ export function CurriculumPage() {
 
   return (
     <div className="space-y-6">
-      {/* Cabecera Principal */}
+      {/* Cabecera Principal con Icono */}
       <PageHeader
         title="Grados, Cursos y Plan de Estudios"
         description="Gestión del catálogo de asignaturas curriculares, talleres y distribución de horas semanales por grado."
+        icon={BookOpen01Icon}
         breadcrumbs={[
           { label: "Inicio", href: "/admin/dashboard" },
           { label: "Estructura Académica" },
@@ -54,41 +61,45 @@ export function CurriculumPage() {
         ]}
       />
 
-      {/* Navegación y Contenido con Tabs de shadcn */}
-      {isLoadingGrados ? (
-        <div className="flex h-64 items-center justify-center">
-          <Spinner className="size-8" />
-        </div>
-      ) : (
+      {/* Navegación y Contenido gestionado por PageState */}
+      <PageState
+        isLoading={isLoadingGrados}
+        isError={isErrorGrados}
+        error={errorGrados}
+        onRetry={() => void refetchGrados()}
+        errorTitle="Error al cargar la estructura académica"
+      >
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full gap-6">
-          <TabsList
-            variant="line"
-            className="border-border/80 h-auto w-full justify-start gap-4 rounded-none border-b p-0"
-          >
-            <TabsTrigger
-              value="plan"
-              className="data-active:text-primary data-active:border-b-primary gap-2 rounded-none border-none px-3 py-2.5 text-xs font-semibold data-active:border-b-2"
+          <div className="border-border/80 -mx-4 overflow-x-auto border-b px-4 sm:mx-0 sm:px-0">
+            <TabsList
+              variant="line"
+              className="h-auto min-w-full justify-start gap-2 rounded-none border-b-0 p-0 sm:min-w-0 sm:gap-4"
             >
-              <HugeiconsIcon icon={BookOpen01Icon} className="size-4" />
-              <span>Plan de Estudios</span>
-            </TabsTrigger>
+              <TabsTrigger
+                value="plan"
+                className="data-active:text-primary data-active:border-b-primary min-h-11 gap-2 rounded-none border-none px-3 py-2.5 text-xs font-semibold whitespace-nowrap data-active:border-b-2"
+              >
+                <HugeiconsIcon icon={BookOpen01Icon} className="size-4 shrink-0" />
+                <span>Plan de Estudios</span>
+              </TabsTrigger>
 
-            <TabsTrigger
-              value="cursos"
-              className="data-active:text-primary data-active:border-b-primary gap-2 rounded-none border-none px-3 py-2.5 text-xs font-semibold data-active:border-b-2"
-            >
-              <HugeiconsIcon icon={Book02Icon} className="size-4" />
-              <span>Catálogo de Cursos</span>
-            </TabsTrigger>
+              <TabsTrigger
+                value="cursos"
+                className="data-active:text-primary data-active:border-b-primary min-h-11 gap-2 rounded-none border-none px-3 py-2.5 text-xs font-semibold whitespace-nowrap data-active:border-b-2"
+              >
+                <HugeiconsIcon icon={Book02Icon} className="size-4 shrink-0" />
+                <span>Catálogo de Cursos</span>
+              </TabsTrigger>
 
-            <TabsTrigger
-              value="grados"
-              className="data-active:text-primary data-active:border-b-primary gap-2 rounded-none border-none px-3 py-2.5 text-xs font-semibold data-active:border-b-2"
-            >
-              <HugeiconsIcon icon={School01Icon} className="size-4" />
-              <span>Grados de Secundaria</span>
-            </TabsTrigger>
-          </TabsList>
+              <TabsTrigger
+                value="grados"
+                className="data-active:text-primary data-active:border-b-primary min-h-11 gap-2 rounded-none border-none px-3 py-2.5 text-xs font-semibold whitespace-nowrap data-active:border-b-2"
+              >
+                <HugeiconsIcon icon={School01Icon} className="size-4 shrink-0" />
+                <span>Grados de Secundaria</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="plan" className="pt-2 outline-none">
             <PlanEstudiosTable
@@ -106,7 +117,7 @@ export function CurriculumPage() {
             <GradosView grados={grados} />
           </TabsContent>
         </Tabs>
-      )}
+      </PageState>
     </div>
   );
 }

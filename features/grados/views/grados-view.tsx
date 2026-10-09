@@ -29,13 +29,10 @@ export function GradosView({ grados }: GradosViewProps) {
   return (
     <div className="space-y-6">
       {/* Banner Informativo de Regla de Negocio (HU1) */}
-      <div className="flex items-start gap-3 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 text-xs text-blue-900 dark:text-blue-200">
-        <HugeiconsIcon
-          icon={InformationCircleIcon}
-          className="mt-0.5 size-5 shrink-0 text-blue-600 dark:text-blue-400"
-        />
+      <div className="border-info/30 bg-info/10 flex items-start gap-3 rounded-2xl border p-4 text-xs">
+        <HugeiconsIcon icon={InformationCircleIcon} className="text-info mt-0.5 size-5 shrink-0" />
         <div>
-          <p className="text-foreground font-semibold">Estructura Fija de Secundaria (1.° a 5.°)</p>
+          <p className="text-foreground font-semibold">Estructura fija de secundaria (1.° a 5.°)</p>
           <p className="text-muted-foreground mt-0.5 leading-relaxed">
             El colegio atiende exclusivamente el nivel secundaria: los grados 1.° a 5.° vienen
             predeterminados en el sistema. No se crean ni se eliminan; puedes personalizar el nombre
@@ -56,8 +53,8 @@ export function GradosView({ grados }: GradosViewProps) {
                 <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-xl text-sm font-bold">
                   {g.numero}.°
                 </span>
-                <span className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
-                  Nivel Secundaria
+                <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
+                  Nivel secundaria
                 </span>
               </div>
 
@@ -68,12 +65,12 @@ export function GradosView({ grados }: GradosViewProps) {
             </div>
 
             <div className="border-border/60 mt-5 flex items-center justify-between border-t pt-3">
-              <span className="text-muted-foreground text-[11px]">Orden: Grado {g.numero}</span>
+              <span className="text-muted-foreground text-xs">Orden: Grado {g.numero}</span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setSelectedGrado(g)}
-                className="h-8 gap-1.5 rounded-xl px-3 text-xs font-semibold"
+                className="h-9 gap-1.5 rounded-xl px-3.5 text-xs font-semibold"
               >
                 <HugeiconsIcon icon={Edit01Icon} className="size-3.5" />
                 <span>Editar nombre</span>

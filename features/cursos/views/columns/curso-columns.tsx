@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/common/status-badge";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
 import { CursoActions } from "./curso-actions";
 import type { Curso } from "../../types";
@@ -39,7 +40,7 @@ export function getCursoColumns({
     },
     {
       accessorKey: "nombre",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre del Curso" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre del curso" />,
       cell: ({ row }) => (
         <span className="text-foreground font-semibold">{row.original.nombre}</span>
       ),
@@ -47,9 +48,9 @@ export function getCursoColumns({
     {
       id: "areaCurricular",
       accessorFn: (row) => row.areaCurricularNombre,
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Área Curricular" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Área curricular" />,
       cell: ({ row }) => (
-        <Badge variant="secondary" className="rounded-lg px-2.5 py-0.5 text-[11px] font-medium">
+        <Badge variant="secondary" className="rounded-lg px-2.5 py-0.5 text-xs font-medium">
           {row.original.areaCurricularNombre}
         </Badge>
       ),
@@ -72,21 +73,9 @@ export function getCursoColumns({
         const activo = row.original.activo;
         return (
           <div className="flex justify-center">
-            {activo ? (
-              <Badge
-                variant="default"
-                className="rounded-lg border border-emerald-600/30 bg-emerald-600/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400"
-              >
-                Activo
-              </Badge>
-            ) : (
-              <Badge
-                variant="secondary"
-                className="bg-muted text-muted-foreground rounded-lg px-2 py-0.5 text-[10px] font-semibold"
-              >
-                Inactivo
-              </Badge>
-            )}
+            <StatusBadge tone={activo ? "success" : "neutral"} dot>
+              {activo ? "Activo" : "Inactivo"}
+            </StatusBadge>
           </div>
         );
       },
