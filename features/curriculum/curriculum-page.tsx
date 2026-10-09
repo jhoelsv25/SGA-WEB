@@ -101,7 +101,7 @@ export function CurriculumPage() {
             </TabsList>
           </div>
 
-          <TabsContent value="plan" className="pt-2 outline-none">
+          <TabsContent value="plan" className="pt-2">
             <PlanEstudiosTable
               grados={grados}
               selectedGradoId={gradoParam}
@@ -109,11 +109,11 @@ export function CurriculumPage() {
             />
           </TabsContent>
 
-          <TabsContent value="cursos" className="pt-2 outline-none">
+          <TabsContent value="cursos" className="pt-2">
             <CursosTable />
           </TabsContent>
 
-          <TabsContent value="grados" className="pt-2 outline-none">
+          <TabsContent value="grados" className="pt-2">
             <GradosView grados={grados} />
           </TabsContent>
         </Tabs>

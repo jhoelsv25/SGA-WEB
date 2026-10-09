@@ -184,7 +184,7 @@ export function PortalNavbar() {
           </div>
 
           {/* Footer info */}
-          <p className="text-muted-foreground mt-4 text-center text-[11px]">
+          <p className="text-muted-foreground mt-4 text-center text-xs">
             {siteConfig.institution.shortName} · {siteConfig.institution.location.reference}
           </p>
         </div>

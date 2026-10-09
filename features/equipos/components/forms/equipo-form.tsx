@@ -181,7 +181,7 @@ export function EquipoForm({
               {...register("numeroSerie")}
               disabled={isSubmitting}
             />
-            <p className="text-muted-foreground text-[11px]">
+            <p className="text-muted-foreground text-xs">
               Identificador de hardware para sincronización de huellas en versiones futuras.
             </p>
             {errors.numeroSerie && (
@@ -207,14 +207,14 @@ export function EquipoForm({
                   onClick={() => toggleUsuarioPermitido(opt.value)}
                   disabled={isSubmitting || isLocked}
                   aria-pressed={isChecked}
-                  className={`flex min-h-[44px] items-center gap-2 rounded-lg border p-2.5 text-xs font-medium transition-all ${
+                  className={`focus-visible:ring-primary/40 flex min-h-[44px] items-center gap-2 rounded-lg border p-2.5 text-xs font-medium transition-all outline-none focus-visible:ring-2 ${
                     isChecked
                       ? "bg-primary/10 border-primary/40 text-primary font-semibold"
                       : "bg-background border-border text-muted-foreground hover:bg-muted/60"
                   } ${isLocked ? "cursor-not-allowed opacity-80" : ""}`}
                 >
                   <span
-                    className={`flex h-4 w-4 items-center justify-center rounded border text-[10px] ${
+                    className={`flex h-4 w-4 items-center justify-center rounded border text-xs ${
                       isChecked
                         ? "bg-primary text-primary-foreground border-primary"
                         : "border-muted-foreground/40 bg-background"
@@ -228,7 +228,7 @@ export function EquipoForm({
             })}
           </div>
           {watchProposito === "sesiones" && (
-            <p className="text-info pt-1 text-[11px] font-medium">
+            <p className="text-info pt-1 text-xs font-medium">
               * Para firma de sesiones, el kiosko está reservado exclusivamente para Docentes.
             </p>
           )}
@@ -243,7 +243,7 @@ export function EquipoForm({
             <Label htmlFor="activo" className="text-xs font-semibold">
               Equipo activo
             </Label>
-            <p className="text-muted-foreground text-[11px]">
+            <p className="text-muted-foreground text-xs">
               Al desactivarlo, la pantalla del kiosko dejará de permitir marcaciones de inmediato.
             </p>
           </div>

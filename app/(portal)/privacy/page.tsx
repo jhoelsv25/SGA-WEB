@@ -65,10 +65,7 @@ export default function PrivacyPage() {
             <span>Volver al portal principal</span>
           </Link>
 
-          <Badge
-            variant="outline"
-            className="border-primary/20 bg-primary/5 text-primary text-[11px]"
-          >
+          <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-xs">
             <HugeiconsIcon icon={Shield01Icon} className="mr-1 size-3.5" />
             Ley N° 29733 (Perú)
           </Badge>

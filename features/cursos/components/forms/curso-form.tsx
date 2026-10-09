@@ -114,7 +114,7 @@ export function CursoForm({ curso, onSubmit, isLoading, onCancel }: CursoFormPro
               type="button"
               disabled={isLoading}
               onClick={() => setValue("colorHex", preset.hex, { shouldValidate: true })}
-              className="relative size-8 rounded-full border border-black/10 transition-transform hover:scale-110 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-white/10"
+              className="border-foreground/10 focus-visible:ring-ring relative size-8 rounded-full border transition-transform outline-none hover:scale-110 focus-visible:ring-2 focus-visible:ring-offset-2"
               style={{ backgroundColor: preset.hex }}
               title={preset.label}
               aria-label={preset.label}

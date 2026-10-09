@@ -133,7 +133,7 @@ export function TurnoForm({
             <HugeiconsIcon icon={Clock01Icon} className="h-4 w-4" />
             1. Horario y ventana de entrada
           </h4>
-          <span className="text-muted-foreground text-[11px]">Marcación matutina</span>
+          <span className="text-muted-foreground text-xs">Marcación matutina</span>
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -200,7 +200,7 @@ export function TurnoForm({
             <HugeiconsIcon icon={Clock01Icon} className="h-4 w-4" />
             2. Horario y ventana de salida
           </h4>
-          <span className="text-muted-foreground text-[11px]">Término de jornada</span>
+          <span className="text-muted-foreground text-xs">Término de jornada</span>
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -288,7 +288,7 @@ export function TurnoForm({
               <Label htmlFor="activo" className="text-xs font-semibold">
                 Estado del turno
               </Label>
-              <p className="text-muted-foreground text-[11px]">
+              <p className="text-muted-foreground text-xs">
                 Si está inactivo, las marcaciones no calculan tardanzas.
               </p>
             </div>
@@ -348,14 +348,14 @@ export function TurnoForm({
                 disabled={isSubmitting}
                 aria-pressed={isSelected}
                 aria-label={`Día ${dia.label}`}
-                className={`flex min-h-[44px] flex-col items-center justify-center rounded-lg border p-2 text-xs font-semibold transition-all ${
+                className={`focus-visible:ring-primary/40 flex min-h-[44px] flex-col items-center justify-center rounded-lg border p-2 text-xs font-semibold transition-all outline-none focus-visible:ring-2 ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-xs"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/70"
                 }`}
               >
                 <span>{dia.short}</span>
-                <span className="hidden text-[10px] font-normal sm:inline">
+                <span className="hidden text-xs font-normal sm:inline">
                   {dia.label.slice(0, 3)}
                 </span>
               </button>

@@ -101,7 +101,7 @@ export default function NotFound() {
         <p>
           ¿Crees que esto es un error? Comunícate con {siteConfig.institution.contact.supportEmail}.
         </p>
-        <p className="text-[11px] opacity-75">
+        <p className="text-xs opacity-75">
           © {new Date().getFullYear()} {siteConfig.institution.badge}. Todos los derechos
           reservados.
         </p>

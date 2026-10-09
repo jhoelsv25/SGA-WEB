@@ -29,7 +29,7 @@ function AdvancingProgressBar() {
   }, []);
 
   return (
-    <div className="dark:bg-muted/80 mt-6 mb-4 h-1.5 w-44 overflow-hidden rounded-full bg-zinc-100">
+    <div className="bg-muted mt-6 mb-4 h-1.5 w-44 overflow-hidden rounded-full">
       <div
         className="bg-primary h-full rounded-full transition-all duration-300 ease-out"
         style={{ width: `${progress}%` }}
@@ -56,7 +56,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
   // Pantalla de carga / verificación estética de alto nivel
   if (isLoading) {
     return (
-      <div className="dark:bg-background relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-white px-4 py-8">
+      <div className="bg-background relative flex min-h-screen w-full items-center justify-center overflow-hidden px-4 py-8">
         {/* Resplandor ambiental institucional en el fondo */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="bg-primary/4 dark:bg-primary/15 size-96 rounded-full blur-3xl" />
@@ -78,7 +78,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
           </div>
 
           {/* Insignia cápsula */}
-          <div className="border-primary/20 bg-primary/10 text-primary mb-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10.5px] font-bold tracking-widest uppercase">
+          <div className="border-primary/20 bg-primary/10 text-primary mb-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold tracking-widest uppercase">
             <span className="bg-primary size-1.5 animate-pulse rounded-full" />
             <span>{siteConfig.institution.badge}</span>
           </div>
@@ -95,7 +95,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
           {/* Barra de progreso con avance dinámico real */}
           <AdvancingProgressBar />
 
-          <div className="text-muted-foreground/80 inline-flex items-center gap-1.5 text-[11px] font-medium">
+          <div className="text-muted-foreground/80 inline-flex items-center gap-1.5 text-xs font-medium">
             <HugeiconsIcon icon={ShieldCheckIcon} className="text-primary size-3.5" />
             <span>Conexión segura</span>
           </div>
@@ -106,7 +106,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   if (isError || !session?.user) {
     return (
-      <div className="dark:bg-background relative flex min-h-screen w-full items-center justify-center bg-white px-4">
+      <div className="bg-background relative flex min-h-screen w-full items-center justify-center px-4">
         <div className="animate-in fade-in flex flex-col items-center gap-3 text-center duration-200">
           <div className="bg-primary size-1.5 animate-pulse rounded-full" />
           <p className="text-muted-foreground text-xs font-medium">
@@ -120,7 +120,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
   // Si requiere cambio obligatorio de contraseña y aún no redirigió
   if (session.user.mustChangePassword && pathname !== "/change-password") {
     return (
-      <div className="dark:bg-background relative flex min-h-screen w-full items-center justify-center bg-white px-4">
+      <div className="bg-background relative flex min-h-screen w-full items-center justify-center px-4">
         <div className="animate-in fade-in flex flex-col items-center gap-3 text-center duration-200">
           <div className="bg-primary size-1.5 animate-pulse rounded-full" />
           <p className="text-muted-foreground text-xs font-medium">

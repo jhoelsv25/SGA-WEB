@@ -79,7 +79,7 @@ function ToolbarFiltersButton({
           {badgeCount > 0 ? (
             <Badge
               variant="secondary"
-              className="ml-0.5 h-5 min-w-5 rounded-full px-1.5 text-[10px] font-semibold"
+              className="ml-0.5 h-5 min-w-5 rounded-full px-1.5 text-xs font-semibold"
             >
               {badgeCount}
             </Badge>

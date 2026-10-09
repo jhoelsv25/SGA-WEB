@@ -129,7 +129,7 @@ export function PortalFooter() {
                 <HugeiconsIcon icon={Mail01Icon} className="text-primary size-4 shrink-0" />
                 <span>{siteConfig.institution.contact.email}</span>
               </a>
-              <p className="text-muted-foreground/75 text-[11px]">
+              <p className="text-muted-foreground/75 text-xs">
                 Atención: {siteConfig.institution.contact.schedule}
               </p>
             </div>

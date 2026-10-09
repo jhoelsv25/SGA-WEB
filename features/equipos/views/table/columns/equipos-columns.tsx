@@ -47,7 +47,7 @@ export function getEquiposColumns({
                 {equipo.numeroSerie && (
                   <>
                     <span>•</span>
-                    <span className="text-muted-foreground/80 font-mono text-[11px]">
+                    <span className="text-muted-foreground/80 font-mono text-xs">
                       S/N: {equipo.numeroSerie}
                     </span>
                   </>
@@ -96,7 +96,7 @@ export function getEquiposColumns({
             {usuarios.map((u) => (
               <span
                 key={u}
-                className="bg-muted text-muted-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium capitalize"
+                className="bg-muted text-muted-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium capitalize"
               >
                 {u}
               </span>

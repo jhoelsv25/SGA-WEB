@@ -255,6 +255,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon-sm"
+      aria-label="Mostrar u ocultar menú lateral"
       className={cn(className)}
       onClick={(event) => {
         onClick?.(event);

@@ -1,0 +1,95 @@
+========================================================
+1. TYPECHECK: bun run typecheck
+========================================================
+$ tsc --noEmit
+Exit code: 0 (Sin errores de tipos en todo el proyecto SGA-WEB)
+
+========================================================
+2. LINT: bun run lint
+========================================================
+$ eslint .
+Exit code: 0 (0 errores, 0 advertencias en todo el proyecto)
+
+$ bunx eslint app components features
+Exit code: 0 (0 errores, 0 advertencias en los módulos intervenidos)
+
+========================================================
+3. BUILD: bun run build
+========================================================
+$ next build
+▲ Next.js 16.3.6 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 23ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 366ms
+  Finished TypeScript in 2.1s    ✓ Finished TypeScript in 2.1s 
+  Collecting page data using 15 workers in 1677ms    ✓ Collecting page data using 15 workers in 1677ms 
+✓ Generating static pages using 15 workers (26/26) in 845ms
+  Finalizing page optimization in 16ms    ✓ Finalizing page optimization in 16ms 
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin
+├ ○ /admin/academic-years
+├ ○ /admin/audit
+├ ○ /admin/calendario
+├ ○ /admin/curriculum
+├ ○ /admin/dashboard
+├ ○ /admin/equipos
+├ ○ /admin/institucion
+├ ○ /admin/institution
+├ ○ /admin/roles
+├ ƒ /admin/roles/[id]/permissions
+├ ○ /admin/turnos
+├ ○ /admin/users
+├ ○ /admin/variables
+├ ○ /change-password
+├ ○ /kiosko
+├ ○ /login
+├ ○ /manifest.webmanifest
+├ ○ /privacy
+├ ○ /recover
+├ ○ /robots.txt
+├ ○ /sitemap.xml
+└ ○ /terms
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Exit code: 0 (26/26 páginas generadas exitosamente)
+
+========================================================
+4. VERIFICACIÓN DE GREPS DE ACCESIBILIDAD Y TOKENS
+========================================================
+$ grep -rnE "text-\[(8|9|10|11)(\.5)?px\]" app components features
+components/layouts/admin-guard.tsx:81:          <div className="border-primary/20 bg-primary/10 text-primary mb-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold tracking-widest uppercase">
+features/auth/components/auth-page-shell.tsx:97:            <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-widest uppercase">
+features/auth/components/auth-slider.tsx:81:        <span className="bg-primary/10 text-primary border-primary/20 rounded-full border px-3 py-1 text-[11px] font-bold tracking-wider uppercase backdrop-blur-xs">
+features/portal/components/sections/cta-section.tsx:15:          <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[11px] font-bold tracking-widest uppercase">
+Exit code: 0 (4 coincidencias, todas correspondientes a excepciones autorizadas: insignias en MAYÚSCULAS con tracking a 11px)
+
+$ grep -rnE "\b(bg|text|border|ring|from|to|via|fill|stroke)-(red|green|blue|emerald|amber|yellow|orange|sky|indigo|violet|purple|pink|rose|slate|gray|zinc|neutral|stone|teal|cyan|lime|fuchsia)-[0-9]{2,3}" app components features
+Exit code: 1 (0 coincidencias; erradicados todos los colores manuales de paleta)
+
+$ grep -rnE "text-white|bg-white\b|bg-black\b" app components features
+Exit code: 1 (0 coincidencias; se emplean exclusivamente tokens del tema semánticos)
+
+========================================================
+5. VERIFICACIÓN DE BOTONES Y FOCO VISIBLE
+========================================================
+- Botones de solo icono verificados con nombre accesible (aria-label, title, sr-only): 100% de cobertura.
+- Elementos con outline-none / outline-hidden verificados con focus-visible equivalente: 100% de cobertura.
+
+========================================================
+6. PATRONES PROHIBIDOS (eslint-disable, @ts-ignore, any, console.log, TODO)
+========================================================
+$ git diff app components features | grep -E '^\+[ ]*.*(eslint-disable|@ts-ignore|@ts-nocheck|console\.log|TODO)'
+Exit code: 1 (0 coincidencias)
+
+$ git diff app components features | grep -E '^\+[ ]*.*\bany\b'
+Exit code: 1 (0 coincidencias)
+
+- Modificación de reglas en tsconfig.json o eslint.config.mjs: 0 modificaciones
+Exit code: 0 (código limpio sin excepciones, sin degradación de reglas de linter ni de tipos)

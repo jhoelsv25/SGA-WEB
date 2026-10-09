@@ -94,7 +94,7 @@ export function AuthPageShell({
           </div>
 
           <div className="space-y-1">
-            <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-widest uppercase">
+            <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-widest uppercase">
               {badge ?? siteConfig.institution.badge}
             </span>
             <h1 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
@@ -110,7 +110,7 @@ export function AuthPageShell({
       {/* Pie de página con información de soporte y derechos */}
       <div className="text-muted-foreground space-y-1 text-center text-xs">
         {supportText && <p>{supportText}</p>}
-        <p className="text-[11px] opacity-75">
+        <p className="text-xs opacity-75">
           © {anioActual} {siteConfig.institution.badge}. Todos los derechos reservados.
         </p>
       </div>

@@ -65,10 +65,7 @@ export default function TermsPage() {
             <span>Volver al portal principal</span>
           </Link>
 
-          <Badge
-            variant="outline"
-            className="border-primary/20 bg-primary/5 text-primary text-[11px]"
-          >
+          <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-xs">
             <HugeiconsIcon icon={FileCheckIcon} className="mr-1 size-3.5" />
             Normativa Escolar
           </Badge>

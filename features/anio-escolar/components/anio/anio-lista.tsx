@@ -18,7 +18,7 @@ export function AnioLista({ anios, seleccionadoId, onSeleccionar }: AnioListaPro
           key={anio.id}
           type="button"
           onClick={() => onSeleccionar(anio.id)}
-          className={`flex items-center justify-between rounded-lg border px-3 py-2 text-left ${
+          className={`focus-visible:ring-primary/40 flex items-center justify-between rounded-lg border px-3 py-2 text-left outline-none focus-visible:ring-2 ${
             seleccionadoId === anio.id ? "border-primary bg-primary/5" : "bg-card"
           }`}
         >

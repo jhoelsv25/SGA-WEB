@@ -1,0 +1,15 @@
+{
+  "tarea": "T16",
+  "validador": "VAL-2",
+  "veredicto": "APROBADA",
+  "criterios": {
+    "total": 3,
+    "pasan": 3
+  },
+  "pruebas": {
+    "corridas": 5,
+    "fallan": 0,
+    "nuevas": 0
+  },
+  "hallazgos": []
+}

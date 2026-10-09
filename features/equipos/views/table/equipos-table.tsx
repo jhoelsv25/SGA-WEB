@@ -98,7 +98,7 @@ export function EquiposTable() {
               <p className="text-foreground truncate text-sm font-semibold">{equipo.nombre}</p>
               <p className="text-muted-foreground text-xs">{equipo.ubicacion}</p>
               {equipo.numeroSerie && (
-                <p className="text-muted-foreground/80 font-mono text-[11px]">
+                <p className="text-muted-foreground/80 font-mono text-xs">
                   S/N: {equipo.numeroSerie}
                 </p>
               )}

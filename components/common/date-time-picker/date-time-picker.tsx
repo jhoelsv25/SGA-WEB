@@ -142,28 +142,28 @@ export function DateTimePicker({
       >
         {/* Atajos Rápidos Superiores */}
         <div className="border-border/60 flex items-center gap-1.5 border-b p-2.5">
-          <div className="text-muted-foreground flex items-center gap-1 pl-1 text-[11px] font-semibold">
+          <div className="text-muted-foreground flex items-center gap-1 pl-1 text-xs font-semibold">
             <HugeiconsIcon icon={SparklesIcon} size={13} className="text-primary" />
             <span>Atajos:</span>
           </div>
           <button
             type="button"
             onClick={() => handleQuickPreset(1, 9)}
-            className="bg-muted/50 hover:bg-primary/15 hover:text-primary cursor-pointer rounded-lg px-2 py-1 text-[11px] font-medium transition-colors"
+            className="bg-muted/50 hover:bg-primary/15 hover:text-primary cursor-pointer rounded-lg px-2 py-1 text-xs font-medium transition-colors"
           >
             Mañana 9:00 AM
           </button>
           <button
             type="button"
             onClick={() => handleQuickPreset(1, 15)}
-            className="bg-muted/50 hover:bg-primary/15 hover:text-primary cursor-pointer rounded-lg px-2 py-1 text-[11px] font-medium transition-colors"
+            className="bg-muted/50 hover:bg-primary/15 hover:text-primary cursor-pointer rounded-lg px-2 py-1 text-xs font-medium transition-colors"
           >
             Mañana 3:00 PM
           </button>
           <button
             type="button"
             onClick={() => handleQuickPreset(3, 10)}
-            className="bg-muted/50 hover:bg-primary/15 hover:text-primary cursor-pointer rounded-lg px-2 py-1 text-[11px] font-medium transition-colors"
+            className="bg-muted/50 hover:bg-primary/15 hover:text-primary cursor-pointer rounded-lg px-2 py-1 text-xs font-medium transition-colors"
           >
             En 3 días
           </button>
@@ -190,7 +190,7 @@ export function DateTimePicker({
           {/* Selector de Hora y Minutos */}
           <div className="flex flex-col p-3 sm:w-56">
             <div className="border-border/60 mb-2.5 flex items-center justify-between border-b pb-2">
-              <span className="text-muted-foreground flex items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase">
+              <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase">
                 <HugeiconsIcon icon={Clock01Icon} size={13} className="text-primary" />
                 Hora de publicación
               </span>
@@ -201,7 +201,7 @@ export function DateTimePicker({
                   type="button"
                   onClick={() => handleAmPmToggle(false)}
                   className={cn(
-                    "cursor-pointer rounded-md px-1.5 py-0.5 text-[10px] font-bold transition-all",
+                    "cursor-pointer rounded-md px-1.5 py-0.5 text-xs font-bold transition-all",
                     !isPm
                       ? "bg-primary text-primary-foreground shadow-2xs"
                       : "text-muted-foreground hover:text-foreground",
@@ -213,7 +213,7 @@ export function DateTimePicker({
                   type="button"
                   onClick={() => handleAmPmToggle(true)}
                   className={cn(
-                    "cursor-pointer rounded-md px-1.5 py-0.5 text-[10px] font-bold transition-all",
+                    "cursor-pointer rounded-md px-1.5 py-0.5 text-xs font-bold transition-all",
                     isPm
                       ? "bg-primary text-primary-foreground shadow-2xs"
                       : "text-muted-foreground hover:text-foreground",
@@ -228,7 +228,7 @@ export function DateTimePicker({
             <div className="grid grid-cols-2 gap-2">
               {/* Horas (1-12) */}
               <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground text-center text-[10px] font-semibold uppercase">
+                <span className="text-muted-foreground text-center text-xs font-semibold uppercase">
                   Hora
                 </span>
                 <ScrollArea className="border-border/60 h-44 rounded-xl border p-1">
@@ -257,7 +257,7 @@ export function DateTimePicker({
 
               {/* Minutos (00 - 55 en saltos de 5) */}
               <div className="flex flex-col gap-1">
-                <span className="text-muted-foreground text-center text-[10px] font-semibold uppercase">
+                <span className="text-muted-foreground text-center text-xs font-semibold uppercase">
                   Minuto
                 </span>
                 <ScrollArea className="border-border/60 h-44 rounded-xl border p-1">
@@ -291,10 +291,10 @@ export function DateTimePicker({
         {/* Barra Inferior con Resumen y Confirmación */}
         <div className="border-border/60 bg-muted/20 flex items-center justify-between border-t p-2.5">
           <div className="flex max-w-[240px] flex-col truncate pl-1">
-            <span className="text-muted-foreground text-[10px] font-medium uppercase">
+            <span className="text-muted-foreground text-xs font-medium uppercase">
               Programar para
             </span>
-            <span className="text-foreground truncate font-mono text-[11px] font-semibold">
+            <span className="text-foreground truncate font-mono text-xs font-semibold">
               {format(currentDate, "d MMM, yyyy • hh:mm a", { locale: es })}
             </span>
           </div>

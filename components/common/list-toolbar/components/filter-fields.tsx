@@ -34,7 +34,7 @@ function FilterFieldShell({
   }
   return (
     <label className={cn("flex w-full min-w-0 flex-col gap-1.5", className)}>
-      <span className="text-muted-foreground px-0.5 text-[11px] leading-none font-semibold">
+      <span className="text-muted-foreground px-0.5 text-xs leading-none font-semibold">
         {label}
       </span>
       {children}

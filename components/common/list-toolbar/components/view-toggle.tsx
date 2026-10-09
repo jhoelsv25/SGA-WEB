@@ -19,7 +19,9 @@ export function ListToolbarViewToggle({ viewMode, onViewModeChange }: ListToolba
         size="icon"
         onClick={() => onViewModeChange("table")}
         title="Vista de Tabla"
-        className={`size-8 rounded-lg transition-all ${
+        aria-label="Vista de tabla"
+        aria-pressed={viewMode === "table"}
+        className={`focus-visible:ring-primary/40 size-8 rounded-lg transition-all outline-none focus-visible:ring-2 ${
           viewMode === "table"
             ? "bg-background text-foreground dark:bg-card shadow-2xs"
             : "text-muted-foreground hover:text-foreground"
@@ -34,7 +36,9 @@ export function ListToolbarViewToggle({ viewMode, onViewModeChange }: ListToolba
         size="icon"
         onClick={() => onViewModeChange("list")}
         title="Vista de Tarjetas"
-        className={`size-8 rounded-lg transition-all ${
+        aria-label="Vista de tarjetas"
+        aria-pressed={viewMode === "list"}
+        className={`focus-visible:ring-primary/40 size-8 rounded-lg transition-all outline-none focus-visible:ring-2 ${
           viewMode === "list"
             ? "bg-background text-foreground dark:bg-card shadow-2xs"
             : "text-muted-foreground hover:text-foreground"

@@ -68,7 +68,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
             la operación o regresar a la página de inicio.
           </p>
           {error.digest && (
-            <p className="bg-muted text-muted-foreground mx-auto max-w-xs rounded-lg px-3 py-1 font-mono text-[11px]">
+            <p className="bg-muted text-muted-foreground mx-auto max-w-xs rounded-lg px-3 py-1 font-mono text-xs">
               ID de rastreo: {error.digest}
             </p>
           )}
@@ -105,7 +105,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
           Si el problema persiste, contacta al administrador del sistema en la{" "}
           {siteConfig.institution.shortName}.
         </p>
-        <p className="text-[11px] opacity-75">
+        <p className="text-xs opacity-75">
           © {new Date().getFullYear()} {siteConfig.institution.badge}.
         </p>
       </div>

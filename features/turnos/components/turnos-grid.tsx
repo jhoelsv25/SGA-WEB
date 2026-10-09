@@ -131,7 +131,7 @@ export function TurnosGrid({
                       disabled={isToggling}
                       aria-label={`Activar o desactivar turno de ${meta.label}`}
                     />
-                    <span className="text-muted-foreground text-[10px] font-medium">
+                    <span className="text-muted-foreground text-xs font-medium">
                       {turno.activo ? "Activo" : "Pausado"}
                     </span>
                   </div>
@@ -151,7 +151,7 @@ export function TurnosGrid({
                     </span>
                   </div>
 
-                  <div className="text-muted-foreground border-info/15 flex items-center justify-between border-t pt-1 text-[11px]">
+                  <div className="text-muted-foreground border-info/15 flex items-center justify-between border-t pt-1 text-xs">
                     <span>Ventana de marcado:</span>
                     <span className="text-foreground font-medium">
                       {turno.ventanaEntradaInicio} — {turno.ventanaEntradaFin}
@@ -171,7 +171,7 @@ export function TurnosGrid({
                     </span>
                   </div>
 
-                  <div className="text-muted-foreground border-warning/15 flex items-center justify-between border-t pt-1 text-[11px]">
+                  <div className="text-muted-foreground border-warning/15 flex items-center justify-between border-t pt-1 text-xs">
                     <span>Ventana de salida:</span>
                     <span className="text-foreground font-medium">
                       {turno.ventanaSalidaInicio} — {turno.ventanaSalidaFin}
@@ -182,7 +182,7 @@ export function TurnosGrid({
                 {/* Tolerancia y Días */}
                 <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
                   <div className="bg-muted/20 space-y-1 rounded-lg border p-2.5">
-                    <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
+                    <span className="text-muted-foreground flex items-center gap-1 text-xs">
                       <HugeiconsIcon icon={HourglassIcon} className="h-3 w-3" />
                       Tolerancia:
                     </span>
@@ -190,7 +190,7 @@ export function TurnosGrid({
                   </div>
 
                   <div className="bg-muted/20 space-y-1 rounded-lg border p-2.5">
-                    <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
+                    <span className="text-muted-foreground flex items-center gap-1 text-xs">
                       <HugeiconsIcon icon={Calendar03Icon} className="h-3 w-3" />
                       Días activos:
                     </span>
@@ -207,7 +207,7 @@ export function TurnosGrid({
                     return (
                       <span
                         key={dia.value}
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded-md text-[10px] font-bold ${
+                        className={`inline-flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold ${
                           isLaborable
                             ? "bg-primary/15 text-primary border-primary/25 border"
                             : "bg-muted/40 text-muted-foreground/50 border border-transparent"
