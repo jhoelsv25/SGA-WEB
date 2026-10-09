@@ -35,6 +35,24 @@ export interface DatosRegistroMarcacion {
   tipo: TipoMarcacion;
   equipoId?: string;
   notas?: string;
+  idLocal?: string;
+}
+
+export interface MarcacionPendiente {
+  idLocal: string;
+  codigo: string;
+  tipo: TipoMarcacion;
+  marcadoEnDispositivo: string;
+  intentos: number;
+  ultimoError?: string;
+  equipoId?: string;
+}
+
+export interface EstadoColaMarcaciones {
+  totalPendientes: number;
+  enviando: boolean;
+  disponible: boolean;
+  ultimoError?: string;
 }
 
 export interface ResultadoMarcacion {

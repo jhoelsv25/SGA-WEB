@@ -1,0 +1,14 @@
+{
+  "conversation_id": "40778264-5d4d-4fa6-afd8-28608081e791",
+  "status": "SUCCESS",
+  "response": "{\n  \"tarea\": \"T14\",\n  \"validador\": \"VAL-3\",\n  \"veredicto\": \"APROBADA\",\n  \"criterios\": {\n    \"total\": 5,\n    \"pasan\": 5\n  },\n  \"pruebas\": {\n    \"corridas\": 6,\n    \"fallan\": 0,\n    \"nuevas\": 0\n  },\n  \"hallazgos\": [\n    {\n      \"severidad\": \"baja\",\n      \"archivo\": \"features/kiosko/cola/use-cola-marcaciones.ts:113\",\n      \"detalle\": \"La dependencia totalPendientes en el useEffect de retransmisión aborta y reinicia el efecto con cada marcación vaciada en vez de permitir que el bucle drene de forma continua.\"\n    },\n    {\n      \"severidad\": \"baja\",\n      \"archivo\": \"features/kiosko/cola/gestor-cola.ts:71\",\n      \"detalle\": \"En la función esperar(), el listener de abort no se desuscribe explícitamente si el setTimeout expira de forma normal.\"\n    }\n  ]\n}\n",
+  "duration_seconds": 298.349305391,
+  "num_turns": 1,
+  "usage": {
+    "input_tokens": 146061,
+    "output_tokens": 23835,
+    "thinking_tokens": 16561,
+    "cache_read_tokens": 1247103,
+    "total_tokens": 169896
+  }
+}

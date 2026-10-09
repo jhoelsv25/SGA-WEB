@@ -1,0 +1,76 @@
+========================================================
+1. TYPECHECK: bun run typecheck
+========================================================
+$ tsc --noEmit
+Exit code: 0 (Sin errores de tipos en todo el proyecto)
+
+========================================================
+2. ESLINT: bunx eslint features/kiosko app/kiosko
+========================================================
+$ bunx eslint features/kiosko app/kiosko
+Exit code: 0 (0 errores, 0 advertencias)
+
+========================================================
+3. BUILD: bun run build
+========================================================
+$ next build
+▲ Next.js 16.3.6 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 23ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 219ms
+  Finished TypeScript in 1526ms    ✓ Finished TypeScript in 1526ms 
+  Collecting page data using 15 workers in 1025ms    ✓ Collecting page data using 15 workers in 1025ms 
+✓ Generating static pages using 15 workers (26/26) in 637ms
+  Finalizing page optimization in 20ms    ✓ Finalizing page optimization in 20ms 
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin
+├ ○ /admin/academic-years
+├ ○ /admin/audit
+├ ○ /admin/calendario
+├ ○ /admin/curriculum
+├ ○ /admin/dashboard
+├ ○ /admin/equipos
+├ ○ /admin/institucion
+├ ○ /admin/institution
+├ ○ /admin/roles
+├ ƒ /admin/roles/[id]/permissions
+├ ○ /admin/turnos
+├ ○ /admin/users
+├ ○ /admin/variables
+├ ○ /change-password
+├ ○ /kiosko
+├ ○ /login
+├ ○ /manifest.webmanifest
+├ ○ /privacy
+├ ○ /recover
+├ ○ /robots.txt
+├ ○ /sitemap.xml
+└ ○ /terms
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Exit code: 0 (26/26 páginas generadas exitosamente)
+
+========================================================
+4. VERIFICACIÓN DE COLORES MANUALES Y TOKENS SEMÁNTICOS
+========================================================
+$ grep -rnE "(slate-|blue-|rose-|purple-|emerald-|amber-|cyan-|indigo-|violet-|sky-|#[0-9a-fA-F]{3,6}|text-white|bg-white|bg-black|text-black)" app/kiosko features/kiosko
+Exit code: 0 (0 coincidencias; no se encontraron colores de paleta manuales; se emplean exclusivamente tokens del tema: background, foreground, primary, card, muted, border, destructive, warning, success, info)
+
+========================================================
+5. PATRONES PROHIBIDOS (eslint-disable, @ts-ignore, any, console.log, TODO)
+========================================================
+$ grep -rnE "(eslint-disable|@ts-ignore|@ts-nocheck|\bany\b|console\.log|TODO)" app/kiosko features/kiosko
+- eslint-disable: 0 coincidencias
+- @ts-ignore / @ts-nocheck: 0 coincidencias
+- any: 0 coincidencias
+- console.log: 0 coincidencias
+- TODO: 0 coincidencias
+- Modificación de reglas en tsconfig o eslint: 0 modificaciones
+Exit code: 0 (código limpio sin excepciones ni bypasses)

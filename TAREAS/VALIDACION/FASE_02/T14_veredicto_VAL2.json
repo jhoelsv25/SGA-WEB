@@ -1,0 +1,15 @@
+{
+  "tarea": "T14",
+  "validador": "VAL-2",
+  "veredicto": "APROBADA",
+  "criterios": {
+    "total": 5,
+    "pasan": 5
+  },
+  "pruebas": {
+    "corridas": 5,
+    "fallan": 0,
+    "nuevas": 0
+  },
+  "hallazgos": []
+}

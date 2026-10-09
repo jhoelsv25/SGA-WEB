@@ -10,6 +10,7 @@ import { parseUsuariosPermitidos } from "@/features/equipos";
 import { useValidarKioskoQuery } from "@/features/equipos/hooks";
 import { useInstitucionQuery } from "@/features/institucion/hooks";
 import {
+  COLA_SIN_CONEXION_HABILITADA,
   KioskoAvisoResultado,
   KioskoEntradaCodigo,
   KioskoFooter,
@@ -31,6 +32,7 @@ import {
   locutarMarcacionRegistrada,
   locutarNombrePersona,
   servicioMarcacion,
+  useColaMarcaciones,
   useConexionRed,
   useInactividad,
   useRelojDigital,
@@ -38,6 +40,27 @@ import {
   type PersonaMarcacion,
   type TipoMarcacion,
 } from "@/features/kiosko";
+
+function esErrorDeRed(error: unknown): boolean {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    return true;
+  }
+  if (error instanceof TypeError && error.message.toLowerCase().includes("fetch")) {
+    return true;
+  }
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    return (
+      msg.includes("network") ||
+      msg.includes("conexión") ||
+      msg.includes("conexion") ||
+      msg.includes("offline") ||
+      msg.includes("timeout") ||
+      msg.includes("failed to fetch")
+    );
+  }
+  return false;
+}
 
 function getLocalStorageKioskToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -63,6 +86,9 @@ function KioskoContent() {
 
   // Estado real de conectividad del dispositivo
   const { estaEnLinea } = useConexionRed();
+
+  // Cola local de marcaciones sin conexión
+  const { totalPendientes, enviandoCola, encolarMarcacion } = useColaMarcaciones(estaEnLinea);
 
   // Validación de seguridad del equipo con TanStack Query
   const {
@@ -178,6 +204,37 @@ function KioskoContent() {
     async (codigoAProcesar: string, pinAProcesar = "") => {
       if (!codigoAProcesar.trim() || procesando) return;
 
+      // Si la cola sin conexión está habilitada y nos encontramos sin conexión de red:
+      if (COLA_SIN_CONEXION_HABILITADA && !estaEnLinea) {
+        setProcesando(true);
+        try {
+          await encolarMarcacion({
+            codigo: codigoAProcesar.trim(),
+            tipo: tipoEfectivo,
+            equipoId: validationResult?.equipo?.id,
+          });
+
+          locutarMarcacionRegistrada(undefined, sonidoHabilitado);
+          kioskoAudio.reproducirExito(sonidoHabilitado);
+
+          mostrarAvisoConTiempo(
+            {
+              tipo: "info",
+              titulo: "Marcación guardada",
+              mensaje: "Marcación guardada. Se enviará al volver la conexión.",
+              tipoMarcacion: tipoEfectivo,
+              hora: horaFormateada,
+            },
+            TIEMPO_AUTO_CIERRE_AVISO_MS,
+          );
+
+          reiniciarFormulario();
+        } finally {
+          setProcesando(false);
+        }
+        return;
+      }
+
       setProcesando(true);
 
       try {
@@ -250,6 +307,36 @@ function KioskoContent() {
           reiniciarFormulario();
         }
       } catch (err: unknown) {
+        // Si la cola está activa y ocurrió una falla de conectividad de red:
+        if (COLA_SIN_CONEXION_HABILITADA && esErrorDeRed(err)) {
+          try {
+            await encolarMarcacion({
+              codigo: codigoAProcesar.trim(),
+              tipo: tipoEfectivo,
+              equipoId: validationResult?.equipo?.id,
+            });
+
+            locutarMarcacionRegistrada(undefined, sonidoHabilitado);
+            kioskoAudio.reproducirExito(sonidoHabilitado);
+
+            mostrarAvisoConTiempo(
+              {
+                tipo: "info",
+                titulo: "Marcación guardada",
+                mensaje: "Marcación guardada. Se enviará al volver la conexión.",
+                tipoMarcacion: tipoEfectivo,
+                hora: horaFormateada,
+              },
+              TIEMPO_AUTO_CIERRE_AVISO_MS,
+            );
+
+            reiniciarFormulario();
+            return;
+          } catch {
+            // Si el almacenamiento local no está disponible, continuar con aviso de error regular
+          }
+        }
+
         // Manejo amigable sin alert()
         kioskoAudio.reproducirError(sonidoHabilitado);
 
@@ -280,6 +367,9 @@ function KioskoContent() {
       sonidoHabilitado,
       tipoEfectivo,
       validationResult,
+      estaEnLinea,
+      horaFormateada,
+      encolarMarcacion,
       mostrarAvisoConTiempo,
       reiniciarFormulario,
       enfocarEntrada,
@@ -365,8 +455,20 @@ function KioskoContent() {
   }
 
   // PANTALLA 2: Sin conexión a internet o al servidor de la institución
-  if (!estaEnLinea || hasValidationError) {
-    return <KioskoPantallaDesconectado onReintentar={() => void checkToken()} />;
+  if (!COLA_SIN_CONEXION_HABILITADA) {
+    if (!estaEnLinea || hasValidationError) {
+      return <KioskoPantallaDesconectado onReintentar={() => void checkToken()} />;
+    }
+  } else {
+    // Si la cola está activa y el equipo ya cuenta con validación previa de seguridad,
+    // se mantiene la pantalla operativa para aceptar marcaciones locales sin conexión.
+    // Si nunca ha validado o falla la validación inicial sin datos de equipo, muestra pantalla de desconexión.
+    if (
+      (!estaEnLinea && !validationResult?.valido) ||
+      (hasValidationError && !validationResult?.valido)
+    ) {
+      return <KioskoPantallaDesconectado onReintentar={() => void checkToken()} />;
+    }
   }
 
   // PANTALLA 3: Equipo no autorizado (respuesta válida de la API con valido: false o sin token)
@@ -513,7 +615,12 @@ function KioskoContent() {
       </main>
 
       {/* Pie de página con estado de conexión real y soporte */}
-      <KioskoFooter institucion={institucion} estaEnLinea={estaEnLinea} />
+      <KioskoFooter
+        institucion={institucion}
+        estaEnLinea={estaEnLinea}
+        totalPendientes={totalPendientes}
+        enviandoCola={enviandoCola}
+      />
     </div>
   );
 }
