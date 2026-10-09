@@ -12,3 +12,9 @@
 ## Orquestación con agy
 
 - `agy` exige el prompt pegado a la opción (`-p="<prompt>"`). Si `-p` va antes de otra opción, toma esa opción como prompt.
+
+## 2026-10-09 · Orquestación — tope de agentes
+
+**Contexto:** el usuario amplió el paralelismo permitido.
+**Decisión:** hasta 15 agy DEV y hasta 15 agy VAL a la vez (cada tarea con sus 3 VAL). Los VAL se lanzan apenas termina su DEV, sin cola.
+**Impacto:** T13 (kiosko) puede correr en paralelo con la ola 4 porque no comparte archivos con ella.
