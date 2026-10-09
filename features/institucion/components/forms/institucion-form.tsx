@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SelectOption } from "@/components/common/select";
 import { Spinner } from "@/components/common/spinner";
+import { StatusBadge } from "@/components/common/status-badge";
 import { FileDropzone } from "@/components/common/file-dropzone";
 import { toast } from "@/lib/toast";
 import { updateInstitucionSchema, type UpdateInstitucionFormValues } from "../../schemas";
@@ -144,7 +145,7 @@ export function InstitucionForm({
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <HugeiconsIcon icon={ImageUploadIcon} className="text-primary h-5 w-5" />
-                Logo Institucional
+                Logo institucional
               </CardTitle>
               <CardDescription>
                 Aparece en la cabecera, documentos oficiales y reportes del colegio.
@@ -183,7 +184,7 @@ export function InstitucionForm({
                   accept="image/png, image/jpeg, image/jpg"
                   acceptedFormats={["PNG", "JPG"]}
                   maxSizeBytes={1024 * 1024}
-                  title="Cambiar Logo"
+                  title="Cambiar logo"
                   description="Arrastra o selecciona PNG o JPG (máx. 1 MB)"
                   disabled={isUploadingLogo || isSubmitting}
                   error={logoError}
@@ -203,7 +204,7 @@ export function InstitucionForm({
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                 <HugeiconsIcon icon={Building03Icon} className="text-muted-foreground h-4 w-4" />
-                Resumen de Identificación
+                Resumen de identificación
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
@@ -217,12 +218,11 @@ export function InstitucionForm({
                   {institucion.tipoGestion}
                 </span>
               </div>
-              <div className="flex justify-between py-1">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-muted-foreground">Estado:</span>
-                <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                <StatusBadge tone="success" dot size="sm">
                   Operativo
-                </span>
+                </StatusBadge>
               </div>
             </CardContent>
           </Card>
@@ -235,7 +235,7 @@ export function InstitucionForm({
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <HugeiconsIcon icon={School01Icon} className="text-primary h-5 w-5" />
-                Datos de la Institución
+                Datos de la institución
               </CardTitle>
               <CardDescription>
                 Información básica y registro modular ante el Ministerio de Educación.
@@ -245,7 +245,7 @@ export function InstitucionForm({
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-1.5 md:col-span-2">
                   <Label htmlFor="nombre" className="text-xs font-semibold">
-                    Nombre de la Institución <span className="text-destructive">*</span>
+                    Nombre de la institución <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="nombre"
@@ -260,7 +260,7 @@ export function InstitucionForm({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="codigoModular" className="text-xs font-semibold">
-                    Código Modular <span className="text-destructive">*</span>
+                    Código modular <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="codigoModular"
@@ -275,7 +275,7 @@ export function InstitucionForm({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="codigoLocal" className="text-xs font-semibold">
-                    Código de Local
+                    Código de local (Opcional)
                   </Label>
                   <Input
                     id="codigoLocal"
@@ -290,7 +290,7 @@ export function InstitucionForm({
 
                 <div className="space-y-1.5 md:col-span-2">
                   <Label htmlFor="tipoGestion" className="text-xs font-semibold">
-                    Tipo de Gestión <span className="text-destructive">*</span>
+                    Tipo de gestión <span className="text-destructive">*</span>
                   </Label>
                   <Controller
                     control={control}
@@ -318,7 +318,7 @@ export function InstitucionForm({
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <HugeiconsIcon icon={Location01Icon} className="text-primary h-5 w-5" />
-                Ubicación Geográfica
+                Ubicación geográfica
               </CardTitle>
               <CardDescription>
                 Domicilio legal y jurisdicción administrativa de la institución educativa.
@@ -343,7 +343,7 @@ export function InstitucionForm({
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="departamento" className="text-xs font-semibold">
-                    Departamento
+                    Departamento (Opcional)
                   </Label>
                   <Input
                     id="departamento"
@@ -358,7 +358,7 @@ export function InstitucionForm({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="provincia" className="text-xs font-semibold">
-                    Provincia
+                    Provincia (Opcional)
                   </Label>
                   <Input
                     id="provincia"
@@ -373,7 +373,7 @@ export function InstitucionForm({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="distrito" className="text-xs font-semibold">
-                    Distrito
+                    Distrito (Opcional)
                   </Label>
                   <Input
                     id="distrito"
@@ -394,7 +394,7 @@ export function InstitucionForm({
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <HugeiconsIcon icon={UserCheck01Icon} className="text-primary h-5 w-5" />
-                Autoridad y Canales de Contacto
+                Autoridad y canales de contacto
               </CardTitle>
               <CardDescription>
                 Representante legal que firma los reportes y medios de comunicación.
@@ -404,7 +404,7 @@ export function InstitucionForm({
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="director" className="text-xs font-semibold">
-                    Director (Nombre para reportes)
+                    Director (nombre para reportes) (Opcional)
                   </Label>
                   <Input
                     id="director"
@@ -419,7 +419,7 @@ export function InstitucionForm({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="ugelDre" className="text-xs font-semibold">
-                    UGEL / DRE
+                    UGEL / DRE (Opcional)
                   </Label>
                   <Input
                     id="ugelDre"
@@ -438,7 +438,7 @@ export function InstitucionForm({
                     className="flex items-center gap-1.5 text-xs font-semibold"
                   >
                     <HugeiconsIcon icon={CallIcon} className="text-muted-foreground h-3.5 w-3.5" />
-                    Teléfono
+                    Teléfono (Opcional)
                   </Label>
                   <Input
                     id="telefono"
@@ -460,7 +460,7 @@ export function InstitucionForm({
                       icon={Mail01Icon}
                       className="text-muted-foreground h-3.5 w-3.5"
                     />
-                    Correo Electrónico Institucional
+                    Correo electrónico institucional (Opcional)
                   </Label>
                   <Input
                     id="correo"
@@ -478,19 +478,18 @@ export function InstitucionForm({
           </Card>
 
           {/* Botones de acción */}
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <Button type="submit" disabled={isSubmitting || !isDirty} className="gap-2 px-6">
+          <div className="flex items-center justify-end gap-2.5 pt-3">
+            <Button
+              type="submit"
+              disabled={isSubmitting || !isDirty}
+              className="shadow-primary/20 h-10 gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md"
+            >
               {isSubmitting ? (
-                <>
-                  <Spinner className="h-4 w-4" />
-                  Guardando cambios...
-                </>
+                <Spinner className="size-3.5" />
               ) : (
-                <>
-                  <HugeiconsIcon icon={CheckmarkCircle02Icon} className="h-4 w-4" />
-                  Guardar Datos
-                </>
+                <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5" />
               )}
+              <span>Guardar datos</span>
             </Button>
           </div>
         </div>

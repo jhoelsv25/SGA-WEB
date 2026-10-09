@@ -2,10 +2,9 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Clock01Icon, AlertCircleIcon, InformationCircleIcon } from "@hugeicons/core-free-icons";
+import { Clock01Icon, InformationCircleIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
-import { Spinner } from "@/components/common/spinner";
-import { Button } from "@/components/ui/button";
+import { PageState } from "@/components/common/page-state";
 import {
   useTurnosQuery,
   useCreateTurnoMutation,
@@ -79,7 +78,7 @@ export function TurnosPage() {
   return (
     <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
-        title="Turnos de Marcación"
+        title="Turnos de marcación"
         description="Define las horas oficiales de entrada y salida, ventanas de marcado y tolerancia reglamentaria por cada estamento escolar."
         icon={Clock01Icon}
         breadcrumbs={[
@@ -104,25 +103,13 @@ export function TurnosPage() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="flex h-64 flex-col items-center justify-center gap-3">
-          <Spinner className="text-primary h-8 w-8" />
-          <p className="text-muted-foreground text-xs">Cargando turnos escolares...</p>
-        </div>
-      ) : isError ? (
-        <div className="border-destructive/20 bg-destructive/5 flex h-64 flex-col items-center justify-center gap-4 rounded-xl border p-8 text-center">
-          <HugeiconsIcon icon={AlertCircleIcon} className="text-destructive h-10 w-10" />
-          <div className="space-y-1">
-            <h3 className="text-destructive text-sm font-semibold">Error al cargar turnos</h3>
-            <p className="text-muted-foreground text-xs">
-              {(error as Error)?.message || "No se pudieron obtener los turnos registrados."}
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => refetch()}>
-            Reintentar
-          </Button>
-        </div>
-      ) : (
+      <PageState
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+        onRetry={() => refetch()}
+        errorTitle="Error al cargar turnos"
+      >
         <TurnosGrid
           turnos={turnos}
           onEditTurno={handleEditTurno}
@@ -130,7 +117,7 @@ export function TurnosPage() {
           onToggleActivo={handleToggleActivo}
           isToggling={toggleMutation.isPending}
         />
-      )}
+      </PageState>
 
       {/* Modal de Creación / Edición */}
       <TurnoEditModal

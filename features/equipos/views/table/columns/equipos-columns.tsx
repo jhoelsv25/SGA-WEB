@@ -1,15 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
+import { StatusBadge } from "@/components/common/status-badge";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ComputerIcon,
-  FingerPrintIcon,
-  CheckmarkCircle02Icon,
-  Alert02Icon,
-} from "@hugeicons/core-free-icons";
+import { ComputerIcon, FingerPrintIcon } from "@hugeicons/core-free-icons";
 import { EquiposActions } from "./equipos-actions";
 import { TIPO_EQUIPO_META, PROPOSITO_EQUIPO_META } from "../../../consts";
 import { parseUsuariosPermitidos } from "../../../utils";
@@ -31,7 +26,7 @@ export function getEquiposColumns({
   return [
     {
       accessorKey: "nombre",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Equipo y Ubicación" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Equipo y ubicación" />,
       cell: ({ row }) => {
         const equipo = row.original;
         const isKiosko = equipo.tipo === "kiosko";
@@ -40,9 +35,7 @@ export function getEquiposColumns({
           <div className="flex items-center gap-3">
             <div
               className={`shrink-0 rounded-xl p-2 ${
-                isKiosko
-                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                  : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                isKiosko ? "bg-info/10 text-info" : "bg-warning/10 text-warning"
               }`}
             >
               <HugeiconsIcon icon={isKiosko ? ComputerIcon : FingerPrintIcon} className="h-4 w-4" />
@@ -72,9 +65,9 @@ export function getEquiposColumns({
         const tipo = row.original.tipo;
         const meta = TIPO_EQUIPO_META[tipo];
         return (
-          <Badge variant="outline" className={meta?.badgeClass}>
+          <StatusBadge tone={meta?.tone ?? "neutral"} size="sm">
             {meta?.label || tipo}
-          </Badge>
+          </StatusBadge>
         );
       },
     },
@@ -85,16 +78,16 @@ export function getEquiposColumns({
         const proposito = row.original.proposito;
         const meta = PROPOSITO_EQUIPO_META[proposito];
         return (
-          <Badge variant="outline" className={meta?.badgeClass}>
+          <StatusBadge tone={meta?.tone ?? "brand"} size="sm">
             {meta?.label || proposito}
-          </Badge>
+          </StatusBadge>
         );
       },
     },
     {
       accessorKey: "usuariosPermitidos",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Usuarios Autorizados" />
+        <DataTableColumnHeader column={column} title="Usuarios autorizados" />
       ),
       cell: ({ row }) => {
         const usuarios = parseUsuariosPermitidos(row.original.usuariosPermitidos);
@@ -121,16 +114,10 @@ export function getEquiposColumns({
           equipo.tokenAutorizado || equipo.autorizado || equipo.autorizadoEn,
         );
 
-        return isAutorizado ? (
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-            <HugeiconsIcon icon={CheckmarkCircle02Icon} className="h-4 w-4" />
-            <span>Autorizado</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400">
-            <HugeiconsIcon icon={Alert02Icon} className="h-4 w-4" />
-            <span>Pendiente</span>
-          </div>
+        return (
+          <StatusBadge tone={isAutorizado ? "success" : "warning"} dot size="sm">
+            {isAutorizado ? "Autorizado" : "Pendiente"}
+          </StatusBadge>
         );
       },
     },
@@ -140,16 +127,9 @@ export function getEquiposColumns({
       cell: ({ row }) => {
         const activo = row.original.activo;
         return (
-          <Badge
-            variant={activo ? "default" : "secondary"}
-            className={
-              activo
-                ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-                : "text-muted-foreground"
-            }
-          >
+          <StatusBadge tone={activo ? "success" : "neutral"} dot size="sm">
             {activo ? "Activo" : "Inactivo"}
-          </Badge>
+          </StatusBadge>
         );
       },
     },

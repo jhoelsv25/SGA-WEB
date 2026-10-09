@@ -14,8 +14,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { StatusBadge } from "@/components/common/status-badge";
 import { TIPO_PERSONA_META, DIAS_SEMANA } from "../consts";
 import type { TipoPersona, Turno } from "../types";
 
@@ -67,9 +67,11 @@ export function TurnosGrid({
                   </div>
                   <div>
                     <h3 className="text-foreground text-base font-bold capitalize">{meta.label}</h3>
-                    <Badge variant="outline" className="text-muted-foreground mt-0.5 text-[11px]">
-                      No registrado
-                    </Badge>
+                    <div className="mt-0.5">
+                      <StatusBadge tone="neutral" size="sm">
+                        No configurado
+                      </StatusBadge>
+                    </div>
                   </div>
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed">{meta.description}</p>
@@ -82,7 +84,7 @@ export function TurnosGrid({
                   onClick={() => onCreateTurno(tipo)}
                 >
                   <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
-                  Configurar Turno de {meta.label}
+                  Configurar turno de {meta.label.toLowerCase()}
                 </Button>
               </div>
             </Card>
@@ -114,12 +116,9 @@ export function TurnosGrid({
                         {meta.label}
                       </h3>
                       <div className="mt-0.5 flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className={turno.activo ? meta.badgeClass : "text-muted-foreground"}
-                        >
-                          {turno.activo ? "Turno Activo" : "Turno Inactivo"}
-                        </Badge>
+                        <StatusBadge tone={turno.activo ? "success" : "neutral"} dot size="sm">
+                          {turno.activo ? "Activo" : "Pausado"}
+                        </StatusBadge>
                       </div>
                     </div>
                   </div>
@@ -141,22 +140,19 @@ export function TurnosGrid({
 
               <CardContent className="space-y-4 pt-4">
                 {/* Horario de Entrada y Ventana */}
-                <div className="space-y-2 rounded-xl border border-blue-500/15 bg-blue-50/50 p-3.5 dark:bg-blue-950/20">
+                <div className="border-info/20 bg-info/10 space-y-2 rounded-xl border p-3.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                      <HugeiconsIcon
-                        icon={Clock01Icon}
-                        className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400"
-                      />
-                      Entrada Oficial:
+                      <HugeiconsIcon icon={Clock01Icon} className="text-info h-3.5 w-3.5" />
+                      Entrada oficial:
                     </span>
                     <span className="text-foreground text-sm font-bold">
                       {turno.horaEntrada} hrs
                     </span>
                   </div>
 
-                  <div className="text-muted-foreground flex items-center justify-between border-t border-blue-500/10 pt-1 text-[11px]">
-                    <span>Ventana de Marcado:</span>
+                  <div className="text-muted-foreground border-info/15 flex items-center justify-between border-t pt-1 text-[11px]">
+                    <span>Ventana de marcado:</span>
                     <span className="text-foreground font-medium">
                       {turno.ventanaEntradaInicio} — {turno.ventanaEntradaFin}
                     </span>
@@ -164,22 +160,19 @@ export function TurnosGrid({
                 </div>
 
                 {/* Horario de Salida y Ventana */}
-                <div className="space-y-2 rounded-xl border border-amber-500/15 bg-amber-50/50 p-3.5 dark:bg-amber-950/20">
+                <div className="border-warning/20 bg-warning/10 space-y-2 rounded-xl border p-3.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
-                      <HugeiconsIcon
-                        icon={Clock01Icon}
-                        className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400"
-                      />
-                      Salida Oficial:
+                      <HugeiconsIcon icon={Clock01Icon} className="text-warning h-3.5 w-3.5" />
+                      Salida oficial:
                     </span>
                     <span className="text-foreground text-sm font-bold">
                       {turno.horaSalida} hrs
                     </span>
                   </div>
 
-                  <div className="text-muted-foreground flex items-center justify-between border-t border-amber-500/10 pt-1 text-[11px]">
-                    <span>Ventana de Salida:</span>
+                  <div className="text-muted-foreground border-warning/15 flex items-center justify-between border-t pt-1 text-[11px]">
+                    <span>Ventana de salida:</span>
                     <span className="text-foreground font-medium">
                       {turno.ventanaSalidaInicio} — {turno.ventanaSalidaFin}
                     </span>
@@ -236,7 +229,7 @@ export function TurnosGrid({
                 onClick={() => onEditTurno(turno)}
               >
                 <HugeiconsIcon icon={Edit01Icon} className="h-3.5 w-3.5" />
-                Editar Parámetros del Turno
+                Editar parámetros del turno
               </Button>
             </CardFooter>
           </Card>

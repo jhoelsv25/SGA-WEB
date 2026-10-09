@@ -28,7 +28,7 @@ export function TurnoEditModal({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title={isEditing ? `Configurar Turno: ${turno?.tipoPersona}` : "Nuevo Turno Escolar"}
+      title={isEditing ? `Configurar turno: ${turno?.tipoPersona}` : "Nuevo turno escolar"}
       description="Establece los horarios oficiales, ventanas de marcación y tolerancia reglamentaria."
       icon={Clock01Icon}
       size="2xl"

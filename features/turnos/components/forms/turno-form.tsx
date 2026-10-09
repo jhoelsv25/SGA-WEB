@@ -7,6 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Clock01Icon,
   CheckmarkCircle02Icon,
+  Cancel01Icon,
   Calendar03Icon,
   InformationCircleIcon,
 } from "@hugeicons/core-free-icons";
@@ -94,7 +95,7 @@ export function TurnoForm({
       {/* Tipo de Persona */}
       <div className="space-y-2">
         <Label htmlFor="tipoPersona" className="text-xs font-semibold">
-          Tipo de Persona destinataria <span className="text-destructive">*</span>
+          Tipo de persona destinataria <span className="text-destructive">*</span>
         </Label>
         {isEditing ? (
           <div className="bg-muted/60 border-border/80 flex items-center justify-between rounded-lg border p-2.5">
@@ -102,7 +103,7 @@ export function TurnoForm({
               {initialTurno?.tipoPersona}
             </span>
             <Badge variant="outline" className="text-xs">
-              Configuración de Turno Oficial
+              Configuración de turno oficial
             </Badge>
           </div>
         ) : (
@@ -126,19 +127,19 @@ export function TurnoForm({
       </div>
 
       {/* Bloque: Ventana y Hora Oficial de ENTRADA */}
-      <div className="space-y-4 rounded-xl border border-blue-500/20 bg-blue-50/40 p-4 dark:bg-blue-950/20">
+      <div className="border-info/20 bg-info/10 space-y-4 rounded-xl border p-4">
         <div className="flex items-center justify-between">
-          <h4 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-blue-700 uppercase dark:text-blue-400">
+          <h4 className="text-info flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
             <HugeiconsIcon icon={Clock01Icon} className="h-4 w-4" />
-            1. Horario y Ventana de Entrada
+            1. Horario y ventana de entrada
           </h4>
-          <span className="text-muted-foreground text-[11px]">Marcación Matutina</span>
+          <span className="text-muted-foreground text-[11px]">Marcación matutina</span>
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div className="space-y-1">
             <Label htmlFor="horaEntrada" className="text-foreground text-xs font-semibold">
-              Hora Oficial Entrada <span className="text-destructive">*</span>
+              Hora oficial de entrada <span className="text-destructive">*</span>
             </Label>
             <Input
               id="horaEntrada"
@@ -157,7 +158,7 @@ export function TurnoForm({
               htmlFor="ventanaEntradaInicio"
               className="text-muted-foreground text-xs font-medium"
             >
-              Ventana Desde
+              Ventana desde
             </Label>
             <Input
               id="ventanaEntradaInicio"
@@ -176,7 +177,7 @@ export function TurnoForm({
               htmlFor="ventanaEntradaFin"
               className="text-muted-foreground text-xs font-medium"
             >
-              Ventana Hasta
+              Ventana hasta
             </Label>
             <Input
               id="ventanaEntradaFin"
@@ -193,19 +194,19 @@ export function TurnoForm({
       </div>
 
       {/* Bloque: Ventana y Hora Oficial de SALIDA */}
-      <div className="space-y-4 rounded-xl border border-amber-500/20 bg-amber-50/40 p-4 dark:bg-amber-950/20">
+      <div className="border-warning/20 bg-warning/10 space-y-4 rounded-xl border p-4">
         <div className="flex items-center justify-between">
-          <h4 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-amber-700 uppercase dark:text-amber-400">
+          <h4 className="text-warning flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
             <HugeiconsIcon icon={Clock01Icon} className="h-4 w-4" />
-            2. Horario y Ventana de Salida
+            2. Horario y ventana de salida
           </h4>
-          <span className="text-muted-foreground text-[11px]">Término de Jornada</span>
+          <span className="text-muted-foreground text-[11px]">Término de jornada</span>
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div className="space-y-1">
             <Label htmlFor="horaSalida" className="text-foreground text-xs font-semibold">
-              Hora Oficial Salida <span className="text-destructive">*</span>
+              Hora oficial de salida <span className="text-destructive">*</span>
             </Label>
             <Input
               id="horaSalida"
@@ -224,7 +225,7 @@ export function TurnoForm({
               htmlFor="ventanaSalidaInicio"
               className="text-muted-foreground text-xs font-medium"
             >
-              Ventana Desde
+              Ventana desde
             </Label>
             <Input
               id="ventanaSalidaInicio"
@@ -240,7 +241,7 @@ export function TurnoForm({
 
           <div className="space-y-1">
             <Label htmlFor="ventanaSalidaFin" className="text-muted-foreground text-xs font-medium">
-              Ventana Hasta
+              Ventana hasta
             </Label>
             <Input
               id="ventanaSalidaFin"
@@ -260,7 +261,7 @@ export function TurnoForm({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="bg-muted/20 space-y-2 rounded-xl border p-3.5">
           <Label htmlFor="toleranciaMinutos" className="text-xs font-semibold">
-            Tolerancia de Ingreso (Minutos)
+            Tolerancia de ingreso (minutos) (Opcional)
           </Label>
           <div className="flex items-center gap-3">
             <Input
@@ -285,7 +286,7 @@ export function TurnoForm({
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="activo" className="text-xs font-semibold">
-                Estado del Turno
+                Estado del turno
               </Label>
               <p className="text-muted-foreground text-[11px]">
                 Si está inactivo, las marcaciones no calculan tardanzas.
@@ -312,7 +313,7 @@ export function TurnoForm({
         <div className="flex items-center justify-between">
           <Label className="flex items-center gap-1.5 text-xs font-semibold">
             <HugeiconsIcon icon={Calendar03Icon} className="text-primary h-4 w-4" />
-            Días Laborables <span className="text-destructive">*</span>
+            Días laborables <span className="text-destructive">*</span>
           </Label>
           <div className="flex gap-2 text-xs">
             <Button
@@ -322,7 +323,7 @@ export function TurnoForm({
               onClick={handleSelectLunesViernes}
               className="h-7 px-2 text-xs"
             >
-              Lunes a Viernes
+              Lunes a viernes
             </Button>
             <Button
               type="button"
@@ -345,7 +346,9 @@ export function TurnoForm({
                 type="button"
                 onClick={() => toggleDia(dia.value)}
                 disabled={isSubmitting}
-                className={`flex flex-col items-center justify-center rounded-lg border p-2 text-xs font-semibold transition-all ${
+                aria-pressed={isSelected}
+                aria-label={`Día ${dia.label}`}
+                className={`flex min-h-[44px] flex-col items-center justify-center rounded-lg border p-2 text-xs font-semibold transition-all ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-xs"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/70"
@@ -365,11 +368,8 @@ export function TurnoForm({
       </div>
 
       {/* Nota de negocio */}
-      <div className="flex items-start gap-2.5 rounded-lg border border-blue-500/20 bg-blue-500/10 p-3 text-xs text-blue-900 dark:text-blue-200">
-        <HugeiconsIcon
-          icon={InformationCircleIcon}
-          className="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400"
-        />
+      <div className="border-info/20 bg-info/10 text-foreground flex items-start gap-2.5 rounded-lg border p-3 text-xs">
+        <HugeiconsIcon icon={InformationCircleIcon} className="text-info mt-0.5 h-4 w-4 shrink-0" />
         <p>
           <strong>Sin efecto retroactivo:</strong> Los cambios en este turno aplican exclusivamente
           a las nuevas marcaciones que se registren a partir de ahora.
@@ -377,22 +377,28 @@ export function TurnoForm({
       </div>
 
       {/* Botones de acción */}
-      <div className="flex items-center justify-end gap-3 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          Cancelar
+      <div className="flex items-center justify-end gap-2.5 pt-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="h-10 gap-1.5 rounded-full px-4.5 text-xs font-semibold"
+        >
+          <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+          <span>Cancelar</span>
         </Button>
-        <Button type="submit" disabled={isSubmitting} className="gap-2 px-5">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="shadow-primary/20 h-10 gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md"
+        >
           {isSubmitting ? (
-            <>
-              <Spinner className="h-4 w-4" />
-              Guardando turno...
-            </>
+            <Spinner className="size-3.5" />
           ) : (
-            <>
-              <HugeiconsIcon icon={CheckmarkCircle02Icon} className="h-4 w-4" />
-              Guardar Turno
-            </>
+            <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5" />
           )}
+          <span>Guardar turno</span>
         </Button>
       </div>
     </form>

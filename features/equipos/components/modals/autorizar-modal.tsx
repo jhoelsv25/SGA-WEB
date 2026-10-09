@@ -9,6 +9,7 @@ import {
   ComputerIcon,
   Alert02Icon,
   ArrowRight01Icon,
+  Cancel01Icon,
 } from "@hugeicons/core-free-icons";
 import { Modal } from "@/components/common/modal";
 import { Button } from "@/components/ui/button";
@@ -60,13 +61,11 @@ export function AutorizarModal({
     <Modal
       open={open}
       onOpenChange={handleOpenChange}
-      title={
-        autorizadoExitoso ? "¡Equipo Autorizado con Éxito!" : "Autorizar este Dispositivo Físico"
-      }
+      title={autorizadoExitoso ? "Equipo autorizado con éxito" : "Autorizar este dispositivo"}
       description={
         autorizadoExitoso
-          ? "Este navegador ha sido vinculado exitosamente con la clave del kiosko."
-          : "Vincula esta computadora o tableta para operar como terminal del colegio."
+          ? "Este navegador ha sido vinculado exitosamente para operar el kiosko."
+          : "Habilita esta computadora o tableta para operar como terminal del colegio."
       }
       icon={ShieldCheckIcon}
       size="lg"
@@ -74,7 +73,7 @@ export function AutorizarModal({
       <div className="space-y-5 py-2">
         {autorizadoExitoso ? (
           <div className="space-y-5 py-4 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <div className="border-success/20 bg-success/10 text-success mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border">
               <HugeiconsIcon icon={CheckmarkCircle02Icon} className="h-8 w-8" />
             </div>
 
@@ -83,21 +82,28 @@ export function AutorizarModal({
                 Equipo autorizado. Ya puede usarse como kiosko.
               </h4>
               <p className="text-muted-foreground mx-auto max-w-md text-xs">
-                La clave criptográfica ha quedado guardada de forma segura en este navegador. Ahora
-                puedes abrir la pantalla del kiosko en modo pantalla completa.
+                La autorización se guardó de forma segura en este navegador. Ahora puedes abrir la
+                pantalla del kiosko en pantalla completa.
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-3 pt-2">
-              <Button variant="outline" onClick={() => onOpenChange(false)} className="text-xs">
-                Cerrar y Permanecer en Administración
+            <div className="flex items-center justify-center gap-2.5 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="h-10 gap-1.5 rounded-full px-4.5 text-xs font-semibold"
+              >
+                <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+                <span>Cerrar y permanecer aquí</span>
               </Button>
               <Button
+                type="button"
                 onClick={handleOpenKiosko}
-                className="gap-2 bg-emerald-600 text-xs text-white hover:bg-emerald-700"
+                className="shadow-primary/20 h-10 gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md"
               >
-                <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4" />
-                Abrir Modo Kiosko Ahora
+                <HugeiconsIcon icon={ArrowRight01Icon} className="size-3.5" />
+                <span>Abrir modo kiosko</span>
               </Button>
             </div>
           </div>
@@ -129,39 +135,40 @@ export function AutorizarModal({
               </div>
             </div>
 
-            <div className="flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3.5 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
-              <HugeiconsIcon
-                icon={Alert02Icon}
-                className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400"
-              />
+            <div className="border-warning/25 bg-warning/10 text-foreground flex items-start gap-3 rounded-xl border p-3.5 text-xs leading-relaxed">
+              <HugeiconsIcon icon={Alert02Icon} className="text-warning mt-0.5 h-5 w-5 shrink-0" />
               <div>
                 <strong>Asegúrate de estar en el equipo físico correspondiente:</strong> Al
-                presionar el botón de autorización, se generará y guardará un token criptográfico
-                local en este navegador específico. Sin esta clave, la pantalla del kiosko no se
-                abrirá.
+                confirmar la autorización, este navegador quedará habilitado para operar como
+                kiosko. Sin este paso, no se podrán registrar asistencias.
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-2.5 pt-2">
               <Button
+                type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isAuthorizing}
+                className="h-10 gap-1.5 rounded-full px-4.5 text-xs font-semibold"
               >
-                Cancelar
+                <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+                <span>Cancelar</span>
               </Button>
-              <Button onClick={handleAutorizar} disabled={isAuthorizing} className="gap-2 px-5">
+              <Button
+                type="button"
+                onClick={handleAutorizar}
+                disabled={isAuthorizing}
+                className="shadow-primary/20 h-10 gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md"
+              >
                 {isAuthorizing ? (
-                  <>
-                    <Spinner className="h-4 w-4" />
-                    Generando clave de autorización...
-                  </>
+                  <Spinner className="size-3.5" />
                 ) : (
-                  <>
-                    <HugeiconsIcon icon={ShieldCheckIcon} className="h-4 w-4" />
-                    Autorizar Este Dispositivo
-                  </>
+                  <HugeiconsIcon icon={ShieldCheckIcon} className="size-3.5" />
                 )}
+                <span>
+                  {isAuthorizing ? "Autorizando dispositivo..." : "Autorizar este dispositivo"}
+                </span>
               </Button>
             </div>
           </>
