@@ -10,12 +10,14 @@ import type { Persona } from "../../types/personas.types";
 interface GetPersonaColumnsOptions {
   onEdit: (persona: Persona) => void;
   onDelete: (persona: Persona) => void;
+  onVerHistorial?: (persona: Persona) => void;
   isDeleting?: boolean;
 }
 
 export function getPersonaColumns({
   onEdit,
   onDelete,
+  onVerHistorial,
   isDeleting,
 }: GetPersonaColumnsOptions): ColumnDef<Persona>[] {
   return [
@@ -148,6 +150,7 @@ export function getPersonaColumns({
           persona={row.original}
           onEdit={onEdit}
           onDelete={onDelete}
+          onVerHistorial={onVerHistorial}
           isDeleting={isDeleting}
         />
       ),

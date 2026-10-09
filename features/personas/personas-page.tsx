@@ -13,6 +13,7 @@ import { personaExportColumns } from "./config/export";
 import { usePersonasQuery } from "./hooks/use-personas";
 import { PersonasTable } from "./views/personas-table";
 import { CreatePersonaModal } from "./components/modals/create-persona-modal";
+import { ImportarButton } from "@/features/importacion";
 import type { Persona, TipoDocumento } from "./types/personas.types";
 
 export function PersonasPage() {
@@ -102,6 +103,7 @@ export function PersonasPage() {
           isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
+              <ImportarButton tipo="personas" onSuccess={() => void refetch()} />
               <Button
                 variant="outline"
                 size="sm"

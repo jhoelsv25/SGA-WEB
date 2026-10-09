@@ -72,3 +72,18 @@ export interface CreatePersonaInput {
 export interface UpdatePersonaInput extends Partial<CreatePersonaInput> {
   motivo?: string;
 }
+
+export interface CampoModificado {
+  campo: string;
+  valorAnterior: unknown;
+  valorNuevo: unknown;
+}
+
+export interface HistorialCorreccionCritica {
+  id: number;
+  fechaHora: string;
+  usuarioNombre: string | null;
+  motivo: string;
+  camposModificados: CampoModificado[];
+  direccionIp?: string | null;
+}

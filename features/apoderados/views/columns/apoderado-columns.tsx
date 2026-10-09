@@ -10,6 +10,7 @@ import type { Apoderado } from "../../types/apoderados.types";
 interface GetApoderadoColumnsOptions {
   onEdit: (apoderado: Apoderado) => void;
   onDelete: (apoderado: Apoderado) => void;
+  onVerHistorial?: (apoderado: Apoderado) => void;
 }
 
 const gradoLabels: Record<string, string> = {
@@ -24,6 +25,7 @@ const gradoLabels: Record<string, string> = {
 export function getApoderadoColumns({
   onEdit,
   onDelete,
+  onVerHistorial,
 }: GetApoderadoColumnsOptions): ColumnDef<Apoderado>[] {
   return [
     {
@@ -134,7 +136,12 @@ export function getApoderadoColumns({
     {
       id: "actions",
       cell: ({ row }) => (
-        <ApoderadoActions apoderado={row.original} onEdit={onEdit} onDelete={onDelete} />
+        <ApoderadoActions
+          apoderado={row.original}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onVerHistorial={onVerHistorial}
+        />
       ),
     },
   ];

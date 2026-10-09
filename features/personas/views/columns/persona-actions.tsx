@@ -2,12 +2,14 @@
 
 import * as React from "react";
 import { TableRowActions } from "@/components/common/row-actions";
+import { ShieldCheckIcon } from "@hugeicons/core-free-icons";
 import type { Persona } from "../../types/personas.types";
 
 interface PersonaActionsProps {
   persona: Persona;
   onEdit: (persona: Persona) => void;
   onDelete: (persona: Persona) => void;
+  onVerHistorial?: (persona: Persona) => void;
   isDeleting?: boolean;
 }
 
@@ -15,6 +17,7 @@ export function PersonaActions({
   persona,
   onEdit,
   onDelete,
+  onVerHistorial,
   isDeleting = false,
 }: PersonaActionsProps) {
   const docTipo = persona.tipoDocumento.toUpperCase();
@@ -32,6 +35,18 @@ export function PersonaActions({
       }}
       onEdit={() => onEdit(persona)}
       editLabel="Editar datos de persona"
+      items={
+        onVerHistorial
+          ? [
+              {
+                key: "historial-critico",
+                label: "Bitácora de correcciones (RF-007)",
+                icon: ShieldCheckIcon,
+                onClick: () => onVerHistorial(persona),
+              },
+            ]
+          : undefined
+      }
       deleteAction={
         persona.esProvisional
           ? {

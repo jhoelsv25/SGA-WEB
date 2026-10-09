@@ -10,11 +10,17 @@ import type { Docente } from "../../types/docentes.types";
 interface GetDocenteColumnsOptions {
   onEdit: (docente: Docente) => void;
   onCesar: (docente: Docente) => void;
+  onPrintCarne?: (docente: Docente) => void;
+  onReemitirCredencial?: (docente: Docente) => void;
+  onVerHistorial?: (docente: Docente) => void;
 }
 
 export function getDocenteColumns({
   onEdit,
   onCesar,
+  onPrintCarne,
+  onReemitirCredencial,
+  onVerHistorial,
 }: GetDocenteColumnsOptions): ColumnDef<Docente>[] {
   return [
     {
@@ -142,7 +148,14 @@ export function getDocenteColumns({
       id: "actions",
       header: () => <span className="sr-only">Acciones</span>,
       cell: ({ row }) => (
-        <DocenteActions docente={row.original} onEdit={onEdit} onCesar={onCesar} />
+        <DocenteActions
+          docente={row.original}
+          onEdit={onEdit}
+          onCesar={onCesar}
+          onPrintCarne={onPrintCarne}
+          onReemitirCredencial={onReemitirCredencial}
+          onVerHistorial={onVerHistorial}
+        />
       ),
     },
   ];

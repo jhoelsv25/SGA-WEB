@@ -14,6 +14,7 @@ import { useDocentesQuery } from "./hooks/use-docentes";
 import { DocentesTable } from "./views/docentes-table";
 import { CreateDocenteModal } from "./components/modals/create-docente-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
+import { ImportarButton } from "@/features/importacion";
 import type {
   CreateDocenteResponse,
   Docente,
@@ -114,6 +115,7 @@ export function DocentesPage() {
           isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
+              <ImportarButton tipo="docentes" onSuccess={() => void refetch()} />
               <Button
                 variant="outline"
                 size="sm"

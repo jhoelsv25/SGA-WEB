@@ -5,7 +5,12 @@ import { DataTable } from "@/components/common/data-table";
 import { getEstudianteColumns } from "./columns/estudiante-columns";
 import { EditEstudianteModal } from "../components/modals/edit-estudiante-modal";
 import { DeleteEstudianteModal } from "../components/modals/delete-estudiante-modal";
+import { CredentialsModal } from "../components/modals/credentials-modal";
+import { CarneModal } from "../../credenciales/components/modals/carne-modal";
+import { ReemitirCredencialModal } from "../../credenciales/components/modals/reemitir-credencial-modal";
+import { HistorialCriticoModal } from "@/features/personas";
 import type { Estudiante } from "../types/estudiantes.types";
+import type { CredencialResponse } from "../../credenciales/types/credenciales.types";
 
 interface EstudiantesTableProps {
   estudiantes: Estudiante[];
@@ -28,6 +33,16 @@ export function EstudiantesTable({
   const [selectedEstudiante, setSelectedEstudiante] = React.useState<Estudiante | null>(null);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [carneModalOpen, setCarneModalOpen] = React.useState(false);
+  const [reemitirModalOpen, setReemitirModalOpen] = React.useState(false);
+  const [historialModalOpen, setHistorialModalOpen] = React.useState(false);
+  const [reemitidaData, setReemitidaData] = React.useState<{
+    nombreCompleto: string;
+    codigoSiagie: string;
+    codigoCredencial: string;
+    pin: string;
+  } | null>(null);
+  const [credentialsModalOpen, setCredentialsModalOpen] = React.useState(false);
 
   const handleEdit = React.useCallback((estudiante: Estudiante) => {
     setSelectedEstudiante(estudiante);
@@ -39,13 +54,46 @@ export function EstudiantesTable({
     setDeleteModalOpen(true);
   }, []);
 
+  const handlePrintCarne = React.useCallback((estudiante: Estudiante) => {
+    setSelectedEstudiante(estudiante);
+    setCarneModalOpen(true);
+  }, []);
+
+  const handleReemitir = React.useCallback((estudiante: Estudiante) => {
+    setSelectedEstudiante(estudiante);
+    setReemitirModalOpen(true);
+  }, []);
+
+  const handleVerHistorial = React.useCallback((estudiante: Estudiante) => {
+    setSelectedEstudiante(estudiante);
+    setHistorialModalOpen(true);
+  }, []);
+
+  const handleReemitirSuccess = React.useCallback(
+    (nuevaCred: CredencialResponse) => {
+      if (selectedEstudiante) {
+        setReemitidaData({
+          nombreCompleto: selectedEstudiante.persona.nombreCompleto,
+          codigoSiagie: selectedEstudiante.codigo,
+          codigoCredencial: nuevaCred.codigo,
+          pin: nuevaCred.pin || "----",
+        });
+        setCredentialsModalOpen(true);
+      }
+    },
+    [selectedEstudiante],
+  );
+
   const columns = React.useMemo(
     () =>
       getEstudianteColumns({
         onEdit: handleEdit,
         onDelete: handleDelete,
+        onPrintCarne: handlePrintCarne,
+        onReemitirCredencial: handleReemitir,
+        onVerHistorial: handleVerHistorial,
       }),
-    [handleEdit, handleDelete],
+    [handleEdit, handleDelete, handlePrintCarne, handleReemitir, handleVerHistorial],
   );
 
   return (
@@ -71,6 +119,49 @@ export function EstudiantesTable({
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
       />
+
+      {/* Modal para Carné Escolar Imprimible con QR (RF-007 HU5) */}
+      {selectedEstudiante && (
+        <CarneModal
+          personaId={selectedEstudiante.personaId}
+          open={carneModalOpen}
+          onOpenChange={setCarneModalOpen}
+        />
+      )}
+
+      {/* Modal para Anular y Reemitir Credencial (Carné Perdido - RF-007 HU5) */}
+      {selectedEstudiante && (
+        <ReemitirCredencialModal
+          personaId={selectedEstudiante.personaId}
+          nombreCompleto={selectedEstudiante.persona.nombreCompleto}
+          codigoActual={selectedEstudiante.credencial?.codigo}
+          open={reemitirModalOpen}
+          onOpenChange={setReemitirModalOpen}
+          onSuccess={handleReemitirSuccess}
+        />
+      )}
+
+      {/* Modal para Visualizar Nueva Credencial y PIN Reemitidos */}
+      {reemitidaData && (
+        <CredentialsModal
+          open={credentialsModalOpen}
+          onOpenChange={setCredentialsModalOpen}
+          nombreCompleto={reemitidaData.nombreCompleto}
+          codigoSiagie={reemitidaData.codigoSiagie}
+          nombreUsuario={reemitidaData.codigoSiagie}
+          codigoCredencial={reemitidaData.codigoCredencial}
+          pin={reemitidaData.pin}
+        />
+      )}
+
+      {/* Bitácora de Correcciones Críticas (RF-007 HU6) */}
+      {selectedEstudiante && (
+        <HistorialCriticoModal
+          persona={selectedEstudiante.persona}
+          open={historialModalOpen}
+          onOpenChange={setHistorialModalOpen}
+        />
+      )}
     </>
   );
 }

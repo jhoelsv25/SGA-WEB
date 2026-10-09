@@ -5,5 +5,6 @@ export * from "./hooks/use-personas";
 export * from "./components/modals/create-persona-modal";
 export * from "./components/modals/edit-persona-modal";
 export * from "./components/modals/delete-persona-modal";
+export * from "./components/modals/historial-critico-modal";
 export * from "./views/personas-table";
 export * from "./personas-page";

@@ -286,7 +286,7 @@ export function EditPersonaForm({
       {!isProvisional && isAdmin && (
         <div className="border-primary/20 bg-primary/5 space-y-1.5 rounded-xl border p-3.5">
           <Label htmlFor="edit-motivo" className="text-foreground text-xs font-semibold">
-            Motivo de la corrección de datos críticos (Auditoría RF-003) *
+            Motivo de la corrección de datos críticos (Auditoría RF-007) *
           </Label>
           <Textarea
             id="edit-motivo"

@@ -5,6 +5,7 @@ import { DataTable } from "@/components/common/data-table";
 import { getApoderadoColumns } from "./columns/apoderado-columns";
 import { EditApoderadoModal } from "../components/modals/edit-apoderado-modal";
 import { DeleteApoderadoModal } from "../components/modals/delete-apoderado-modal";
+import { HistorialCriticoModal } from "@/features/personas";
 import type { Apoderado } from "../types/apoderados.types";
 
 interface ApoderadosTableProps {
@@ -24,6 +25,7 @@ export function ApoderadosTable({ apoderados, isLoading, cursorPagination }: Apo
   const [selectedApoderado, setSelectedApoderado] = React.useState<Apoderado | null>(null);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [historialModalOpen, setHistorialModalOpen] = React.useState(false);
 
   const handleEdit = React.useCallback((apoderado: Apoderado) => {
     setSelectedApoderado(apoderado);
@@ -35,13 +37,19 @@ export function ApoderadosTable({ apoderados, isLoading, cursorPagination }: Apo
     setDeleteModalOpen(true);
   }, []);
 
+  const handleVerHistorial = React.useCallback((apoderado: Apoderado) => {
+    setSelectedApoderado(apoderado);
+    setHistorialModalOpen(true);
+  }, []);
+
   const columns = React.useMemo(
     () =>
       getApoderadoColumns({
         onEdit: handleEdit,
         onDelete: handleDelete,
+        onVerHistorial: handleVerHistorial,
       }),
-    [handleEdit, handleDelete],
+    [handleEdit, handleDelete, handleVerHistorial],
   );
 
   return (
@@ -65,6 +73,15 @@ export function ApoderadosTable({ apoderados, isLoading, cursorPagination }: Apo
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
       />
+
+      {/* Bitácora de Correcciones Críticas (RF-007 HU6) */}
+      {selectedApoderado && (
+        <HistorialCriticoModal
+          persona={selectedApoderado.persona}
+          open={historialModalOpen}
+          onOpenChange={setHistorialModalOpen}
+        />
+      )}
     </>
   );
 }

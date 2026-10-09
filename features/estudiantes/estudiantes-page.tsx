@@ -14,6 +14,7 @@ import { useEstudiantesQuery } from "./hooks/use-estudiantes";
 import { EstudiantesTable } from "./views/estudiantes-table";
 import { CreateEstudianteModal } from "./components/modals/create-estudiante-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
+import { ImportarButton } from "@/features/importacion";
 import type {
   CreateEstudianteResponse,
   Estudiante,
@@ -102,6 +103,7 @@ export function EstudiantesPage() {
           isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
+              <ImportarButton tipo="estudiantes" onSuccess={() => void refetch()} />
               <Button
                 variant="outline"
                 size="sm"

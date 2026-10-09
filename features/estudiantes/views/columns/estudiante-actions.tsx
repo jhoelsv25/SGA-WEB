@@ -1,16 +1,31 @@
 "use client";
 
 import { TableRowActions } from "@/components/common/row-actions";
-import { Delete02Icon } from "@hugeicons/core-free-icons";
+import {
+  Delete02Icon,
+  PrinterIcon,
+  RefreshIcon,
+  ShieldCheckIcon,
+} from "@hugeicons/core-free-icons";
 import type { Estudiante } from "../../types/estudiantes.types";
 
 interface EstudianteActionsProps {
   estudiante: Estudiante;
   onEdit: (estudiante: Estudiante) => void;
   onDelete: (estudiante: Estudiante) => void;
+  onPrintCarne?: (estudiante: Estudiante) => void;
+  onReemitirCredencial?: (estudiante: Estudiante) => void;
+  onVerHistorial?: (estudiante: Estudiante) => void;
 }
 
-export function EstudianteActions({ estudiante, onEdit, onDelete }: EstudianteActionsProps) {
+export function EstudianteActions({
+  estudiante,
+  onEdit,
+  onDelete,
+  onPrintCarne,
+  onReemitirCredencial,
+  onVerHistorial,
+}: EstudianteActionsProps) {
   return (
     <TableRowActions
       header={{
@@ -25,11 +40,41 @@ export function EstudianteActions({ estudiante, onEdit, onDelete }: EstudianteAc
       onEdit={() => onEdit(estudiante)}
       editLabel="Editar ficha de estudiante"
       items={[
+        ...(onPrintCarne
+          ? [
+              {
+                key: "print-carne",
+                label: "Imprimir carné escolar",
+                icon: PrinterIcon,
+                onClick: () => onPrintCarne(estudiante),
+              },
+            ]
+          : []),
+        ...(onReemitirCredencial
+          ? [
+              {
+                key: "reemitir-credencial",
+                label: "Carné perdido (Reemitir)",
+                icon: RefreshIcon,
+                onClick: () => onReemitirCredencial(estudiante),
+              },
+            ]
+          : []),
+        ...(onVerHistorial
+          ? [
+              {
+                key: "historial-critico",
+                label: "Bitácora de correcciones (RF-007)",
+                icon: ShieldCheckIcon,
+                onClick: () => onVerHistorial(estudiante),
+              },
+            ]
+          : []),
         {
           key: "delete",
           label: "Eliminar ficha de estudiante",
           icon: Delete02Icon,
-          variant: "destructive",
+          variant: "destructive" as const,
           onClick: () => onDelete(estudiante),
         },
       ]}

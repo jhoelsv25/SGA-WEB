@@ -13,6 +13,7 @@ import { apoderadoExportColumns } from "./config/export";
 import { useApoderadosQuery } from "./hooks/use-apoderados";
 import { ApoderadosTable } from "./views/apoderados-table";
 import { CreateApoderadoModal } from "./components/modals/create-apoderado-modal";
+import { ImportarButton } from "@/features/importacion";
 import type { Apoderado } from "./types/apoderados.types";
 
 export function ApoderadosPage() {
@@ -89,6 +90,7 @@ export function ApoderadosPage() {
           isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
+              <ImportarButton tipo="apoderados" onSuccess={() => void refetch()} />
               <Button
                 variant="outline"
                 size="sm"

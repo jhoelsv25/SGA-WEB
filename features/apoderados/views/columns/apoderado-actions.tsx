@@ -10,16 +10,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { MoreVerticalIcon, Edit01Icon, Delete02Icon } from "@hugeicons/core-free-icons";
+import {
+  MoreVerticalIcon,
+  Edit01Icon,
+  Delete02Icon,
+  ShieldCheckIcon,
+} from "@hugeicons/core-free-icons";
 import type { Apoderado } from "../../types/apoderados.types";
 
 interface ApoderadoActionsProps {
   apoderado: Apoderado;
   onEdit: (apoderado: Apoderado) => void;
   onDelete: (apoderado: Apoderado) => void;
+  onVerHistorial?: (apoderado: Apoderado) => void;
 }
 
-export function ApoderadoActions({ apoderado, onEdit, onDelete }: ApoderadoActionsProps) {
+export function ApoderadoActions({
+  apoderado,
+  onEdit,
+  onDelete,
+  onVerHistorial,
+}: ApoderadoActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,6 +45,16 @@ export function ApoderadoActions({ apoderado, onEdit, onDelete }: ApoderadoActio
           <HugeiconsIcon icon={Edit01Icon} className="h-4 w-4" />
           Editar ficha
         </DropdownMenuItem>
+
+        {onVerHistorial && (
+          <DropdownMenuItem
+            onClick={() => onVerHistorial(apoderado)}
+            className="cursor-pointer gap-2"
+          >
+            <HugeiconsIcon icon={ShieldCheckIcon} className="h-4 w-4" />
+            Bitácora de correcciones (RF-007)
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuSeparator />
 

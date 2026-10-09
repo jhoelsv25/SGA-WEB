@@ -4,6 +4,7 @@ import { ApiClientError } from "@/lib/api-client";
 import { personasApi } from "../api/personas.api";
 import type {
   CreatePersonaInput,
+  HistorialCorreccionCritica,
   PaginatedPersonasResponse,
   Persona,
   PersonaQueryParams,
@@ -82,5 +83,13 @@ export function useDeletePersonaMutation() {
     onError: (error: ApiClientError) => {
       toast.error(error.message || "No se pudo eliminar la persona.");
     },
+  });
+}
+
+export function useHistorialCriticoQuery(personaId?: string) {
+  return useQuery<HistorialCorreccionCritica[], ApiClientError>({
+    queryKey: [...PERSONAS_QUERY_KEY, "historial-critico", personaId],
+    queryFn: () => personasApi.getHistorialCritico(personaId!),
+    enabled: Boolean(personaId),
   });
 }

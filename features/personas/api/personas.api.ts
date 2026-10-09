@@ -1,6 +1,7 @@
 import { apiClient, handleApiError } from "@/lib/api-client";
 import type {
   CreatePersonaInput,
+  HistorialCorreccionCritica,
   PaginatedPersonasResponse,
   Persona,
   PersonaQueryParams,
@@ -64,6 +65,17 @@ export const personasApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al eliminar la persona del padrón.");
+    }
+  },
+
+  async getHistorialCritico(personaId: string): Promise<HistorialCorreccionCritica[]> {
+    try {
+      const { data } = await apiClient.get<HistorialCorreccionCritica[]>(
+        `/personas/${personaId}/historial-critico`,
+      );
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al consultar el historial de correcciones.");
     }
   },
 };

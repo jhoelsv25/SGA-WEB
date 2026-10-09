@@ -11,6 +11,9 @@ import type { Estudiante, EstadoEstudiante } from "../../types/estudiantes.types
 interface GetEstudianteColumnsOptions {
   onEdit: (estudiante: Estudiante) => void;
   onDelete: (estudiante: Estudiante) => void;
+  onPrintCarne?: (estudiante: Estudiante) => void;
+  onReemitirCredencial?: (estudiante: Estudiante) => void;
+  onVerHistorial?: (estudiante: Estudiante) => void;
 }
 
 const estadoBadges: Record<EstadoEstudiante, { label: string; className: string }> = {
@@ -35,6 +38,9 @@ const estadoBadges: Record<EstadoEstudiante, { label: string; className: string 
 export function getEstudianteColumns({
   onEdit,
   onDelete,
+  onPrintCarne,
+  onReemitirCredencial,
+  onVerHistorial,
 }: GetEstudianteColumnsOptions): ColumnDef<Estudiante>[] {
   return [
     {
@@ -141,7 +147,14 @@ export function getEstudianteColumns({
     {
       id: "actions",
       cell: ({ row }) => (
-        <EstudianteActions estudiante={row.original} onEdit={onEdit} onDelete={onDelete} />
+        <EstudianteActions
+          estudiante={row.original}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onPrintCarne={onPrintCarne}
+          onReemitirCredencial={onReemitirCredencial}
+          onVerHistorial={onVerHistorial}
+        />
       ),
     },
   ];
