@@ -54,10 +54,20 @@ export type ListFilterDateRangeDef = {
   widthClassName?: string;
 } & ListFilterVisibility;
 
+export type ListFilterChipsDef = {
+  type: "chips";
+  key: string;
+  options: SelectOptionItem<string>[];
+  /** Valor que representa "sin filtro" o "todos" — omitido de la URL. Por defecto: `"all"`. */
+  allValue?: string;
+  className?: string;
+} & ListFilterVisibility;
+
 export type ListFilterDef =
   | ListFilterSearchDef
   | ListFilterSelectDef
   | ListFilterMultiSelectDef
+  | ListFilterChipsDef
   | ListFilterDateDef
   | ListFilterDateRangeDef;
 
