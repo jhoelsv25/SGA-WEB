@@ -250,7 +250,7 @@ export function ChangePasswordForm() {
       >
         {isSubmitting ? (
           <>
-            <Spinner className="mr-2 size-4 text-white" />
+            <Spinner className="mr-2 size-4 text-current" />
             Actualizando contraseña...
           </>
         ) : (

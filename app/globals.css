@@ -108,8 +108,9 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0.01 60);
 
-  --primary: oklch(0.46 0.16 20);
-  --primary-foreground: oklch(0.985 0.01 20);
+  /* Color institucional #881337 */
+  --primary: oklch(0.41 0.15 10.3);
+  --primary-foreground: oklch(0.985 0.01 10);
   --primary-content: var(--primary-foreground);
 
   --secondary: oklch(0.965 0.01 20);
@@ -167,8 +168,9 @@
   --popover: oklch(0.2 0.008 30);
   --popover-foreground: oklch(0.94 0.006 30);
 
-  --primary: oklch(0.6 0.17 22);
-  --primary-foreground: oklch(0.985 0.005 20);
+  /* #881337 aclarado para fondo oscuro; texto oscuro encima (contraste AA) */
+  --primary: oklch(0.62 0.16 10.3);
+  --primary-foreground: oklch(0.16 0.02 10);
   --primary-content: var(--primary-foreground);
 
   --secondary: oklch(0.2 0.007 30);
@@ -242,5 +244,17 @@
   [data-slot="dialog-content"],
   [data-slot="alert-dialog-content"] {
     @apply border-none shadow-2xl ring-0;
+  }
+}
+
+/* Respeta la preferencia de movimiento reducido del sistema operativo */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -113,30 +113,30 @@ export function FeaturesSection() {
 
         {/* Banner de Identidad Institucional */}
         <div className="from-primary to-primary/80 text-primary-foreground relative mt-16 overflow-hidden rounded-3xl bg-linear-to-r p-8 shadow-2xl sm:p-12">
-          <div className="absolute top-0 right-0 -mt-12 -mr-12 size-60 rounded-full bg-white/10 blur-3xl" />
+          <div className="bg-primary-foreground/10 absolute top-0 right-0 -mt-12 -mr-12 size-60 rounded-full blur-3xl" />
 
           <div className="relative z-10 flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
             <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold tracking-wider uppercase backdrop-blur-xs">
-                <HugeiconsIcon icon={Award01Icon} className="size-3.5 text-white" />
+              <span className="bg-primary-foreground/15 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold tracking-wider uppercase backdrop-blur-xs">
+                <HugeiconsIcon icon={Award01Icon} className="text-primary-foreground size-3.5" />
                 Misión y Lema Institucional
               </span>
-              <h3 className="text-2xl font-extrabold text-white sm:text-3xl">
+              <h3 className="text-primary-foreground text-2xl font-extrabold sm:text-3xl">
                 &ldquo;{siteConfig.institution.motto}&rdquo;
               </h3>
-              <p className="text-xs text-white/80 sm:text-sm">
+              <p className="text-primary-foreground/80 text-xs sm:text-sm">
                 {siteConfig.institution.name} · {siteConfig.institution.location.reference}
               </p>
             </div>
 
-            <div className="flex shrink-0 items-center gap-6 border-t border-white/20 pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
+            <div className="border-primary-foreground/20 flex shrink-0 items-center gap-6 border-t pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8">
               <div className="text-center">
-                <p className="text-3xl font-extrabold text-white">2026</p>
-                <p className="text-[11px] text-white/80">Año Escolar Activo</p>
+                <p className="text-primary-foreground text-3xl font-extrabold">2026</p>
+                <p className="text-primary-foreground/80 text-[11px]">Año Escolar Activo</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-extrabold text-white">Secundaria</p>
-                <p className="text-[11px] text-white/80">Nivel Educativo</p>
+                <p className="text-primary-foreground text-3xl font-extrabold">Secundaria</p>
+                <p className="text-primary-foreground/80 text-[11px]">Nivel Educativo</p>
               </div>
             </div>
           </div>

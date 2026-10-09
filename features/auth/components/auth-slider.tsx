@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, PauseIcon, PlayIcon } from "@hugeicons/core-free-icons";
 
 interface SlideData {
   id: number;
@@ -45,25 +45,29 @@ const SLIDES: SlideData[] = [
     title: "Conectada",
     description:
       "Comunicación transparente y oportuna entre docentes, directivos y familias para potenciar el talento de cada alumno.",
-    badge: "Año Escolar 2026",
+    badge: "Plataforma institucional",
   },
 ];
 
 export function AuthSlider() {
   const [current, setCurrent] = React.useState(0);
+  const movimientoReducido = useReducedMotion();
+  const [pausado, setPausado] = React.useState(false);
+  const enMovimiento = !pausado && !movimientoReducido;
 
-  // Cambio automático cada 5.5 segundos
+  // Cambio automático cada 5.5 segundos (WCAG 2.2.2: se puede pausar)
   React.useEffect(() => {
+    if (!enMovimiento) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % SLIDES.length);
     }, 5500);
     return () => clearInterval(timer);
-  }, []);
+  }, [enMovimiento]);
 
   const slide = SLIDES[current];
 
   return (
-    <div className="relative flex h-full w-full flex-col justify-between overflow-hidden bg-[#FAF7F0] p-8 select-none sm:p-12 lg:p-16 dark:bg-[#140809]">
+    <div className="bg-secondary relative flex h-full w-full flex-col justify-between overflow-hidden p-8 select-none sm:p-12 lg:p-16">
       {/* Botón superior para volver al portal */}
       <div className="relative z-20 flex items-center justify-between">
         <Link
@@ -102,7 +106,7 @@ export function AuthSlider() {
               </h2>
               <div className="text-foreground text-5xl font-black tracking-tight italic sm:text-6xl lg:text-7xl">
                 <span className="text-primary not-italic">{slide.highlight} </span>
-                <span className="text-foreground/90 dark:text-white">{slide.title}</span>
+                <span className="text-foreground">{slide.title}</span>
               </div>
             </div>
 
@@ -126,10 +130,7 @@ export function AuthSlider() {
           viewBox="0 0 800 700"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          animate={{
-            y: [0, -12, 0],
-            rotate: [0, 1.2, 0],
-          }}
+          animate={enMovimiento ? { y: [0, -12, 0], rotate: [0, 1.2, 0] } : undefined}
           transition={{
             duration: 8,
             repeat: Infinity,
@@ -186,13 +187,23 @@ export function AuthSlider() {
 
       {/* Indicadores de paginación del slider (Píldora expandida + puntos) */}
       <div className="relative z-20 flex items-center gap-2 pt-6">
+        <button
+          type="button"
+          onClick={() => setPausado((valor) => !valor)}
+          aria-pressed={pausado}
+          aria-label={pausado ? "Reanudar diapositivas" : "Pausar diapositivas"}
+          className="text-foreground/70 hover:text-foreground focus-visible:ring-ring/40 mr-1 flex size-9 items-center justify-center rounded-full outline-none focus-visible:ring-2"
+        >
+          <HugeiconsIcon icon={pausado ? PlayIcon : PauseIcon} className="size-4" />
+        </button>
         {SLIDES.map((s, idx) => {
           const isActive = current === idx;
           return (
             <button
               key={s.id}
               onClick={() => setCurrent(idx)}
-              className="group relative flex h-6 items-center justify-center p-1 focus:outline-hidden"
+              className="group focus-visible:ring-ring/40 relative flex h-9 min-w-9 items-center justify-center rounded-full p-1 outline-none focus-visible:ring-2"
+              aria-current={isActive ? "true" : undefined}
               aria-label={`Ir a la diapositiva ${idx + 1}`}
             >
               <span
