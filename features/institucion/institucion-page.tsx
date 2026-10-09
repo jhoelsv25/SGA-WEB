@@ -39,7 +39,7 @@ export function InstitucionPage() {
         description="Gestiona la información legal, canales de contacto y el logo oficial de la institución educativa."
         icon={School01Icon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Inicio", href: "/admin/dashboard" },
           { label: "Configuración" },
           { label: "Institución" },
         ]}

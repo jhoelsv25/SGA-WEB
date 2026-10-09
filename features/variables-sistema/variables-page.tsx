@@ -72,6 +72,11 @@ export function VariablesPage() {
         title="Variables del Sistema"
         description="Administración de parámetros configurables, tolerancias de asistencia, plazos de descargo y pesos de evaluación."
         icon={Settings02Icon}
+        breadcrumbs={[
+          { label: "Inicio", href: "/admin/dashboard" },
+          { label: "Configuración" },
+          { label: "Variables del Sistema" },
+        ]}
         actions={
           <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-1.5">
             <HugeiconsIcon icon={RefreshIcon} className="h-4 w-4" />

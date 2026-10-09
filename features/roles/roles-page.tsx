@@ -12,8 +12,8 @@ export function RolesPage() {
         description="Administra los perfiles de acceso y la matriz de privilegios del sistema."
         icon={ShieldCheckIcon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Administración", href: "#" },
+          { label: "Inicio", href: "/admin/dashboard" },
+          { label: "Administración" },
           { label: "Roles y Permisos" },
         ]}
       />

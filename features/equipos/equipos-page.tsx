@@ -14,7 +14,7 @@ export function EquiposPage() {
         description="Gestiona las estaciones de marcación de asistencia (kioskos y biométricos) y firma de sesiones docentes dentro del colegio."
         icon={ComputerIcon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Inicio", href: "/admin/dashboard" },
           { label: "Configuración" },
           { label: "Equipos Autorizados" },
         ]}

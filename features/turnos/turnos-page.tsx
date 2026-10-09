@@ -83,7 +83,7 @@ export function TurnosPage() {
         description="Define las horas oficiales de entrada y salida, ventanas de marcado y tolerancia reglamentaria por cada estamento escolar."
         icon={Clock01Icon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Inicio", href: "/admin/dashboard" },
           { label: "Configuración" },
           { label: "Turnos" },
         ]}

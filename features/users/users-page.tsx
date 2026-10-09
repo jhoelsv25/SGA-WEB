@@ -14,8 +14,8 @@ export function UsersPage() {
         description="Administra las cuentas de usuario, asignación de roles y estados de acceso al sistema."
         icon={UserGroupIcon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
-          { label: "Administración", href: "#" },
+          { label: "Inicio", href: "/admin/dashboard" },
+          { label: "Administración" },
           { label: "Usuarios" },
         ]}
       />

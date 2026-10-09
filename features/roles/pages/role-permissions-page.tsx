@@ -209,7 +209,7 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
         description="Asigna y gestiona los privilegios de acceso y operaciones autorizadas en el sistema."
         icon={ShieldCheckIcon}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin/dashboard" },
+          { label: "Inicio", href: "/admin/dashboard" },
           { label: "Administración", href: "/admin/roles" },
           { label: "Roles y Permisos", href: "/admin/roles" },
           { label: `Permisos: ${roleDetail.nombre}` },
