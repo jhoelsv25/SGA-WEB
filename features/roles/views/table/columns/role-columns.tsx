@@ -2,10 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
+import { StatusBadge } from "@/components/common/status-badge";
 import { RoleActions } from "./role-actions";
-import { ROLE_BADGE_VARIANTS } from "../../../consts/roles.consts";
 import type { RoleItem } from "../../../types/roles.types";
 
 interface GetRoleColumnsOptions {
@@ -23,7 +22,6 @@ export function getRoleColumns({
       header: ({ column }) => <DataTableColumnHeader column={column} title="Rol" />,
       cell: ({ row }) => {
         const role = row.original;
-        const variant = role.esSistema ? ROLE_BADGE_VARIANTS.system : ROLE_BADGE_VARIANTS.custom;
 
         return (
           <div className="flex items-center gap-2">
@@ -34,9 +32,9 @@ export function getRoleColumns({
             >
               {role.nombre}
             </button>
-            <Badge variant="outline" className={variant.className}>
-              {variant.label}
-            </Badge>
+            <StatusBadge tone={role.esSistema ? "brand" : "neutral"}>
+              {role.esSistema ? "Sistema" : "Adicional"}
+            </StatusBadge>
           </div>
         );
       },
@@ -66,23 +64,9 @@ export function getRoleColumns({
       cell: ({ row }) => {
         const active = row.original.activo;
         return (
-          <Badge
-            variant="outline"
-            className={cn(
-              "gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold",
-              active
-                ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                : "border-muted bg-muted/60 text-muted-foreground",
-            )}
-          >
-            <span
-              className={cn(
-                "size-1.5 shrink-0 rounded-full",
-                active ? "animate-pulse bg-emerald-500" : "bg-muted-foreground/60",
-              )}
-            />
-            <span>{active ? "Activo" : "Inactivo"}</span>
-          </Badge>
+          <StatusBadge tone={active ? "success" : "neutral"} dot>
+            {active ? "Activo" : "Inactivo"}
+          </StatusBadge>
         );
       },
     },
