@@ -30,7 +30,7 @@ export default function RecoverPage() {
           className="text-muted-foreground hover:text-primary inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} className="size-3.5" />
-          <span>Volver al login</span>
+          <span>Volver al inicio de sesión</span>
         </Link>
         <ThemeToggle />
       </div>
@@ -69,7 +69,7 @@ export default function RecoverPage() {
 
       {/* Pie de página estático */}
       <div className="text-muted-foreground space-y-1 text-center text-xs">
-        <p>¿Problemas para acceder? Dirígete a la coordinación académica de la I.E.</p>
+        <p>¿Problemas para acceder? Comunícate con la secretaría del colegio.</p>
         <p className="text-[11px] opacity-75">
           © {new Date().getFullYear()} {siteConfig.institution.badge}.
         </p>

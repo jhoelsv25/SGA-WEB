@@ -99,7 +99,7 @@ export function ChangePasswordForm() {
 
       {/* Contraseña Actual */}
       <div className="space-y-1.5">
-        <Label htmlFor="currentPassword">Contraseña Actual *</Label>
+        <Label htmlFor="currentPassword">Contraseña actual *</Label>
         <Input
           id="currentPassword"
           type={showCurrentPassword ? "text" : "password"}
@@ -133,7 +133,7 @@ export function ChangePasswordForm() {
 
       {/* Nueva Contraseña */}
       <div className="space-y-1.5">
-        <Label htmlFor="newPassword">Nueva Contraseña *</Label>
+        <Label htmlFor="newPassword">Nueva contraseña *</Label>
         <Input
           id="newPassword"
           type={showNewPassword ? "text" : "password"}
@@ -210,7 +210,7 @@ export function ChangePasswordForm() {
 
       {/* Confirmar Nueva Contraseña */}
       <div className="space-y-1.5">
-        <Label htmlFor="confirmPassword">Confirmar Nueva Contraseña *</Label>
+        <Label htmlFor="confirmPassword">Confirmar nueva contraseña *</Label>
         <Input
           id="confirmPassword"
           type={showConfirmPassword ? "text" : "password"}
@@ -254,7 +254,7 @@ export function ChangePasswordForm() {
             Actualizando contraseña...
           </>
         ) : (
-          "Guardar Nueva Contraseña"
+          "Guardar nueva contraseña"
         )}
       </Button>
     </form>

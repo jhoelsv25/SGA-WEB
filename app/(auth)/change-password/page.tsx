@@ -1,12 +1,9 @@
 import * as React from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { siteConfig } from "@/config";
-import { ChangePasswordForm } from "@/features/auth";
+import { CerrarSesionEnlace, ChangePasswordForm } from "@/features/auth";
 import { ThemeToggle } from "@/components/common/theme-toggle";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
 export const metadata: Metadata = {
   title: "Cambiar Contraseña",
@@ -25,13 +22,7 @@ export default function ChangePasswordPage() {
     <div className="bg-background relative flex min-h-screen w-full flex-col justify-between px-6 py-8 sm:px-12 lg:px-16">
       {/* Barra superior de la página */}
       <div className="flex items-center justify-between">
-        <Link
-          href={siteConfig.routes.login}
-          className="text-muted-foreground hover:text-primary inline-flex items-center gap-1.5 text-xs font-semibold transition-colors"
-        >
-          <HugeiconsIcon icon={ArrowLeft01Icon} className="size-3.5" />
-          <span>Volver al inicio de sesión</span>
-        </Link>
+        <CerrarSesionEnlace />
         <ThemeToggle />
       </div>
 

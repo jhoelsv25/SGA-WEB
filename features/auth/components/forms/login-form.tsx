@@ -67,16 +67,14 @@ function SeleccionRol({
         <p className="text-sm font-semibold">
           Hola, {session.user?.firstName ?? session.user?.username}
         </p>
-        <p className="text-muted-foreground text-xs">
-          Seleccione el rol con el que desea ingresar.
-        </p>
+        <p className="text-muted-foreground text-xs">Elige el rol con el que quieres ingresar.</p>
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="rol">Rol *</Label>
         <Select value={rolId} onValueChange={setRolId} disabled={isPending}>
           <SelectTrigger id="rol" className="w-full">
-            <SelectValue placeholder="Seleccione un rol" />
+            <SelectValue placeholder="Elige un rol" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -229,7 +227,7 @@ function LoginFormInner() {
 
       {/* Campo Usuario */}
       <div className="space-y-1.5">
-        <Label htmlFor="username">Usuario o Código *</Label>
+        <Label htmlFor="username">Usuario o DNI *</Label>
         <Input
           id="username"
           type="text"
@@ -297,7 +295,7 @@ function LoginFormInner() {
           href="/recover"
           className="text-foreground/80 decoration-muted-foreground/40 hover:text-primary text-xs font-medium underline underline-offset-4 transition-colors"
         >
-          He olvidado mi contraseña
+          ¿Olvidaste tu contraseña?
         </Link>
       </div>
 

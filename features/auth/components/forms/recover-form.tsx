@@ -99,7 +99,7 @@ export function RecoverForm() {
 
       {/* Campo Usuario o Código */}
       <div className="space-y-1.5">
-        <Label htmlFor="username">Usuario, DNI o Código Modular *</Label>
+        <Label htmlFor="username">Usuario o DNI *</Label>
         <Input
           id="username"
           type="text"
@@ -149,7 +149,7 @@ export function RecoverForm() {
         <HugeiconsIcon icon={HelpCircleIcon} className="mt-0.5 size-4 shrink-0" />
         <p className="leading-relaxed">
           Tu fecha de nacimiento valida tu identidad en el registro institucional. Si tus datos no
-          coinciden, comunícate con la secretaría de la I.E. Carmelinas.
+          coinciden, comunícate con la secretaría del colegio.
         </p>
       </div>
 

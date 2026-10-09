@@ -97,7 +97,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
           <div className="text-muted-foreground/80 inline-flex items-center gap-1.5 text-[11px] font-medium">
             <HugeiconsIcon icon={ShieldCheckIcon} className="text-primary size-3.5" />
-            <span>Acceso seguro protegido por JWT</span>
+            <span>Conexión segura</span>
           </div>
         </div>
       </div>

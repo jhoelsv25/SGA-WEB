@@ -9,3 +9,4 @@ export * from "./components/auth-slider";
 export * from "./components/forms/login-form";
 export * from "./components/forms/recover-form";
 export * from "./components/forms/change-password-form";
+export * from "./components/cerrar-sesion-enlace";

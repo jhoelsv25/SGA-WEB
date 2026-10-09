@@ -1,6 +1,9 @@
 import * as React from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { siteConfig } from "@/config";
 import { LoginForm } from "@/features/auth";
 import { ThemeToggle } from "@/components/common/theme-toggle";
@@ -21,8 +24,15 @@ export default function LoginPage() {
   return (
     <div className="bg-background relative flex min-h-screen w-full flex-col justify-between px-6 py-8 sm:px-12 lg:px-16">
       <div className="flex items-center justify-between">
-        <span className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase">
-          {siteConfig.acronym} · Acceso Institucional
+        <Link
+          href={siteConfig.routes.home}
+          className="text-muted-foreground hover:text-primary inline-flex min-h-11 items-center gap-1.5 text-xs font-semibold transition-colors lg:hidden"
+        >
+          <HugeiconsIcon icon={ArrowLeft01Icon} className="size-3.5" />
+          <span>Volver al portal</span>
+        </Link>
+        <span className="text-muted-foreground hidden text-xs font-semibold tracking-wider uppercase lg:inline">
+          {siteConfig.acronym} · Acceso institucional
         </span>
         <ThemeToggle />
       </div>
