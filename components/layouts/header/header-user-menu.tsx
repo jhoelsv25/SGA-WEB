@@ -1,22 +1,16 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  UserIcon,
-  Settings02Icon,
-  Notification01Icon,
-  Logout01Icon,
-  School01Icon,
-} from "@hugeicons/core-free-icons";
+import { Logout01Icon, School01Icon } from "@hugeicons/core-free-icons";
+import { siteConfig } from "@/config";
 import { useLogout } from "@/features/auth";
+import { getInitials } from "@/lib/utils";
 import { useOptionalDashboardRole } from "../dashboard-role-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -29,132 +23,79 @@ export interface HeaderUserMenuProps {
   user?: UserProfileData;
 }
 
-const DEFAULT_USER: UserProfileData = {
-  name: "Usuario Institucional",
-  email: "usuario@carmelinas.edu.pe",
-  roleLabel: "Docente / Directivo",
-};
-
-export function HeaderUserMenu({ user = DEFAULT_USER }: HeaderUserMenuProps) {
+export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
   // RF-001 V3: el rol se elige al iniciar sesión; aquí solo se muestra el activo
   const dashboard = useOptionalDashboardRole();
-  const activeRoleName = dashboard?.currentUser?.activeRoleName;
-
-  const initials = user.name
-    .split(" ")
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
+  const nombre = user?.name ?? "";
+  const rolActivo = dashboard?.rolActivo || user?.roleLabel || "";
+  const iniciales = getInitials(nombre) || "U";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="hover:bg-accent/60 h-9.5 gap-2.5 rounded-full px-1.5 py-1 transition-all md:px-2"
-          aria-label="Menú de usuario"
+          className="hover:bg-accent/60 h-11 gap-2.5 rounded-full px-1.5 py-1 transition-all md:px-2"
+          aria-label={`Menú de usuario${rolActivo ? `, rol ${rolActivo}` : ""}`}
         >
-          <Avatar className="ring-border/80 size-7.5 shrink-0 rounded-full shadow-2xs ring-1">
-            <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback className="bg-primary/10 text-primary text-[11px] font-bold">
-              {initials || "U"}
+          <Avatar className="ring-border/80 size-8 shrink-0 rounded-full shadow-2xs ring-1">
+            <AvatarImage src={user?.avatar} alt="" />
+            <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+              {iniciales}
             </AvatarFallback>
           </Avatar>
 
-          <div className="hidden text-left leading-none md:flex md:flex-col">
-            <span className="text-foreground max-w-30 truncate text-[12.5px] font-semibold lg:max-w-38">
-              {user.name}
+          <div className="hidden text-left leading-tight md:flex md:flex-col">
+            <span className="text-foreground max-w-30 truncate text-sm font-semibold lg:max-w-38">
+              {nombre}
             </span>
-            <span className="text-muted-foreground/90 max-w-30 truncate text-[10.5px] font-medium lg:max-w-38">
-              {activeRoleName ? `Rol: ${activeRoleName}` : user.roleLabel || user.email}
-            </span>
+            {rolActivo ? (
+              <span className="text-muted-foreground max-w-30 truncate text-xs lg:max-w-38">
+                Rol: {rolActivo}
+              </span>
+            ) : null}
           </div>
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        className="bg-popover/98 w-68 rounded-2xl border-none p-2 shadow-2xl backdrop-blur-xl"
-        align="end"
-        sideOffset={10}
-      >
+      <DropdownMenuContent className="w-68 rounded-2xl p-2" align="end" sideOffset={10}>
         <DropdownMenuLabel className="p-0 font-normal">
-          <div className="flex items-center gap-3 px-2 py-2 text-left text-sm">
-            <Avatar className="ring-primary/20 size-10 rounded-xl shadow-xs ring-1">
-              <AvatarImage src={user.avatar} alt={user.name} />
+          <div className="flex items-center gap-3 px-2 py-2 text-left">
+            <Avatar className="ring-primary/20 size-10 rounded-xl ring-1">
+              <AvatarImage src={user?.avatar} alt="" />
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
-                {initials || "U"}
+                {iniciales}
               </AvatarFallback>
             </Avatar>
-            <div className="grid flex-1 text-left leading-tight">
-              <span className="text-foreground truncate text-[13.5px] font-bold">{user.name}</span>
-              <span className="text-muted-foreground truncate text-[11px]">{user.email}</span>
-              {user.roleLabel && (
-                <div className="mt-1.5">
-                  <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-tight">
-                    {user.roleLabel}
-                  </span>
-                </div>
-              )}
+            <div className="grid min-w-0 flex-1 leading-tight">
+              <span className="text-foreground truncate text-sm font-bold">{nombre}</span>
+              {user?.email ? (
+                <span className="text-muted-foreground truncate text-xs">{user.email}</span>
+              ) : null}
+              {rolActivo ? (
+                <span className="text-primary mt-1 text-xs font-semibold">Rol: {rolActivo}</span>
+              ) : null}
             </div>
           </div>
         </DropdownMenuLabel>
 
-        <DropdownMenuSeparator className="bg-border/60 my-1.5" />
+        <DropdownMenuSeparator className="my-1.5" />
 
-        <div className="bg-muted/50 text-muted-foreground/90 my-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px]">
+        <div className="bg-muted/50 text-muted-foreground my-1 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs">
           <HugeiconsIcon icon={School01Icon} className="text-primary size-3.5 shrink-0" />
-          <span className="truncate font-semibold">I.E. Carmelinas · Lircay</span>
+          <span className="truncate font-semibold">{siteConfig.institution.badge}</span>
         </div>
 
-        <DropdownMenuGroup className="space-y-0.5">
-          <DropdownMenuItem asChild>
-            <Link
-              href="/dashboard/profile"
-              className="hover:bg-accent flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium transition-colors"
-            >
-              <HugeiconsIcon icon={UserIcon} className="text-muted-foreground size-4 shrink-0" />
-              <span>Mi Perfil</span>
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
-            <Link
-              href="/dashboard/notifications"
-              className="hover:bg-accent flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium transition-colors"
-            >
-              <HugeiconsIcon
-                icon={Notification01Icon}
-                className="text-muted-foreground size-4 shrink-0"
-              />
-              <span>Notificaciones</span>
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
-            <Link
-              href="/dashboard/settings"
-              className="hover:bg-accent flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium transition-colors"
-            >
-              <HugeiconsIcon
-                icon={Settings02Icon}
-                className="text-muted-foreground size-4 shrink-0"
-              />
-              <span>Preferencias</span>
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-
-        <DropdownMenuSeparator className="bg-border/60 my-1.5" />
+        <DropdownMenuSeparator className="my-1.5" />
 
         <DropdownMenuItem
           disabled={isLoggingOut}
           onClick={() => logout()}
-          className="text-destructive focus:bg-destructive/10 focus:text-destructive flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-xs font-medium transition-colors"
+          className="text-destructive focus:bg-destructive/10 focus:text-destructive flex h-10 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium"
         >
           <HugeiconsIcon icon={Logout01Icon} className="size-4 shrink-0" />
-          <span>{isLoggingOut ? "Cerrando sesión..." : "Cerrar Sesión"}</span>
+          <span>{isLoggingOut ? "Cerrando sesión..." : "Cerrar sesión"}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
