@@ -72,7 +72,7 @@ export function AuthSlider() {
       <div className="relative z-20 flex items-center justify-between">
         <Link
           href="/"
-          className="text-foreground/80 hover:text-primary inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-xs font-semibold shadow-xs backdrop-blur-md transition-all hover:bg-white dark:bg-black/40 dark:hover:bg-black/60"
+          className="text-foreground/80 hover:text-primary bg-card/75 hover:bg-card focus-visible:ring-ring/40 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold shadow-xs backdrop-blur-md transition-all outline-none focus-visible:ring-2"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} className="size-3.5" />
           <span>Volver al portal</span>
@@ -120,9 +120,9 @@ export function AuthSlider() {
 
       {/* Composición Artística 3D con Pétalos y Ondas de Seda Carmesí */}
       <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-        {/* Glow cálido ambiental */}
+        {/* Glow institucional ambiental */}
         <div className="bg-primary/20 dark:bg-primary/30 absolute -bottom-24 -left-24 size-130 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -right-20 size-80 rounded-full bg-amber-500/10 blur-2xl" />
+        <div className="bg-primary/10 absolute top-1/3 -right-20 size-80 rounded-full blur-2xl" />
 
         {/* Formas orgánicas de ondas fluidas (Carmesí / Seda 3D) */}
         <motion.svg
@@ -210,7 +210,7 @@ export function AuthSlider() {
                 className={`block h-2 rounded-full transition-all duration-300 ${
                   isActive
                     ? "bg-primary w-8 shadow-xs"
-                    : "bg-foreground/25 hover:bg-foreground/50 w-2 dark:bg-white/30"
+                    : "bg-foreground/25 hover:bg-foreground/50 dark:bg-muted-foreground/40 w-2"
                 }`}
               />
             </button>

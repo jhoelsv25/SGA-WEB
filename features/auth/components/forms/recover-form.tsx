@@ -59,7 +59,11 @@ export function RecoverForm() {
 
   if (successMessage) {
     return (
-      <div className="border-primary/20 bg-primary/5 space-y-4 rounded-2xl border p-5 text-center shadow-xs">
+      <div
+        role="status"
+        aria-live="polite"
+        className="border-primary/20 bg-primary/5 space-y-4 rounded-2xl border p-5 text-center shadow-xs"
+      >
         <div className="bg-primary/10 text-primary mx-auto flex size-12 items-center justify-center rounded-full">
           <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-6" />
         </div>
@@ -92,7 +96,7 @@ export function RecoverForm() {
           <HugeiconsIcon icon={AlertCircleIcon} className="mt-0.5 size-4 shrink-0" />
           <div className="flex-1 space-y-0.5">
             <p className="leading-tight font-semibold">Error de solicitud</p>
-            <p className="text-[11px] leading-relaxed opacity-90">{error.message}</p>
+            <p className="text-xs leading-relaxed opacity-90">{error.message}</p>
           </div>
         </div>
       )}
@@ -109,36 +113,43 @@ export function RecoverForm() {
           startIcon={<HugeiconsIcon icon={UserIcon} className="size-4" />}
           {...register("username")}
           aria-invalid={!!errors.username}
+          aria-describedby={errors.username ? "username-error" : undefined}
         />
         {errors.username && (
-          <p className="text-destructive px-2 text-[11px] font-medium">{errors.username.message}</p>
+          <p id="username-error" className="text-destructive px-2 text-xs font-medium">
+            {errors.username.message}
+          </p>
         )}
       </div>
 
       {/* Campo Fecha de Nacimiento con DatePicker */}
       <div className="space-y-1.5">
         <Label htmlFor="birthdate">Fecha de nacimiento *</Label>
-        <Controller
-          control={control}
-          name="birthdate"
-          render={({ field }) => (
-            <DatePicker
-              date={field.value}
-              onSelect={field.onChange}
-              disabled={isSubmitting}
-              placeholder="Selecciona tu fecha de nacimiento"
-              captionLayout="dropdown"
-              startMonth={new Date(1940, 0)}
-              endMonth={new Date()}
-              maxDate={new Date()}
-              className={
-                errors.birthdate ? "border-destructive ring-destructive/20 w-full ring-1" : "w-full"
-              }
-            />
-          )}
-        />
+        <div id="birthdate" aria-describedby={errors.birthdate ? "birthdate-error" : undefined}>
+          <Controller
+            control={control}
+            name="birthdate"
+            render={({ field }) => (
+              <DatePicker
+                date={field.value}
+                onSelect={field.onChange}
+                disabled={isSubmitting}
+                placeholder="Selecciona tu fecha de nacimiento"
+                captionLayout="dropdown"
+                startMonth={new Date(1940, 0)}
+                endMonth={new Date()}
+                maxDate={new Date()}
+                className={
+                  errors.birthdate
+                    ? "border-destructive ring-destructive/20 w-full ring-1"
+                    : "w-full"
+                }
+              />
+            )}
+          />
+        </div>
         {errors.birthdate && (
-          <p className="text-destructive px-2 text-[11px] font-medium">
+          <p id="birthdate-error" className="text-destructive px-2 text-xs font-medium">
             {errors.birthdate.message}
           </p>
         )}

@@ -6,6 +6,8 @@ export * from "./schemas/change-password.schema";
 export * from "./hooks/use-auth";
 export * from "./utils";
 export * from "./components/auth-slider";
+export * from "./components/auth-page-shell";
+export * from "./components/password-input";
 export * from "./components/forms/login-form";
 export * from "./components/forms/recover-form";
 export * from "./components/forms/change-password-form";
