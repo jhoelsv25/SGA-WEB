@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { useListFilters } from "@/hooks/use-list-filters";
+import { useCursorPagination } from "@/hooks/use-cursor-pagination";
 import { NotificacionCard } from "./components/notificacion-card";
 import {
   useEliminarNotificacionMutation,
@@ -35,19 +36,11 @@ export function NotificacionesPage() {
   const estado = listFilters.getString("estado") as EstadoNotificacionFiltro | undefined;
   const tipo = listFilters.getString("tipo") as TipoNotificacion | "all" | undefined;
 
-  // Manejo de paginación por cursores
+  // Manejo de paginación por cursores mediante hook global
   const limit = NOTIFICACIONES_PAGINACION_DEFAULT.limitBandeja;
-  const [cursorHistory, setCursorHistory] = React.useState<(string | null)[]>([null]);
-  const [pageIndex, setPageIndex] = React.useState<number>(0);
-  const currentCursor = cursorHistory[pageIndex] ?? null;
-
-  // Reset de cursores al cambiar filtros
-  const [prevFilters, setPrevFilters] = React.useState({ search, estado, tipo });
-  if (prevFilters.search !== search || prevFilters.estado !== estado || prevFilters.tipo !== tipo) {
-    setPrevFilters({ search, estado, tipo });
-    setCursorHistory([null]);
-    setPageIndex(0);
-  }
+  const pagination = useCursorPagination({
+    resetDeps: [search, estado, tipo],
+  });
 
   // Conteo global de no leídas
   const { data: conteoData } = useNotificacionesConteoQuery();
@@ -60,7 +53,7 @@ export function NotificacionesPage() {
     isFetching,
     refetch,
   } = useNotificacionesQuery({
-    cursor: currentCursor,
+    cursor: pagination.cursor,
     limit,
     search: search && search.length >= 2 ? search : undefined,
     estado: estado && estado !== "all" ? estado : undefined,
@@ -76,20 +69,6 @@ export function NotificacionesPage() {
     () => notificaciones.filter((n) => n.leida).length,
     [notificaciones],
   );
-
-  // Navegación por cursores
-  const handleNextPage = () => {
-    if (notificacionesData?.hasMore && notificacionesData?.nextCursor) {
-      setCursorHistory((prev) => [...prev.slice(0, pageIndex + 1), notificacionesData.nextCursor]);
-      setPageIndex((prev) => prev + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (pageIndex > 0) {
-      setPageIndex((prev) => prev - 1);
-    }
-  };
 
   // Mutations
   const marcarLeidaMutation = useMarcarNotificacionLeidaMutation();
@@ -219,13 +198,10 @@ export function NotificacionesPage() {
             />
           ))}
 
-          {/* Barra de paginación por cursor */}
+          {/* Barra de paginación por cursor mediante hook global */}
           <div className="pt-2">
             <DataTableCursorPagination
-              hasNextPage={Boolean(notificacionesData?.hasMore && notificacionesData?.nextCursor)}
-              hasPreviousPage={pageIndex > 0}
-              onNextPage={handleNextPage}
-              onPreviousPage={handlePreviousPage}
+              {...pagination.getPaginationProps(notificacionesData)}
               isLoading={isLoading || isFetching}
               loadedCount={notificaciones.length}
             />

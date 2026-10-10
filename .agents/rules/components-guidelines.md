@@ -21,7 +21,10 @@ Toda nueva funcionalidad o vista debe consumir los componentes compartidos estan
   - **Filtros secundarios en Popover (`inline: false`)**:
     - Los filtros primarios (búsqueda, grado, estado principal) van visibles en la barra.
     - Si una vista tiene más de 2 o 3 filtros, los secundarios deben declararse con `inline: false` en `ListFilterDef` para agruparse automáticamente dentro del botón desplegable **`Filtros`** con insignia numérica de filtros activos.
-  - **Acciones y Recarga**: Los botones de creación/exportación van en el prop `actions` y el refresco en `onRefresh`.
+- **Paginación por Cursores Global:**
+  - Hook obligatorio: `useCursorPagination` (`@/hooks/use-cursor-pagination`).
+  - Componente obligatorio: `DataTableCursorPagination` (`@/components/common/data-table`).
+  - Prohibido reimplementar `cursorHistory` y lógica manual de cursores en cada página. Debe consumirse `useCursorPagination(queryData, { resetDeps: [filtros...] })`.
 - **Selectores de Búsqueda y Filtro:** `@/components/common/select` (`<SelectOption />`)
   - Combobox institucional estilizado con búsqueda integrada, truncado de textos y selección tipada. Prohibido usar selectores nativos planos para filtros.
 - **Fechas y Rangos:**

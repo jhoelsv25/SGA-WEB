@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
 import { useListFilters } from "@/hooks/use-list-filters";
+import { useCursorPagination } from "@/hooks/use-cursor-pagination";
 import { useExportExcel } from "@/hooks/use-export-excel";
 import { estudianteFilterDefs } from "./config/filters";
 import { estudianteExportColumns } from "./config/export";
@@ -33,44 +34,20 @@ export function EstudiantesPage() {
   const estado: EstadoEstudiante | undefined =
     estadoRaw && estadoRaw !== "all" ? (estadoRaw as EstadoEstudiante) : undefined;
 
-  // Paginación por cursores
+  // Paginación por cursores mediante hook global
   const limit = 10;
-  const [cursorHistory, setCursorHistory] = React.useState<(string | null)[]>([null]);
-  const [pageIndex, setPageIndex] = React.useState<number>(0);
-  const currentCursor = cursorHistory[pageIndex] ?? null;
-
-  const [prevFilters, setPrevFilters] = React.useState({
-    search,
-    estado,
+  const pagination = useCursorPagination({
+    resetDeps: [search, estado],
   });
 
-  if (prevFilters.search !== search || prevFilters.estado !== estado) {
-    setPrevFilters({ search, estado });
-    setCursorHistory([null]);
-    setPageIndex(0);
-  }
-
   const { data, isLoading, refetch, isFetching } = useEstudiantesQuery({
-    cursor: currentCursor,
+    cursor: pagination.cursor,
     limit,
     search: search ? search.trim() : undefined,
     estado,
   });
 
   const estudiantes = data?.data ?? [];
-
-  const handleNextPage = () => {
-    if (data?.hasMore && data?.nextCursor) {
-      setCursorHistory((prev) => [...prev.slice(0, pageIndex + 1), data.nextCursor]);
-      setPageIndex((prev) => prev + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (pageIndex > 0) {
-      setPageIndex((prev) => prev - 1);
-    }
-  };
 
   const { exportToExcel, isExporting } = useExportExcel<Estudiante>({
     columns: estudianteExportColumns,
@@ -130,10 +107,7 @@ export function EstudiantesPage() {
           estudiantes={estudiantes}
           isLoading={isLoading}
           cursorPagination={{
-            hasNextPage: Boolean(data?.hasMore && data?.nextCursor),
-            hasPreviousPage: pageIndex > 0,
-            onNextPage: handleNextPage,
-            onPreviousPage: handlePreviousPage,
+            ...pagination.getPaginationProps(data),
             isLoading: isFetching,
             loadedCount: estudiantes.length,
           }}

@@ -4,6 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { useListFilters } from "@/hooks/use-list-filters";
+import { useCursorPagination } from "@/hooks/use-cursor-pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/common/data-table";
 import {
@@ -70,31 +71,11 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
   const tipo = listFilters.getString("tipo");
   const estado = listFilters.getString("estado");
 
-  // Paginación por cursores (idéntico a estudiantes)
+  // Paginación por cursores mediante hook global
   const limit = 20;
-  const [cursorHistory, setCursorHistory] = React.useState<(string | null)[]>([null]);
-  const [pageIndex, setPageIndex] = React.useState<number>(0);
-  const currentCursor = cursorHistory[pageIndex] ?? null;
-
-  const [prevFilters, setPrevFilters] = React.useState({
-    search,
-    gradoId,
-    seccionId,
-    tipo,
-    estado,
+  const pagination = useCursorPagination({
+    resetDeps: [search, gradoId, seccionId, tipo, estado],
   });
-
-  if (
-    prevFilters.search !== search ||
-    prevFilters.gradoId !== gradoId ||
-    prevFilters.seccionId !== seccionId ||
-    prevFilters.tipo !== tipo ||
-    prevFilters.estado !== estado
-  ) {
-    setPrevFilters({ search, gradoId, seccionId, tipo, estado });
-    setCursorHistory([null]);
-    setPageIndex(0);
-  }
 
   // Consulta de matrículas conectada a cursor y filtros
   const {
@@ -103,7 +84,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
     refetch,
     isFetching,
   } = useMatriculasQuery({
-    cursor: currentCursor,
+    cursor: pagination.cursor,
     limit,
     search: search && search.length >= 2 ? search : undefined,
     gradoId: gradoId && gradoId !== "all" ? gradoId : undefined,
@@ -113,19 +94,6 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
   });
 
   const matriculas = React.useMemo(() => matriculasData?.data ?? [], [matriculasData]);
-
-  const handleNextPage = () => {
-    if (matriculasData?.hasMore && matriculasData?.nextCursor) {
-      setCursorHistory((prev) => [...prev.slice(0, pageIndex + 1), matriculasData.nextCursor]);
-      setPageIndex((prev) => prev + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (pageIndex > 0) {
-      setPageIndex((prev) => prev - 1);
-    }
-  };
 
   // Métricas de cabecera
   const metricas = React.useMemo(() => {
@@ -254,10 +222,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         data={matriculas}
         isLoading={isLoading}
         cursorPagination={{
-          hasNextPage: Boolean(matriculasData?.hasMore && matriculasData?.nextCursor),
-          hasPreviousPage: pageIndex > 0,
-          onNextPage: handleNextPage,
-          onPreviousPage: handlePreviousPage,
+          ...pagination.getPaginationProps(matriculasData),
           isLoading: isFetching,
           loadedCount: matriculas.length,
         }}
