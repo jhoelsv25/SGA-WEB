@@ -27,7 +27,7 @@ export class ApiClientError extends Error {
 
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 const TOKEN_STORAGE_KEY = "sga_access_token";
 

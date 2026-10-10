@@ -19,6 +19,7 @@ import {
   useMarcarTodasLeidasMutation,
   useNotificacionesConteoQuery,
   useNotificacionesQuery,
+  useNotificacionesRealtime,
 } from "../hooks";
 import type { NotificacionItem, TipoNotificacion } from "../types";
 
@@ -37,6 +38,9 @@ const COLOR_TIPO: Record<TipoNotificacion, string> = {
 export function HeaderNotificationBell() {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
+
+  // Escucha activa en tiempo real mediante SSE
+  useNotificacionesRealtime();
 
   const { data: conteoData } = useNotificacionesConteoQuery();
   const unreadCount = conteoData?.unreadCount ?? 0;

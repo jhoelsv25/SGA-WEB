@@ -38,3 +38,21 @@ export async function marcarTodasNotificacionesLeidas(): Promise<{
   );
   return response.data;
 }
+
+export async function eliminarNotificacion(id: string): Promise<{
+  message: string;
+  id: string;
+}> {
+  const response = await apiClient.delete<{ message: string; id: string }>(`/notificaciones/${id}`);
+  return response.data;
+}
+
+export async function eliminarTodasLeidas(): Promise<{
+  message: string;
+  eliminadas: number;
+}> {
+  const response = await apiClient.delete<{ message: string; eliminadas: number }>(
+    "/notificaciones/leidas/todas",
+  );
+  return response.data;
+}
