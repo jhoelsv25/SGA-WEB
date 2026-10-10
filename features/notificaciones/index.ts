@@ -5,3 +5,4 @@ export * from "./api";
 export * from "./views";
 export * from "./constants";
 export * from "./utils";
+export * from "./notificaciones-page";
