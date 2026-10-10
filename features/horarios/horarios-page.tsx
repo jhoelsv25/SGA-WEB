@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { useGradosQuery } from "@/features/grados";
 import {
+  AvisoSeccionCerrada,
   AvisosYAdvertencias,
   HorariosDialogsContainer,
   HorariosHeaderActions,
@@ -27,7 +28,7 @@ import type { CargaItemHorario } from "./types";
 import { GrillaSemanal } from "./views";
 
 export function HorariosPage() {
-  const puedeGestionar = usePuedeGestionarHorarios();
+  const permisoGestionar = usePuedeGestionarHorarios();
 
   // 1. Cargar grados escolares
   const {
@@ -50,6 +51,8 @@ export function HorariosPage() {
     seleccionarSeccion,
   } = useHorariosSeleccion(grados);
 
+  const seccionCerrada = seccionActual?.estado === "cerrada";
+  const puedeGestionar = permisoGestionar && !seccionCerrada;
   // 3. Cargar horario de la sección seleccionada
   const {
     data: horarioData,
@@ -62,7 +65,6 @@ export function HorariosPage() {
   // 4. Cargar carga académica de la sección
   const { data: cargaData, isLoading: isLoadingCarga } = useCargaSeccionQuery(seccionId);
 
-  // 5. Estado de propuesta de grilla
   const [horaEntradaGrilla, setHoraEntradaGrilla] = useState<string | undefined>(undefined);
   const [grillaPropuestaActiva, setGrillaPropuestaActiva] = useState(false);
 
@@ -72,16 +74,13 @@ export function HorariosPage() {
     grillaPropuestaActiva,
   );
 
-  // 6. Mensaje de vigencia y curso seleccionado
   const [mensajeVigencia, setMensajeVigencia] = useState<string | null>(null);
   const [cursoSeleccionado, setCursoSeleccionado] = useState<CargaItemHorario | null>(null);
 
-  // 7. Modales y mutaciones
   const dialogs = useHorariosDialogs();
   const crearBloqueMutation = useCreateBloqueMutation();
   const deleteBloqueMutation = useDeleteBloqueMutation();
 
-  // Datos derivados
   const cargaItems = useMemo(() => cargaData?.items ?? [], [cargaData]);
   const bloquesHorario = useMemo(() => horarioData?.bloques ?? [], [horarioData]);
   const advertenciasPlan = useMemo(() => horarioData?.advertencias ?? [], [horarioData]);
@@ -191,6 +190,7 @@ export function HorariosPage() {
       >
         {seccionId && (
           <div className="space-y-6">
+            {seccionCerrada && <AvisoSeccionCerrada />}
             <AvisosYAdvertencias
               mensajeVigencia={mensajeVigencia}
               advertencias={advertenciasPlan}

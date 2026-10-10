@@ -43,7 +43,9 @@ export function SeccionActions({
         subtitle: seccion.aula ? `Aula: ${seccion.aula}` : "Sin aula asignada",
       }}
       items={customItems}
-      onEdit={puedeGestionar && onEdit ? () => onEdit(seccion) : undefined}
+      onEdit={
+        puedeGestionar && onEdit && seccion.estado === "activa" ? () => onEdit(seccion) : undefined
+      }
       editLabel="Editar sección"
       deleteAction={
         puedeGestionar && onCerrar && seccion.estado === "activa"
