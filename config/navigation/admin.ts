@@ -224,6 +224,15 @@ export const adminNavigation: NavSection[] = [
         description: "Libretas oficiales en PDF descargadas de SIAGIE",
       },
       {
+        id: "admin-conducta",
+        label: "Conducta y Convivencia",
+        link: "/admin/conducta",
+        icon: Award01Icon,
+        permissions: ["conducta:ver", "conducta:registrar"],
+        roles: ["admin"],
+        description: "Incidencias, méritos y observaciones formativas del estudiante (RF-018)",
+      },
+      {
         id: "admin-virtual-classroom",
         label: "Aula Virtual (Refuerzo)",
         link: "/admin/virtual-classroom",

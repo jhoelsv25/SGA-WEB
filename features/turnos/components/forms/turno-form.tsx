@@ -348,7 +348,7 @@ export function TurnoForm({
                 disabled={isSubmitting}
                 aria-pressed={isSelected}
                 aria-label={`Día ${dia.label}`}
-                className={`focus-visible:ring-primary/40 flex min-h-[44px] flex-col items-center justify-center rounded-lg border p-2 text-xs font-semibold transition-all outline-none focus-visible:ring-2 ${
+                className={`focus-visible:ring-primary/40 flex min-h-11 flex-col items-center justify-center rounded-lg border p-2 text-xs font-semibold transition-all outline-none focus-visible:ring-2 ${
                   isSelected
                     ? "bg-primary text-primary-foreground border-primary shadow-xs"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/70"
