@@ -14,11 +14,16 @@ Toda nueva funcionalidad o vista debe consumir los componentes compartidos estan
   - Para acciones destructivas (eliminar, cancelar, resetear estados).
 - **Acciones de Fila en Tablas:** `@/components/common/row-actions` (`<TableRowActions />`)
   - Uso obligatorio para celdas de acciones en TanStack Table con popover de estados, edición y confirmación de eliminación integrada.
-- **Toolbars y Filtros:**
-  - `@/components/common/data-toolbar` (`<DataToolbar />`)
-  - `@/components/common/list-toolbar` (`<ListToolbar />`)
+- **Toolbars, Búsqueda y Filtros de Listados:**
+  - `@/components/common/list-toolbar` (`<ListToolbar />`) y `useListFilters` (`@/hooks/use-list-filters`).
+  - **Obligatorio para toda tabla o listado del sistema**: Prohibido crear barras de filtros manuales con `<Select>` sueltos que se quiebren en 2 líneas.
+  - **Sincronización con la URL (100% Reactiva)**: Todos los filtros y el campo de búsqueda deben persistir en los query params de la URL mediante `useListFilters(filterDefs)` para permitir compartir enlaces directos y recargar la página (`F5`) sin perder filtros.
+  - **Filtros secundarios en Popover (`inline: false`)**:
+    - Los filtros primarios (búsqueda, grado, estado principal) van visibles en la barra.
+    - Si una vista tiene más de 2 o 3 filtros, los secundarios deben declararse con `inline: false` en `ListFilterDef` para agruparse automáticamente dentro del botón desplegable **`Filtros`** con insignia numérica de filtros activos.
+  - **Acciones y Recarga**: Los botones de creación/exportación van en el prop `actions` y el refresco en `onRefresh`.
 - **Selectores de Búsqueda y Filtro:** `@/components/common/select` (`<SelectOption />`)
-  - Combobox optimizado con búsqueda y selección tipada.
+  - Combobox institucional estilizado con búsqueda integrada, truncado de textos y selección tipada. Prohibido usar selectores nativos planos para filtros.
 - **Fechas y Rangos:**
   - `@/components/common/date-picker` (`<DatePicker />`)
   - `@/components/common/date-range-picker` (`<DateRangePicker />`)
