@@ -30,7 +30,8 @@ export function MatriculasPage() {
       {/* Cabecera Principal */}
       <PageHeader
         title="Matrícula y Traslados"
-        description="Gestión oficial de matrículas individuales, matrículas masivas de continuadores, retiros, traslados y constancias PDF (RF-009)."
+        description="Gestión oficial de matrículas de estudiantes, promoción masiva de continuadores, retiros, traslados y emisión de constancias oficiales."
+
         icon={CheckmarkCircle02Icon}
         badge={anioBadge}
         breadcrumbs={[

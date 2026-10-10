@@ -2,15 +2,16 @@
 
 import * as React from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  UserRemove01Icon,
+  ArrowRight01Icon,
+  Exchange01Icon,
+  Delete02Icon,
+  AlertCircleIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Modal } from "@/components/common/modal";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -57,7 +58,7 @@ export function ModalOperacionMatricula({
   const cambiarSeccionMutation = useCambiarSeccionMutation(() => onOpenChange(false));
   const anularMutation = useAnularMatriculaMutation(() => onOpenChange(false));
 
-  // Filtrar secciones del mismo grado (regla HU3)
+  // Filtrar secciones del mismo grado
   const seccionesMismoGrado = React.useMemo(() => {
     if (!seccionesData || !matricula) return [];
     return (seccionesData as Seccion[]).filter(
@@ -117,133 +118,173 @@ export function ModalOperacionMatricula({
     cambiarSeccionMutation.isPending ||
     anularMutation.isPending;
 
+  const configOperacion = {
+    retirar: {
+      title: "Retiro de Estudiante",
+      desc: "Registra la baja definitiva del estudiante. Su cuenta institucional y credencial de acceso quedarán inactivas.",
+      icon: UserRemove01Icon,
+    },
+    trasladar: {
+      title: "Traslado a Otra Institución",
+      desc: "Registra la transferencia del estudiante a otro colegio. Sus credenciales institucionales serán revocadas.",
+      icon: ArrowRight01Icon,
+    },
+    "cambiar-seccion": {
+      title: "Cambio de Sección",
+      desc: `Transfiere al estudiante a otra sección paralela de ${matricula.gradoNombre} con vacantes disponibles.`,
+      icon: Exchange01Icon,
+    },
+    anular: {
+      title: "¿Anular Matrícula por Error?",
+      desc: "Esta acción anula el registro de matrícula y libera la vacante si el estudiante aún no tiene asistencias ni calificaciones.",
+      icon: Delete02Icon,
+    },
+  }[tipo];
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {tipo === "retirar" && "Retiro de Estudiante"}
-            {tipo === "trasladar" && "Traslado a Otro Colegio"}
-            {tipo === "cambiar-seccion" && "Cambio de Sección (Mismo Grado)"}
-            {tipo === "anular" && "¿Anular Matrícula Registrada por Error?"}
-          </DialogTitle>
-          <DialogDescription>
-            Estudiante:{" "}
-            <strong className="text-foreground">
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title={configOperacion.title}
+      description={configOperacion.desc}
+      icon={configOperacion.icon}
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4 py-1">
+        {/* Ficha resumida del estudiante */}
+        <div className="bg-muted/40 border-border/60 flex items-center justify-between rounded-lg border p-3 text-xs">
+          <div>
+            <span className="text-muted-foreground block text-[11px]">Estudiante</span>
+            <span className="text-foreground font-semibold">
               {matricula.estudiante.apellidos}, {matricula.estudiante.nombres}
-            </strong>{" "}
-            ({matricula.gradoNombre} &quot;{matricula.seccionNombre}&quot;)
-          </DialogDescription>
-        </DialogHeader>
+            </span>
+          </div>
+          <div className="text-right">
+            <span className="text-muted-foreground block text-[11px]">Salón Actual</span>
+            <span className="text-foreground font-semibold">
+              {matricula.gradoNombre} &quot;{matricula.seccionNombre}&quot;
+            </span>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {tipo === "anular" ? (
-            <div className="text-muted-foreground space-y-2 text-sm">
-              <p>
-                Esta acción eliminará la matrícula y liberará la vacante en{" "}
-                {matricula.seccionNombre}.
-              </p>
-              <div className="bg-destructive/10 text-destructive rounded-md border p-3 text-xs">
-                <strong>Regla de integridad:</strong> Solo se puede anular si el estudiante aún no
-                registra asistencias ni entregas de tareas. Si ya cuenta con actividad, debe
-                registrarse como Retirado.
-              </div>
+        {tipo === "anular" ? (
+          <div className="border-destructive/30 bg-destructive/5 text-destructive space-y-1.5 rounded-lg border p-3.5 text-xs">
+            <div className="flex items-center gap-2 font-semibold">
+              <HugeiconsIcon icon={AlertCircleIcon} className="size-4" />
+              <span>Condición de anulación:</span>
             </div>
-          ) : (
-            <>
-              {/* Fecha para Retiro o Traslado */}
-              {(tipo === "retirar" || tipo === "trasladar") && (
-                <div className="space-y-1">
-                  <Label htmlFor="fecha-op">Fecha de Salida</Label>
-                  <Input
-                    id="fecha-op"
-                    type="date"
-                    value={fecha}
-                    onChange={(e) => setFecha(e.target.value)}
-                    required
-                  />
-                  <p className="text-muted-foreground text-[11px]">
-                    A partir de esta fecha se desactiva su cuenta y credencial de marcación.
-                  </p>
-                </div>
-              )}
-
-              {/* Colegio de destino para traslado */}
-              {tipo === "trasladar" && (
-                <div className="space-y-1">
-                  <Label htmlFor="col-dest">
-                    Colegio de Destino <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="col-dest"
-                    placeholder="Ej. I.E. Emblemática Melitón Carvajal"
-                    value={colegioDestino}
-                    onChange={(e) => setColegioDestino(e.target.value)}
-                    required
-                  />
-                </div>
-              )}
-
-              {/* Nueva sección para cambio de sección */}
-              {tipo === "cambiar-seccion" && (
-                <div className="space-y-1">
-                  <Label htmlFor="sec-dest">Nueva Sección ({matricula.gradoNombre})</Label>
-                  <Select value={nuevaSeccionId} onValueChange={setNuevaSeccionId}>
-                    <SelectTrigger id="sec-dest">
-                      <SelectValue placeholder="Seleccione sección destino" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {seccionesMismoGrado.map((sec: Seccion) => (
-                        <SelectItem key={sec.id} value={sec.id}>
-                          Sección &quot;{sec.nombre}&quot; (Vacantes libres:{" "}
-                          {sec.vacantes - sec.matriculados})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {seccionesMismoGrado.length === 0 && (
-                    <p className="text-destructive text-xs">
-                      No hay otras secciones activas con vacantes en este grado.
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Motivo para retiro, traslado o cambio */}
-              <div className="space-y-1">
-                <Label htmlFor="motivo-op">
-                  Motivo <span className="text-destructive">*</span>
+            <p className="leading-relaxed">
+              Solo es posible anular la matrícula si se cometió una equivocación en el registro y el
+              alumno no cuenta con asistencias registradas ni notas. Si ya inició clases, debe
+              registrarse como <strong>Retirado</strong>.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Fecha de Retiro / Traslado */}
+            {(tipo === "retirar" || tipo === "trasladar") && (
+              <div className="space-y-1.5">
+                <Label htmlFor="fecha-op" className="text-xs font-semibold">
+                  Fecha Efectiva de Salida <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  id="motivo-op"
-                  placeholder={
-                    tipo === "cambiar-seccion"
-                      ? "Ej. Ajuste de convivencia o afinidad horaria"
-                      : "Ej. Cambio de domicilio familiar"
-                  }
-                  value={motivo}
-                  onChange={(e) => setMotivo(e.target.value)}
+                  id="fecha-op"
+                  type="date"
+                  value={fecha}
+                  onChange={(e) => setFecha(e.target.value)}
+                  className="h-10 text-xs"
                   required
                 />
               </div>
-            </>
-          )}
+            )}
 
-          <DialogFooter className="pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              variant={tipo === "anular" || tipo === "retirar" ? "destructive" : "default"}
-              disabled={isPending}
-            >
-              {isPending ? "Procesando..." : "Confirmar Operación"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            {/* Colegio de destino para traslado */}
+            {tipo === "trasladar" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="col-dest" className="text-xs font-semibold">
+                  Institución Educativa de Destino <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="col-dest"
+                  placeholder="Ej. I.E. Emblemática Melitón Carvajal"
+                  value={colegioDestino}
+                  onChange={(e) => setColegioDestino(e.target.value)}
+                  className="h-10 text-xs"
+                  required
+                />
+              </div>
+            )}
+
+            {/* Nueva sección para cambio de sección */}
+            {tipo === "cambiar-seccion" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="sec-dest" className="text-xs font-semibold">
+                  Nueva Sección ({matricula.gradoNombre}){" "}
+                  <span className="text-destructive">*</span>
+                </Label>
+                <Select value={nuevaSeccionId} onValueChange={setNuevaSeccionId}>
+                  <SelectTrigger id="sec-dest" className="h-10 text-xs">
+                    <SelectValue placeholder="Seleccione el nuevo salón" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {seccionesMismoGrado.map((sec: Seccion) => (
+                      <SelectItem key={sec.id} value={sec.id}>
+                        Sección &quot;{sec.nombre}&quot; ({sec.vacantes - sec.matriculados} vacantes
+                        disponibles)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {seccionesMismoGrado.length === 0 && (
+                  <p className="text-destructive pt-1 text-[11px]">
+                    No existen otras secciones paralelas activas en este grado escolar.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Motivo */}
+            <div className="space-y-1.5">
+              <Label htmlFor="motivo-op" className="text-xs font-semibold">
+                Motivo Detallado <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="motivo-op"
+                placeholder={
+                  tipo === "cambiar-seccion"
+                    ? "Ej. Ajuste de convivencia o solicitud fundamentada del apoderado"
+                    : "Ej. Cambio de domicilio o viaje familiar"
+                }
+                value={motivo}
+                onChange={(e) => setMotivo(e.target.value)}
+                className="h-10 text-xs"
+                required
+              />
+            </div>
+          </>
+        )}
+
+        <div className="border-border/50 flex items-center justify-end gap-2 border-t pt-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+            className="text-xs"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            size="sm"
+            variant={tipo === "anular" || tipo === "retirar" ? "destructive" : "default"}
+            disabled={isPending}
+            className="text-xs"
+          >
+            {isPending ? "Procesando..." : "Confirmar Operación"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

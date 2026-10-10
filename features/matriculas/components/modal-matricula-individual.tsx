@@ -2,15 +2,9 @@
 
 import * as React from "react";
 import { toast } from "sonner";
+import { UserAdd01Icon } from "@hugeicons/core-free-icons";
+import { Modal } from "@/components/common/modal";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -109,137 +103,156 @@ export function ModalMatriculaIndividual({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Matrícula Individual de Estudiante</DialogTitle>
-          <DialogDescription>
-            Registre un nuevo ingreso, continuador o traslado en una sección activa con vacantes.
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {/* Búsqueda y selección de estudiante */}
-          <div className="space-y-2">
-            <Label htmlFor="search-est">Buscar Estudiante (DNI o Apellidos)</Label>
-            <Input
-              id="search-est"
-              placeholder="Escriba al menos 2 letras..."
-              value={searchEstudiante}
-              onChange={(e) => setSearchEstudiante(e.target.value)}
-            />
-            <div className="space-y-1">
-              <Label htmlFor="estudiante-sel">Estudiante</Label>
-              <Select value={estudianteId} onValueChange={setEstudianteId}>
-                <SelectTrigger id="estudiante-sel">
-                  <SelectValue
-                    placeholder={loadingEstudiantes ? "Cargando..." : "Seleccione el estudiante"}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {estudiantesData?.data?.map((est: Estudiante) => (
-                    <SelectItem key={est.id} value={est.id}>
-                      {est.persona.apellidoPaterno} {est.persona.apellidoMaterno ?? ""}{" "}
-                      {est.persona.nombres} ({est.persona.numeroDocumento})
-                    </SelectItem>
-                  ))}
-                  {(!estudiantesData?.data || estudiantesData.data.length === 0) && (
-                    <div className="text-muted-foreground p-2 text-center text-xs">
-                      No hay estudiantes que coincidan
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Sección y vacantes */}
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Matricular Estudiante"
+      description="Inscriba formalmente a un estudiante nuevo, continuador o trasladado en una sección activa."
+      icon={UserAdd01Icon}
+      size="xl"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4 py-1">
+        {/* Búsqueda y selección de estudiante */}
+        <div className="space-y-2">
+          <Label htmlFor="search-est" className="text-xs font-semibold">
+            Buscar Estudiante (DNI o Apellidos)
+          </Label>
+          <Input
+            id="search-est"
+            placeholder="Escriba para filtrar por DNI o apellidos..."
+            value={searchEstudiante}
+            onChange={(e) => setSearchEstudiante(e.target.value)}
+            className="h-10 text-xs"
+          />
           <div className="space-y-1">
-            <Label htmlFor="seccion-sel">Grado y Sección Destino</Label>
-            <Select value={seccionId} onValueChange={setSeccionId}>
-              <SelectTrigger id="seccion-sel">
+            <Label htmlFor="estudiante-sel" className="text-xs font-semibold">
+              Estudiante a Matricular <span className="text-destructive">*</span>
+            </Label>
+            <Select value={estudianteId} onValueChange={setEstudianteId}>
+              <SelectTrigger id="estudiante-sel" className="h-10 text-xs">
                 <SelectValue
                   placeholder={
-                    loadingSecciones ? "Cargando secciones..." : "Seleccione grado y sección"
+                    loadingEstudiantes ? "Cargando estudiantes..." : "Seleccione el estudiante"
                   }
                 />
               </SelectTrigger>
               <SelectContent>
-                {seccionesDisponibles.map((sec: Seccion) => (
-                  <SelectItem key={sec.id} value={sec.id}>
-                    {sec.gradoNombre} &quot;{sec.nombre}&quot; — Vacantes:{" "}
-                    {sec.vacantes - sec.matriculados}/{sec.vacantes}
+                {estudiantesData?.data?.map((est: Estudiante) => (
+                  <SelectItem key={est.id} value={est.id}>
+                    {est.persona.apellidoPaterno} {est.persona.apellidoMaterno ?? ""}{" "}
+                    {est.persona.nombres} ({est.persona.numeroDocumento})
                   </SelectItem>
                 ))}
+                {(!estudiantesData?.data || estudiantesData.data.length === 0) && (
+                  <div className="text-muted-foreground p-2 text-center text-xs">
+                    No hay estudiantes que coincidan con la búsqueda
+                  </div>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Sección y vacantes */}
+        <div className="space-y-1.5">
+          <Label htmlFor="seccion-sel" className="text-xs font-semibold">
+            Grado y Sección de Destino <span className="text-destructive">*</span>
+          </Label>
+          <Select value={seccionId} onValueChange={setSeccionId}>
+            <SelectTrigger id="seccion-sel" className="h-10 text-xs">
+              <SelectValue
+                placeholder={
+                  loadingSecciones ? "Cargando salones..." : "Seleccione grado y sección"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {seccionesDisponibles.map((sec: Seccion) => (
+                <SelectItem key={sec.id} value={sec.id}>
+                  {sec.gradoNombre} &quot;{sec.nombre}&quot; — {sec.vacantes - sec.matriculados}{" "}
+                  vacantes libres ({sec.vacantes} total)
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Tipo de matrícula */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="tipo-sel" className="text-xs font-semibold">
+              Tipo de Matrícula
+            </Label>
+            <Select value={tipo} onValueChange={(val) => setTipo(val as TipoMatricula)}>
+              <SelectTrigger id="tipo-sel" className="h-10 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="nuevo">Nuevo ingreso</SelectItem>
+                <SelectItem value="continuador">Continuador</SelectItem>
+                <SelectItem value="traslado">Traslado externo</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Tipo de matrícula */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <Label htmlFor="tipo-sel">Tipo de Matrícula</Label>
-              <Select value={tipo} onValueChange={(val) => setTipo(val as TipoMatricula)}>
-                <SelectTrigger id="tipo-sel">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="nuevo">Nuevo</SelectItem>
-                  <SelectItem value="continuador">Continuador</SelectItem>
-                  <SelectItem value="traslado">Traslado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center space-x-2 pt-6">
-              <Checkbox
-                id="es-repitente"
-                checked={esRepitente}
-                onCheckedChange={(c) => setEsRepitente(Boolean(c))}
-              />
-              <Label htmlFor="es-repitente" className="cursor-pointer text-sm font-normal">
-                ¿Es Repitente?
-              </Label>
-            </div>
+          <div className="flex items-center space-x-2 pt-6">
+            <Checkbox
+              id="es-repitente"
+              checked={esRepitente}
+              onCheckedChange={(c) => setEsRepitente(Boolean(c))}
+            />
+            <Label htmlFor="es-repitente" className="cursor-pointer text-xs font-medium">
+              ¿Estudiante repite el grado?
+            </Label>
           </div>
+        </div>
 
-          {/* Colegio de procedencia si es traslado */}
-          {tipo === "traslado" && (
-            <div className="animate-in fade-in space-y-1 duration-200">
-              <Label htmlFor="colegio-procedencia">
-                Colegio de Procedencia <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="colegio-procedencia"
-                placeholder="Nombre del colegio de donde proviene..."
-                value={colegioProcedencia}
-                onChange={(e) => setColegioProcedencia(e.target.value)}
-                required
-              />
-            </div>
-          )}
-
-          {/* Observaciones */}
-          <div className="space-y-1">
-            <Label htmlFor="obs">Observaciones (Opcional)</Label>
+        {/* Colegio de procedencia si es traslado */}
+        {tipo === "traslado" && (
+          <div className="animate-in fade-in space-y-1.5 duration-200">
+            <Label htmlFor="colegio-procedencia" className="text-xs font-semibold">
+              Colegio de Procedencia <span className="text-destructive">*</span>
+            </Label>
             <Input
-              id="obs"
-              placeholder="Detalles adicionales..."
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
+              id="colegio-procedencia"
+              placeholder="Nombre de la institución educativa anterior..."
+              value={colegioProcedencia}
+              onChange={(e) => setColegioProcedencia(e.target.value)}
+              className="h-10 text-xs"
+              required
             />
           </div>
+        )}
 
-          <DialogFooter className="pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "Matriculando..." : "Confirmar Matrícula"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        {/* Observaciones */}
+        <div className="space-y-1.5">
+          <Label htmlFor="obs" className="text-xs font-semibold">
+            Observaciones (Opcional)
+          </Label>
+          <Input
+            id="obs"
+            placeholder="Información adicional relevante..."
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            className="h-10 text-xs"
+          />
+        </div>
+
+        <div className="border-border/50 flex items-center justify-end gap-2 border-t pt-3">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+            className="text-xs"
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" size="sm" disabled={mutation.isPending} className="text-xs">
+            {mutation.isPending ? "Matriculando..." : "Confirmar Matrícula"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
