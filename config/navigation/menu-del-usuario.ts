@@ -14,12 +14,15 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/roles",
   "/admin/audit",
   "/admin/curriculum",
+  "/admin/secciones",
+  "/admin/horarios",
   "/admin/institucion",
   "/admin/turnos",
   "/admin/equipos",
   "/admin/variables",
   "/admin/academic-years",
   "/admin/calendario",
+  "/admin/mi-horario",
 ]);
 
 interface OpcionesMenu {

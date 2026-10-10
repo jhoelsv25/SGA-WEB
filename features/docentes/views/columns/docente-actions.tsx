@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { TableRowActions } from "@/components/common/row-actions";
 import {
+  BookOpen01Icon,
   PrinterIcon,
   RefreshIcon,
   ShieldCheckIcon,
@@ -27,6 +29,8 @@ export function DocenteActions({
   onReemitirCredencial,
   onVerHistorial,
 }: DocenteActionsProps) {
+  const router = useRouter();
+
   return (
     <TableRowActions
       header={{
@@ -41,6 +45,13 @@ export function DocenteActions({
       onEdit={() => onEdit(docente)}
       editLabel="Editar ficha docente"
       items={[
+        {
+          key: "carga-academica",
+          label: "Carga académica",
+          icon: BookOpen01Icon,
+          href: `/admin/docentes/${docente.id}/carga`,
+          onClick: () => router.push(`/admin/docentes/${docente.id}/carga`),
+        },
         ...(onPrintCarne && docente.estado !== "cesado"
           ? [
               {
@@ -83,6 +94,7 @@ export function DocenteActions({
             ]
           : []),
       ]}
+      triggerAriaLabel={`Abrir menú de opciones para ${docente.persona.nombreCompleto}`}
     />
   );
 }
