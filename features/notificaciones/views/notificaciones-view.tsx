@@ -1,17 +1,15 @@
 "use client";
 
 import * as React from "react";
-import {
-  Delete02Icon,
-  Notification01Icon,
-  RefreshIcon,
-  Tick02Icon,
-} from "@hugeicons/core-free-icons";
+import { Delete02Icon, Notification01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ListToolbar } from "@/components/common/list-toolbar";
+import { DataTableCursorPagination } from "@/components/common/data-table";
+import { EmptyState } from "@/components/common/empty-state";
+import { useListFilters } from "@/hooks/use-list-filters";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,42 +29,75 @@ import {
   useNotificacionesConteoQuery,
   useNotificacionesQuery,
 } from "../hooks";
-import { NOTIFICACIONES_PAGINACION_DEFAULT } from "../constants";
-import type { TipoNotificacion } from "../types";
-
-type TabFiltro = "todas" | "no_leidas" | TipoNotificacion;
+import { NOTIFICACIONES_PAGINACION_DEFAULT, createNotificacionFilterDefs } from "../constants";
+import type { EstadoNotificacionFiltro, TipoNotificacion } from "../types";
 
 export function NotificacionesView() {
-  const [tabActual, setTabActual] = React.useState<TabFiltro>("todas");
   const [confirmLimpiarOpen, setConfirmLimpiarOpen] = React.useState(false);
 
-  // Queries
+  // Filtros reactivos sincronizados con la URL
+  const filterDefs = React.useMemo(() => createNotificacionFilterDefs(), []);
+  const listFilters = useListFilters(filterDefs);
+
+  const search = listFilters.getString("search");
+  const estado = listFilters.getString("estado") as EstadoNotificacionFiltro | undefined;
+  const tipo = listFilters.getString("tipo") as TipoNotificacion | "all" | undefined;
+
+  // Manejo de paginación por cursores
+  const limit = NOTIFICACIONES_PAGINACION_DEFAULT.limitBandeja;
+  const [cursorHistory, setCursorHistory] = React.useState<(string | null)[]>([null]);
+  const [pageIndex, setPageIndex] = React.useState<number>(0);
+  const currentCursor = cursorHistory[pageIndex] ?? null;
+
+  // Reset de cursores al cambiar filtros
+  const [prevFilters, setPrevFilters] = React.useState({ search, estado, tipo });
+  if (prevFilters.search !== search || prevFilters.estado !== estado || prevFilters.tipo !== tipo) {
+    setPrevFilters({ search, estado, tipo });
+    setCursorHistory([null]);
+    setPageIndex(0);
+  }
+
+  // Conteo global de no leídas
   const { data: conteoData } = useNotificacionesConteoQuery();
   const unreadCount = conteoData?.unreadCount ?? 0;
 
+  // Consulta de notificaciones con cursor y filtros de backend
   const {
     data: notificacionesData,
     isLoading,
-    isRefetching,
+    isFetching,
     refetch,
   } = useNotificacionesQuery({
-    limit: NOTIFICACIONES_PAGINACION_DEFAULT.limitBandeja,
-    soloNoLeidas: tabActual === "no_leidas" ? true : undefined,
+    cursor: currentCursor,
+    limit,
+    search: search && search.length >= 2 ? search : undefined,
+    estado: estado && estado !== "all" ? estado : undefined,
+    tipo: tipo && tipo !== "all" ? tipo : undefined,
   });
 
-  const todasNotificaciones = React.useMemo(
+  const notificaciones = React.useMemo(
     () => notificacionesData?.data ?? [],
     [notificacionesData?.data],
   );
 
-  // Filtrado según la pestaña seleccionada
-  const notificacionesFiltradas = React.useMemo(() => {
-    if (tabActual === "todas") return todasNotificaciones;
-    if (tabActual === "no_leidas") return todasNotificaciones.filter((n) => !n.leida);
-    return todasNotificaciones.filter((n) => n.tipo === tabActual);
-  }, [todasNotificaciones, tabActual]);
+  const totalLeidas = React.useMemo(
+    () => notificaciones.filter((n) => n.leida).length,
+    [notificaciones],
+  );
 
-  const totalLeidas = todasNotificaciones.filter((n) => n.leida).length;
+  // Navegación por cursores
+  const handleNextPage = () => {
+    if (notificacionesData?.hasMore && notificacionesData?.nextCursor) {
+      setCursorHistory((prev) => [...prev.slice(0, pageIndex + 1), notificacionesData.nextCursor]);
+      setPageIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (pageIndex > 0) {
+      setPageIndex((prev) => prev - 1);
+    }
+  };
 
   // Mutations
   const marcarLeidaMutation = useMarcarNotificacionLeidaMutation();
@@ -91,7 +122,7 @@ export function NotificacionesView() {
   return (
     <div className="space-y-6">
       {/* Header de la vista */}
-      <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-foreground text-2xl font-bold tracking-tight">
@@ -104,74 +135,49 @@ export function NotificacionesView() {
             )}
           </div>
           <p className="text-muted-foreground mt-0.5 text-sm">
-            Historial de avisos personales, confirmaciones del sistema y alertas escolares.
+            Bandeja personal con avisos en tiempo real, alertas de matrículas y confirmaciones del
+            sistema.
           </p>
-        </div>
-
-        {/* Acciones globales */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isLoading || isRefetching}
-            className="h-8 gap-1 text-xs"
-          >
-            <HugeiconsIcon
-              icon={RefreshIcon}
-              className={`h-3.5 w-3.5 ${isRefetching ? "animate-spin" : ""}`}
-            />
-            Actualizar
-          </Button>
-
-          {unreadCount > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => marcarTodasMutation.mutate()}
-              disabled={marcarTodasMutation.isPending}
-              className="h-8 gap-1 text-xs"
-            >
-              <HugeiconsIcon icon={Tick02Icon} className="h-3.5 w-3.5" />
-              Marcar todo como leído
-            </Button>
-          )}
-
-          {totalLeidas > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setConfirmLimpiarOpen(true)}
-              disabled={eliminarLeidasMutation.isPending}
-              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 gap-1 text-xs"
-            >
-              <HugeiconsIcon icon={Delete02Icon} className="h-3.5 w-3.5" />
-              Limpiar leídas
-            </Button>
-          )}
         </div>
       </div>
 
-      {/* Selector de pestañas */}
-      <Tabs value={tabActual} onValueChange={(val) => setTabActual(val as TabFiltro)}>
-        <TabsList className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-5">
-          <TabsTrigger value="todas" className="text-xs">
-            Todas ({todasNotificaciones.length})
-          </TabsTrigger>
-          <TabsTrigger value="no_leidas" className="text-xs">
-            No leídas ({unreadCount})
-          </TabsTrigger>
-          <TabsTrigger value="informacion" className="text-xs">
-            Información
-          </TabsTrigger>
-          <TabsTrigger value="alerta" className="text-xs">
-            Alertas
-          </TabsTrigger>
-          <TabsTrigger value="recordatorio" className="text-xs">
-            Recordatorios
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Toolbar estandarizado con filtros y acciones */}
+      <ListToolbar
+        filterDefs={filterDefs}
+        listFilters={listFilters}
+        searchPlaceholder="Buscar por título o mensaje..."
+        onRefresh={() => void refetch()}
+        isRefreshing={isFetching}
+        actions={
+          <div className="flex items-center gap-2">
+            {unreadCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => marcarTodasMutation.mutate()}
+                disabled={marcarTodasMutation.isPending}
+                className="h-8 gap-1 text-xs"
+              >
+                <HugeiconsIcon icon={Tick02Icon} className="h-3.5 w-3.5" />
+                Marcar todo como leído
+              </Button>
+            )}
+
+            {totalLeidas > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setConfirmLimpiarOpen(true)}
+                disabled={eliminarLeidasMutation.isPending}
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 gap-1 text-xs"
+              >
+                <HugeiconsIcon icon={Delete02Icon} className="h-3.5 w-3.5" />
+                Limpiar leídas
+              </Button>
+            )}
+          </div>
+        }
+      />
 
       {/* Contenido de la lista */}
       {isLoading ? (
@@ -188,21 +194,31 @@ export function NotificacionesView() {
             </div>
           ))}
         </div>
-      ) : notificacionesFiltradas.length === 0 ? (
-        <div className="bg-muted/20 flex flex-col items-center justify-center rounded-2xl border border-dashed p-12 text-center">
-          <div className="bg-muted text-muted-foreground mb-3 flex h-12 w-12 items-center justify-center rounded-2xl">
-            <HugeiconsIcon icon={Notification01Icon} className="h-6 w-6" />
-          </div>
-          <h3 className="text-foreground text-sm font-semibold">No hay notificaciones</h3>
-          <p className="text-muted-foreground mt-1 max-w-sm text-xs">
-            {tabActual === "no_leidas"
-              ? "¡Estás al día! No tienes notificaciones pendientes de leer."
-              : "No se encontraron notificaciones en esta categoría."}
-          </p>
-        </div>
+      ) : notificaciones.length === 0 ? (
+        <EmptyState
+          icon={Notification01Icon}
+          title="No hay notificaciones"
+          description={
+            search || (estado && estado !== "all") || (tipo && tipo !== "all")
+              ? "No se encontraron notificaciones que coincidan con los filtros aplicados."
+              : "¡Estás al día! No tienes notificaciones en tu bandeja personal."
+          }
+          action={
+            (search || (estado && estado !== "all") || (tipo && tipo !== "all")) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => listFilters.clearFilters()}
+                className="text-xs"
+              >
+                Restablecer filtros
+              </Button>
+            )
+          }
+        />
       ) : (
         <div className="space-y-3">
-          {notificacionesFiltradas.map((notificacion) => (
+          {notificaciones.map((notificacion) => (
             <NotificacionCard
               key={notificacion.id}
               notificacion={notificacion}
@@ -212,6 +228,18 @@ export function NotificacionesView() {
               isDeleting={eliminarMutation.isPending}
             />
           ))}
+
+          {/* Barra de paginación por cursor */}
+          <div className="pt-2">
+            <DataTableCursorPagination
+              hasNextPage={Boolean(notificacionesData?.hasMore && notificacionesData?.nextCursor)}
+              hasPreviousPage={pageIndex > 0}
+              onNextPage={handleNextPage}
+              onPreviousPage={handlePreviousPage}
+              isLoading={isLoading || isFetching}
+              loadedCount={notificaciones.length}
+            />
+          </div>
         </div>
       )}
 
@@ -219,10 +247,10 @@ export function NotificacionesView() {
       <AlertDialog open={confirmLimpiarOpen} onOpenChange={setConfirmLimpiarOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar todas las notificaciones leídas?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar notificaciones leídas?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción eliminará de forma permanente todas las notificaciones que ya fueron
-              leídas ({totalLeidas} en total). Las notificaciones sin leer se mantendrán intactas.
+              Esta acción eliminará de forma permanente todas las notificaciones de tu bandeja que
+              ya han sido leídas. Las notificaciones pendientes se mantendrán intactas.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

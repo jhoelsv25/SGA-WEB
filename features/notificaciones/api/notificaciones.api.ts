@@ -7,6 +7,9 @@ export async function getNotificaciones(
   const queryParams: Record<string, string | number | boolean> = {};
   if (params?.cursor) queryParams.cursor = params.cursor;
   if (params?.soloNoLeidas) queryParams.soloNoLeidas = params.soloNoLeidas;
+  if (params?.estado && params.estado !== "all") queryParams.estado = params.estado;
+  if (params?.tipo && params.tipo !== "all") queryParams.tipo = params.tipo;
+  if (params?.search?.trim()) queryParams.search = params.search.trim();
   if (params?.limit !== undefined) queryParams.limit = params.limit;
 
   const response = await apiClient.get<PaginatedNotificacionesResponse>("/notificaciones", {
