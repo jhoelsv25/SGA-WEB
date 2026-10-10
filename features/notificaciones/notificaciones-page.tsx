@@ -9,16 +9,7 @@ import { DataTableCursorPagination } from "@/components/common/data-table";
 import { EmptyState } from "@/components/common/empty-state";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { NotificacionCard } from "./components/notificacion-card";
 import {
@@ -34,6 +25,7 @@ import type { EstadoNotificacionFiltro, TipoNotificacion } from "./types";
 
 export function NotificacionesPage() {
   const [confirmLimpiarOpen, setConfirmLimpiarOpen] = React.useState(false);
+  const [notificacionAEliminar, setNotificacionAEliminar] = React.useState<string | null>(null);
 
   // Filtros reactivos sincronizados con la URL
   const filterDefs = React.useMemo(() => createNotificacionFilterDefs(), []);
@@ -110,13 +102,19 @@ export function NotificacionesPage() {
   };
 
   const handleEliminar = (id: string) => {
-    eliminarMutation.mutate(id);
+    setNotificacionAEliminar(id);
   };
 
-  const handleLimpiarLeidasConfirm = () => {
-    eliminarLeidasMutation.mutate(undefined, {
-      onSuccess: () => setConfirmLimpiarOpen(false),
-    });
+  const handleLimpiarLeidasConfirm = async () => {
+    await eliminarLeidasMutation.mutateAsync();
+    setConfirmLimpiarOpen(false);
+  };
+
+  const handleEliminarIndividualConfirm = async () => {
+    if (notificacionAEliminar) {
+      await eliminarMutation.mutateAsync(notificacionAEliminar);
+      setNotificacionAEliminar(null);
+    }
   };
 
   return (
@@ -235,28 +233,31 @@ export function NotificacionesPage() {
         </div>
       )}
 
-      {/* Modal de confirmación para limpiar leídas */}
-      <AlertDialog open={confirmLimpiarOpen} onOpenChange={setConfirmLimpiarOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar notificaciones leídas?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta acción eliminará de forma permanente todas las notificaciones de tu bandeja que
-              ya han sido leídas. Las notificaciones pendientes se mantendrán intactas.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleLimpiarLeidasConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={eliminarLeidasMutation.isPending}
-            >
-              {eliminarLeidasMutation.isPending ? "Eliminando..." : "Sí, eliminar leídas"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Diálogo de confirmación para limpiar todas las leídas */}
+      <ConfirmDialog
+        open={confirmLimpiarOpen}
+        onOpenChange={setConfirmLimpiarOpen}
+        title="¿Eliminar notificaciones leídas?"
+        description="Esta acción eliminará de forma permanente todas las notificaciones de tu bandeja que ya han sido leídas. Las notificaciones pendientes se mantendrán intactas."
+        confirmText="Sí, eliminar leídas"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={eliminarLeidasMutation.isPending}
+        onConfirm={handleLimpiarLeidasConfirm}
+      />
+
+      {/* Diálogo de confirmación para eliminar notificación individual */}
+      <ConfirmDialog
+        open={Boolean(notificacionAEliminar)}
+        onOpenChange={(val) => !val && setNotificacionAEliminar(null)}
+        title="¿Eliminar notificación?"
+        description="Esta notificación se eliminará de forma permanente de tu bandeja personal."
+        confirmText="Sí, eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={eliminarMutation.isPending}
+        onConfirm={handleEliminarIndividualConfirm}
+      />
     </div>
   );
 }
