@@ -85,7 +85,7 @@ export function NotificacionCard({
               {notificacion.enlaceUrl && (
                 <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" asChild>
                   <Link href={notificacion.enlaceUrl}>
-                    Ver expediente
+                    {notificacion.comunicadoId ? "Ver comunicado" : "Ver detalle"}
                     <HugeiconsIcon icon={ArrowUpRight01Icon} className="h-3 w-3" />
                   </Link>
                 </Button>
