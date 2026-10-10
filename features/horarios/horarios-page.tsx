@@ -55,6 +55,7 @@ export function HorariosPage() {
     data: horarioData,
     isLoading: isLoadingHorario,
     isError: isErrorHorario,
+    error: errorHorario,
     refetch: refetchHorario,
   } = useHorarioSeccionQuery(seccionId);
 
@@ -174,6 +175,7 @@ export function HorariosPage() {
       <PageState
         isLoading={isLoadingGrados || (Boolean(seccionId) && (isLoadingHorario || isLoadingCarga))}
         isError={isErrorGrados || isErrorSecciones || isErrorHorario}
+        error={errorHorario}
         onRetry={() => {
           refetchGrados();
           refetchHorario();

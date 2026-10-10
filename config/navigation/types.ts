@@ -55,6 +55,8 @@ export interface NavItem {
   exact?: boolean;
   external?: boolean;
   disabled?: boolean;
+  /** Opción de uso personal: el Administrador no la ve (los demás roles, según Roles-Menú). */
+  ocultarAlAdministrador?: boolean;
   items?: NavItem[];
 }
 

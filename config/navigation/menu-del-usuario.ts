@@ -51,6 +51,7 @@ export function menuDelUsuario({ esAdministrador, menuRoutes = [] }: OpcionesMen
 
   const esVisible = (item: NavItem) => {
     if (!RUTAS_CON_PAGINA.has(item.link)) return false;
+    if (item.ocultarAlAdministrador && esAdministrador) return false;
     if (item.link === RUTA_INICIO || esAdministrador) return true;
     return asignadas.has(item.link);
   };

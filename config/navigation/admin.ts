@@ -100,6 +100,15 @@ export const adminNavigation: NavSection[] = [
         roles: ["admin"],
         description: "Horas pedagógicas, recreos y asignación de docentes",
       },
+      {
+        id: "admin-mi-horario",
+        label: "Mi horario",
+        link: "/admin/mi-horario",
+        icon: Clock01Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Consulta del horario personal de clases de la semana",
+      },
     ],
   },
   {
@@ -249,14 +258,6 @@ export const adminNavigation: NavSection[] = [
         icon: Calendar03Icon,
         roles: ["admin"],
         description: "Feriados, suspensiones y días sin clases del año en curso",
-      },
-      {
-        id: "admin-mi-horario",
-        label: "Mi horario",
-        link: "/admin/mi-horario",
-        icon: Clock01Icon,
-        roles: ["admin"],
-        description: "Consulta del horario personal de clases de la semana",
       },
       {
         id: "admin-communications",
