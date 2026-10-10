@@ -36,6 +36,7 @@ export interface MatriculaItem {
 }
 
 export interface MatriculaQueryParams {
+  cursor?: string | null;
   anioAcademicoId?: string;
   gradoId?: string;
   seccionId?: string;
@@ -43,7 +44,13 @@ export interface MatriculaQueryParams {
   estado?: EstadoMatricula;
   search?: string;
   limit?: number;
-  offset?: number;
+}
+
+export interface PaginatedMatriculasResponse {
+  data: MatriculaItem[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  limit: number;
 }
 
 export interface CrearMatriculaPayload {

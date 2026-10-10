@@ -21,6 +21,7 @@ import type {
   MatriculaMasivaPayload,
   MatriculaMasivaResponse,
   MatriculaQueryParams,
+  PaginatedMatriculasResponse,
   RetirarMatriculaPayload,
   TrasladarMatriculaPayload,
 } from "../types";
@@ -28,7 +29,7 @@ import type {
 export const MATRICULAS_QUERY_KEY = ["matriculas"] as const;
 
 export function useMatriculasQuery(params: MatriculaQueryParams = {}) {
-  return useQuery<{ items: MatriculaItem[]; total: number }, ApiClientError>({
+  return useQuery<PaginatedMatriculasResponse, ApiClientError>({
     queryKey: [...MATRICULAS_QUERY_KEY, params],
     queryFn: () => getMatriculas(params),
   });

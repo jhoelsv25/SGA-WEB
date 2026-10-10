@@ -7,14 +7,16 @@ import type {
   MatriculaMasivaPayload,
   MatriculaMasivaResponse,
   MatriculaQueryParams,
+  PaginatedMatriculasResponse,
   RetirarMatriculaPayload,
   TrasladarMatriculaPayload,
 } from "../types";
 
 export async function getMatriculas(
   params?: MatriculaQueryParams,
-): Promise<{ items: MatriculaItem[]; total: number }> {
+): Promise<PaginatedMatriculasResponse> {
   const queryParams: Record<string, string | number> = {};
+  if (params?.cursor) queryParams.cursor = params.cursor;
   if (params?.anioAcademicoId) queryParams.anioAcademicoId = params.anioAcademicoId;
   if (params?.gradoId) queryParams.gradoId = params.gradoId;
   if (params?.seccionId) queryParams.seccionId = params.seccionId;
@@ -22,9 +24,8 @@ export async function getMatriculas(
   if (params?.estado) queryParams.estado = params.estado;
   if (params?.search) queryParams.search = params.search;
   if (params?.limit !== undefined) queryParams.limit = params.limit;
-  if (params?.offset !== undefined) queryParams.offset = params.offset;
 
-  const response = await apiClient.get<{ items: MatriculaItem[]; total: number }>("/matriculas", {
+  const response = await apiClient.get<PaginatedMatriculasResponse>("/matriculas", {
     params: queryParams,
   });
   return response.data;

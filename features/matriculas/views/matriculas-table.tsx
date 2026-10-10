@@ -1,20 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { useListFilters } from "@/hooks/use-list-filters";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import { DataTable } from "@/components/common/data-table";
 import {
   CheckmarkCircle02Icon,
   UserRemove01Icon,
@@ -30,7 +21,6 @@ import {
   ModalOperacionMatricula,
   type OperacionMatriculaTipo,
 } from "../components";
-
 import { useDescargarConstancia, useMatriculasQuery } from "../hooks";
 import { useSeccionesQuery } from "@/features/secciones";
 import type { Seccion } from "@/features/secciones/types";
@@ -80,22 +70,62 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
   const tipo = listFilters.getString("tipo");
   const estado = listFilters.getString("estado");
 
-  // Consulta de matrículas conectada a los filtros
+  // Paginación por cursores (idéntico a estudiantes)
+  const limit = 20;
+  const [cursorHistory, setCursorHistory] = React.useState<(string | null)[]>([null]);
+  const [pageIndex, setPageIndex] = React.useState<number>(0);
+  const currentCursor = cursorHistory[pageIndex] ?? null;
+
+  const [prevFilters, setPrevFilters] = React.useState({
+    search,
+    gradoId,
+    seccionId,
+    tipo,
+    estado,
+  });
+
+  if (
+    prevFilters.search !== search ||
+    prevFilters.gradoId !== gradoId ||
+    prevFilters.seccionId !== seccionId ||
+    prevFilters.tipo !== tipo ||
+    prevFilters.estado !== estado
+  ) {
+    setPrevFilters({ search, gradoId, seccionId, tipo, estado });
+    setCursorHistory([null]);
+    setPageIndex(0);
+  }
+
+  // Consulta de matrículas conectada a cursor y filtros
   const {
     data: matriculasData,
     isLoading,
     refetch,
     isFetching,
   } = useMatriculasQuery({
+    cursor: currentCursor,
+    limit,
     search: search && search.length >= 2 ? search : undefined,
     gradoId: gradoId && gradoId !== "all" ? gradoId : undefined,
     seccionId: seccionId && seccionId !== "all" ? seccionId : undefined,
     tipo: tipo && tipo !== "all" ? (tipo as TipoMatricula) : undefined,
     estado: estado && estado !== "all" ? (estado as EstadoMatricula) : undefined,
-    limit: 50,
   });
 
-  const matriculas = React.useMemo(() => matriculasData?.items ?? [], [matriculasData]);
+  const matriculas = React.useMemo(() => matriculasData?.data ?? [], [matriculasData]);
+
+  const handleNextPage = () => {
+    if (matriculasData?.hasMore && matriculasData?.nextCursor) {
+      setCursorHistory((prev) => [...prev.slice(0, pageIndex + 1), matriculasData.nextCursor]);
+      setPageIndex((prev) => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (pageIndex > 0) {
+      setPageIndex((prev) => prev - 1);
+    }
+  };
 
   // Métricas de cabecera
   const metricas = React.useMemo(() => {
@@ -134,12 +164,6 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
     [puedeGestionar, descargarConstanciaMutation],
   );
 
-  const table = useReactTable({
-    data: matriculas,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   return (
     <div className="space-y-6">
       {/* Tarjetas de Métricas de Matrícula */}
@@ -147,7 +171,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         <Card className="border-border/60">
           <CardContent className="flex items-center justify-between p-4">
             <div className="space-y-1">
-              <p className="text-muted-foreground text-xs font-medium">Estudiantes Matriculados</p>
+              <p className="text-muted-foreground text-xs font-medium">Estudiantes en Página</p>
               <p className="text-2xl font-bold">{metricas.totalMatriculados}</p>
             </div>
             <div className="rounded-full bg-emerald-500/10 p-2.5 text-emerald-600">
@@ -183,7 +207,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         <Card className="border-border/60">
           <CardContent className="flex items-center justify-between p-4">
             <div className="space-y-1">
-              <p className="text-muted-foreground text-xs font-medium">Traslados a Otro Colegio</p>
+              <p className="text-muted-foreground text-xs font-medium">Traslados Registrados</p>
               <p className="text-2xl font-bold text-purple-600">{metricas.totalTrasladados}</p>
             </div>
             <div className="rounded-full bg-purple-500/10 p-2.5 text-purple-600">
@@ -193,7 +217,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         </Card>
       </div>
 
-      {/* Barra de Herramientas Estándar con ListToolbar (Colapsa a Popover si son más de 2 filtros) */}
+      {/* Barra de Herramientas Estándar con ListToolbar */}
       <ListToolbar
         filterDefs={filterDefs}
         listFilters={listFilters}
@@ -224,70 +248,21 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         }
       />
 
-      {/* Tabla de Resultados */}
-      <div className="border-border/60 bg-card overflow-hidden rounded-2xl border shadow-2xs">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-muted/30">
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-xs font-semibold">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <TableRow key={i}>
-                  {Array.from({ length: 7 }).map((_, j) => (
-                    <TableCell key={j}>
-                      <Skeleton className="h-5 w-full" />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-2.5">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-32 text-center">
-                  <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-6">
-                    <HugeiconsIcon
-                      icon={UserGroupIcon}
-                      className="text-muted-foreground/60 size-8 stroke-1"
-                    />
-                    <p className="text-foreground text-sm font-medium">
-                      No se encontraron matrículas
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      {search ||
-                      (gradoId && gradoId !== "all") ||
-                      (seccionId && seccionId !== "all") ||
-                      (tipo && tipo !== "all") ||
-                      (estado && estado !== "all")
-                        ? "Intente ajustar los filtros de búsqueda seleccionados."
-                        : "Aún no se han registrado estudiantes en este año académico. Utilice los botones de matrícula para comenzar."}
-                    </p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      {/* Tabla con Paginación por Cursores */}
+      <DataTable
+        columns={columns}
+        data={matriculas}
+        isLoading={isLoading}
+        cursorPagination={{
+          hasNextPage: Boolean(matriculasData?.hasMore && matriculasData?.nextCursor),
+          hasPreviousPage: pageIndex > 0,
+          onNextPage: handleNextPage,
+          onPreviousPage: handlePreviousPage,
+          isLoading: isFetching,
+          loadedCount: matriculas.length,
+        }}
+        emptyMessage="No se encontraron matrículas con los criterios seleccionados."
+      />
 
       {/* Modales de Gestión */}
       <ModalMatriculaIndividual open={modalIndividualOpen} onOpenChange={setModalIndividualOpen} />

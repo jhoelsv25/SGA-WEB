@@ -34,8 +34,8 @@ export function MatriculaMasivaForm({ onSuccess, onCancel }: MatriculaMasivaForm
   });
 
   const estudiantesElegibles = React.useMemo(() => {
-    if (!estudiantesOrigenData?.items) return [];
-    return estudiantesOrigenData.items.filter(
+    if (!estudiantesOrigenData?.data) return [];
+    return estudiantesOrigenData.data.filter(
       (item) => item.estado === "culminado" || item.estado === "matriculado",
     );
   }, [estudiantesOrigenData]);
