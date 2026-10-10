@@ -31,6 +31,7 @@ import {
   useNotificacionesConteoQuery,
   useNotificacionesQuery,
 } from "../hooks";
+import { NOTIFICACIONES_PAGINACION_DEFAULT } from "../constants";
 import type { TipoNotificacion } from "../types";
 
 type TabFiltro = "todas" | "no_leidas" | TipoNotificacion;
@@ -49,7 +50,7 @@ export function NotificacionesView() {
     isRefetching,
     refetch,
   } = useNotificacionesQuery({
-    limit: 50,
+    limit: NOTIFICACIONES_PAGINACION_DEFAULT.limitBandeja,
     soloNoLeidas: tabActual === "no_leidas" ? true : undefined,
   });
 

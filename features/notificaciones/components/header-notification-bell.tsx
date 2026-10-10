@@ -2,13 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import {
-  Notification01Icon,
-  AlertCircleIcon,
-  InformationCircleIcon,
-  Tick02Icon,
-  Clock01Icon,
-} from "@hugeicons/core-free-icons";
+import { Notification01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
@@ -21,19 +15,8 @@ import {
   useNotificacionesQuery,
   useNotificacionesRealtime,
 } from "../hooks";
-import type { NotificacionItem, TipoNotificacion } from "../types";
-
-const ICONO_TIPO: Record<TipoNotificacion, typeof InformationCircleIcon> = {
-  informacion: InformationCircleIcon,
-  alerta: AlertCircleIcon,
-  recordatorio: Clock01Icon,
-};
-
-const COLOR_TIPO: Record<TipoNotificacion, string> = {
-  informacion: "text-blue-500 bg-blue-500/10",
-  alerta: "text-rose-500 bg-rose-500/10",
-  recordatorio: "text-amber-500 bg-amber-500/10",
-};
+import type { NotificacionItem } from "../types";
+import { formatNotificacionFecha, getNotificacionVisualConfig } from "../utils";
 
 export function HeaderNotificationBell() {
   const router = useRouter();
@@ -128,8 +111,8 @@ export function HeaderNotificationBell() {
             </div>
           ) : (
             notificaciones.map((item) => {
-              const Icono = ICONO_TIPO[item.tipo] || InformationCircleIcon;
-              const colorClases = COLOR_TIPO[item.tipo] || COLOR_TIPO.informacion;
+              const config = getNotificacionVisualConfig(item.tipo);
+              const fechaFormateada = formatNotificacionFecha(item.creadoEn);
 
               return (
                 <div
@@ -139,8 +122,8 @@ export function HeaderNotificationBell() {
                     !item.leida ? "bg-primary/5 font-medium" : "opacity-80"
                   }`}
                 >
-                  <div className={`mt-0.5 shrink-0 rounded-full p-1.5 ${colorClases}`}>
-                    <HugeiconsIcon icon={Icono} className="size-3.5" />
+                  <div className={`mt-0.5 shrink-0 rounded-full p-1.5 ${config.colorClasses}`}>
+                    <HugeiconsIcon icon={config.icon} className="size-3.5" />
                   </div>
 
                   <div className="min-w-0 flex-1 space-y-1">
@@ -153,12 +136,7 @@ export function HeaderNotificationBell() {
                     <p className="text-muted-foreground line-clamp-2 text-[11px] leading-relaxed">
                       {item.mensaje}
                     </p>
-                    <p className="text-muted-foreground/70 text-[10px]">
-                      {new Date(item.creadoEn).toLocaleDateString("es-PE", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
+                    <p className="text-muted-foreground/70 text-[10px]">{fechaFormateada}</p>
                   </div>
                 </div>
               );
