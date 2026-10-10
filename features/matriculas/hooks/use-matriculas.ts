@@ -7,10 +7,12 @@ import {
   crearMatricula,
   descargarConstanciaPdf,
   getMatriculas,
+  getMatriculaById,
   matricularMasivo,
   retirarMatricula,
   trasladarMatricula,
 } from "../api";
+
 import type {
   CambiarSeccionPayload,
   CrearMatriculaPayload,
@@ -29,6 +31,14 @@ export function useMatriculasQuery(params: MatriculaQueryParams = {}) {
   return useQuery<{ items: MatriculaItem[]; total: number }, ApiClientError>({
     queryKey: [...MATRICULAS_QUERY_KEY, params],
     queryFn: () => getMatriculas(params),
+  });
+}
+
+export function useMatriculaDetailQuery(id: string) {
+  return useQuery<MatriculaItem, ApiClientError>({
+    queryKey: [...MATRICULAS_QUERY_KEY, id],
+    queryFn: () => getMatriculaById(id),
+    enabled: Boolean(id),
   });
 }
 

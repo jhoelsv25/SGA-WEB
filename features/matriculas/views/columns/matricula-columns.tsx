@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
+
 import { Badge } from "@/components/ui/badge";
 import type { MatriculaItem } from "../../types";
 import { MatriculaActions } from "./matricula-actions";
@@ -48,9 +50,15 @@ export function getMatriculaColumns({
       accessorKey: "codigo",
       header: "Código",
       cell: ({ row }) => (
-        <span className="text-primary font-mono text-xs font-semibold">{row.original.codigo}</span>
+        <Link
+          href={`/admin/enrollment/${row.original.id}`}
+          className="text-primary font-mono text-xs font-semibold hover:underline"
+        >
+          {row.original.codigo}
+        </Link>
       ),
     },
+
     {
       accessorKey: "estudiante",
       header: "Estudiante",

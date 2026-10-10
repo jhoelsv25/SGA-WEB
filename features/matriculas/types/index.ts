@@ -6,7 +6,9 @@ export interface MatriculaEstudianteInfo {
   nombres: string;
   apellidos: string;
   numeroDocumento: string;
+  tipoDocumento?: string;
   codigo: string | null;
+  estado?: string;
 }
 
 export interface MatriculaItem {

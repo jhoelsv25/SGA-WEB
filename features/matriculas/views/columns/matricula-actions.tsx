@@ -1,23 +1,26 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   MoreHorizontalIcon,
   Pdf01Icon,
   ArrowRight01Icon,
   UserRemove01Icon,
   Delete02Icon,
+  EyeIcon,
 } from "@hugeicons/core-free-icons";
+
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import type { MatriculaItem } from "../../types";
 
 interface MatriculaActionsProps {
@@ -49,9 +52,14 @@ export function MatriculaActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+        {/* Ver detalle y constancia PDF */}
+        <DropdownMenuItem asChild>
+          <Link href={`/admin/enrollment/${matricula.id}`} className="cursor-pointer">
+            <HugeiconsIcon icon={EyeIcon} className="text-primary mr-2 size-4" />
+            Ver expediente
+          </Link>
+        </DropdownMenuItem>
 
-        {/* Constancia PDF siempre disponible */}
         <DropdownMenuItem onClick={() => onDescargarConstancia(matricula)}>
           <HugeiconsIcon icon={Pdf01Icon} className="mr-2 size-4 text-rose-500" />
           Constancia PDF
