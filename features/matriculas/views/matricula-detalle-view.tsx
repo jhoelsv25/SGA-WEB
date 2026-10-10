@@ -1,78 +1,40 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft01Icon,
   Pdf01Icon,
   UserRemove01Icon,
   Exchange01Icon,
-  Delete02Icon,
-  AlertCircleIcon,
-  SchoolIcon,
   FileCheckIcon,
 } from "@hugeicons/core-free-icons";
-
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/common/page-header";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { EmptyState } from "@/components/common/empty-state";
-import { useDescargarConstancia, useMatriculaDetailQuery } from "@/features/matriculas/hooks";
+import { useDescargarConstancia, useMatriculaDetailQuery } from "../hooks";
 import {
   ModalOperacionMatricula,
   type OperacionMatriculaTipo,
-} from "@/features/matriculas/components";
-import type { MatriculaItem } from "@/features/matriculas/types";
+  DetalleAsignacionEscolar,
+  DetalleEstudianteCard,
+  DetalleOperacionesPanel,
+} from "../components";
+import { MATRICULA_ESTADO_CONFIG } from "../constants";
 
 interface MatriculaDetalleViewProps {
   matriculaId: string;
 }
-
-const ESTADO_CONFIG: Record<
-  string,
-  { label: string; variant: "default" | "secondary" | "destructive" | "outline"; color: string }
-> = {
-  matriculado: {
-    label: "Matriculado Regular",
-    variant: "default",
-    color: "text-emerald-600 bg-emerald-500/10 border-emerald-500/20",
-  },
-  retirado: {
-    label: "Retirado del Colegio",
-    variant: "destructive",
-    color: "text-destructive bg-destructive/10 border-destructive/20",
-  },
-  trasladado: {
-    label: "Trasladado a Otra I.E.",
-    variant: "secondary",
-    color: "text-purple-600 bg-purple-500/10 border-purple-500/20",
-  },
-  culminado: {
-    label: "Culminado / Promovido",
-    variant: "outline",
-    color: "text-muted-foreground bg-muted border-border",
-  },
-};
-
-const TIPO_CONFIG: Record<string, string> = {
-  nuevo: "Nuevo Ingreso",
-  continuador: "Estudiante Continuador",
-  traslado: "Traslado Externo",
-};
 
 export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps) {
   const router = useRouter();
   const { data: matricula, isLoading, isError } = useMatriculaDetailQuery(matriculaId);
   const descargarConstanciaMutation = useDescargarConstancia();
 
-  const [operacionActiva, setOperacionActiva] = React.useState<{
-    matricula: MatriculaItem | null;
-    tipo: OperacionMatriculaTipo;
-  }>({ matricula: null, tipo: null });
+  const [operacionActiva, setOperacionActiva] = React.useState<OperacionMatriculaTipo>(null);
 
   if (isLoading) {
     return <LoadingScreen message="Cargando ficha oficial de matrícula..." />;
@@ -93,12 +55,11 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
     );
   }
 
-  const est = matricula.estudiante;
-  const esMatriculado = matricula.estado === "matriculado";
-  const estadoInfo = ESTADO_CONFIG[matricula.estado] || {
+  const estadoInfo = MATRICULA_ESTADO_CONFIG[matricula.estado] || {
     label: matricula.estado,
-    variant: "outline",
-    color: "",
+    color: "text-muted-foreground",
+    bg: "bg-muted",
+    border: "border-border",
   };
 
   return (
@@ -111,7 +72,7 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
           icon={FileCheckIcon}
           badge={
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${estadoInfo.color}`}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${estadoInfo.bg} ${estadoInfo.color} ${estadoInfo.border}`}
             >
               {estadoInfo.label}
             </span>
@@ -186,203 +147,21 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
         </div>
       )}
 
-      {/* Grilla Principal de Información */}
+      {/* Grilla Principal de Información Limpia y Desacoplada */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Columna Izquierda: Datos del Estudiante (2 cols en lg) */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Tarjeta de Datos Escolares y Académicos */}
-          <Card className="border-border/60 overflow-hidden rounded-2xl shadow-2xs">
-            <CardHeader className="bg-muted/30 border-border/50 border-b px-5 py-3.5">
-              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                <HugeiconsIcon icon={SchoolIcon} className="text-primary size-4" />
-                Asignación Escolar y Salón
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 gap-4 p-5 text-xs sm:grid-cols-2">
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Grado Escolar</span>
-                <span className="text-foreground text-sm font-semibold">
-                  {matricula.gradoNombre}
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Sección Asignada</span>
-                <div className="flex items-center gap-2">
-                  <span className="bg-primary/10 text-primary rounded px-2 py-0.5 text-xs font-bold">
-                    Sección {matricula.seccionNombre}
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Año Académico</span>
-                <span className="text-foreground font-medium">{matricula.anioNumero}</span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Modalidad / Tipo</span>
-                <span className="text-foreground font-medium">
-                  {TIPO_CONFIG[matricula.tipo] || matricula.tipo}
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Condición Académica</span>
-                {matricula.esRepitente ? (
-                  <Badge variant="outline" className="border-amber-400 text-[11px] text-amber-600">
-                    Repitente del grado
-                  </Badge>
-                ) : (
-                  <span className="text-foreground font-medium">Regular (Promovido)</span>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">
-                  Fecha Oficial de Matrícula
-                </span>
-                <span className="text-foreground font-medium">{matricula.fechaMatricula}</span>
-              </div>
-
-              {matricula.colegioProcedencia && (
-                <div className="border-border/40 space-y-1 border-t pt-2 sm:col-span-2">
-                  <span className="text-muted-foreground block text-[11px]">
-                    Colegio de Procedencia
-                  </span>
-                  <span className="text-foreground font-medium">
-                    {matricula.colegioProcedencia}
-                  </span>
-                </div>
-              )}
-
-              {matricula.observaciones && (
-                <div className="border-border/40 space-y-1 border-t pt-2 sm:col-span-2">
-                  <span className="text-muted-foreground block text-[11px]">
-                    Observaciones del Expediente
-                  </span>
-                  <p className="text-muted-foreground italic">{matricula.observaciones}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Tarjeta de Ficha del Estudiante */}
-          <Card className="border-border/60 overflow-hidden rounded-2xl shadow-2xs">
-            <CardHeader className="bg-muted/30 border-border/50 border-b px-5 py-3.5">
-              <CardTitle className="flex items-center justify-between text-sm font-semibold">
-                <span>Información del Alumno</span>
-                <Link
-                  href={`/admin/estudiantes`}
-                  className="text-primary text-xs font-medium hover:underline"
-                >
-                  Ver en Padrón de Estudiantes →
-                </Link>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 gap-4 p-5 text-xs sm:grid-cols-2">
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Apellidos y Nombres</span>
-                <span className="text-foreground text-sm font-bold">
-                  {est.apellidos}, {est.nombres}
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">
-                  Documento de Identidad
-                </span>
-                <span className="text-foreground font-mono font-medium">
-                  {est.tipoDocumento || "DNI"}: {est.numeroDocumento}
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">
-                  Código SIAGIE / Matrícula
-                </span>
-                <span className="text-primary font-mono font-bold">
-                  {est.codigo || "No asignado"}
-                </span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-muted-foreground block text-[11px]">Estado en Padrón</span>
-                <span className="text-foreground font-medium capitalize">
-                  {est.estado || "Activo"}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+          <DetalleAsignacionEscolar matricula={matricula} />
+          <DetalleEstudianteCard estudiante={matricula.estudiante} />
         </div>
 
-        {/* Columna Derecha: Acciones Administrativas y Control */}
         <div className="space-y-6">
-          <Card className="border-border/60 rounded-2xl shadow-2xs">
-            <CardHeader className="border-border/50 bg-muted/30 border-b px-5 py-3.5">
-              <CardTitle className="text-sm font-semibold">Operaciones de Secretaría</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 p-5">
-              {esMatriculado ? (
-                <>
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    Acciones reglamentarias disponibles para este estudiante matriculado:
-                  </p>
-
-                  <Button
-                    variant="outline"
-                    className="h-10 w-full justify-start gap-2.5 rounded-xl text-xs"
-                    onClick={() => setOperacionActiva({ matricula, tipo: "cambiar-seccion" })}
-                  >
-                    <HugeiconsIcon icon={Exchange01Icon} className="size-4 text-blue-500" />
-                    <span>Cambiar de Sección (Mismo Grado)</span>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="h-10 w-full justify-start gap-2.5 rounded-xl text-xs"
-                    onClick={() => setOperacionActiva({ matricula, tipo: "retirar" })}
-                  >
-                    <HugeiconsIcon icon={UserRemove01Icon} className="size-4 text-amber-500" />
-                    <span>Registrar Retiro Escolar</span>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="h-10 w-full justify-start gap-2.5 rounded-xl text-xs"
-                    onClick={() => setOperacionActiva({ matricula, tipo: "trasladar" })}
-                  >
-                    <HugeiconsIcon icon={SchoolIcon} className="size-4 text-purple-500" />
-                    <span>Registrar Traslado Externo</span>
-                  </Button>
-
-                  <div className="border-border/50 border-t pt-2">
-                    <Button
-                      variant="ghost"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive h-9 w-full justify-start gap-2.5 rounded-xl text-xs"
-                      onClick={() => setOperacionActiva({ matricula, tipo: "anular" })}
-                    >
-                      <HugeiconsIcon icon={Delete02Icon} className="size-4" />
-                      <span>Anular Matrícula (por error)</span>
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="text-muted-foreground space-y-2 py-2 text-xs">
-                  <div className="text-foreground flex items-center gap-2 font-semibold">
-                    <HugeiconsIcon icon={AlertCircleIcon} className="size-4 text-amber-500" />
-                    <span>Expediente Cerrado</span>
-                  </div>
-                  <p>
-                    Esta matrícula se encuentra en estado <strong>{matricula.estado}</strong>. No
-                    admite cambios de sección ni anulaciones adicionales.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <DetalleOperacionesPanel
+            matricula={matricula}
+            onSelectOperacion={(tipo: OperacionMatriculaTipo) => setOperacionActiva(tipo)}
+          />
 
           {/* Resumen de Certificación */}
+
           <Card className="border-border/60 bg-card/60 rounded-2xl shadow-2xs">
             <CardHeader className="border-border/50 border-b px-5 py-3">
               <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
@@ -411,12 +190,12 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
         </div>
       </div>
 
-      {/* Modales de Operación */}
+      {/* Modal Reutilizable para Operaciones */}
       <ModalOperacionMatricula
-        matricula={operacionActiva.matricula}
-        tipo={operacionActiva.tipo}
-        open={Boolean(operacionActiva.tipo)}
-        onOpenChange={(op) => !op && setOperacionActiva({ matricula: null, tipo: null })}
+        matricula={matricula}
+        tipo={operacionActiva}
+        open={Boolean(operacionActiva)}
+        onOpenChange={(op: boolean) => !op && setOperacionActiva(null)}
       />
     </div>
   );
