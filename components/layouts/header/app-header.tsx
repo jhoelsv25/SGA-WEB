@@ -3,6 +3,7 @@
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { HeaderNotificationBell } from "@/features/notificaciones";
 import { useOptionalDashboardRole } from "../dashboard-role-context";
 import type { UserProfileData } from "../sidebar/nav-user";
 import { HeaderAcademicYearSelect } from "./header-academic-year";
@@ -26,6 +27,8 @@ export function AppHeader({ user }: AppHeaderProps) {
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <HeaderLiveClock />
         <HeaderAcademicYearSelect />
+
+        <HeaderNotificationBell />
 
         <ThemeToggle />
 
