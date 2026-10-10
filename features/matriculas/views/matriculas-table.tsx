@@ -12,15 +12,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SelectOption, type SelectOptionItem } from "@/components/common/select";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+
 import {
   Search01Icon,
   CheckmarkCircle02Icon,
@@ -110,6 +106,55 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
     return list.filter((s: Seccion) => s.gradoId === gradoId);
   }, [seccionesData, gradoId]);
 
+  // Opciones formateadas para SelectOption (labels cortos, limpios y descriptivos)
+  const gradoOptions: SelectOptionItem<string>[] = React.useMemo(() => {
+    const list: SelectOptionItem<string>[] = [{ value: "all", label: "Todos los grados" }];
+    (gradosData as Grado[] | undefined)?.forEach((g: Grado) => {
+      list.push({ value: g.id, label: `${g.numero}.° Secundaria` });
+    });
+    return list;
+  }, [gradosData]);
+
+  const seccionOptions: SelectOptionItem<string>[] = React.useMemo(() => {
+    const list: SelectOptionItem<string>[] = [{ value: "all", label: "Todas las secciones" }];
+    seccionesFiltradas.forEach((s: Seccion) => {
+      list.push({
+        value: s.id,
+        label: `${s.gradoNumero}.° ${s.nombre}`,
+        description: `${s.vacantes - s.matriculados} vacantes libres`,
+      });
+    });
+    return list;
+  }, [seccionesFiltradas]);
+
+  const tipoOptions: SelectOptionItem<string>[] = React.useMemo(
+    () => [
+      { value: "all", label: "Todos los tipos" },
+      { value: "nuevo", label: "Nuevo ingreso" },
+      { value: "continuador", label: "Continuador" },
+      { value: "traslado", label: "Traslado" },
+    ],
+    [],
+  );
+
+  const estadoOptions: SelectOptionItem<string>[] = React.useMemo(
+    () => [
+      { value: "all", label: "Todos los estados" },
+      { value: "matriculado", label: "Matriculado" },
+      { value: "retirado", label: "Retirado" },
+      { value: "traslado", label: "Trasladado" },
+      { value: "culminado", label: "Culminado" },
+    ],
+    [],
+  );
+
+  const hayFiltrosActivos =
+    Boolean(search) ||
+    gradoId !== "all" ||
+    seccionId !== "all" ||
+    tipo !== "all" ||
+    estado !== "all";
+
   // Columnas de TanStack Table
   const columns = React.useMemo(
     () =>
@@ -184,89 +229,102 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         </Card>
       </div>
 
-      {/* Barra de Acciones y Filtros */}
-      <div className="border-border/60 bg-card/60 flex flex-col gap-3 rounded-2xl border p-3.5 shadow-2xs backdrop-blur-xs sm:flex-row sm:items-center sm:justify-between sm:p-4">
-        {/* Controles de filtrado */}
-        <div className="flex flex-1 flex-wrap items-center gap-2.5">
+      {/* Barra de Acciones y Filtros Unificada */}
+      <div className="border-border/60 bg-card/60 flex flex-col gap-3 rounded-2xl border p-3.5 shadow-2xs backdrop-blur-xs lg:flex-row lg:items-center lg:justify-between lg:p-4">
+        {/* Controles de filtrado con SelectOption */}
+        <div className="grid min-w-0 flex-1 grid-cols-1 items-center gap-2.5 sm:grid-cols-2 lg:flex lg:flex-wrap">
           {/* Búsqueda por texto */}
-          <div className="relative w-full sm:w-64">
+          <div className="relative w-full min-w-[180px] sm:w-64">
             <HugeiconsIcon
               icon={Search01Icon}
-              className="text-muted-foreground absolute top-2.5 left-2.5 size-4"
+              className="text-muted-foreground absolute top-2.5 left-3 size-4"
             />
             <Input
-              placeholder="Buscar por estudiante, DNI o código..."
+              placeholder="Buscar por DNI o apellidos..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-9 pl-8 text-xs"
+              className="border-border/80 h-10 rounded-full pl-9 text-xs"
             />
           </div>
 
           {/* Filtro Grado */}
-          <Select value={gradoId} onValueChange={setGradoId}>
-            <SelectTrigger className="h-9 w-[150px] text-xs">
-              <SelectValue placeholder="Grado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los grados</SelectItem>
-              {(gradosData as Grado[] | undefined)?.map((g: Grado) => (
-                <SelectItem key={g.id} value={g.id}>
-                  {g.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="w-full min-w-[140px] sm:w-44">
+            <SelectOption
+              options={gradoOptions}
+              value={gradoId}
+              onSelect={(val) => {
+                setGradoId(val);
+                setSeccionId("all");
+              }}
+              placeholder="Grado..."
+              searchPlaceholder="Buscar grado..."
+              className="h-10 truncate text-xs"
+            />
+          </div>
 
           {/* Filtro Sección */}
-          <Select value={seccionId} onValueChange={setSeccionId}>
-            <SelectTrigger className="h-9 w-[150px] text-xs">
-              <SelectValue placeholder="Sección" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas las secciones</SelectItem>
-              {seccionesFiltradas.map((s: Seccion) => (
-                <SelectItem key={s.id} value={s.id}>
-                  {s.gradoNombre} {s.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="w-full min-w-[150px] sm:w-48">
+            <SelectOption
+              options={seccionOptions}
+              value={seccionId}
+              onSelect={(val) => setSeccionId(val)}
+              placeholder="Sección..."
+              searchPlaceholder="Buscar sección..."
+              className="h-10 truncate text-xs"
+            />
+          </div>
 
           {/* Filtro Tipo */}
-          <Select value={tipo} onValueChange={setTipo}>
-            <SelectTrigger className="h-9 w-[130px] text-xs">
-              <SelectValue placeholder="Tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los tipos</SelectItem>
-              <SelectItem value="nuevo">Nuevo</SelectItem>
-              <SelectItem value="continuador">Continuador</SelectItem>
-              <SelectItem value="traslado">Traslado</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="w-full min-w-[130px] sm:w-40">
+            <SelectOption
+              options={tipoOptions}
+              value={tipo}
+              onSelect={(val) => setTipo(val)}
+              placeholder="Tipo..."
+              searchPlaceholder="Buscar tipo..."
+              className="h-10 truncate text-xs"
+            />
+          </div>
 
           {/* Filtro Estado */}
-          <Select value={estado} onValueChange={setEstado}>
-            <SelectTrigger className="h-9 w-[130px] text-xs">
-              <SelectValue placeholder="Estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los estados</SelectItem>
-              <SelectItem value="matriculado">Matriculado</SelectItem>
-              <SelectItem value="retirado">Retirado</SelectItem>
-              <SelectItem value="traslado">Trasladado</SelectItem>
-              <SelectItem value="culminado">Culminado</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="w-full min-w-[130px] sm:w-40">
+            <SelectOption
+              options={estadoOptions}
+              value={estado}
+              onSelect={(val) => setEstado(val)}
+              placeholder="Estado..."
+              searchPlaceholder="Buscar estado..."
+              className="h-10 truncate text-xs"
+            />
+          </div>
+
+          {/* Botón para Limpiar Filtros */}
+          {hayFiltrosActivos && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSearch("");
+                setGradoId("all");
+                setSeccionId("all");
+                setTipo("all");
+                setEstado("all");
+              }}
+              className="text-muted-foreground hover:text-foreground h-10 px-3 text-xs"
+            >
+              Limpiar filtros
+            </Button>
+          )}
         </div>
 
         {/* Botones de Matrícula */}
         {puedeGestionar && (
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="border-border/40 flex shrink-0 items-center gap-2 border-t pt-2 lg:border-t-0 lg:pt-0">
             <Button
               variant="outline"
               size="sm"
-              className="h-9 gap-1.5 text-xs"
+              className="h-10 gap-2 rounded-full px-4 text-xs"
               onClick={() => setModalMasivaOpen(true)}
             >
               <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
@@ -274,7 +332,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
             </Button>
             <Button
               size="sm"
-              className="h-9 gap-1.5 text-xs shadow-xs"
+              className="h-10 gap-2 rounded-full px-4 text-xs shadow-sm"
               onClick={() => setModalIndividualOpen(true)}
             >
               <HugeiconsIcon icon={Add01Icon} className="size-4" />
