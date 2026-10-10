@@ -185,16 +185,17 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
       </div>
 
       {/* Barra de Acciones y Filtros */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-1 flex-wrap items-center gap-2">
+      <div className="border-border/60 bg-card/60 flex flex-col gap-3 rounded-2xl border p-3.5 shadow-2xs backdrop-blur-xs sm:flex-row sm:items-center sm:justify-between sm:p-4">
+        {/* Controles de filtrado */}
+        <div className="flex flex-1 flex-wrap items-center gap-2.5">
           {/* Búsqueda por texto */}
-          <div className="relative w-full max-w-xs">
+          <div className="relative w-full sm:w-64">
             <HugeiconsIcon
               icon={Search01Icon}
               className="text-muted-foreground absolute top-2.5 left-2.5 size-4"
             />
             <Input
-              placeholder="Buscar por alumno o código..."
+              placeholder="Buscar por estudiante, DNI o código..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-9 pl-8 text-xs"
@@ -203,7 +204,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
 
           {/* Filtro Grado */}
           <Select value={gradoId} onValueChange={setGradoId}>
-            <SelectTrigger className="h-9 w-[140px] text-xs">
+            <SelectTrigger className="h-9 w-[150px] text-xs">
               <SelectValue placeholder="Grado" />
             </SelectTrigger>
             <SelectContent>
@@ -218,7 +219,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
 
           {/* Filtro Sección */}
           <Select value={seccionId} onValueChange={setSeccionId}>
-            <SelectTrigger className="h-9 w-[140px] text-xs">
+            <SelectTrigger className="h-9 w-[150px] text-xs">
               <SelectValue placeholder="Sección" />
             </SelectTrigger>
             <SelectContent>
@@ -253,7 +254,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
               <SelectItem value="all">Todos los estados</SelectItem>
               <SelectItem value="matriculado">Matriculado</SelectItem>
               <SelectItem value="retirado">Retirado</SelectItem>
-              <SelectItem value="trasladado">Trasladado</SelectItem>
+              <SelectItem value="traslado">Trasladado</SelectItem>
               <SelectItem value="culminado">Culminado</SelectItem>
             </SelectContent>
           </Select>
@@ -261,7 +262,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
 
         {/* Botones de Matrícula */}
         {puedeGestionar && (
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -269,7 +270,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
               onClick={() => setModalMasivaOpen(true)}
             >
               <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
-              Matrícula Masiva (HU2)
+              Matrícula Masiva
             </Button>
             <Button
               size="sm"
@@ -277,18 +278,18 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
               onClick={() => setModalIndividualOpen(true)}
             >
               <HugeiconsIcon icon={Add01Icon} className="size-4" />
-              Matricular Estudiante (HU1)
+              Matricular Estudiante
             </Button>
           </div>
         )}
       </div>
 
       {/* Tabla de Resultados */}
-      <div className="bg-card rounded-md border">
+      <div className="border-border/60 bg-card overflow-hidden rounded-2xl border shadow-2xs">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="bg-muted/30">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id} className="text-xs font-semibold">
                     {header.isPlaceholder
@@ -322,11 +323,25 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-muted-foreground h-24 text-center text-sm"
-                >
-                  No se encontraron registros de matrícula para los filtros seleccionados.
+                <TableCell colSpan={columns.length} className="h-32 text-center">
+                  <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 py-6">
+                    <HugeiconsIcon
+                      icon={UserGroupIcon}
+                      className="text-muted-foreground/60 size-8 stroke-1"
+                    />
+                    <p className="text-foreground text-sm font-medium">
+                      No se encontraron matrículas
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {search ||
+                      gradoId !== "all" ||
+                      seccionId !== "all" ||
+                      tipo !== "all" ||
+                      estado !== "all"
+                        ? "Intente ajustar los filtros de búsqueda seleccionados."
+                        : "Aún no se han registrado estudiantes en este año académico. Utilice los botones de matrícula para comenzar."}
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

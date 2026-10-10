@@ -1,11 +1,15 @@
 "use client";
 
 import * as React from "react";
+import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
+import { PageHeader } from "@/components/common/page-header";
+import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { MatriculasTable } from "./views";
 import { useSession } from "@/features/auth";
 
 export function MatriculasPage() {
   const { data: session } = useSession();
+  const { anio: anioActivo, cargando: cargandoAnio } = useAnioLectivo();
 
   // Roles autorizados para gestionar según RF-009
   const rol = session?.user?.activeRoleName || session?.user?.roles?.[0] || "";
@@ -15,18 +19,28 @@ export function MatriculasPage() {
     rol.toLowerCase().includes("admin") ||
     rol.toLowerCase().includes("secretaria");
 
-  return (
-    <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-foreground text-2xl font-bold tracking-tight">
-          Gestión de Matrícula, Retiro y Traslado
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          Control oficial de matrículas individuales, masivas por continuadores, cambios de sección
-          y constancias PDF (RF-009).
-        </p>
-      </div>
+  const anioBadge = React.useMemo(() => {
+    if (cargandoAnio) return undefined;
+    if (!anioActivo) return "Sin año académico activo";
+    return `Año ${anioActivo.anio}`;
+  }, [anioActivo, cargandoAnio]);
 
+  return (
+    <div className="space-y-6">
+      {/* Cabecera Principal */}
+      <PageHeader
+        title="Matrícula y Traslados"
+        description="Gestión oficial de matrículas individuales, matrículas masivas de continuadores, retiros, traslados y constancias PDF (RF-009)."
+        icon={CheckmarkCircle02Icon}
+        badge={anioBadge}
+        breadcrumbs={[
+          { label: "Inicio", href: "/admin/dashboard" },
+          { label: "Comunidad y Matrícula" },
+          { label: "Matrícula y Traslados" },
+        ]}
+      />
+
+      {/* Contenido Principal */}
       <MatriculasTable puedeGestionar={puedeGestionar} />
     </div>
   );
