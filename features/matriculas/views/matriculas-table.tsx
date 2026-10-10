@@ -11,14 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { SelectOption, type SelectOptionItem } from "@/components/common/select";
-
+import { ListToolbar } from "@/components/common/list-toolbar";
+import { useListFilters } from "@/hooks/use-list-filters";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-
 import {
-  Search01Icon,
   CheckmarkCircle02Icon,
   UserRemove01Icon,
   ArrowRight01Icon,
@@ -39,19 +36,13 @@ import type { Seccion } from "@/features/secciones/types";
 import { useGradosQuery } from "@/features/grados/hooks";
 import type { Grado } from "@/features/grados/types";
 import type { EstadoMatricula, MatriculaItem, TipoMatricula } from "../types";
+import { createMatriculaFilterDefs } from "./matricula-filters.config";
 
 interface MatriculasTableProps {
   puedeGestionar?: boolean;
 }
 
 export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps) {
-  // Filtros de estado local
-  const [search, setSearch] = React.useState("");
-  const [gradoId, setGradoId] = React.useState<string>("all");
-  const [seccionId, setSeccionId] = React.useState<string>("all");
-  const [tipo, setTipo] = React.useState<string>("all");
-  const [estado, setEstado] = React.useState<string>("all");
-
   // Estado de modales
   const [modalIndividualOpen, setModalIndividualOpen] = React.useState(false);
   const [modalMasivaOpen, setModalMasivaOpen] = React.useState(false);
@@ -60,23 +51,52 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
     tipo: OperacionMatriculaTipo;
   }>({ matricula: null, tipo: null });
 
-  // Consultas
+  // Consultas de catálogos
   const { data: gradosData } = useGradosQuery();
   const { data: seccionesData } = useSeccionesQuery();
   const descargarConstanciaMutation = useDescargarConstancia();
 
-  const { data: matriculasData, isLoading } = useMatriculasQuery({
-    search: search.length >= 2 ? search : undefined,
-    gradoId: gradoId !== "all" ? gradoId : undefined,
-    seccionId: seccionId !== "all" ? seccionId : undefined,
-    tipo: tipo !== "all" ? (tipo as TipoMatricula) : undefined,
-    estado: estado !== "all" ? (estado as EstadoMatricula) : undefined,
+  // Filtros declarativos con ListToolbar (máximo 2 inline, el resto en Popover 'Filtros')
+  const filterDefs = React.useMemo(() => {
+    const grados =
+      (gradosData as Grado[] | undefined)?.map((g) => ({
+        id: g.id,
+        numero: g.numero,
+      })) ?? [];
+    const secciones =
+      (seccionesData as Seccion[] | undefined)?.map((s) => ({
+        id: s.id,
+        gradoNumero: s.gradoNumero,
+        nombre: s.nombre,
+      })) ?? [];
+    return createMatriculaFilterDefs(grados, secciones);
+  }, [gradosData, seccionesData]);
+
+  const listFilters = useListFilters(filterDefs);
+  const search = listFilters.getString("search");
+  const gradoId = listFilters.getString("gradoId");
+  const seccionId = listFilters.getString("seccionId");
+  const tipo = listFilters.getString("tipo");
+  const estado = listFilters.getString("estado");
+
+  // Consulta de matrículas conectada a los filtros
+  const {
+    data: matriculasData,
+    isLoading,
+    refetch,
+    isFetching,
+  } = useMatriculasQuery({
+    search: search && search.length >= 2 ? search : undefined,
+    gradoId: gradoId && gradoId !== "all" ? gradoId : undefined,
+    seccionId: seccionId && seccionId !== "all" ? seccionId : undefined,
+    tipo: tipo && tipo !== "all" ? (tipo as TipoMatricula) : undefined,
+    estado: estado && estado !== "all" ? (estado as EstadoMatricula) : undefined,
     limit: 50,
   });
 
   const matriculas = React.useMemo(() => matriculasData?.items ?? [], [matriculasData]);
 
-  // Métricas rápidas de cabecera
+  // Métricas de cabecera
   const metricas = React.useMemo(() => {
     const totalMatriculados = matriculas.filter((m) => m.estado === "matriculado").length;
     const totalRetirados = matriculas.filter((m) => m.estado === "retirado").length;
@@ -97,63 +117,6 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
       vacantesTotales,
     };
   }, [matriculas, seccionesData]);
-
-  // Secciones filtradas por grado
-  const seccionesFiltradas = React.useMemo(() => {
-    if (!seccionesData) return [];
-    const list = seccionesData as Seccion[];
-    if (gradoId === "all") return list;
-    return list.filter((s: Seccion) => s.gradoId === gradoId);
-  }, [seccionesData, gradoId]);
-
-  // Opciones formateadas para SelectOption (labels cortos, limpios y descriptivos)
-  const gradoOptions: SelectOptionItem<string>[] = React.useMemo(() => {
-    const list: SelectOptionItem<string>[] = [{ value: "all", label: "Todos los grados" }];
-    (gradosData as Grado[] | undefined)?.forEach((g: Grado) => {
-      list.push({ value: g.id, label: `${g.numero}.° Secundaria` });
-    });
-    return list;
-  }, [gradosData]);
-
-  const seccionOptions: SelectOptionItem<string>[] = React.useMemo(() => {
-    const list: SelectOptionItem<string>[] = [{ value: "all", label: "Todas las secciones" }];
-    seccionesFiltradas.forEach((s: Seccion) => {
-      list.push({
-        value: s.id,
-        label: `${s.gradoNumero}.° ${s.nombre}`,
-        description: `${s.vacantes - s.matriculados} vacantes libres`,
-      });
-    });
-    return list;
-  }, [seccionesFiltradas]);
-
-  const tipoOptions: SelectOptionItem<string>[] = React.useMemo(
-    () => [
-      { value: "all", label: "Todos los tipos" },
-      { value: "nuevo", label: "Nuevo ingreso" },
-      { value: "continuador", label: "Continuador" },
-      { value: "traslado", label: "Traslado" },
-    ],
-    [],
-  );
-
-  const estadoOptions: SelectOptionItem<string>[] = React.useMemo(
-    () => [
-      { value: "all", label: "Todos los estados" },
-      { value: "matriculado", label: "Matriculado" },
-      { value: "retirado", label: "Retirado" },
-      { value: "traslado", label: "Trasladado" },
-      { value: "culminado", label: "Culminado" },
-    ],
-    [],
-  );
-
-  const hayFiltrosActivos =
-    Boolean(search) ||
-    gradoId !== "all" ||
-    seccionId !== "all" ||
-    tipo !== "all" ||
-    estado !== "all";
 
   // Columnas de TanStack Table
   const columns = React.useMemo(
@@ -229,118 +192,36 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         </Card>
       </div>
 
-      {/* Barra de Acciones y Filtros Unificada */}
-      <div className="border-border/60 bg-card/60 flex flex-col gap-3 rounded-2xl border p-3.5 shadow-2xs backdrop-blur-xs lg:flex-row lg:items-center lg:justify-between lg:p-4">
-        {/* Controles de filtrado con SelectOption */}
-        <div className="grid min-w-0 flex-1 grid-cols-1 items-center gap-2.5 sm:grid-cols-2 lg:flex lg:flex-wrap">
-          {/* Búsqueda por texto */}
-          <div className="relative w-full min-w-[180px] sm:w-64">
-            <HugeiconsIcon
-              icon={Search01Icon}
-              className="text-muted-foreground absolute top-2.5 left-3 size-4"
-            />
-            <Input
-              placeholder="Buscar por DNI o apellidos..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border-border/80 h-10 rounded-full pl-9 text-xs"
-            />
-          </div>
-
-          {/* Filtro Grado */}
-          <div className="w-full min-w-[140px] sm:w-44">
-            <SelectOption
-              options={gradoOptions}
-              value={gradoId}
-              onSelect={(val) => {
-                setGradoId(val);
-                setSeccionId("all");
-              }}
-              placeholder="Grado..."
-              searchPlaceholder="Buscar grado..."
-              className="h-10 truncate text-xs"
-            />
-          </div>
-
-          {/* Filtro Sección */}
-          <div className="w-full min-w-[150px] sm:w-48">
-            <SelectOption
-              options={seccionOptions}
-              value={seccionId}
-              onSelect={(val) => setSeccionId(val)}
-              placeholder="Sección..."
-              searchPlaceholder="Buscar sección..."
-              className="h-10 truncate text-xs"
-            />
-          </div>
-
-          {/* Filtro Tipo */}
-          <div className="w-full min-w-[130px] sm:w-40">
-            <SelectOption
-              options={tipoOptions}
-              value={tipo}
-              onSelect={(val) => setTipo(val)}
-              placeholder="Tipo..."
-              searchPlaceholder="Buscar tipo..."
-              className="h-10 truncate text-xs"
-            />
-          </div>
-
-          {/* Filtro Estado */}
-          <div className="w-full min-w-[130px] sm:w-40">
-            <SelectOption
-              options={estadoOptions}
-              value={estado}
-              onSelect={(val) => setEstado(val)}
-              placeholder="Estado..."
-              searchPlaceholder="Buscar estado..."
-              className="h-10 truncate text-xs"
-            />
-          </div>
-
-          {/* Botón para Limpiar Filtros */}
-          {hayFiltrosActivos && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSearch("");
-                setGradoId("all");
-                setSeccionId("all");
-                setTipo("all");
-                setEstado("all");
-              }}
-              className="text-muted-foreground hover:text-foreground h-10 px-3 text-xs"
-            >
-              Limpiar filtros
-            </Button>
-          )}
-        </div>
-
-        {/* Botones de Matrícula */}
-        {puedeGestionar && (
-          <div className="border-border/40 flex shrink-0 items-center gap-2 border-t pt-2 lg:border-t-0 lg:pt-0">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-10 gap-2 rounded-full px-4 text-xs"
-              onClick={() => setModalMasivaOpen(true)}
-            >
-              <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
-              Matrícula Masiva
-            </Button>
-            <Button
-              size="sm"
-              className="h-10 gap-2 rounded-full px-4 text-xs shadow-sm"
-              onClick={() => setModalIndividualOpen(true)}
-            >
-              <HugeiconsIcon icon={Add01Icon} className="size-4" />
-              Matricular Estudiante
-            </Button>
-          </div>
-        )}
-      </div>
+      {/* Barra de Herramientas Estándar con ListToolbar (Colapsa a Popover si son más de 2 filtros) */}
+      <ListToolbar
+        filterDefs={filterDefs}
+        listFilters={listFilters}
+        onRefresh={() => void refetch()}
+        isRefreshing={isFetching}
+        actions={
+          puedeGestionar ? (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10 gap-2 rounded-full px-4 text-xs"
+                onClick={() => setModalMasivaOpen(true)}
+              >
+                <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
+                Matrícula Masiva
+              </Button>
+              <Button
+                size="sm"
+                className="h-10 gap-2 rounded-full px-4 text-xs shadow-sm"
+                onClick={() => setModalIndividualOpen(true)}
+              >
+                <HugeiconsIcon icon={Add01Icon} className="size-4" />
+                Matricular Estudiante
+              </Button>
+            </div>
+          ) : undefined
+        }
+      />
 
       {/* Tabla de Resultados */}
       <div className="border-border/60 bg-card overflow-hidden rounded-2xl border shadow-2xs">
@@ -392,10 +273,10 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
                     </p>
                     <p className="text-muted-foreground text-xs">
                       {search ||
-                      gradoId !== "all" ||
-                      seccionId !== "all" ||
-                      tipo !== "all" ||
-                      estado !== "all"
+                      (gradoId && gradoId !== "all") ||
+                      (seccionId && seccionId !== "all") ||
+                      (tipo && tipo !== "all") ||
+                      (estado && estado !== "all")
                         ? "Intente ajustar los filtros de búsqueda seleccionados."
                         : "Aún no se han registrado estudiantes en este año académico. Utilice los botones de matrícula para comenzar."}
                     </p>
