@@ -31,6 +31,11 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/calendario",
   "/admin/mi-horario",
   "/admin/conducta",
+  "/admin/marcaciones-hoy",
+  "/admin/marcacion-manual",
+  "/admin/asistencia",
+  "/admin/asistencia-seccion",
+  "/admin/mi-asistencia",
 ]);
 
 interface OpcionesMenu {
@@ -59,6 +64,7 @@ export function menuDelUsuario({ esAdministrador, menuRoutes = [] }: OpcionesMen
 
   const esVisible = (item: NavItem) => {
     if (!RUTAS_CON_PAGINA.has(item.link)) return false;
+    if (item.ocultarAlAdministrador && esAdministrador) return false;
     if (item.link === RUTA_INICIO || esAdministrador) return true;
     return asignadas.has(item.link);
   };

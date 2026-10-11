@@ -29,7 +29,7 @@ interface SeccionCargaViewProps {
 }
 
 export function SeccionCargaView({ seccionId }: SeccionCargaViewProps) {
-  const puedeGestionar = usePuedeGestionarCarga();
+  const permisoGestionar = usePuedeGestionarCarga();
 
   const {
     data: cargaData,
@@ -52,6 +52,9 @@ export function SeccionCargaView({ seccionId }: SeccionCargaViewProps) {
     estado: "activo",
     limit: 100,
   });
+
+  const seccionCerrada = seccion?.estado === "cerrada";
+  const puedeGestionar = permisoGestionar && !seccionCerrada;
 
   const asignarMutation = useAsignarDocenteMutation(seccionId);
 
@@ -177,9 +180,10 @@ export function SeccionCargaView({ seccionId }: SeccionCargaViewProps) {
         <div className="border-border bg-muted/50 text-muted-foreground flex items-center gap-3 rounded-xl border p-3.5 text-xs sm:text-sm">
           <HugeiconsIcon icon={InformationCircleIcon} className="text-primary size-5 shrink-0" />
           <p>
-            <strong className="text-foreground font-semibold">Modo de solo consulta:</strong> Tu rol
-            de usuario no cuenta con permisos para modificar la asignación de docentes de la
-            sección.
+            <strong className="text-foreground font-semibold">Modo de solo consulta:</strong>{" "}
+            {seccionCerrada
+              ? "La sección está cerrada y no admite cambios en la asignación de docentes."
+              : "Tu rol de usuario no cuenta con permisos para modificar la asignación de docentes de la sección."}
           </p>
         </div>
       )}

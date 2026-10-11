@@ -8,7 +8,6 @@ import { Spinner } from "@/components/common/spinner";
 import { KIOSK_TOKEN_STORAGE_KEY } from "@/features/equipos/consts";
 import { parseUsuariosPermitidos } from "@/features/equipos";
 import { useValidarKioskoQuery } from "@/features/equipos/hooks";
-import { useInstitucionQuery } from "@/features/institucion/hooks";
 import {
   COLA_SIN_CONEXION_HABILITADA,
   KioskoAvisoResultado,
@@ -19,7 +18,6 @@ import {
   KioskoPantallaDesconectado,
   KioskoPantallaNoAutorizado,
   KioskoReloj,
-  KioskoSelectorTipo,
   KioskoTeclado,
   LONGITUD_CODIGO_DEFECTO,
   LONGITUD_CODIGO_MAXIMA,
@@ -27,7 +25,6 @@ import {
   MarcacionNoDisponibleError,
   TIEMPO_AUTO_CIERRE_AVISO_MS,
   TIEMPO_AUTO_LIMPIEZA_ERROR_MS,
-  detectarTurnoSugerido,
   kioskoAudio,
   locutarMarcacionRegistrada,
   locutarNombrePersona,
@@ -99,10 +96,10 @@ function KioskoContent() {
   } = useValidarKioskoQuery(effectiveToken || undefined);
 
   // Reloj digital en tiempo real sincronizado
-  const { fechaActual, horaFormateada, fechaFormateada } = useRelojDigital();
+  const { horaFormateada, fechaFormateada } = useRelojDigital();
 
-  // Datos institucionales oficiales
-  const { data: institucion } = useInstitucionQuery();
+  // El kiosko no tiene sesión: /institucion exige rol, así que usa los datos de config/site.ts
+  const institucion = null;
 
   // Preferencia de audio y síntesis de voz (activado por defecto)
   const [sonidoHabilitado, setSonidoHabilitado] = React.useState<boolean>(true);
@@ -117,10 +114,8 @@ function KioskoContent() {
   // Aviso flotante de resultado o error con temporizador automático
   const [aviso, setAviso] = React.useState<AvisoKiosko | null>(null);
 
-  // Turno detectado automáticamente y selección manual
-  const turnoInfo = React.useMemo(() => detectarTurnoSugerido(fechaActual), [fechaActual]);
-  const [tipoManual, setTipoManual] = React.useState<TipoMarcacion | null>(null);
-  const tipoEfectivo: TipoMarcacion = tipoManual ?? turnoInfo.tipoSugerido;
+  // El servidor decide si es entrada o salida; este valor solo cumple el contrato del servicio
+  const tipoEfectivo: TipoMarcacion = "entrada";
 
   // Referencia al input físico para mantener foco permanente
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -243,7 +238,9 @@ function KioskoContent() {
           const resolucion = await servicioMarcacion.resolverCodigo(codigoAProcesar.trim());
 
           // Momento 1: Locutar nombre en voz alta si el servicio resolvió a la persona
-          locutarNombrePersona(resolucion.persona.nombre, sonidoHabilitado);
+          if (resolucion.persona.nombre) {
+            locutarNombrePersona(resolucion.persona.nombre, sonidoHabilitado);
+          }
 
           if (resolucion.requierePin) {
             setPersonaResuelta(resolucion.persona);
@@ -259,6 +256,7 @@ function KioskoContent() {
             codigo: codigoAProcesar.trim(),
             tipo: tipoEfectivo,
             equipoId: validationResult?.equipo?.id,
+            tokenEquipo: effectiveToken,
           });
 
           // Momento 2: Locutar confirmación según género
@@ -268,7 +266,10 @@ function KioskoContent() {
           mostrarAvisoConTiempo(
             {
               tipo: "exito",
-              titulo: "Marcación Registrada",
+              titulo:
+                resultado.estado === "ya_marco"
+                  ? "Marcación ya registrada"
+                  : "Marcación Registrada",
               mensaje: resultado.mensaje || "Asistencia registrada correctamente.",
               persona: resultado.persona,
               tipoMarcacion: resultado.tipo,
@@ -286,6 +287,7 @@ function KioskoContent() {
             pin: pinAProcesar.trim(),
             tipo: tipoEfectivo,
             equipoId: validationResult?.equipo?.id,
+            tokenEquipo: effectiveToken,
           });
 
           locutarMarcacionRegistrada(resultado.persona.genero, sonidoHabilitado);
@@ -345,12 +347,12 @@ function KioskoContent() {
             ? err.message
             : err instanceof Error && err.message
               ? err.message
-              : "El registro de asistencia todavía no está habilitado en este equipo.";
+              : "Sin conexión. Avise a secretaría para registrar su marcación.";
 
         mostrarAvisoConTiempo(
           {
             tipo: "error",
-            titulo: "Servicio no disponible",
+            titulo: "No se registró la marcación",
             mensaje: mensajeError,
           },
           TIEMPO_AUTO_LIMPIEZA_ERROR_MS,
@@ -367,6 +369,7 @@ function KioskoContent() {
       sonidoHabilitado,
       tipoEfectivo,
       validationResult,
+      effectiveToken,
       estaEnLinea,
       horaFormateada,
       encolarMarcacion,
@@ -510,17 +513,6 @@ function KioskoContent() {
         <div className="space-y-6 lg:col-span-6">
           <KioskoReloj hora={horaFormateada} fecha={fechaFormateada} />
 
-          {/* Selector de Entrada / Salida con sugerencia inteligente */}
-          <KioskoSelectorTipo
-            tipo={tipoEfectivo}
-            onCambiarTipo={(t) => {
-              kioskoAudio.reproducirTecla(sonidoHabilitado);
-              setTipoManual(t);
-              enfocarEntrada();
-            }}
-            turnoInfo={turnoInfo}
-          />
-
           {/* Tarjeta de instrucciones y usuarios autorizados */}
           <div className="border-border/80 bg-card/60 space-y-3 rounded-3xl border p-5 shadow-2xs backdrop-blur-xs">
             <h2 className="text-foreground flex items-center gap-2 text-base font-bold sm:text-lg">
@@ -571,7 +563,9 @@ function KioskoContent() {
             {/* Si ya se resolvió la persona y pide PIN, mostrar su nombre */}
             {paso === "pin" && personaResuelta && (
               <div className="border-primary/20 bg-primary/10 text-primary flex items-center justify-between rounded-2xl border p-3.5 text-sm font-bold">
-                <span>Hola, {personaResuelta.nombre}</span>
+                <span>
+                  {personaResuelta.nombre ? `Hola, ${personaResuelta.nombre}` : "Código recibido"}
+                </span>
                 <span className="text-muted-foreground text-xs font-normal">Ingrese su PIN</span>
               </div>
             )}

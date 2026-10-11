@@ -45,6 +45,10 @@ export const ESTADOS_MARCACION_CONFIG: Record<
     label: "Tardanza",
     tone: "warning",
   },
+  salida_anticipada: {
+    label: "Salida anticipada",
+    tone: "warning",
+  },
   fuera_de_horario: {
     label: "Fuera de horario",
     tone: "danger",
@@ -58,8 +62,8 @@ export const ESTADOS_MARCACION_CONFIG: Record<
 /**
  * Bandera para habilitar o deshabilitar la cola de marcaciones sin conexión en el kiosko.
  *
- * Desactivada por defecto (false) porque el backend del SGA aún no tiene habilitado
- * el endpoint de marcación (RF-010). Con false el kiosko se comporta como en T13.
+ * Desactivada (false): el RF-010 define la operación 100 % en línea; sin conexión el kiosko
+ * avisa y no registra (se usa la marcación manual). Ver P-30 en PENDIENTES.md.
  * Con true, las marcaciones sin conexión o con fallas de red se guardan en IndexedDB
  * y se retransmiten en orden FIFO al recuperarse la conectividad.
  */

@@ -1,72 +1,85 @@
+import { apiClient } from "@/lib/api-client";
 import type { DatosRegistroMarcacion, ResultadoMarcacion, ResultadoResolucion } from "../types";
+import type { EstadoMarcacion } from "../types";
 
 /**
- * Error tipado emitido cuando el servicio de marcación no está disponible,
- * o cuando el endpoint de backend RF-010 aún no ha sido implementado en la API del SGA.
+ * Error tipado emitido cuando el servicio de marcación no puede atender la petición.
  */
 export class MarcacionNoDisponibleError extends Error {
-  readonly codigo = "RF-010_PENDIENTE";
+  readonly codigo = "MARCACION_NO_DISPONIBLE";
 
-  constructor(message = "El registro de asistencia todavía no está habilitado en este equipo.") {
+  constructor(message = "Sin conexión. Avise a secretaría para registrar su marcación.") {
     super(message);
     this.name = "MarcacionNoDisponibleError";
   }
 }
 
+interface MarcacionKioskoApi {
+  registrada: boolean;
+  mensaje: string;
+  nombreCompleto: string;
+  fotoUrl: string | null;
+  tipo?: "entrada" | "salida";
+  resultado?: "puntual" | "tardanza" | "salida_anticipada" | "fuera_de_turno";
+  minutosTardanza?: number;
+  hora?: string;
+}
+
+const ESTADO_POR_RESULTADO: Record<
+  NonNullable<MarcacionKioskoApi["resultado"]>,
+  EstadoMarcacion
+> = {
+  puntual: "a_tiempo",
+  tardanza: "tardanza",
+  salida_anticipada: "salida_anticipada",
+  fuera_de_turno: "fuera_de_horario",
+};
+
 /**
  * Contrato tipado del servicio de marcación para el terminal Kiosko.
- *
- * @remarks
- * Diseñado para conectarse con el Requerimiento Funcional RF-010 (Registro de Asistencia
- * y Marcación de Entrada/Salida). Esta interfaz servirá como base para la integración
- * de la cola sin conexión (offline queue) en la tarea T14.
  */
 export interface ServicioMarcacion {
   /**
-   * Resuelve el código o DNI de una persona ingresado en el kiosko.
-   * Retorna los datos básicos de la persona, rol, sugerencia de tipo de marcación
-   * y si se requiere validación por PIN.
-   *
-   * @param codigo Código de identificación institucional o DNI.
-   * @throws {MarcacionNoDisponibleError} Si el backend no tiene habilitado el endpoint RF-010.
+   * El servidor valida código y PIN en una sola llamada (para no revelar a quién
+   * pertenece un código sin PIN). Siempre pide el PIN.
    */
   resolverCodigo(codigo: string): Promise<ResultadoResolucion>;
 
-  /**
-   * Registra formalmente el evento de marcación (entrada o salida).
-   *
-   * @param datos Objeto con código, PIN opcional, tipo de marcación y metadatos del equipo.
-   * @throws {MarcacionNoDisponibleError} Si el backend no tiene habilitado el endpoint RF-010.
-   */
+  /** Registra la marcación; el servidor decide si es entrada o salida con su propia hora. */
   registrarMarcacion(datos: DatosRegistroMarcacion): Promise<ResultadoMarcacion>;
 }
 
-/**
- * Implementación del servicio de marcación de asistencia.
- *
- * @remarks
- * Conecta conceptualmente con el Requerimiento Funcional RF-010 (Registro de Asistencia).
- * Actualmente el endpoint de backend no existe en la API del SGA (solo se encuentra disponible
- * GET /equipos/validar-kiosko). Por lo tanto, esta implementación lanza un error tipado
- * MarcacionNoDisponibleError, permitiendo que la interfaz informe en lenguaje claro al usuario
- * sin inventar llamadas ficticias a endpoints inexistentes ni usar alert().
- *
- * Esta clase e interfaz quedan listas para que la tarea T14 (cola sin conexión) las extienda
- * o implemente almacenamiento local en IndexedDB cuando no haya conectividad de red.
- */
 export class ServicioMarcacionKiosko implements ServicioMarcacion {
   async resolverCodigo(_codigo: string): Promise<ResultadoResolucion> {
-    // RF-010: pendiente de desarrollo en el backend SGA
-    throw new MarcacionNoDisponibleError();
+    return {
+      persona: { nombre: "", rol: "" },
+      tipoSugerido: "entrada",
+      requierePin: true,
+    };
   }
 
-  async registrarMarcacion(_datos: DatosRegistroMarcacion): Promise<ResultadoMarcacion> {
-    // RF-010: pendiente de desarrollo en el backend SGA
-    throw new MarcacionNoDisponibleError();
+  async registrarMarcacion(datos: DatosRegistroMarcacion): Promise<ResultadoMarcacion> {
+    const respuesta = await apiClient.post<MarcacionKioskoApi>(
+      "/marcaciones/kiosko",
+      { codigo: datos.codigo, pin: datos.pin ?? "" },
+      { headers: datos.tokenEquipo ? { "x-kiosk-token": datos.tokenEquipo } : undefined },
+    );
+    const api = respuesta.data;
+    const estado: EstadoMarcacion = !api.registrada
+      ? "ya_marco"
+      : ESTADO_POR_RESULTADO[api.resultado ?? "puntual"];
+    return {
+      persona: {
+        nombre: api.nombreCompleto,
+        rol: "",
+        fotoUrl: api.fotoUrl ?? undefined,
+      },
+      tipo: api.tipo ?? datos.tipo,
+      estado,
+      hora: api.hora ?? "",
+      mensaje: api.mensaje,
+    };
   }
 }
 
-/**
- * Instancia singleton exportada del servicio de marcación.
- */
 export const servicioMarcacion: ServicioMarcacion = new ServicioMarcacionKiosko();

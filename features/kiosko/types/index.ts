@@ -7,7 +7,8 @@
 
 export type TipoMarcacion = "entrada" | "salida";
 
-export type EstadoMarcacion = "a_tiempo" | "tardanza" | "fuera_de_horario" | "ya_marco";
+export type EstadoMarcacion =
+  "a_tiempo" | "tardanza" | "salida_anticipada" | "fuera_de_horario" | "ya_marco";
 
 export type RolPersona = "estudiante" | "docente" | "administrativo" | "personal";
 
@@ -34,6 +35,8 @@ export interface DatosRegistroMarcacion {
   pin?: string;
   tipo: TipoMarcacion;
   equipoId?: string;
+  /** Token secreto del kiosko autorizado (header x-kiosk-token). */
+  tokenEquipo?: string;
   notas?: string;
   idLocal?: string;
 }
