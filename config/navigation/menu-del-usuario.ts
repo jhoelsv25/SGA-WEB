@@ -36,6 +36,9 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/asistencia",
   "/admin/asistencia-seccion",
   "/admin/mi-asistencia",
+  "/admin/sesiones-hoy",
+  "/admin/mis-sesiones",
+  "/admin/justificaciones-sesion",
 ]);
 
 interface OpcionesMenu {
