@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { siteConfig } from "@/config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormValues } from "../../schemas/login.schema";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -120,6 +122,49 @@ function SeleccionRol({
   );
 }
 
+/**
+ * Pantalla independiente para el paso 2: tapa el layout dividido del login (slider + panel)
+ * con una tarjeta limpia y centrada en toda la ventana, igual al resto de pantallas de
+ * un solo paso del sistema (p. ej. el kiosko).
+ */
+function PantallaSeleccionRol(props: {
+  session: AuthResponse;
+  redirectTo: string;
+  onVolver: () => void;
+}) {
+  return (
+    <div className="bg-background fixed inset-0 z-50 flex flex-col items-center justify-center px-6 py-8">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <div className="bg-card ring-border relative mb-3 flex size-16 items-center justify-center rounded-2xl p-2 shadow-md ring-1">
+            <Image
+              src={siteConfig.branding.logo}
+              alt={`Logo ${siteConfig.institution.name}`}
+              width={52}
+              height={52}
+              priority
+              className="object-contain"
+            />
+          </div>
+          <div className="space-y-1">
+            <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold tracking-widest uppercase">
+              {siteConfig.institution.badge}
+            </span>
+            <h1 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
+              Elige tu rol
+            </h1>
+            <p className="text-muted-foreground text-xs">
+              Confirma con qué rol quieres ingresar al sistema.
+            </p>
+          </div>
+        </div>
+
+        <SeleccionRol {...props} />
+      </div>
+    </div>
+  );
+}
+
 function LoginFormInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -171,7 +216,7 @@ function LoginFormInner() {
 
   if (autenticado) {
     return (
-      <SeleccionRol
+      <PantallaSeleccionRol
         session={autenticado}
         redirectTo={redirectTo}
         onVolver={() => setAutenticado(null)}
