@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Key01Icon, UserCheck01Icon, ShieldCheckIcon } from "@hugeicons/core-free-icons";
+import { UserCheck01Icon, ShieldCheckIcon } from "@hugeicons/core-free-icons";
 import { Spinner } from "@/components/common/spinner";
 import { KIOSK_TOKEN_STORAGE_KEY } from "@/features/equipos/consts";
 import { parseUsuariosPermitidos } from "@/features/equipos";
@@ -37,6 +37,7 @@ import {
   type PersonaMarcacion,
   type TipoMarcacion,
 } from "@/features/kiosko";
+import { KioskoSesiones } from "@/features/sesiones/kiosko";
 
 function esErrorDeRed(error: unknown): boolean {
   if (typeof navigator !== "undefined" && !navigator.onLine) {
@@ -487,7 +488,11 @@ function KioskoContent() {
 
   // PANTALLA 4: Terminal AUTORIZADO y OPERATIVO
   const equipo = validationResult.equipo;
-  const esSesiones = equipo.proposito === "sesiones";
+
+  // RF-011: el Kiosko de Sesiones tiene su propio flujo (sesiones del día, tema y firmas)
+  if (equipo.proposito === "sesiones") {
+    return <KioskoSesiones token={effectiveToken} equipo={equipo} />;
+  }
   const valorActual = paso === "codigo" ? codigoValor : pinValor;
   const puedeEnviar = paso === "codigo" ? codigoValor.length >= 3 : pinValor.length >= 1;
 
@@ -517,13 +522,11 @@ function KioskoContent() {
           <div className="border-border/80 bg-card/60 space-y-3 rounded-3xl border p-5 shadow-2xs backdrop-blur-xs">
             <h2 className="text-foreground flex items-center gap-2 text-base font-bold sm:text-lg">
               <HugeiconsIcon
-                icon={esSesiones ? Key01Icon : UserCheck01Icon}
+                icon={UserCheck01Icon}
                 className="text-primary size-5"
                 aria-hidden="true"
               />
-              <span>
-                {esSesiones ? "Firma de Sesión Docente" : "Control de Asistencia Escolar"}
-              </span>
+              <span>Control de Asistencia Escolar</span>
             </h2>
 
             {(() => {
@@ -531,9 +534,8 @@ function KioskoContent() {
               return (
                 <>
                   <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
-                    {esSesiones
-                      ? "Docentes: Ingrese su documento de identidad y PIN de seguridad para firmar el inicio o cierre de su clase programada."
-                      : "Estudiantes y personal autorizado: Digite su código en el teclado, use el teclado físico o pase su tarjeta de identificación por el lector."}
+                    Estudiantes y personal autorizado: Digite su código en el teclado, use el
+                    teclado físico o pase su tarjeta de identificación por el lector.
                   </p>
 
                   <div className="flex flex-wrap gap-1.5 pt-1">
@@ -578,13 +580,7 @@ function KioskoContent() {
               inputRef={inputRef}
               deshabilitado={procesando}
               esModoPin={paso === "pin"}
-              etiqueta={
-                paso === "pin"
-                  ? "PIN de Seguridad"
-                  : esSesiones
-                    ? "Código de Docente o DNI"
-                    : "Código de Estudiante o DNI"
-              }
+              etiqueta={paso === "pin" ? "PIN de Seguridad" : "Código de Estudiante o DNI"}
               placeholder={paso === "pin" ? "••••" : "Digite o pase su tarjeta..."}
             />
 

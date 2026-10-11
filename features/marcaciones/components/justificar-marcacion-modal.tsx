@@ -44,7 +44,10 @@ function FormularioJustificacion({
         <Textarea
           id="motivo-justificacion"
           value={motivo}
-          onChange={(e) => setMotivo(e.target.value)}
+          onChange={(e) => {
+            setMotivo(e.target.value);
+            if (error) setError(null);
+          }}
           placeholder="Ej. Cita médica con constancia"
           maxLength={500}
           disabled={justificar.isPending}
