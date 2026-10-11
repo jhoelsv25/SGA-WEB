@@ -16,6 +16,8 @@ import {
   CheckmarkCircle02Icon,
   ComputerIcon,
   Settings02Icon,
+  ChartBarLineIcon,
+  FileEditIcon,
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
@@ -164,6 +166,36 @@ export const adminNavigation: NavSection[] = [
         roles: ["admin"],
         ocultarAlAdministrador: true,
         description: "Asistencia al colegio y por curso del estudiante",
+      },
+    ],
+  },
+  {
+    title: "Aula virtual",
+    items: [
+      {
+        id: "admin-aula-virtual",
+        label: "Aula virtual",
+        link: "/admin/aula-virtual",
+        icon: BookOpen01Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Unidades y materiales de reforzamiento del curso",
+      },
+      {
+        id: "admin-materiales-bimestre",
+        label: "Materiales del bimestre",
+        link: "/admin/materiales-bimestre",
+        icon: ChartBarLineIcon,
+        roles: ["admin"],
+        description: "Cumplimiento de los materiales planificados por docente y curso",
+      },
+      {
+        id: "admin-solicitudes-cambio-fecha",
+        label: "Solicitudes de cambio de fecha",
+        link: "/admin/solicitudes-cambio-fecha",
+        icon: FileEditIcon,
+        roles: ["admin"],
+        description: "Pedidos de los docentes para mover la fecha de un material congelado",
       },
     ],
   },
