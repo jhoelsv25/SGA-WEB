@@ -104,8 +104,8 @@ export function AuthSlider() {
               <h2 className="text-primary text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
                 {slide.prefix}
               </h2>
-              <div className="text-foreground text-5xl font-black tracking-tight italic sm:text-6xl lg:text-7xl">
-                <span className="text-primary not-italic">{slide.highlight} </span>
+              <div className="text-foreground text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
+                <span className="text-primary">{slide.highlight} </span>
                 <span className="text-foreground">{slide.title}</span>
               </div>
             </div>
