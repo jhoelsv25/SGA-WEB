@@ -48,7 +48,10 @@ function FormularioFalta({ falta, onCerrar }: { falta: FaltaAJustificar; onCerra
         <Textarea
           id="motivo-falta"
           value={motivo}
-          onChange={(e) => setMotivo(e.target.value)}
+          onChange={(e) => {
+            setMotivo(e.target.value);
+            if (error) setError(null);
+          }}
           placeholder="Ej. Certificado médico"
           maxLength={500}
           disabled={justificar.isPending}

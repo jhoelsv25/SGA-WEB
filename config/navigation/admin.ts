@@ -123,6 +123,36 @@ export const adminNavigation: NavSection[] = [
     ],
   },
   {
+    title: "Seguimiento docente",
+    items: [
+      {
+        id: "admin-sesiones-hoy",
+        label: "Sesiones de hoy",
+        link: "/admin/sesiones-hoy",
+        icon: Clock01Icon,
+        roles: ["admin"],
+        description: "Firmas de las sesiones del día, en vivo y con alertas",
+      },
+      {
+        id: "admin-justificaciones-sesion",
+        label: "Justificaciones de sesiones",
+        link: "/admin/justificaciones-sesion",
+        icon: CheckmarkCircle02Icon,
+        roles: ["admin"],
+        description: "Aprobar o rechazar justificaciones de sesiones no cumplidas",
+      },
+      {
+        id: "admin-mis-sesiones",
+        label: "Mis sesiones",
+        link: "/admin/mis-sesiones",
+        icon: BookOpen01Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Historial de mis sesiones, tema y justificaciones",
+      },
+    ],
+  },
+  {
     title: "Asistencia",
     items: [
       {
