@@ -39,6 +39,9 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/sesiones-hoy",
   "/admin/mis-sesiones",
   "/admin/justificaciones-sesion",
+  "/admin/aula-virtual",
+  "/admin/solicitudes-cambio-fecha",
+  "/admin/materiales-bimestre",
 ]);
 
 interface OpcionesMenu {
