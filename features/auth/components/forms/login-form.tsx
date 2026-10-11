@@ -134,8 +134,8 @@ function PantallaSeleccionRol(props: {
 }) {
   return (
     <div className="bg-background fixed inset-0 z-50 flex flex-col items-center justify-center px-6 py-8">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 flex flex-col items-center text-center">
+      <div className="border-border/80 bg-card w-full max-w-sm rounded-3xl border p-8 shadow-2xl">
+        <div className="mb-6 flex flex-col items-center text-center">
           <div className="bg-card ring-border relative mb-3 flex size-16 items-center justify-center rounded-2xl p-2 shadow-md ring-1">
             <Image
               src={siteConfig.branding.logo}
