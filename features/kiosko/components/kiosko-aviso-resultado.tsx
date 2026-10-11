@@ -82,9 +82,11 @@ export function KioskoAvisoResultado({ aviso, onCerrar }: KioskoAvisoResultadoPr
             {aviso.persona && (
               <div className="flex flex-wrap items-center gap-2 pt-0.5">
                 {/* Insignia de rol */}
-                <span className="border-border bg-muted/60 text-foreground rounded-lg border px-2.5 py-0.5 text-xs font-semibold capitalize">
-                  {aviso.persona.rol}
-                </span>
+                {aviso.persona.rol && (
+                  <span className="border-border bg-muted/60 text-foreground rounded-lg border px-2.5 py-0.5 text-xs font-semibold capitalize">
+                    {aviso.persona.rol}
+                  </span>
+                )}
 
                 {/* Insignia de estado de marcación */}
                 {aviso.estado && (

@@ -23,6 +23,11 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/academic-years",
   "/admin/calendario",
   "/admin/mi-horario",
+  "/admin/marcaciones-hoy",
+  "/admin/marcacion-manual",
+  "/admin/asistencia",
+  "/admin/asistencia-seccion",
+  "/admin/mi-asistencia",
 ]);
 
 interface OpcionesMenu {

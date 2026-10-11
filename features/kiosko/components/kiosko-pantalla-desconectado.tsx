@@ -29,8 +29,8 @@ export function KioskoPantallaDesconectado({ onReintentar }: KioskoPantallaDesco
             Sin conexión con el servidor
           </h1>
           <p className="text-muted-foreground pt-1 text-xs leading-relaxed">
-            El terminal kiosko no puede comunicarse con los servicios del SGA. Verifique la conexión
-            de red de la portería o el cable de datos.
+            Sin conexión. Avise a secretaría para registrar su marcación. Verifique también la red
+            de la portería o el cable de datos.
           </p>
         </div>
 

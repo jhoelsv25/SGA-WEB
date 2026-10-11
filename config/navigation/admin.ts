@@ -112,6 +112,53 @@ export const adminNavigation: NavSection[] = [
     ],
   },
   {
+    title: "Asistencia",
+    items: [
+      {
+        id: "admin-marcaciones-hoy",
+        label: "Marcaciones de hoy",
+        link: "/admin/marcaciones-hoy",
+        icon: Clock01Icon,
+        roles: ["admin"],
+        description: "Quién marcó hoy, tardanzas y quiénes aún no llegan",
+      },
+      {
+        id: "admin-marcacion-manual",
+        label: "Marcación manual",
+        link: "/admin/marcacion-manual",
+        icon: Clock01Icon,
+        roles: ["admin"],
+        description: "Registro de marcaciones a mano con hora real y motivo",
+      },
+      {
+        id: "admin-asistencia",
+        label: "Asistencia",
+        link: "/admin/asistencia",
+        icon: CheckmarkCircle02Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Asistencia de los estudiantes en cada sesión de clase",
+      },
+      {
+        id: "admin-asistencia-seccion",
+        label: "Asistencia de mi sección",
+        link: "/admin/asistencia-seccion",
+        icon: UserGroupIcon,
+        roles: ["admin"],
+        description: "Faltas y tardanzas por estudiante, al colegio y por curso",
+      },
+      {
+        id: "admin-mi-asistencia",
+        label: "Mi asistencia",
+        link: "/admin/mi-asistencia",
+        icon: CheckmarkCircle02Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Asistencia al colegio y por curso del estudiante",
+      },
+    ],
+  },
+  {
     title: "Comunidad y Matrícula",
     items: [
       {
