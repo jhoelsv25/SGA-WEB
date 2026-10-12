@@ -1,5 +1,9 @@
 import { apiClient } from "@/lib/api-client";
-import type { HorarioEstudianteResponse, MiHorarioDocenteResponse } from "../types";
+import type {
+  EstudianteDelApoderadoDto,
+  HorarioEstudianteResponse,
+  MiHorarioDocenteResponse,
+} from "../types";
 
 export const miHorarioApi = {
   /**
@@ -18,6 +22,17 @@ export const miHorarioApi = {
   async getHorarioEstudiante(estudianteId: string): Promise<HorarioEstudianteResponse> {
     const { data } = await apiClient.get<HorarioEstudianteResponse>(
       `/horarios/estudiante/${estudianteId}`,
+    );
+    return data;
+  },
+
+  /**
+   * Obtiene los estudiantes vinculados al apoderado autenticado.
+   * Endpoint: GET /apoderados/mis-estudiantes
+   */
+  async getMisEstudiantes(): Promise<EstudianteDelApoderadoDto[]> {
+    const { data } = await apiClient.get<EstudianteDelApoderadoDto[]>(
+      "/apoderados/mis-estudiantes",
     );
     return data;
   },

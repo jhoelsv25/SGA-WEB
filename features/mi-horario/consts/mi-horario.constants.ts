@@ -18,9 +18,11 @@ export const TEXTOS_MI_HORARIO = {
   ROL_SIN_HORARIO_TITULO: "Este rol no tiene un horario propio",
   ROL_SIN_HORARIO_DESCRIPCION:
     "La consulta directa de horario escolar está destinada a docentes y estudiantes de la institución.",
-  APODERADO_SIN_LISTADO_TITULO: "Consulta de horario de estudiantes",
+  APODERADO_SIN_LISTADO_TITULO: "Sin estudiantes vinculados",
   APODERADO_SIN_LISTADO_DESCRIPCION:
-    "Actualmente el sistema no dispone de un mecanismo para que el apoderado elija a sus estudiantes vinculados.",
+    "Tu cuenta de apoderado no tiene estudiantes vinculados. Comunícate con Secretaría si crees que es un error.",
+  DESCRIPCION_APODERADO: "Horario semanal de clases y recesos del estudiante seleccionado.",
+  SELECTOR_ESTUDIANTE_LABEL: "Estudiante",
   ETIQUETA_RECESO: "Receso",
   ETIQUETA_AULA: "Aula",
   ETIQUETA_SIN_AULA: "Sin aula asignada",
