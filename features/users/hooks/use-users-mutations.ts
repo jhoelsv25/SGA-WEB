@@ -18,7 +18,11 @@ export function useCreateUserMutation(onSuccessCallback?: (data: CreateUserRespo
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
       queryClient.invalidateQueries({ queryKey: usersKeys.all });
-      toast.success(`Cuenta para "${data.user.nombreUsuario}" creada exitosamente.`);
+      toast.success(
+        data.cuentaExistente
+          ? `Cargo y roles actualizados para "${data.usuario.nombreUsuario}".`
+          : `Cuenta para "${data.usuario.nombreUsuario}" creada exitosamente.`,
+      );
       onSuccessCallback?.(data);
     },
     onError: (error: Error) => {

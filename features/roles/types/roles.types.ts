@@ -10,17 +10,29 @@ export interface RoleItem {
 }
 
 export interface RoleDetail extends RoleItem {
-  permisos: string[];
+  /** RF-002 V3 (Roles-Menú): IDs de las opciones de menú asignadas al rol. */
+  menus: string[];
 }
 
-export interface PermissionCatalogItem {
+export interface MenuOptionCatalogItem {
+  id: string;
+  menuPadreId?: string | null;
+  moduloId: string;
+  nombre: string;
+  ruta?: string | null;
+  icono?: string | null;
+  orden: number;
+  esContenedor: boolean;
+  vigente: boolean;
+}
+
+export interface ModuleCatalogItem {
   id: string;
   codigo: string;
   nombre: string;
-  descripcion?: string | null;
-  moduloId: string;
-  moduloNombre: string;
-  moduloCodigo: string;
+  icono?: string | null;
+  orden: number;
+  vigente: boolean;
 }
 
 export interface CreateRoleInput {

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { RolePermissionsPage } from "@/features/roles";
 
 export const metadata: Metadata = {
-  title: "Matriz de Permisos",
-  description: "Asignación granular de privilegios y permisos por rol en el sistema.",
+  title: "Roles-Menú",
+  description: "Asignación de las opciones de menú a las que tiene acceso cada rol (RF-002 V3).",
 };
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {

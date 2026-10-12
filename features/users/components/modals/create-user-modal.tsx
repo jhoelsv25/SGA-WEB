@@ -21,9 +21,23 @@ export function CreateUserModal({ open, onOpenChange, onUserCreated }: CreateUse
 
   const handleSubmit = async (values: CreateUserFormValues) => {
     await createMutation.mutateAsync({
-      personaId: values.personaId,
-      rolId: values.rolId,
-      nombreUsuario: values.nombreUsuario,
+      ...(values.tipoPersona === "existente"
+        ? { personaId: values.personaId }
+        : {
+            persona: {
+              tipoDocumento: values.tipoDocumento!,
+              numeroDocumento: values.numeroDocumento!,
+              nombres: values.nombres!,
+              apellidoPaterno: values.apellidoPaterno!,
+              apellidoMaterno: values.apellidoMaterno || undefined,
+              sexo: values.sexo!,
+              correo: values.correo || undefined,
+              celular: values.celular || undefined,
+            },
+          }),
+      cargoId: values.cargoId,
+      rolIds: values.rolIds,
+      nombreUsuario: values.nombreUsuario || undefined,
     });
   };
 

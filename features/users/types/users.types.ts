@@ -40,15 +40,32 @@ export interface PaginatedUsersResponse {
 
 export type EligiblePersona = UserPersona;
 
+/** RF-002 V3: datos de una persona nueva en el registro único. */
+export interface NuevaPersonaInput {
+  tipoDocumento: string;
+  numeroDocumento: string;
+  nombres: string;
+  apellidoPaterno: string;
+  apellidoMaterno?: string;
+  sexo: "M" | "F";
+  correo?: string;
+  celular?: string;
+}
+
+/** RF-002 V3 (registro único): persona existente o nueva + cargo + roles, en una transacción. */
 export interface CreateUserInput {
-  personaId: string;
-  rolId: string;
-  nombreUsuario: string;
+  personaId?: string;
+  persona?: NuevaPersonaInput;
+  cargoId: string;
+  rolIds?: string[];
+  nombreUsuario?: string;
 }
 
 export interface CreateUserResponse {
-  user: UserItem;
-  tempPassword: string;
+  usuario: UserItem;
+  tempPassword: string | null;
+  /** true si la persona ya tenía cuenta y solo se le agregó el cargo y los roles. */
+  cuentaExistente: boolean;
 }
 
 export interface TempPasswordResetResponse {
