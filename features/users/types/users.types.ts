@@ -73,10 +73,6 @@ export interface TempPasswordResetResponse {
   tempPassword: string;
 }
 
-export interface ChangeUserRoleInput {
-  rolId: string;
-}
-
 export interface UpdateUsernameInput {
   nombreUsuario: string;
 }
@@ -87,4 +83,21 @@ export interface UserQueryParams {
   rolId?: string;
   estado?: UserStatus;
   search?: string;
+}
+
+/** RF-002 V3 (HU1): rol asignado a una cuenta, vigente o retirado (historial). */
+export interface UserRoleAssignment {
+  id: string;
+  rolId: string;
+  rolNombre: string;
+  esPrincipal: boolean;
+  vigente: boolean;
+  asignadoEn: string;
+  asignadoPor?: string | null;
+  retiradoEn?: string | null;
+  retiradoPor?: string | null;
+}
+
+export interface AddUserRoleInput {
+  rolId: string;
 }

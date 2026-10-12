@@ -11,3 +11,15 @@ export interface CargoItem {
   rolesSugeridos: CargoRol[];
   personasCount: number;
 }
+
+export interface CreateCargoInput {
+  nombre: string;
+  descripcion?: string;
+  rolesSugeridosIds?: string[];
+}
+
+export interface UpdateCargoInput {
+  nombre?: string;
+  descripcion?: string;
+  rolesSugeridosIds?: string[];
+}

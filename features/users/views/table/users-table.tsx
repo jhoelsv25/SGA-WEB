@@ -24,7 +24,7 @@ import { useUsersQuery } from "../../hooks/use-users-query";
 import { usersApi } from "../../api/users.api";
 import { useSession } from "../../../auth/hooks/use-auth";
 import { CreateUserModal } from "../../components/modals/create-user-modal";
-import { ChangeRoleModal } from "../../components/modals/change-role-modal";
+import { ManageRolesModal } from "../../components/modals/manage-roles-modal";
 import { UpdateUsernameModal } from "../../components/modals/update-username-modal";
 import { TempPasswordModal } from "../../components/modals/temp-password-modal";
 import type {
@@ -334,7 +334,7 @@ export function UsersTable() {
         onUserCreated={handleUserCreated}
       />
 
-      <ChangeRoleModal open={roleModalOpen} onOpenChange={setRoleModalOpen} user={userForRole} />
+      <ManageRolesModal open={roleModalOpen} onOpenChange={setRoleModalOpen} user={userForRole} />
 
       <UpdateUsernameModal
         open={usernameModalOpen}

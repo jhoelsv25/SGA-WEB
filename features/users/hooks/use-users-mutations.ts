@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/lib/toast";
 import { usersApi } from "../api/users.api";
 import type {
-  ChangeUserRoleInput,
+  AddUserRoleInput,
   CreateUserInput,
   CreateUserResponse,
   TempPasswordResetResponse,
@@ -31,20 +31,52 @@ export function useCreateUserMutation(onSuccessCallback?: (data: CreateUserRespo
   });
 }
 
-export function useChangeRoleMutation(onSuccessCallback?: () => void) {
+export function useAddRoleMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: ChangeUserRoleInput }) =>
-      usersApi.changeRole(id, input),
-    onSuccess: (data) => {
+    mutationFn: ({ id, input }: { id: string; input: AddUserRoleInput }) =>
+      usersApi.addRole(id, input),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.roles(variables.id) });
       queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: usersKeys.detail(data.id) });
-      toast.success(`Rol de "${data.nombreUsuario}" actualizado a ${data.rol.nombre}.`);
-      onSuccessCallback?.();
+      toast.success("Rol asignado a la cuenta.");
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Error al cambiar el rol del usuario.");
+      toast.error(error.message || "Error al asignar el rol a la cuenta.");
+    },
+  });
+}
+
+export function useSetPrincipalRoleMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, rolId }: { id: string; rolId: string }) =>
+      usersApi.setPrincipalRole(id, rolId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.roles(variables.id) });
+      queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
+      toast.success("Rol principal actualizado. Se aplicará en el siguiente ingreso.");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Error al marcar el rol como principal.");
+    },
+  });
+}
+
+export function useRetireRoleMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, rolId }: { id: string; rolId: string }) => usersApi.retireRole(id, rolId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.roles(variables.id) });
+      queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
+      toast.success("Rol retirado de la cuenta.");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Error al retirar el rol de la cuenta.");
     },
   });
 }

@@ -87,3 +87,14 @@ export interface HistorialCorreccionCritica {
   camposModificados: CampoModificado[];
   direccionIp?: string | null;
 }
+
+/** RF-002 V3: cambiar el cargo vigente de una persona (el anterior termina y queda en el historial). */
+export interface ChangeCargoInput {
+  cargoId: string;
+  fechaInicio?: string;
+}
+
+export interface CargoAsignadoResponse {
+  cargoVigente: string;
+  rolesSugeridosIds: string[];
+}

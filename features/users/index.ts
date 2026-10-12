@@ -5,3 +5,4 @@ export * from "./hooks/use-users-mutations";
 export * from "./schemas/users.schema";
 export * from "./types/users.types";
 export * from "./users-page";
+export * from "./components/modals/manage-roles-modal";

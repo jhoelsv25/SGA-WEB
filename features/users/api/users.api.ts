@@ -1,6 +1,6 @@
 import { apiClient, handleApiError } from "@/lib/api-client";
 import type {
-  ChangeUserRoleInput,
+  AddUserRoleInput,
   CreateUserInput,
   CreateUserResponse,
   EligiblePersona,
@@ -9,6 +9,7 @@ import type {
   UpdateUsernameInput,
   UserItem,
   UserQueryParams,
+  UserRoleAssignment,
 } from "../types/users.types";
 
 export const usersApi = {
@@ -48,15 +49,6 @@ export const usersApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al crear la cuenta de usuario.");
-    }
-  },
-
-  async changeRole(id: string, input: ChangeUserRoleInput): Promise<UserItem> {
-    try {
-      const { data } = await apiClient.put<UserItem>(`/users/${id}/role`, input);
-      return data;
-    } catch (error) {
-      handleApiError(error, "Error al cambiar el rol del usuario.");
     }
   },
 
@@ -104,6 +96,46 @@ export const usersApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al restablecer la contraseña.");
+    }
+  },
+
+  async listRoles(id: string, historial = false): Promise<UserRoleAssignment[]> {
+    try {
+      const { data } = await apiClient.get<UserRoleAssignment[]>(`/users/${id}/roles`, {
+        params: { historial },
+      });
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al cargar los roles de la cuenta.");
+    }
+  },
+
+  async addRole(id: string, input: AddUserRoleInput): Promise<UserRoleAssignment[]> {
+    try {
+      const { data } = await apiClient.post<UserRoleAssignment[]>(`/users/${id}/roles`, input);
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al asignar el rol a la cuenta.");
+    }
+  },
+
+  async setPrincipalRole(id: string, rolId: string): Promise<UserRoleAssignment[]> {
+    try {
+      const { data } = await apiClient.patch<UserRoleAssignment[]>(
+        `/users/${id}/roles/${rolId}/principal`,
+      );
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al marcar el rol como principal.");
+    }
+  },
+
+  async retireRole(id: string, rolId: string): Promise<UserRoleAssignment[]> {
+    try {
+      const { data } = await apiClient.delete<UserRoleAssignment[]>(`/users/${id}/roles/${rolId}`);
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al retirar el rol de la cuenta.");
     }
   },
 };

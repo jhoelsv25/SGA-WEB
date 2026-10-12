@@ -12,6 +12,7 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   RUTA_INICIO,
   "/admin/users",
   "/admin/roles",
+  "/admin/cargos",
   "/admin/audit",
   "/admin/curriculum",
   "/admin/secciones",
