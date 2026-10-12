@@ -41,7 +41,7 @@ function FormularioPublicar({
 
   const enviar = (event: React.FormEvent) => {
     event.preventDefault();
-    if (esEnlace && !enlace.trim()) {
+    if (esEnlace && !/^https?:\/\/\S+$/i.test(enlace.trim())) {
       setError("Ingrese un enlace válido que empiece con http:// o https://.");
       return;
     }
@@ -80,6 +80,8 @@ function FormularioPublicar({
             accept={tipoInfo?.accept}
             acceptedFormats={[tipoInfo?.formatos ?? ""]}
             maxSizeBytes={tamanoMaximoMb * 1024 * 1024}
+            sizeErrorMessage={`El archivo supera el máximo de ${tamanoMaximoMb} MB.`}
+            formatErrorMessage="Formato no permitido para el tipo de material elegido."
             disabled={mutacion.isPending}
           />
         </div>
