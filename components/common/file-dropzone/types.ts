@@ -9,4 +9,6 @@ export interface FileDropzoneProps {
   disabled?: boolean;
   className?: string;
   error?: string;
+  sizeErrorMessage?: string;
+  formatErrorMessage?: string;
 }

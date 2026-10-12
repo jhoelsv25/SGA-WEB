@@ -36,6 +36,8 @@ export function FileDropzone({
   disabled = false,
   className,
   error: externalError,
+  sizeErrorMessage,
+  formatErrorMessage,
 }: FileDropzoneProps) {
   const [isDragging, setIsDragging] = React.useState(false);
   const [internalError, setInternalError] = React.useState<string | null>(null);
@@ -50,7 +52,8 @@ export function FileDropzone({
       // Validar tamaño
       if (candidate.size > maxSizeBytes) {
         setInternalError(
-          `El archivo supera el tamaño máximo permitido (${formatBytes(maxSizeBytes)}).`,
+          sizeErrorMessage ??
+            `El archivo supera el tamaño máximo permitido (${formatBytes(maxSizeBytes)}).`,
         );
         return false;
       }
@@ -65,14 +68,15 @@ export function FileDropzone({
         !allowedExtensions.includes("*")
       ) {
         setInternalError(
-          `Formato de archivo no válido (${ext}). Se aceptan: ${acceptedFormats.join(", ")}.`,
+          formatErrorMessage ??
+            `Formato de archivo no válido (${ext}). Se aceptan: ${acceptedFormats.join(", ")}.`,
         );
         return false;
       }
 
       return true;
     },
-    [accept, acceptedFormats, maxSizeBytes],
+    [accept, acceptedFormats, maxSizeBytes, sizeErrorMessage, formatErrorMessage],
   );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
