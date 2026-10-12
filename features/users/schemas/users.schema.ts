@@ -55,10 +55,6 @@ export const createUserSchema = z
     }
   });
 
-export const changeRoleSchema = z.object({
-  rolId: z.string().uuid("Debes seleccionar un rol válido"),
-});
-
 export const updateUsernameSchema = z.object({
   nombreUsuario: z
     .string()
@@ -69,5 +65,4 @@ export const updateUsernameSchema = z.object({
 });
 
 export type CreateUserFormValues = z.infer<typeof createUserSchema>;
-export type ChangeRoleFormValues = z.infer<typeof changeRoleSchema>;
 export type UpdateUsernameFormValues = z.infer<typeof updateUsernameSchema>;

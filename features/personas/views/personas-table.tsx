@@ -6,6 +6,7 @@ import { getPersonaColumns } from "./columns/persona-columns";
 import { EditPersonaModal } from "../components/modals/edit-persona-modal";
 import { DeletePersonaModal } from "../components/modals/delete-persona-modal";
 import { HistorialCriticoModal } from "../components/modals/historial-critico-modal";
+import { ChangeCargoModal } from "../components/modals/change-cargo-modal";
 import type { Persona } from "../types/personas.types";
 
 interface PersonasTableProps {
@@ -26,6 +27,7 @@ export function PersonasTable({ personas, isLoading, cursorPagination }: Persona
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [historialModalOpen, setHistorialModalOpen] = React.useState(false);
+  const [changeCargoModalOpen, setChangeCargoModalOpen] = React.useState(false);
 
   const handleEdit = React.useCallback((persona: Persona) => {
     setSelectedPersona(persona);
@@ -42,14 +44,20 @@ export function PersonasTable({ personas, isLoading, cursorPagination }: Persona
     setHistorialModalOpen(true);
   }, []);
 
+  const handleChangeCargo = React.useCallback((persona: Persona) => {
+    setSelectedPersona(persona);
+    setChangeCargoModalOpen(true);
+  }, []);
+
   const columns = React.useMemo(
     () =>
       getPersonaColumns({
         onEdit: handleEdit,
         onDelete: handleDelete,
         onVerHistorial: handleVerHistorial,
+        onChangeCargo: handleChangeCargo,
       }),
-    [handleEdit, handleDelete, handleVerHistorial],
+    [handleEdit, handleDelete, handleVerHistorial, handleChangeCargo],
   );
 
   return (
@@ -81,6 +89,13 @@ export function PersonasTable({ personas, isLoading, cursorPagination }: Persona
         persona={selectedPersona}
         open={historialModalOpen}
         onOpenChange={setHistorialModalOpen}
+      />
+
+      {/* Modal para Cambiar el Cargo de una Persona (RF-002 V3) */}
+      <ChangeCargoModal
+        persona={selectedPersona}
+        open={changeCargoModalOpen}
+        onOpenChange={setChangeCargoModalOpen}
       />
     </>
   );

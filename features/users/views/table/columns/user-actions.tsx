@@ -46,10 +46,10 @@ export function UserActions({
 
   const actionItems = [];
 
-  // Cambiar rol (no puede cambiarse su propio rol)
+  // Gestionar roles (no puede cambiar sus propios roles)
   if (!isSelf && !isInactive) {
     actionItems.push({
-      label: "Cambiar rol",
+      label: "Gestionar roles",
       icon: ShieldCheckIcon,
       onClick: () => onChangeRole(user),
     });

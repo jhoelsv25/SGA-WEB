@@ -3,6 +3,8 @@ import { toast } from "sonner";
 import { ApiClientError } from "@/lib/api-client";
 import { personasApi } from "../api/personas.api";
 import type {
+  CargoAsignadoResponse,
+  ChangeCargoInput,
   CreatePersonaInput,
   HistorialCorreccionCritica,
   PaginatedPersonasResponse,
@@ -82,6 +84,30 @@ export function useDeletePersonaMutation() {
     },
     onError: (error: ApiClientError) => {
       toast.error(error.message || "No se pudo eliminar la persona.");
+    },
+  });
+}
+
+export function useChangeCargoMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    CargoAsignadoResponse,
+    ApiClientError,
+    { id: string; input: ChangeCargoInput }
+  >({
+    mutationFn: ({ id, input }) => personasApi.changeCargo(id, input),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: PERSONAS_QUERY_KEY });
+      toast.success(`Cargo actualizado a "${data.cargoVigente}".`, {
+        description:
+          data.rolesSugeridosIds.length > 0
+            ? "Se sugirieron nuevos roles para la cuenta; revísalos en Gestión de Usuarios."
+            : undefined,
+      });
+    },
+    onError: (error: ApiClientError) => {
+      toast.error(error.message || "No se pudo cambiar el cargo de la persona.");
     },
   });
 }

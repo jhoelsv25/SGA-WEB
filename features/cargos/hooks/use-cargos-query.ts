@@ -3,7 +3,10 @@ import { cargosApi } from "../api/cargos.api";
 
 export const cargosKeys = {
   all: ["cargos"] as const,
-  list: (vigentes?: boolean) => [...cargosKeys.all, "list", { vigentes }] as const,
+  lists: () => [...cargosKeys.all, "list"] as const,
+  list: (vigentes?: boolean) => [...cargosKeys.lists(), { vigentes }] as const,
+  details: () => [...cargosKeys.all, "detail"] as const,
+  detail: (id: string) => [...cargosKeys.details(), id] as const,
 };
 
 export function useCargosQuery(vigentes = true) {

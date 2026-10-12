@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { TableRowActions } from "@/components/common/row-actions";
-import { ShieldCheckIcon } from "@hugeicons/core-free-icons";
+import { ShieldCheckIcon, IdVerifiedIcon } from "@hugeicons/core-free-icons";
 import type { Persona } from "../../types/personas.types";
 
 interface PersonaActionsProps {
@@ -10,6 +10,7 @@ interface PersonaActionsProps {
   onEdit: (persona: Persona) => void;
   onDelete: (persona: Persona) => void;
   onVerHistorial?: (persona: Persona) => void;
+  onChangeCargo?: (persona: Persona) => void;
   isDeleting?: boolean;
 }
 
@@ -18,9 +19,33 @@ export function PersonaActions({
   onEdit,
   onDelete,
   onVerHistorial,
+  onChangeCargo,
   isDeleting = false,
 }: PersonaActionsProps) {
   const docTipo = persona.tipoDocumento.toUpperCase();
+
+  const items = [
+    ...(onChangeCargo
+      ? [
+          {
+            key: "cambiar-cargo",
+            label: "Cambiar cargo (RF-002)",
+            icon: IdVerifiedIcon,
+            onClick: () => onChangeCargo(persona),
+          },
+        ]
+      : []),
+    ...(onVerHistorial
+      ? [
+          {
+            key: "historial-critico",
+            label: "Bitácora de correcciones (RF-007)",
+            icon: ShieldCheckIcon,
+            onClick: () => onVerHistorial(persona),
+          },
+        ]
+      : []),
+  ];
 
   return (
     <TableRowActions
@@ -35,18 +60,7 @@ export function PersonaActions({
       }}
       onEdit={() => onEdit(persona)}
       editLabel="Editar datos de persona"
-      items={
-        onVerHistorial
-          ? [
-              {
-                key: "historial-critico",
-                label: "Bitácora de correcciones (RF-007)",
-                icon: ShieldCheckIcon,
-                onClick: () => onVerHistorial(persona),
-              },
-            ]
-          : undefined
-      }
+      items={items.length > 0 ? items : undefined}
       deleteAction={
         persona.esProvisional
           ? {

@@ -63,6 +63,15 @@ export const adminNavigation: NavSection[] = [
         description: "Roles del sistema y matriz de permisos",
       },
       {
+        id: "admin-cargos",
+        label: "Cargos",
+        link: "/admin/cargos",
+        icon: FileEditIcon,
+        permissions: ["admin:roles:manage"],
+        roles: ["admin"],
+        description: "Catálogo de cargos del personal y sus roles sugeridos",
+      },
+      {
         id: "admin-audit",
         label: "Bitácora de Auditoría",
         link: "/admin/audit",

@@ -10,6 +10,7 @@ export const usersKeys = {
   detail: (id: string) => [...usersKeys.details(), id] as const,
   eligiblePersonas: (search?: string) =>
     [...usersKeys.all, "eligible-personas", { search }] as const,
+  roles: (id: string) => [...usersKeys.detail(id), "roles"] as const,
 };
 
 export function useUsersQuery(params: UserQueryParams = {}) {
@@ -34,5 +35,14 @@ export function useEligiblePersonasQuery(search?: string) {
     queryKey: usersKeys.eligiblePersonas(search),
     queryFn: () => usersApi.getEligiblePersonas(search),
     staleTime: 1000 * 30, // 30 segundos
+  });
+}
+
+export function useUserRolesQuery(id?: string) {
+  return useQuery({
+    queryKey: usersKeys.roles(id ?? ""),
+    queryFn: () => usersApi.listRoles(id!),
+    enabled: Boolean(id),
+    staleTime: 1000 * 30,
   });
 }

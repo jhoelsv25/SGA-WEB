@@ -1,5 +1,7 @@
 import { apiClient, handleApiError } from "@/lib/api-client";
 import type {
+  CargoAsignadoResponse,
+  ChangeCargoInput,
   CreatePersonaInput,
   HistorialCorreccionCritica,
   PaginatedPersonasResponse,
@@ -76,6 +78,15 @@ export const personasApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al consultar el historial de correcciones.");
+    }
+  },
+
+  async changeCargo(id: string, input: ChangeCargoInput): Promise<CargoAsignadoResponse> {
+    try {
+      const { data } = await apiClient.patch<CargoAsignadoResponse>(`/personas/${id}/cargo`, input);
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al cambiar el cargo de la persona.");
     }
   },
 };

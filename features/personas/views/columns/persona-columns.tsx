@@ -11,6 +11,7 @@ interface GetPersonaColumnsOptions {
   onEdit: (persona: Persona) => void;
   onDelete: (persona: Persona) => void;
   onVerHistorial?: (persona: Persona) => void;
+  onChangeCargo?: (persona: Persona) => void;
   isDeleting?: boolean;
 }
 
@@ -18,6 +19,7 @@ export function getPersonaColumns({
   onEdit,
   onDelete,
   onVerHistorial,
+  onChangeCargo,
   isDeleting,
 }: GetPersonaColumnsOptions): ColumnDef<Persona>[] {
   return [
@@ -151,6 +153,7 @@ export function getPersonaColumns({
           onEdit={onEdit}
           onDelete={onDelete}
           onVerHistorial={onVerHistorial}
+          onChangeCargo={onChangeCargo}
           isDeleting={isDeleting}
         />
       ),
