@@ -7,7 +7,7 @@ export const rolesKeys = {
   list: (soloActivos?: boolean) => [...rolesKeys.lists(), { soloActivos }] as const,
   details: () => [...rolesKeys.all, "detail"] as const,
   detail: (id: string) => [...rolesKeys.details(), id] as const,
-  permissions: () => [...rolesKeys.all, "permissions"] as const,
+  menuItems: () => [...rolesKeys.all, "menu-items"] as const,
 };
 
 export function useRolesQuery(soloActivos?: boolean) {
@@ -27,10 +27,10 @@ export function useRoleDetailQuery(id?: string) {
   });
 }
 
-export function usePermissionsCatalogQuery() {
+export function useMenuItemsCatalogQuery() {
   return useQuery({
-    queryKey: rolesKeys.permissions(),
-    queryFn: () => rolesApi.getPermissionsCatalog(),
+    queryKey: rolesKeys.menuItems(),
+    queryFn: () => rolesApi.getMenuItemsCatalog(),
     staleTime: 1000 * 60 * 60 * 24, // 24 horas (catálogo cuasi-estático)
     gcTime: 1000 * 60 * 60 * 24, // 24 horas en caché de memoria
     refetchOnWindowFocus: false,

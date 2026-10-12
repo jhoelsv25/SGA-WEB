@@ -168,10 +168,16 @@ export function UsersTable() {
   } | null>(null);
 
   const handleUserCreated = (res: CreateUserResponse) => {
+    if (!res.tempPassword) {
+      // La persona ya tenía cuenta: solo se le agregó el cargo y los roles, sin contraseña nueva.
+      return;
+    }
     setTempPasswordData({
-      username: res.user.nombreUsuario,
+      username: res.usuario.nombreUsuario,
       password: res.tempPassword,
-      title: "Cuenta creada - contraseña temporal",
+      title: res.cuentaExistente
+        ? "Cargo y roles agregados"
+        : "Cuenta creada - contraseña temporal",
     });
     setTempPasswordModalOpen(true);
   };

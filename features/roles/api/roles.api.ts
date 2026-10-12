@@ -1,7 +1,8 @@
 import { apiClient, handleApiError } from "@/lib/api-client";
 import type {
   CreateRoleInput,
-  PermissionCatalogItem,
+  MenuOptionCatalogItem,
+  ModuleCatalogItem,
   RoleDetail,
   RoleItem,
   UpdateRoleInput,
@@ -27,12 +28,23 @@ export const rolesApi = {
     }
   },
 
-  async getPermissionsCatalog(): Promise<PermissionCatalogItem[]> {
+  async getMenuItemsCatalog(): Promise<MenuOptionCatalogItem[]> {
     try {
-      const { data } = await apiClient.get<PermissionCatalogItem[]>("/roles/permissions");
+      const { data } = await apiClient.get<MenuOptionCatalogItem[]>("/menus/items");
       return data;
     } catch (error) {
-      handleApiError(error, "Error al cargar el catálogo de permisos.");
+      handleApiError(error, "Error al cargar el catálogo de menús.");
+    }
+  },
+
+  async getModulesCatalog(): Promise<ModuleCatalogItem[]> {
+    try {
+      const { data } = await apiClient.get<ModuleCatalogItem[]>("/menus/modules", {
+        params: { soloVigentes: true },
+      });
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al cargar el catálogo de módulos.");
     }
   },
 
@@ -63,18 +75,15 @@ export const rolesApi = {
     }
   },
 
-  async assignPermissions(
-    id: string,
-    permissionIds: string[],
-  ): Promise<{ message: string; count: number }> {
+  async assignMenus(id: string, menuIds: string[]): Promise<{ message: string; count: number }> {
     try {
       const { data } = await apiClient.put<{ message: string; count: number }>(
-        `/roles/${id}/permissions`,
-        { permissionIds },
+        `/roles/${id}/menus`,
+        { menuIds },
       );
       return data;
     } catch (error) {
-      handleApiError(error, "Error al asignar permisos al rol.");
+      handleApiError(error, "Error al asignar los menús del rol.");
     }
   },
 };

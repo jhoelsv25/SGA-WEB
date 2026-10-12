@@ -22,9 +22,9 @@ import {
   CheckmarkBadge01Icon,
   Layers01Icon,
 } from "@hugeicons/core-free-icons";
-import { usePermissionsCatalogQuery, useRoleDetailQuery } from "../hooks/use-roles-query";
-import { useAssignPermissionsMutation } from "../hooks/use-roles-mutations";
-import type { PermissionCatalogItem, RoleDetail } from "../types/roles.types";
+import { useMenuItemsCatalogQuery, useRoleDetailQuery } from "../hooks/use-roles-query";
+import { useAssignMenusMutation } from "../hooks/use-roles-mutations";
+import type { MenuOptionCatalogItem, RoleDetail } from "../types/roles.types";
 import { cn } from "@/lib/utils";
 
 export interface RolePermissionsPageProps {
@@ -37,7 +37,7 @@ export function RolePermissionsPage({ roleId }: RolePermissionsPageProps) {
     isLoading: isLoadingCatalog,
     isError: isErrorCatalog,
     refetch: refetchCatalog,
-  } = usePermissionsCatalogQuery();
+  } = useMenuItemsCatalogQuery();
   const {
     data: roleDetail,
     isLoading: isLoadingRole,
@@ -56,10 +56,10 @@ export function RolePermissionsPage({ roleId }: RolePermissionsPageProps) {
         if (isErrorCatalog) void refetchCatalog();
         if (isErrorRole) void refetchRole();
       }}
-      errorTitle="No se pudo cargar la matriz de permisos"
+      errorTitle="No se pudo cargar el Roles-Menú"
       errorProps={{
         description:
-          "Ocurrió un problema al obtener los datos del rol o el catálogo de permisos. Por favor, vuelve a intentarlo.",
+          "Ocurrió un problema al obtener los datos del rol o el catálogo de menús. Por favor, vuelve a intentarlo.",
       }}
     >
       {!roleDetail ? (
@@ -68,49 +68,47 @@ export function RolePermissionsPage({ roleId }: RolePermissionsPageProps) {
             El rol solicitado no existe o no se pudo cargar.
           </p>
           <Button asChild variant="outline" className="rounded-full">
-            <Link href="/admin/roles">Volver a Roles y Permisos</Link>
+            <Link href="/admin/roles">Volver a Roles y Menú</Link>
           </Button>
         </div>
       ) : (
-        <RolePermissionsEditor key={roleDetail.id} roleDetail={roleDetail} catalog={catalog} />
+        <RoleMenuEditor key={roleDetail.id} roleDetail={roleDetail} catalog={catalog} />
       )}
     </PageState>
   );
 }
 
-interface RolePermissionsEditorProps {
+interface RoleMenuEditorProps {
   roleDetail: RoleDetail;
-  catalog: PermissionCatalogItem[];
+  catalog: MenuOptionCatalogItem[];
 }
 
-function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorProps) {
+/** Solo las opciones (hojas con ruta) otorgan acceso; los contenedores son agrupadores visuales. */
+function RoleMenuEditor({ roleDetail, catalog }: RoleMenuEditorProps) {
   const router = useRouter();
-  const mutation = useAssignPermissionsMutation();
+  const mutation = useAssignMenusMutation();
 
-  const [selectedPermissions, setSelectedPermissions] = React.useState<Set<string>>(
-    () => new Set(roleDetail.permisos ?? []),
+  const opciones = React.useMemo(() => catalog.filter((item) => !item.esContenedor), [catalog]);
+
+  const [selectedMenus, setSelectedMenus] = React.useState<Set<string>>(
+    () => new Set(roleDetail.menus ?? []),
   );
   const [searchQuery, setSearchQuery] = React.useState("");
   const [confirmLeaveOpen, setConfirmLeaveOpen] = React.useState(false);
 
-  const initialPermissions = React.useMemo(
-    () => new Set(roleDetail.permisos ?? []),
-    [roleDetail.permisos],
-  );
+  const initialMenus = React.useMemo(() => new Set(roleDetail.menus ?? []), [roleDetail.menus]);
 
   const isAdminRole = roleDetail.nombre === "Administrador";
 
-  // Detección de cambios sin guardar
   const hasChanges = React.useMemo(() => {
     if (isAdminRole) return false;
-    if (selectedPermissions.size !== initialPermissions.size) return true;
-    for (const p of selectedPermissions) {
-      if (!initialPermissions.has(p)) return true;
+    if (selectedMenus.size !== initialMenus.size) return true;
+    for (const id of selectedMenus) {
+      if (!initialMenus.has(id)) return true;
     }
     return false;
-  }, [selectedPermissions, initialPermissions, isAdminRole]);
+  }, [selectedMenus, initialMenus, isAdminRole]);
 
-  // Aviso al intentar cerrar la pestaña o recargar con cambios sin guardar
   React.useEffect(() => {
     if (!hasChanges) return;
 
@@ -125,7 +123,6 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
     };
   }, [hasChanges]);
 
-  // Navegación segura hacia el listado de roles
   const handleBackToRoles = () => {
     if (hasChanges) {
       setConfirmLeaveOpen(true);
@@ -134,114 +131,108 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
     }
   };
 
-  // Agrupar catálogo por módulo
-  const permissionsByModule = React.useMemo(() => {
+  // Agrupar opciones por contenedor padre (el "módulo" visual de la pantalla)
+  const optionsByContainer = React.useMemo(() => {
+    const containers = new Map(
+      catalog.filter((item) => item.esContenedor).map((item) => [item.id, item]),
+    );
     const map = new Map<
       string,
-      { moduleId: string; moduleName: string; permissions: PermissionCatalogItem[] }
+      { containerId: string; containerName: string; options: MenuOptionCatalogItem[] }
     >();
-    catalog.forEach((perm) => {
-      if (!map.has(perm.moduloId)) {
-        map.set(perm.moduloId, {
-          moduleId: perm.moduloId,
-          moduleName: perm.moduloNombre,
-          permissions: [],
+    opciones.forEach((opt) => {
+      const containerId = opt.menuPadreId ?? "sin-contenedor";
+      if (!map.has(containerId)) {
+        map.set(containerId, {
+          containerId,
+          containerName: containers.get(containerId)?.nombre ?? "Sin agrupar",
+          options: [],
         });
       }
-      map.get(perm.moduloId)!.permissions.push(perm);
+      map.get(containerId)!.options.push(opt);
     });
     return Array.from(map.values());
-  }, [catalog]);
+  }, [opciones, catalog]);
 
-  // Filtrar módulos y permisos según la búsqueda
-  const filteredModules = React.useMemo(() => {
+  const filteredContainers = React.useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    if (!q) return permissionsByModule;
+    if (!q) return optionsByContainer;
 
-    return permissionsByModule
-      .map((mod) => {
-        const matchesModule = mod.moduleName.toLowerCase().includes(q);
-        const filteredPerms = mod.permissions.filter(
-          (p) =>
-            matchesModule ||
-            p.nombre.toLowerCase().includes(q) ||
-            p.codigo.toLowerCase().includes(q) ||
-            (p.descripcion && p.descripcion.toLowerCase().includes(q)),
+    return optionsByContainer
+      .map((group) => {
+        const matchesContainer = group.containerName.toLowerCase().includes(q);
+        const filteredOptions = group.options.filter(
+          (opt) => matchesContainer || opt.nombre.toLowerCase().includes(q),
         );
 
         return {
-          ...mod,
-          permissions: matchesModule ? mod.permissions : filteredPerms,
+          ...group,
+          options: matchesContainer ? group.options : filteredOptions,
         };
       })
-      .filter((mod) => mod.permissions.length > 0);
-  }, [permissionsByModule, searchQuery]);
+      .filter((group) => group.options.length > 0);
+  }, [optionsByContainer, searchQuery]);
 
-  // Conmutar un permiso individual
-  const togglePermission = (id: string) => {
+  const toggleMenu = (id: string) => {
     if (isAdminRole) return;
-    const next = new Set(selectedPermissions);
+    const next = new Set(selectedMenus);
     if (next.has(id)) {
       next.delete(id);
     } else {
       next.add(id);
     }
-    setSelectedPermissions(next);
+    setSelectedMenus(next);
   };
 
-  // Conmutar todos los permisos de un módulo
-  const toggleModule = (modulePermissions: PermissionCatalogItem[]) => {
+  const toggleContainer = (groupOptions: MenuOptionCatalogItem[]) => {
     if (isAdminRole) return;
-    const next = new Set(selectedPermissions);
-    const allSelected = modulePermissions.every((p) => next.has(p.id));
+    const next = new Set(selectedMenus);
+    const allSelected = groupOptions.every((o) => next.has(o.id));
 
     if (allSelected) {
-      modulePermissions.forEach((p) => next.delete(p.id));
+      groupOptions.forEach((o) => next.delete(o.id));
     } else {
-      modulePermissions.forEach((p) => next.add(p.id));
+      groupOptions.forEach((o) => next.add(o.id));
     }
-    setSelectedPermissions(next);
+    setSelectedMenus(next);
   };
 
-  // Marcar o desmarcar todos en el catálogo
   const handleToggleAll = () => {
     if (isAdminRole) return;
-    if (selectedPermissions.size === catalog.length) {
-      setSelectedPermissions(new Set());
+    if (selectedMenus.size === opciones.length) {
+      setSelectedMenus(new Set());
     } else {
-      setSelectedPermissions(new Set(catalog.map((p) => p.id)));
+      setSelectedMenus(new Set(opciones.map((o) => o.id)));
     }
   };
 
-  // Restablecer al estado inicial
   const handleReset = () => {
-    setSelectedPermissions(new Set(initialPermissions));
+    setSelectedMenus(new Set(initialMenus));
   };
 
-  // Guardar cambios en lote
   const handleSave = async () => {
     if (isAdminRole) return;
     await mutation.mutateAsync({
       id: roleDetail.id,
-      permissionIds: Array.from(selectedPermissions),
+      menuIds: Array.from(selectedMenus),
     });
   };
 
   const coveragePercent =
-    catalog.length > 0 ? Math.round((selectedPermissions.size / catalog.length) * 100) : 0;
+    opciones.length > 0 ? Math.round((selectedMenus.size / opciones.length) * 100) : 0;
 
   return (
     <div className="animate-in fade-in-50 space-y-6 duration-300">
       {/* Cabecera principal de la página */}
       <PageHeader
-        title={`Matriz de Permisos: ${roleDetail.nombre}`}
-        description="Asigna y gestiona los privilegios de acceso y operaciones autorizadas en el sistema."
+        title={`Roles-Menú: ${roleDetail.nombre}`}
+        description="Asigna las opciones de menú (pantallas) a las que el rol tiene acceso. El cargo no da accesos; solo el menú asignado al rol."
         icon={ShieldCheckIcon}
         breadcrumbs={[
           { label: "Inicio", href: "/admin/dashboard" },
           { label: "Administración", href: "/admin/roles" },
-          { label: "Roles y Permisos", href: "/admin/roles" },
-          { label: `Permisos: ${roleDetail.nombre}` },
+          { label: "Roles y Menú", href: "/admin/roles" },
+          { label: `Menú: ${roleDetail.nombre}` },
         ]}
         actions={
           <Button
@@ -265,9 +256,9 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
           <div className="space-y-0.5">
             <p className="text-foreground font-bold">Acceso Maestro Protegido (Superusuario)</p>
             <p className="text-muted-foreground text-xs leading-relaxed">
-              El rol <strong>Administrador</strong> cuenta con todos los permisos del sistema de
-              forma obligatoria e inmutable. Por directivas de seguridad institucional, esta matriz
-              no puede ser deshabilitada.
+              El rol <strong>Administrador</strong> ve todas las opciones del sistema de forma
+              obligatoria e inmutable. Por directivas de seguridad institucional, este menú no puede
+              ser deshabilitado.
             </p>
           </div>
         </div>
@@ -295,7 +286,7 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filtrar por nombre, código o módulo..."
+              placeholder="Filtrar por nombre de opción o grupo..."
               className="border-border/80 bg-muted/20 focus:bg-background h-9 rounded-full pr-3 pl-9 text-xs"
             />
           </div>
@@ -306,10 +297,10 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
           <div className="border-border/60 flex items-center gap-2 border-r pr-3">
             <div className="text-right">
               <span className="text-foreground text-xs font-bold">
-                {selectedPermissions.size} / {catalog.length}
+                {selectedMenus.size} / {opciones.length}
               </span>
               <span className="text-muted-foreground block text-xs font-medium">
-                {coveragePercent}% de permisos
+                {coveragePercent}% de opciones
               </span>
             </div>
             <div className="bg-primary/10 text-primary relative flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold">
@@ -327,41 +318,39 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
             >
               <HugeiconsIcon icon={CheckmarkBadge01Icon} className="size-3.5" />
               <span>
-                {selectedPermissions.size === catalog.length ? "Desmarcar todos" : "Marcar todos"}
+                {selectedMenus.size === opciones.length ? "Desmarcar todos" : "Marcar todos"}
               </span>
             </Button>
           )}
         </div>
       </div>
 
-      {/* Módulos agrupados en tarjetas */}
+      {/* Contenedores de menú agrupados en tarjetas */}
       <div className="space-y-5">
-        {filteredModules.length === 0 ? (
+        {filteredContainers.length === 0 ? (
           <div className="border-border/80 rounded-2xl border border-dashed p-12 text-center">
             <div className="bg-muted/40 text-muted-foreground mx-auto mb-3 flex size-12 items-center justify-center rounded-full">
               <HugeiconsIcon icon={Search01Icon} size={20} />
             </div>
             <p className="text-foreground text-sm font-bold">
-              No se encontraron permisos coincidentes
+              No se encontraron opciones de menú coincidentes
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
               Prueba con otro término de búsqueda o limpia el filtro.
             </p>
           </div>
         ) : (
-          filteredModules.map(({ moduleId, moduleName, permissions }) => {
-            const selectedInModule = permissions.filter((p) =>
-              selectedPermissions.has(p.id),
-            ).length;
-            const allSelectedInModule =
-              permissions.length > 0 && selectedInModule === permissions.length;
+          filteredContainers.map(({ containerId, containerName, options }) => {
+            const selectedInContainer = options.filter((o) => selectedMenus.has(o.id)).length;
+            const allSelectedInContainer =
+              options.length > 0 && selectedInContainer === options.length;
 
             return (
               <div
-                key={moduleId}
+                key={containerId}
                 className="border-border/80 bg-card overflow-hidden rounded-2xl border shadow-xs transition-all"
               >
-                {/* Cabecera del Módulo */}
+                {/* Cabecera del contenedor */}
                 <div className="border-border/60 bg-muted/30 flex flex-col gap-2 border-b px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className="bg-primary/10 text-primary flex size-7 items-center justify-center rounded-lg">
@@ -369,10 +358,10 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                     </div>
                     <div>
                       <h3 className="text-foreground text-sm font-bold tracking-tight">
-                        {moduleName}
+                        {containerName}
                       </h3>
                       <p className="text-muted-foreground text-xs">
-                        {selectedInModule} de {permissions.length} privilegios activos
+                        {selectedInContainer} de {options.length} opciones activas
                       </p>
                     </div>
                   </div>
@@ -380,10 +369,14 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                   <div className="flex items-center gap-2">
                     <StatusBadge
                       tone={
-                        allSelectedInModule ? "success" : selectedInModule > 0 ? "brand" : "neutral"
+                        allSelectedInContainer
+                          ? "success"
+                          : selectedInContainer > 0
+                            ? "brand"
+                            : "neutral"
                       }
                     >
-                      {selectedInModule} / {permissions.length}
+                      {selectedInContainer} / {options.length}
                     </StatusBadge>
 
                     {!isAdminRole && (
@@ -391,27 +384,27 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => toggleModule(permissions)}
+                        onClick={() => toggleContainer(options)}
                         className="hover:bg-muted h-8 rounded-full px-3 text-xs font-medium"
                       >
-                        {allSelectedInModule ? "Desmarcar módulo" : "Marcar módulo"}
+                        {allSelectedInContainer ? "Desmarcar grupo" : "Marcar grupo"}
                       </Button>
                     )}
                   </div>
                 </div>
 
-                {/* Grid de Permisos dentro del Módulo */}
+                {/* Grid de opciones dentro del contenedor */}
                 <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {permissions.map((perm) => {
-                    const isChecked = isAdminRole || selectedPermissions.has(perm.id);
-                    const permInputId = `perm-check-${perm.id}`;
-                    const permLabelId = `perm-label-${perm.id}`;
-                    const permDescId = perm.descripcion ? `perm-desc-${perm.id}` : undefined;
+                  {options.map((opt) => {
+                    const isChecked = isAdminRole || selectedMenus.has(opt.id);
+                    const optInputId = `menu-check-${opt.id}`;
+                    const optLabelId = `menu-label-${opt.id}`;
+                    const optDescId = opt.ruta ? `menu-desc-${opt.id}` : undefined;
 
                     return (
                       <div
-                        key={perm.id}
-                        onClick={() => togglePermission(perm.id)}
+                        key={opt.id}
+                        onClick={() => toggleMenu(opt.id)}
                         className={cn(
                           "group relative flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-all select-none",
                           isChecked
@@ -421,35 +414,30 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                         )}
                       >
                         <Checkbox
-                          id={permInputId}
+                          id={optInputId}
                           checked={isChecked}
-                          onCheckedChange={() => togglePermission(perm.id)}
+                          onCheckedChange={() => toggleMenu(opt.id)}
                           disabled={isAdminRole}
-                          aria-labelledby={permLabelId}
-                          aria-describedby={permDescId}
+                          aria-labelledby={optLabelId}
+                          aria-describedby={optDescId}
                           className="mt-0.5 shrink-0"
                         />
                         <div className="min-w-0 flex-1 space-y-1">
-                          <div className="flex items-start justify-between gap-2">
-                            <label
-                              id={permLabelId}
-                              htmlFor={permInputId}
-                              className="text-foreground cursor-pointer text-xs leading-snug font-bold"
-                              onClick={(e) => e.stopPropagation()}
+                          <label
+                            id={optLabelId}
+                            htmlFor={optInputId}
+                            className="text-foreground cursor-pointer text-xs leading-snug font-bold"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {opt.nombre}
+                          </label>
+                          {opt.ruta && (
+                            <span
+                              id={optDescId}
+                              className="text-muted-foreground bg-muted/60 border-border/40 inline-block rounded border px-1.5 py-0.5 font-mono text-xs"
                             >
-                              {perm.nombre}
-                            </label>
-                          </div>
-                          <span className="text-muted-foreground bg-muted/60 border-border/40 inline-block rounded border px-1.5 py-0.5 font-mono text-xs">
-                            {perm.codigo}
-                          </span>
-                          {perm.descripcion && (
-                            <p
-                              id={permDescId}
-                              className="text-muted-foreground line-clamp-2 text-xs leading-relaxed"
-                            >
-                              {perm.descripcion}
-                            </p>
+                              {opt.ruta}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -473,7 +461,7 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                     Cambios pendientes
                   </StatusBadge>
                   <span className="text-foreground text-xs font-medium">
-                    Tienes cambios de permisos sin guardar para este rol.
+                    Tienes cambios en el menú sin guardar para este rol.
                   </span>
                 </>
               ) : (
@@ -511,7 +499,7 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
                 ) : (
                   <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5" />
                 )}
-                <span>Guardar matriz de permisos</span>
+                <span>Guardar Roles-Menú</span>
               </Button>
             </div>
           </div>
@@ -523,7 +511,7 @@ function RolePermissionsEditor({ roleDetail, catalog }: RolePermissionsEditorPro
         open={confirmLeaveOpen}
         onOpenChange={setConfirmLeaveOpen}
         title="¿Salir sin guardar cambios?"
-        description="Tienes modificaciones en la matriz de permisos que no han sido guardadas. Si sales ahora, se perderán los cambios."
+        description="Tienes modificaciones en el Roles-Menú que no han sido guardadas. Si sales ahora, se perderán los cambios."
         confirmText="Salir sin guardar"
         cancelText="Continuar editando"
         variant="warning"

@@ -31,7 +31,7 @@ export function RoleActions({ role, onEdit, onAssignPermissions }: RoleActionsPr
       }}
       items={[
         {
-          label: "Configurar permisos",
+          label: "Configurar menú (Roles-Menú)",
           icon: ShieldCheckIcon,
           onClick: () => onAssignPermissions(role),
         },

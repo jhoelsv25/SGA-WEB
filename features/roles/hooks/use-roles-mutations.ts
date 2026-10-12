@@ -53,20 +53,20 @@ export function useDeleteRoleMutation() {
   });
 }
 
-export function useAssignPermissionsMutation(onSuccessCallback?: () => void) {
+export function useAssignMenusMutation(onSuccessCallback?: () => void) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, permissionIds }: { id: string; permissionIds: string[] }) =>
-      rolesApi.assignPermissions(id, permissionIds),
+    mutationFn: ({ id, menuIds }: { id: string; menuIds: string[] }) =>
+      rolesApi.assignMenus(id, menuIds),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: rolesKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: rolesKeys.lists() });
-      toast.success(data.message || "Permisos actualizados correctamente.");
+      toast.success(data.message || "Menús actualizados correctamente.");
       onSuccessCallback?.();
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Error al actualizar los permisos.");
+      toast.error(error.message || "Error al actualizar los menús del rol.");
     },
   });
 }
