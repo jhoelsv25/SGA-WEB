@@ -14,14 +14,32 @@ import { PageState } from "@/components/common/page-state";
 import { EmptyState } from "@/components/common/empty-state";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { TEXTOS_MI_HORARIO } from "./consts";
 import { useMiHorarioActivo } from "./hooks";
 import { calcularFranjasHorarias } from "./utils";
 import { MiHorarioDia, MiHorarioGrid } from "./views";
 
 export function MiHorarioPage() {
-  const { rol, anioLectivo, bloques, isLoading, isFetching, isError, error, refetch } =
-    useMiHorarioActivo();
+  const {
+    rol,
+    anioLectivo,
+    bloques,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+    misEstudiantes,
+    estudianteSeleccionadoId,
+    seleccionarEstudiante,
+  } = useMiHorarioActivo();
 
   // Modo de visualización: "semana" (grilla completa) o "dia" (selector por día)
   const [modoVista, setModoVista] = React.useState<"semana" | "dia">("semana");
@@ -37,6 +55,7 @@ export function MiHorarioPage() {
   const descripcionCabecera = React.useMemo(() => {
     if (rol === "docente") return TEXTOS_MI_HORARIO.DESCRIPCION_DOCENTE;
     if (rol === "estudiante") return TEXTOS_MI_HORARIO.DESCRIPCION_ESTUDIANTE;
+    if (rol === "apoderado") return TEXTOS_MI_HORARIO.DESCRIPCION_APODERADO;
     return "Horario escolar semanal de clases y recesos.";
   }, [rol]);
 
@@ -52,7 +71,7 @@ export function MiHorarioPage() {
         icon={Calendar03Icon}
         breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Mi horario" }]}
         actions={
-          rol === "docente" || rol === "estudiante" ? (
+          rol === "docente" || rol === "estudiante" || rol === "apoderado" ? (
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -84,7 +103,7 @@ export function MiHorarioPage() {
         />
       )}
 
-      {rol === "apoderado" && (
+      {rol === "apoderado" && !isLoading && misEstudiantes.length === 0 && (
         <EmptyState
           title={TEXTOS_MI_HORARIO.APODERADO_SIN_LISTADO_TITULO}
           description={TEXTOS_MI_HORARIO.APODERADO_SIN_LISTADO_DESCRIPCION}
@@ -92,8 +111,10 @@ export function MiHorarioPage() {
         />
       )}
 
-      {/* Vista principal para Docente o Estudiante */}
-      {(rol === "docente" || rol === "estudiante") && (
+      {/* Vista principal para Docente, Estudiante o Apoderado */}
+      {(rol === "docente" ||
+        rol === "estudiante" ||
+        (rol === "apoderado" && misEstudiantes.length > 0)) && (
         <PageState
           isLoading={isLoading}
           isError={isError}
@@ -107,6 +128,27 @@ export function MiHorarioPage() {
             icon: Calendar03Icon,
           }}
         >
+          {rol === "apoderado" && misEstudiantes.length > 1 && (
+            <div className="border-border/60 bg-card/60 mb-4 flex items-center gap-3 rounded-2xl border p-3 shadow-xs">
+              <span className="text-muted-foreground text-xs font-semibold">
+                {TEXTOS_MI_HORARIO.SELECTOR_ESTUDIANTE_LABEL}
+              </span>
+              <Select value={estudianteSeleccionadoId} onValueChange={seleccionarEstudiante}>
+                <SelectTrigger className="h-9 w-auto min-w-48 text-sm">
+                  <SelectValue placeholder="Selecciona un estudiante" />
+                </SelectTrigger>
+                <SelectContent>
+                  {misEstudiantes.map((estudiante) => (
+                    <SelectItem key={estudiante.estudianteId} value={estudiante.estudianteId}>
+                      {estudiante.nombreCompleto}
+                      {estudiante.seccionNombre ? ` · ${estudiante.seccionNombre}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {bloques.length > 0 && (
             <div className="space-y-4">
               {/* Barra superior de métricas y selector de modo de vista */}

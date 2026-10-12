@@ -74,3 +74,13 @@ export interface DiaSemanaDef {
 }
 
 export type RolHorarioActivo = "docente" | "estudiante" | "apoderado" | "otro";
+
+/** Estudiante vinculado al apoderado autenticado (RF-008 P-24). */
+export interface EstudianteDelApoderadoDto {
+  estudianteId: string;
+  personaId: string;
+  nombreCompleto: string;
+  parentesco: string;
+  seccionId: string | null;
+  seccionNombre: string | null;
+}
