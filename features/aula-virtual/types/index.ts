@@ -147,3 +147,160 @@ export interface MaterialExtra extends ContenidoMaterial {
   descripcion?: string;
   tipo: TipoMaterial;
 }
+
+// ==========================================
+// RF-016: Tipos de tareas, entregas y libro de notas
+// ==========================================
+
+export type TipoTarea = "trabajo" | "proyecto" | "cuestionario" | "examen";
+export type TipoPregunta = "opcion_unica" | "opcion_multiple" | "respuesta_corta";
+export type CalculoNotaIntentos = "mas_alta" | "ultima" | "promedio";
+export type RevelarRespuestas =
+  "al_terminar_intentos" | "despues_fecha_limite" | "inmediato" | "nunca";
+export type EstadoTarea = "borrador" | "publicada" | "cerrada";
+export type EstadoEntrega = "en_progreso" | "borrador" | "entregada" | "calificada" | "devuelta";
+
+export interface OpcionPregunta {
+  id?: string;
+  texto: string;
+  esCorrecta: boolean;
+  orden?: number;
+}
+
+export interface Pregunta {
+  id?: string;
+  enunciado: string;
+  tipo: TipoPregunta;
+  puntaje: number;
+  orden?: number;
+  opciones?: OpcionPregunta[];
+}
+
+export interface Entrega {
+  id: string;
+  tareaId: string;
+  matriculaId: string;
+  estudianteId?: string;
+  estudianteNombre?: string;
+  codigo?: string;
+  intento: number;
+  iniciadoEn: string;
+  entregadaEn: string | null;
+  texto: string | null;
+  archivoUrl: string | null;
+  archivoNombre: string | null;
+  archivoTamanoBytes: number | null;
+  enlaceUrl: string | null;
+  respuestas: Record<string, unknown> | null;
+  esTardia: boolean;
+  estado: EstadoEntrega;
+  nota: number | null;
+  retroalimentacion: string | null;
+  calificadaPorId: string | null;
+  calificadaEn: string | null;
+}
+
+export interface Tarea {
+  id: string;
+  cursoSeccionId: string;
+  periodoId: string | null;
+  unidadId: string | null;
+  sesionClaseId: string | null;
+  titulo: string;
+  instrucciones: string | null;
+  tipo: TipoTarea;
+  puntajeMaximo: number;
+  publicadaEn: string | null;
+  fechaLimite: string;
+  permiteEntregaTardia: boolean;
+  intentosMaximos: number;
+  limiteTiempoMinutos: number | null;
+  calculoNotaIntentos: CalculoNotaIntentos;
+  revelarRespuestas: RevelarRespuestas;
+  tiposArchivo: string | null;
+  estado: EstadoTarea;
+  creadoEn: string;
+  preguntas?: Pregunta[];
+  miEntrega?: Entrega | null;
+  intentosRestantes?: number;
+}
+
+export interface FilaEstudianteLibro {
+  matriculaId: string;
+  estudianteId: string;
+  codigo: string;
+  estudianteNombre: string;
+  notasPorTarea: Record<
+    string,
+    {
+      nota: number | null;
+      estado: string;
+      esTardia: boolean;
+    }
+  >;
+  promediosPorTipo: Record<string, number | null>;
+  notaFinal: number;
+  notaLiteral: "AD" | "A" | "B" | "C";
+}
+
+export interface LibroNotas {
+  cursoSeccionId: string;
+  cursoNombre: string;
+  seccionNombre: string;
+  periodoId: string;
+  periodoNombre: string;
+  pesosConfig: Record<string, number>;
+  pesosEfectivos: Record<string, number>;
+  tareas: Array<{
+    id: string;
+    titulo: string;
+    tipo: TipoTarea;
+    fechaLimite: string;
+  }>;
+  estudiantes: FilaEstudianteLibro[];
+}
+
+export interface CrearTareaPayload {
+  titulo: string;
+  instrucciones?: string;
+  tipo: TipoTarea;
+  unidadId?: string;
+  periodoId?: string;
+  fechaLimite: string;
+  permiteEntregaTardia?: boolean;
+  intentosMaximos?: number;
+  limiteTiempoMinutos?: number;
+  calculoNotaIntentos?: CalculoNotaIntentos;
+  revelarRespuestas?: RevelarRespuestas;
+  tiposArchivo?: string;
+  publicar?: boolean;
+  preguntas?: Pregunta[];
+}
+
+export interface CalificarEntregaPayload {
+  nota?: number;
+  retroalimentacion?: string;
+  calificacionesPreguntas?: Record<string, { puntajeObtenido: number; comentario?: string }>;
+  devolver?: boolean;
+}
+
+export interface TareaEstudianteNota {
+  tareaId: string;
+  titulo: string;
+  tipo: TipoTarea;
+  fechaLimite: string;
+  nota: number | null;
+  estadoEntrega: string;
+  esTardia?: boolean;
+  retroalimentacion?: string | null;
+}
+
+export interface CursoNotasEstudiante {
+  cursoSeccionId: string;
+  cursoNombre: string;
+  seccionNombre: string;
+  docenteNombre?: string | null;
+  notaFinal: number | null;
+  notaLiteral: "AD" | "A" | "B" | "C" | null;
+  tareas?: TareaEstudianteNota[];
+}

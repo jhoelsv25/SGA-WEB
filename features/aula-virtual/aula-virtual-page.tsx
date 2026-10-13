@@ -4,13 +4,16 @@ import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  Award01Icon,
   BookOpen01Icon,
   Calendar03Icon,
+  ChartBarLineIcon,
   CloudUploadIcon,
   Delete02Icon,
   FileAddIcon,
   FileEditIcon,
   PlusSignIcon,
+  Task01Icon,
 } from "@hugeicons/core-free-icons";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
@@ -19,14 +22,18 @@ import { SelectOption } from "@/components/common/select";
 import { StatusBadge } from "@/components/common/status-badge";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/formatters/date";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { urlDeArchivo } from "./api";
 import {
+  LibroNotasTab,
+  MisNotasTab,
   PlanificarMaterialModal,
   PublicarExtraModal,
   PublicarMaterialModal,
   SolicitarCambioFechaModal,
+  TareasTab,
   UnidadModal,
 } from "./components";
 import { PLAZO_CONFIG } from "./consts";
@@ -131,6 +138,7 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
   const { data: cursos = [] } = useMisCursos();
   const { anio } = useAnioLectivo();
   const [cursoId, setCursoId] = React.useState(cursoSeccionId ?? "");
+  const [periodoId, setPeriodoId] = React.useState<string>("");
   const cursoActual = cursoId || cursos[0]?.cursoSeccionId || "";
 
   const { data: aula, isLoading, isError, error, refetch } = useAula(cursoActual);
@@ -149,11 +157,22 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
 
   const retirar = useRetirarMaterial();
 
+  const opcionesPeriodo = React.useMemo(
+    () => [
+      { value: "", label: "Todos los periodos" },
+      ...(anio?.bimestres ?? []).map((b) => ({
+        value: b.id,
+        label: `Bimestre ${b.nombre}`,
+      })),
+    ],
+    [anio?.bimestres],
+  );
+
   return (
     <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
       <PageHeader
         title="Aula virtual"
-        description="Unidades y materiales de reforzamiento del curso."
+        description="Materiales, tareas, evaluaciones y libro de calificaciones."
         icon={BookOpen01Icon}
         breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Aula virtual" }]}
         actions={
@@ -170,17 +189,29 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
         }
       />
 
-      <div className="w-full max-w-80">
-        <SelectOption
-          options={cursos.map((c) => ({
-            value: c.cursoSeccionId,
-            label: `${c.cursoNombre} · ${c.seccionNombre}`,
-          }))}
-          value={cursoActual}
-          onSelect={setCursoId}
-          placeholder="Curso"
-          searchPlaceholder="Buscar curso"
-        />
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="w-full max-w-80">
+          <SelectOption
+            options={cursos.map((c) => ({
+              value: c.cursoSeccionId,
+              label: `${c.cursoNombre} · ${c.seccionNombre}`,
+            }))}
+            value={cursoActual}
+            onSelect={setCursoId}
+            placeholder="Curso"
+            searchPlaceholder="Buscar curso"
+          />
+        </div>
+        {opcionesPeriodo.length > 1 && (
+          <div className="w-full max-w-56">
+            <SelectOption
+              options={opcionesPeriodo}
+              value={periodoId}
+              onSelect={setPeriodoId}
+              placeholder="Periodo"
+            />
+          </div>
+        )}
       </div>
 
       {!cursoActual ? (
@@ -198,82 +229,128 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
           errorTitle="No se pudo cargar el aula virtual"
         >
           {aula && (
-            <div className="space-y-4">
-              {aula.unidades.length === 0 ? (
-                <EmptyState
-                  title="Aún no hay unidades"
-                  description="Crea la primera unidad para empezar a planificar materiales."
-                  icon={BookOpen01Icon}
-                />
-              ) : (
-                aula.unidades.map((unidad) => (
-                  <div key={unidad.id} className="rounded-xl border p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <p className="font-semibold">{unidad.titulo}</p>
-                        {unidad.descripcion && (
-                          <p className="text-muted-foreground text-sm">{unidad.descripcion}</p>
-                        )}
-                        <p className="text-muted-foreground text-xs">
-                          {unidad.fechaInicio && formatDate(unidad.fechaInicio)} –{" "}
-                          {unidad.fechaFin && formatDate(unidad.fechaFin)}
-                          {!unidad.publicada && " · Oculta"}
-                        </p>
-                      </div>
-                      {aula.puedeAdministrar && (
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="min-h-9 gap-1.5"
-                            onClick={() => setUnidadParaMaterial(unidad.id)}
-                          >
-                            <HugeiconsIcon icon={Calendar03Icon} size={16} />
-                            Planificar
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="min-h-9 gap-1.5"
-                            onClick={() => setUnidadParaExtra(unidad.id)}
-                          >
-                            <HugeiconsIcon icon={FileAddIcon} size={16} />
-                            Material extra
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="min-h-9"
-                            onClick={() => setUnidadModal({ abierto: true, unidad })}
-                          >
-                            Editar
-                          </Button>
+            <Tabs defaultValue="materiales" className="w-full space-y-6">
+              <TabsList variant="line" className="w-full justify-start gap-4 border-b">
+                <TabsTrigger value="materiales" className="gap-2">
+                  <HugeiconsIcon icon={BookOpen01Icon} size={16} />
+                  Materiales de Reforzamiento
+                </TabsTrigger>
+                <TabsTrigger value="tareas" className="gap-2">
+                  <HugeiconsIcon icon={Task01Icon} size={16} />
+                  Tareas y Evaluaciones
+                </TabsTrigger>
+                {aula.puedeAdministrar ? (
+                  <TabsTrigger value="libro-notas" className="gap-2">
+                    <HugeiconsIcon icon={ChartBarLineIcon} size={16} />
+                    Libro de Calificaciones
+                  </TabsTrigger>
+                ) : (
+                  <TabsTrigger value="mis-notas" className="gap-2">
+                    <HugeiconsIcon icon={Award01Icon} size={16} />
+                    Mis Calificaciones
+                  </TabsTrigger>
+                )}
+              </TabsList>
+
+              <TabsContent value="materiales" className="space-y-4">
+                {aula.unidades.length === 0 ? (
+                  <EmptyState
+                    title="Aún no hay unidades"
+                    description="Crea la primera unidad para empezar a planificar materiales."
+                    icon={BookOpen01Icon}
+                  />
+                ) : (
+                  aula.unidades.map((unidad) => (
+                    <div key={unidad.id} className="rounded-xl border p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <p className="font-semibold">{unidad.titulo}</p>
+                          {unidad.descripcion && (
+                            <p className="text-muted-foreground text-sm">{unidad.descripcion}</p>
+                          )}
+                          <p className="text-muted-foreground text-xs">
+                            {unidad.fechaInicio && formatDate(unidad.fechaInicio)} –{" "}
+                            {unidad.fechaFin && formatDate(unidad.fechaFin)}
+                            {!unidad.publicada && " · Oculta"}
+                          </p>
                         </div>
-                      )}
+                        {aula.puedeAdministrar && (
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="min-h-9 gap-1.5"
+                              onClick={() => setUnidadParaMaterial(unidad.id)}
+                            >
+                              <HugeiconsIcon icon={Calendar03Icon} size={16} />
+                              Planificar
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="min-h-9 gap-1.5"
+                              onClick={() => setUnidadParaExtra(unidad.id)}
+                            >
+                              <HugeiconsIcon icon={FileAddIcon} size={16} />
+                              Material extra
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="min-h-9"
+                              onClick={() => setUnidadModal({ abierto: true, unidad })}
+                            >
+                              Editar
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 space-y-2">
+                        {unidad.materiales.length === 0 ? (
+                          <p className="text-muted-foreground text-sm">Sin materiales todavía.</p>
+                        ) : (
+                          unidad.materiales.map((material) => (
+                            <MaterialFila
+                              key={material.id}
+                              material={material}
+                              puedeAdministrar={aula.puedeAdministrar}
+                              onPublicar={setMaterialPublicar}
+                              onSolicitarCambio={setMaterialCambio}
+                              onRetirar={setMaterialRetirar}
+                            />
+                          ))
+                        )}
+                      </div>
                     </div>
-                    <div className="mt-3 space-y-2">
-                      {unidad.materiales.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">Sin materiales todavía.</p>
-                      ) : (
-                        unidad.materiales.map((material) => (
-                          <MaterialFila
-                            key={material.id}
-                            material={material}
-                            puedeAdministrar={aula.puedeAdministrar}
-                            onPublicar={setMaterialPublicar}
-                            onSolicitarCambio={setMaterialCambio}
-                            onRetirar={setMaterialRetirar}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </div>
-                ))
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="tareas">
+                <TareasTab
+                  cursoSeccionId={aula.cursoSeccionId}
+                  periodoId={periodoId || undefined}
+                  puedeAdministrar={aula.puedeAdministrar}
+                  unidades={aula.unidades}
+                />
+              </TabsContent>
+
+              {aula.puedeAdministrar ? (
+                <TabsContent value="libro-notas">
+                  <LibroNotasTab
+                    cursoSeccionId={aula.cursoSeccionId}
+                    periodoId={periodoId || undefined}
+                  />
+                </TabsContent>
+              ) : (
+                <TabsContent value="mis-notas">
+                  <MisNotasTab periodoId={periodoId || undefined} />
+                </TabsContent>
               )}
-            </div>
+            </Tabs>
           )}
         </PageState>
       )}
