@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Clock01Icon, RefreshIcon } from "@hugeicons/core-free-icons";
+import { Clock01Icon, RefreshIcon, UserRemove01Icon } from "@hugeicons/core-free-icons";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
@@ -16,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { usePuedeGestionarAusencias } from "@/features/ausencias-docente/hooks";
+import { RegistrarAusenciaModal } from "@/features/ausencias-docente/components/registro";
 import { EstadoSesionBadge, HorasFirmadas, ModalReemplazo } from "./components";
 import { usePanelSesionesHoy, usePuedeGestionarSesiones } from "./hooks";
 import type { Sesion } from "./types";
@@ -23,7 +25,9 @@ import type { Sesion } from "./types";
 export function SesionesHoyPage() {
   const { data, isLoading, isError, error, refetch, isFetching } = usePanelSesionesHoy();
   const puedeGestionar = usePuedeGestionarSesiones();
+  const puedeGestionarAusencias = usePuedeGestionarAusencias();
   const [aReemplazar, setAReemplazar] = React.useState<Sesion | null>(null);
+  const [aRegistrarAusencia, setARegistrarAusencia] = React.useState<Sesion | null>(null);
 
   return (
     <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
@@ -118,16 +122,34 @@ export function SesionesHoyPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        {puedeGestionar && s.estado === "pendiente" && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="min-h-10"
-                            onClick={() => setAReemplazar(s)}
-                          >
-                            Reemplazo
-                          </Button>
-                        )}
+                        <div className="flex flex-wrap items-center justify-end gap-1.5">
+                          {puedeGestionar && s.estado === "pendiente" && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="min-h-10"
+                              onClick={() => setAReemplazar(s)}
+                            >
+                              Reemplazo
+                            </Button>
+                          )}
+                          {puedeGestionarAusencias &&
+                            (Boolean(s.horaIngreso) || s.estado === "en_curso") && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="min-h-10 gap-1.5"
+                                onClick={() => setARegistrarAusencia(s)}
+                              >
+                                <HugeiconsIcon
+                                  icon={UserRemove01Icon}
+                                  className="size-3.5"
+                                  aria-hidden="true"
+                                />
+                                <span>Registrar ausencia</span>
+                              </Button>
+                            )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -140,6 +162,12 @@ export function SesionesHoyPage() {
       <ModalReemplazo
         sesion={aReemplazar}
         onOpenChange={(abierto) => !abierto && setAReemplazar(null)}
+      />
+
+      <RegistrarAusenciaModal
+        sesion={aRegistrarAusencia}
+        open={Boolean(aRegistrarAusencia)}
+        onOpenChange={(abierto) => !abierto && setARegistrarAusencia(null)}
       />
     </div>
   );
