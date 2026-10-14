@@ -9,6 +9,7 @@ import { Spinner } from "@/components/common/spinner";
 import { SelectOption } from "@/components/common/select";
 import { DatePicker } from "@/components/common/date-picker";
 import { useCrearUnidad, useActualizarUnidad } from "../../hooks";
+import { formatearBimestre } from "../../utils";
 import type { Unidad } from "../../types";
 
 interface Bimestre {
@@ -116,10 +117,10 @@ export function UnidadForm({
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">Bimestre *</Label>
         <SelectOption
-          options={bimestres.map((b) => ({ value: b.id, label: b.nombre }))}
+          options={bimestres.map((b) => ({ value: b.id, label: formatearBimestre(b.nombre) }))}
           value={periodoId}
           onSelect={setPeriodoId}
-          placeholder="Bimestre"
+          placeholder="Seleccionar bimestre..."
           disabled={mutacion.isPending}
         />
       </div>

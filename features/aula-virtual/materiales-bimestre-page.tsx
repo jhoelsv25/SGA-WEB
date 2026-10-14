@@ -4,18 +4,25 @@ import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ChartBarLineIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
+import { Label } from "@/components/ui/label";
 import { SelectOption } from "@/components/common/select";
 import { StatusBadge } from "@/components/common/status-badge";
 import { DataTable, DataTableColumnHeader } from "@/components/common/data-table";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
+import { formatearBimestre } from "./utils";
 import { useSeguimiento } from "./hooks";
 import type { FilaSeguimiento } from "./types";
 
 export function MaterialesBimestrePage() {
   const { anio } = useAnioLectivo();
-  const bimestres = anio?.bimestres ?? [];
-  const [periodoId, setPeriodoId] = React.useState("");
+  const bimestres = React.useMemo(() => anio?.bimestres ?? [], [anio?.bimestres]);
+  const enCurso = React.useMemo(
+    () => bimestres.find((b) => b.estado === "en_curso") ?? bimestres[0],
+    [bimestres],
+  );
+  const [periodoSeleccionado, setPeriodoSeleccionado] = React.useState<string | null>(null);
 
+  const periodoId = periodoSeleccionado ?? enCurso?.id ?? "";
   const { data, isLoading, isError, refetch } = useSeguimiento(periodoId || undefined);
 
   const columns = React.useMemo<ColumnDef<FilaSeguimiento>[]>(
@@ -121,12 +128,18 @@ export function MaterialesBimestrePage() {
         ]}
       />
 
-      <div className="w-full max-w-56">
+      <div className="flex w-full max-w-64 flex-col gap-1.5">
+        <Label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+          Bimestre académico
+        </Label>
         <SelectOption
-          options={bimestres.map((b) => ({ value: b.id, label: b.nombre }))}
+          options={bimestres.map((b) => ({
+            value: b.id,
+            label: `${formatearBimestre(b.nombre)}${b.estado === "en_curso" ? " · En curso" : ""}`,
+          }))}
           value={periodoId}
-          onSelect={setPeriodoId}
-          placeholder={data?.periodoNombre ?? "Bimestre en curso"}
+          onSelect={setPeriodoSeleccionado}
+          placeholder={formatearBimestre(data?.periodoNombre) || "Seleccionar bimestre..."}
         />
       </div>
 
@@ -148,7 +161,7 @@ export function MaterialesBimestrePage() {
         {data && data.filas.length > 0 && (
           <div className="border-border/80 bg-muted/20 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-xs font-semibold">
             <span className="text-muted-foreground text-[11px] tracking-wider uppercase">
-              Totales generales ({data.periodoNombre})
+              Totales generales ({formatearBimestre(data.periodoNombre)})
             </span>
             <div className="flex flex-wrap items-center gap-4 text-xs font-medium tabular-nums">
               <span>

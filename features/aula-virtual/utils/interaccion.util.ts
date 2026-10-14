@@ -40,3 +40,14 @@ export function formatearFechaHora(iso: string | null): string {
     return iso;
   }
 }
+
+/**
+ * Convierte un identificador o número romano de bimestre (ej. "I", "II")
+ * en una etiqueta descriptiva y legible como "I Bimestre", "II Bimestre".
+ */
+export function formatearBimestre(nombre: string | null | undefined): string {
+  if (!nombre) return "";
+  const trim = nombre.trim();
+  if (/bimestre/i.test(trim)) return trim;
+  return `${trim} Bimestre`;
+}
