@@ -1,3 +1,4 @@
+import type { SelectOptionItem } from "@/components/common/select";
 import type { DirigidoA, EstadoComunicado, PrioridadComunicado } from "../types";
 
 export interface EstadoVisualConfig {
@@ -46,3 +47,16 @@ export const COMUNICADO_DIRIGIDO_LABELS: Record<DirigidoA, string> = {
   estudiantes: "Solo Estudiantes",
   apoderados: "Solo Apoderados",
 };
+
+export const OPCIONES_DIRIGIDO_A: SelectOptionItem<DirigidoA>[] = [
+  { value: "todos", label: "Toda la comunidad" },
+  { value: "docentes", label: "Solo Docentes" },
+  { value: "estudiantes", label: "Solo Estudiantes" },
+  { value: "apoderados", label: "Solo Apoderados" },
+];
+
+export const OPCIONES_PRIORIDAD: SelectOptionItem<PrioridadComunicado>[] = [
+  { value: "normal", label: "Normal" },
+  { value: "importante", label: "Importante" },
+  { value: "urgente", label: "Urgente" },
+];

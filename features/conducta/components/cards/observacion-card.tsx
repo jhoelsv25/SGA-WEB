@@ -12,10 +12,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { TIPO_OBSERVACION_CONFIG } from "../constants";
-import type { ObservacionItem } from "../types";
+import { TIPO_OBSERVACION_CONFIG } from "../../constants";
+import type { ObservacionItem } from "../../types";
 
-interface ObservacionCardProps {
+export interface ObservacionCardProps {
   observacion: ObservacionItem;
 }
 

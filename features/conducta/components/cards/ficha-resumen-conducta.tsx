@@ -10,9 +10,9 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { ResumenConductaEstudiante } from "../types";
+import type { ResumenConductaEstudiante } from "../../types";
 
-interface FichaResumenConductaProps {
+export interface FichaResumenConductaProps {
   resumen: ResumenConductaEstudiante;
 }
 

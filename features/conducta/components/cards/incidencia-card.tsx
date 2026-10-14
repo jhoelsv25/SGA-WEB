@@ -17,10 +17,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { GRAVEDAD_CONFIG } from "../constants";
-import type { IncidenciaItem } from "../types";
+import { GRAVEDAD_CONFIG } from "../../constants";
+import type { IncidenciaItem } from "../../types";
 
-interface IncidenciaCardProps {
+export interface IncidenciaCardProps {
   incidencia: IncidenciaItem;
   currentUserId?: string;
   onEditar?: (incidencia: IncidenciaItem) => void;

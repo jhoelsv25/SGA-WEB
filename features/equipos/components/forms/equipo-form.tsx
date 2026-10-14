@@ -207,7 +207,7 @@ export function EquipoForm({
                   onClick={() => toggleUsuarioPermitido(opt.value)}
                   disabled={isSubmitting || isLocked}
                   aria-pressed={isChecked}
-                  className={`focus-visible:ring-primary/40 flex min-h-[44px] items-center gap-2 rounded-lg border p-2.5 text-xs font-medium transition-all outline-none focus-visible:ring-2 ${
+                  className={`focus-visible:ring-primary/40 flex min-h-11 items-center gap-2 rounded-lg border p-2.5 text-xs font-medium transition-all outline-none focus-visible:ring-2 ${
                     isChecked
                       ? "bg-primary/10 border-primary/40 text-primary font-semibold"
                       : "bg-background border-border text-muted-foreground hover:bg-muted/60"

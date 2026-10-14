@@ -20,10 +20,10 @@ import {
   COMUNICADO_DIRIGIDO_LABELS,
   COMUNICADO_ESTADO_CONFIG,
   COMUNICADO_PRIORIDAD_CONFIG,
-} from "../constants";
-import type { ComunicadoItem } from "../types";
+} from "../../constants";
+import type { ComunicadoItem } from "../../types";
 
-interface ComunicadoCardProps {
+export interface ComunicadoCardProps {
   comunicado: ComunicadoItem;
   currentUserId?: string;
   onVerDetalle: (comunicado: ComunicadoItem) => void;
