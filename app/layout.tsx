@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config";
@@ -7,7 +7,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { QueryProvider } from "@/providers/query-provider";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   themeColor: [
@@ -96,7 +100,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="es"
       suppressHydrationWarning
-      className={cn("h-full font-sans antialiased", inter.variable)}
+      className={cn("h-full font-sans antialiased", sourceSans.variable)}
     >
       <body className="bg-background text-foreground selection:bg-primary/20 selection:text-primary flex min-h-full flex-col">
         <ThemeProvider

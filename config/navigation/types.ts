@@ -57,6 +57,8 @@ export interface NavItem {
   disabled?: boolean;
   /** Opción de uso personal: el Administrador no la ve (los demás roles, según Roles-Menú). */
   ocultarAlAdministrador?: boolean;
+  /** Rutas que se abren desde esta opción y mantienen el ítem marcado. */
+  rutasIncluidas?: string[];
   items?: NavItem[];
 }
 

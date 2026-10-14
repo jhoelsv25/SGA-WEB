@@ -63,3 +63,14 @@
   - Todo botón o formulario que ejecute una mutación DEBE reflejar el estado `isPending`:
     - Deshabilitar el botón de submit (`disabled={isPending}`).
     - Mostrar un spinner o indicador de carga visual.
+
+## 5. Descargas y Generación de Archivos (PDF, Carnés, Reportes, Excel)
+
+- **Regla de Oro: Todo archivo descargable debe ser generado por el Backend**:
+  - **Sin excepciones por tamaño**: Todo archivo que el usuario descargue o imprima de forma oficial (constancias, carnés escolares, credenciales, libretas de notas, reportes consolidados o exportaciones de Excel), por pequeño que sea, DEBE ser generado y emitido por el backend (`sga-api`).
+  - **Seguridad y Control de Acceso**:
+    - Las descargas deben pasar por endpoints autenticados usando `apiClient` con `responseType: "blob"`.
+    - Nunca generar documentos oficiales en el cliente con datos parciales o inventados. El backend es la única fuente de verdad y el encargado de validar permisos y registrar auditoría.
+  - **No sobrecargar al cliente**:
+    - Prohibido instalar o usar bibliotecas pesadas de generación de PDF o manipulación de hojas de cálculo en el frontend.
+    - El cliente web solo es responsable de solicitar el blob, previsualizarlo en modales ligeros (`<iframe>` o `<object>`) y disparar la descarga o impresión nativa del archivo binario recibido del servidor.

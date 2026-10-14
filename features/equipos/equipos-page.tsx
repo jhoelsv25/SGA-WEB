@@ -15,7 +15,7 @@ export function EquiposPage() {
         icon={ComputerIcon}
         breadcrumbs={[
           { label: "Inicio", href: "/admin/dashboard" },
-          { label: "Configuración" },
+          { label: "Configuración", href: "/admin/configuracion" },
           { label: "Equipos autorizados" },
         ]}
       />

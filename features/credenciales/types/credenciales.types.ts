@@ -19,6 +19,16 @@ export interface CarneDatos {
   codigoCredencial: string;
   codigoInstitucional?: string | null;
   emitidaEn: string;
+  institucion?: {
+    nombre: string;
+    codigoModular?: string | null;
+    distrito?: string | null;
+    provincia?: string | null;
+    departamento?: string | null;
+    ugel?: string | null;
+    dre?: string | null;
+    logoUrl?: string | null;
+  };
 }
 
 export interface ReemitirCredencialInput {

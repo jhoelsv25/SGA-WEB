@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { IdVerifiedIcon, ShieldCheckIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
-import { ShieldCheckIcon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui/button";
 import { RolesTable } from "./views/table/roles-table";
 
 export function RolesPage() {
@@ -16,6 +19,14 @@ export function RolesPage() {
           { label: "Administración" },
           { label: "Roles y Permisos" },
         ]}
+        actions={
+          <Button variant="outline" asChild>
+            <Link href="/admin/cargos">
+              <HugeiconsIcon icon={IdVerifiedIcon} className="size-4" />
+              Cargos
+            </Link>
+          </Button>
+        }
       />
 
       <RolesTable />

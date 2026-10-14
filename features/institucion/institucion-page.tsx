@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { School01Icon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";

@@ -20,9 +20,10 @@ import {
   ModalMatriculaIndividual,
   ModalMatriculaMasiva,
   ModalOperacionMatricula,
+  ModalConstanciaPdf,
   type OperacionMatriculaTipo,
 } from "../components";
-import { useDescargarConstancia, useMatriculasQuery } from "../hooks";
+import { useMatriculasQuery } from "../hooks";
 import { useSeccionesQuery } from "@/features/secciones";
 import type { Seccion } from "@/features/secciones/types";
 import { useGradosQuery } from "@/features/grados/hooks";
@@ -42,11 +43,13 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
     matricula: MatriculaItem | null;
     tipo: OperacionMatriculaTipo;
   }>({ matricula: null, tipo: null });
+  const [constanciaSeleccionada, setConstanciaSeleccionada] = React.useState<MatriculaItem | null>(
+    null,
+  );
 
   // Consultas de catálogos
   const { data: gradosData } = useGradosQuery();
   const { data: seccionesData } = useSeccionesQuery();
-  const descargarConstanciaMutation = useDescargarConstancia();
 
   // Filtros declarativos con ListToolbar (máximo 2 inline, el resto en Popover 'Filtros')
   const filterDefs = React.useMemo(() => {
@@ -122,14 +125,13 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
     () =>
       getMatriculaColumns({
         puedeGestionar,
-        onDescargarConstancia: (mat) =>
-          descargarConstanciaMutation.mutate({ id: mat.id, codigo: mat.codigo }),
+        onDescargarConstancia: (mat) => setConstanciaSeleccionada(mat),
         onCambiarSeccion: (mat) => setOperacionActiva({ matricula: mat, tipo: "cambiar-seccion" }),
         onRetirar: (mat) => setOperacionActiva({ matricula: mat, tipo: "retirar" }),
         onTrasladar: (mat) => setOperacionActiva({ matricula: mat, tipo: "trasladar" }),
         onAnular: (mat) => setOperacionActiva({ matricula: mat, tipo: "anular" }),
       }),
-    [puedeGestionar, descargarConstanciaMutation],
+    [puedeGestionar],
   );
 
   return (
@@ -239,6 +241,19 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         tipo={operacionActiva.tipo}
         open={Boolean(operacionActiva.tipo)}
         onOpenChange={(op) => !op && setOperacionActiva({ matricula: null, tipo: null })}
+      />
+
+      {/* Modal Visor Oficial de Constancia con Colores del Colegio */}
+      <ModalConstanciaPdf
+        open={Boolean(constanciaSeleccionada)}
+        onOpenChange={(op) => !op && setConstanciaSeleccionada(null)}
+        matriculaId={constanciaSeleccionada?.id || ""}
+        matriculaCodigo={constanciaSeleccionada?.codigo || ""}
+        estudianteNombre={
+          constanciaSeleccionada?.estudiante
+            ? `${constanciaSeleccionada.estudiante.apellidos}, ${constanciaSeleccionada.estudiante.nombres}`
+            : undefined
+        }
       />
     </div>
   );

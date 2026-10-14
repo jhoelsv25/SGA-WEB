@@ -56,4 +56,27 @@ export const credencialesApi = {
       handleApiError(error, "Error al consultar la credencial activa.");
     }
   },
+
+  async obtenerCarnePdfBlobUrl(personaId: string): Promise<string> {
+    const response = await apiClient.get(`/credenciales/personas/${personaId}/carne/pdf`, {
+      responseType: "blob",
+    });
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    return window.URL.createObjectURL(blob);
+  },
+
+  async descargarCarnePdf(personaId: string, nombreArchivo?: string): Promise<void> {
+    const response = await apiClient.get(`/credenciales/personas/${personaId}/carne/pdf`, {
+      responseType: "blob",
+    });
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nombreArchivo || `carnet-${personaId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
 };

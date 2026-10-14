@@ -6,20 +6,20 @@
 export const siteConfig = {
   // Identidad del Sistema
   name: "SGA · Sistema de Gestión Académica",
-  shortName: "SGA Carmelinas",
+  shortName: "SGA Nuestra Señora del Carmen",
   acronym: "SGA",
   description:
-    "Plataforma integral de gestión pedagógica, control escolar, asistencia, calificaciones y comunicación de la Institución Educativa Carmelinas de Lircay, Huancavelica.",
+    "Plataforma integral de gestión pedagógica, control escolar, asistencia, calificaciones y comunicación de la I.E. De Mujeres Nuestra Señora del Carmen, Lircay, Huancavelica.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://sga.carmelinas.edu.pe",
 
   // Datos Institucionales de la Entidad
   institution: {
-    name: "Institución Educativa Carmelinas",
-    shortName: "I.E. Carmelinas",
-    badge: "I.E. Carmelinas · Lircay",
+    name: "I.E. De Mujeres Nuestra Señora del Carmen",
+    shortName: "I.E. Nuestra Señora del Carmen",
+    badge: "I.E. Nuestra Señora del Carmen · Lircay",
     motto: "Excelencia en la Gestión Educativa y Formación Integral",
-    modularCode: "0342918", // EJEMPLO: reemplazar por el código modular real
-    address: "Jr. Los Estudiantes s/n, Lircay, Angaraes, Huancavelica, Perú", // EJEMPLO
+    modularCode: "0543210",
+    address: "Jr. Bolognesi 346, Lircay, Angaraes, Huancavelica, Perú",
     location: {
       district: "Lircay",
       province: "Angaraes",
@@ -71,11 +71,11 @@ export const siteConfig = {
   seo: {
     keywords: [
       "SGA",
-      "I.E. Carmelinas",
-      "Carmelinas Lircay",
+      "I.E. Nuestra Señora del Carmen",
+      "Nuestra Señora del Carmen Lircay",
       "Sistema de Gestión Académica",
       "Control Escolar Lircay",
-      "Colegio Carmelinas Huancavelica",
+      "Colegio Nuestra Señora del Carmen Huancavelica",
       "Intranet Escolar",
       "Asistencia y Calificaciones",
       "Educación Lircay Angaraes",

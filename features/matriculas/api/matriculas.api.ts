@@ -93,3 +93,11 @@ export async function descargarConstanciaPdf(id: string, codigo: string): Promis
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
 }
+
+export async function obtenerConstanciaPdfBlobUrl(id: string): Promise<string> {
+  const response = await apiClient.get(`/matriculas/${id}/constancia`, {
+    responseType: "blob",
+  });
+  const blob = new Blob([response.data], { type: "application/pdf" });
+  return window.URL.createObjectURL(blob);
+}

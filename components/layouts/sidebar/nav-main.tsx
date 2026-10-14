@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChevronRightIcon } from "@hugeicons/core-free-icons";
 import type { NavSection, NavItem, NavBadge } from "@/config/navigation/types";
+import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { cn } from "@/lib/utils";
 import {
   SidebarGroup,
@@ -53,10 +54,16 @@ interface NavMenuItemProps {
 }
 
 function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
+  const { anio } = useAnioLectivo();
   const hasSubItems = item.items && item.items.length > 0;
+  const badge =
+    item.id === "admin-enrollment" ? (anio ? String(anio.anio) : undefined) : item.badge;
+  const rutaIncluida = item.rutasIncluidas?.some(
+    (ruta) => currentPath === ruta || currentPath.startsWith(`${ruta}/`),
+  );
   const isActive = item.exact
     ? currentPath === item.link
-    : currentPath === item.link || currentPath.startsWith(`${item.link}/`);
+    : currentPath === item.link || currentPath.startsWith(`${item.link}/`) || Boolean(rutaIncluida);
 
   const isAnyChildActive = hasSubItems
     ? item.items?.some((sub) =>
@@ -175,10 +182,10 @@ function NavMenuItem({ item, currentPath }: NavMenuItemProps) {
             )}
           />
           <span className="min-w-0 flex-1 truncate">{item.label}</span>
-          {item.badge && <RenderNavBadge badge={item.badge} isParentActive={isActive} />}
-          {isActive && (
+          {badge ? <RenderNavBadge badge={badge} isParentActive={isActive} /> : null}
+          {isActive && !badge ? (
             <span className="bg-primary animate-in fade-in size-1.5 shrink-0 rounded-full" />
-          )}
+          ) : null}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>

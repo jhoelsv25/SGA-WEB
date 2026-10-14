@@ -20,11 +20,11 @@ const SLIDES: SlideData[] = [
   {
     id: 0,
     tagline: "Formación Integral y Valores",
-    prefix: "Bienvenido a",
+    prefix: "Bienvenido a la",
     highlight: "I.E.",
-    title: "Carmelinas",
+    title: "Nuestra Señora del Carmen",
     description:
-      "Institución emblemática comprometida con la excelencia pedagógica, la disciplina y el futuro de nuestros estudiantes en Lircay, Huancavelica.",
+      "Institución emblemática de mujeres comprometida con la excelencia pedagógica, la disciplina y el futuro de nuestras estudiantes en Lircay, Huancavelica.",
     badge: "Lircay · Angaraes · Huancavelica",
   },
   {

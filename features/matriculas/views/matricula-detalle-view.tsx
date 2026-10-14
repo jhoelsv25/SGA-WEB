@@ -15,9 +15,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/common/page-header";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { EmptyState } from "@/components/common/empty-state";
-import { useDescargarConstancia, useMatriculaDetailQuery } from "../hooks";
+import { useMatriculaDetailQuery } from "../hooks";
 import {
   ModalOperacionMatricula,
+  ModalConstanciaPdf,
   type OperacionMatriculaTipo,
   DetalleAsignacionEscolar,
   DetalleEstudianteCard,
@@ -32,9 +33,9 @@ interface MatriculaDetalleViewProps {
 export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps) {
   const router = useRouter();
   const { data: matricula, isLoading, isError } = useMatriculaDetailQuery(matriculaId);
-  const descargarConstanciaMutation = useDescargarConstancia();
 
   const [operacionActiva, setOperacionActiva] = React.useState<OperacionMatriculaTipo>(null);
+  const [modalPdfOpen, setModalPdfOpen] = React.useState(false);
 
   if (isLoading) {
     return <LoadingScreen message="Cargando ficha oficial de matrícula..." />;
@@ -98,17 +99,11 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
 
           <Button
             size="sm"
-            className="h-10 gap-2 rounded-full px-4 text-xs shadow-xs"
-            onClick={() =>
-              descargarConstanciaMutation.mutate({
-                id: matricula.id,
-                codigo: matricula.codigo,
-              })
-            }
-            disabled={descargarConstanciaMutation.isPending}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 gap-2 rounded-full px-4 text-xs font-semibold shadow-xs"
+            onClick={() => setModalPdfOpen(true)}
           >
-            <HugeiconsIcon icon={Pdf01Icon} className="size-4 text-rose-300" />
-            Descargar Constancia PDF
+            <HugeiconsIcon icon={Pdf01Icon} className="size-4 text-amber-400" />
+            Ver Constancia Oficial (PDF)
           </Button>
         </div>
       </div>
@@ -196,6 +191,15 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
         tipo={operacionActiva}
         open={Boolean(operacionActiva)}
         onOpenChange={(op: boolean) => !op && setOperacionActiva(null)}
+      />
+
+      {/* Modal Visor Oficial de Constancia con Colores del Colegio */}
+      <ModalConstanciaPdf
+        open={modalPdfOpen}
+        onOpenChange={setModalPdfOpen}
+        matriculaId={matricula.id}
+        matriculaCodigo={matricula.codigo}
+        estudianteNombre={`${matricula.estudiante.apellidos}, ${matricula.estudiante.nombres}`}
       />
     </div>
   );

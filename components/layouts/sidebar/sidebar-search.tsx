@@ -191,7 +191,9 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
 
           {/* Footer de navegación rápida */}
           <div className="border-border/60 bg-muted/40 text-muted-foreground flex items-center justify-between border-t px-4 py-2.5 text-xs">
-            <span className="font-medium">Navegación Institucional · I.E. Carmelinas</span>
+            <span className="font-medium">
+              Navegación Institucional · I.E. Nuestra Señora del Carmen
+            </span>
             <span className="font-mono text-xs">ESC para salir</span>
           </div>
         </DialogContent>

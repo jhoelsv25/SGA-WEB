@@ -79,7 +79,7 @@ export function VariablesPage() {
         icon={Settings02Icon}
         breadcrumbs={[
           { label: "Inicio", href: "/admin/dashboard" },
-          { label: "Configuración" },
+          { label: "Configuración", href: "/admin/configuracion" },
           { label: "Variables del Sistema" },
         ]}
       />

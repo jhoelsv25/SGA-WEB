@@ -6,7 +6,7 @@ import { getDocenteColumns } from "./columns/docente-columns";
 import { EditDocenteModal } from "../components/modals/edit-docente-modal";
 import { CesarDocenteModal } from "../components/modals/cesar-docente-modal";
 import { CredentialsModal } from "../components/modals/credentials-modal";
-import { CarneModal } from "../../credenciales/components/modals/carne-modal";
+import { CarnetModal } from "../../credenciales/components/modals/carnet-modal";
 import { ReemitirCredencialModal } from "../../credenciales/components/modals/reemitir-credencial-modal";
 import { HistorialCriticoModal } from "@/features/personas";
 import type { Docente } from "../types/docentes.types";
@@ -116,9 +116,9 @@ export function DocentesTable({ docentes, isLoading, cursorPagination }: Docente
         onOpenChange={setCesarModalOpen}
       />
 
-      {/* Modal para Carné Docente Imprimible con QR (RF-007 HU5) */}
+      {/* Modal para Carnet Docente Imprimible con QR (RF-007 HU5) */}
       {selectedDocente && (
-        <CarneModal
+        <CarnetModal
           personaId={selectedDocente.personaId}
           open={carneModalOpen}
           onOpenChange={setCarneModalOpen}

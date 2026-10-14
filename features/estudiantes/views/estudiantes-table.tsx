@@ -6,7 +6,7 @@ import { getEstudianteColumns } from "./columns/estudiante-columns";
 import { EditEstudianteModal } from "../components/modals/edit-estudiante-modal";
 import { DeleteEstudianteModal } from "../components/modals/delete-estudiante-modal";
 import { CredentialsModal } from "../components/modals/credentials-modal";
-import { CarneModal } from "../../credenciales/components/modals/carne-modal";
+import { CarnetModal } from "../../credenciales/components/modals/carnet-modal";
 import { ReemitirCredencialModal } from "../../credenciales/components/modals/reemitir-credencial-modal";
 import { HistorialCriticoModal } from "@/features/personas";
 import type { Estudiante } from "../types/estudiantes.types";
@@ -120,9 +120,9 @@ export function EstudiantesTable({
         onOpenChange={setDeleteModalOpen}
       />
 
-      {/* Modal para Carné Escolar Imprimible con QR (RF-007 HU5) */}
+      {/* Modal para Carnet Escolar Imprimible con QR (RF-007 HU5) */}
       {selectedEstudiante && (
-        <CarneModal
+        <CarnetModal
           personaId={selectedEstudiante.personaId}
           open={carneModalOpen}
           onOpenChange={setCarneModalOpen}

@@ -13,7 +13,7 @@ export function CargosPage() {
         icon={IdVerifiedIcon}
         breadcrumbs={[
           { label: "Inicio", href: "/admin/dashboard" },
-          { label: "Administración" },
+          { label: "Roles y Permisos", href: "/admin/roles" },
           { label: "Cargos" },
         ]}
       />

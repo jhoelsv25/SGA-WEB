@@ -83,7 +83,7 @@ export function TurnosPage() {
         icon={Clock01Icon}
         breadcrumbs={[
           { label: "Inicio", href: "/admin/dashboard" },
-          { label: "Configuración" },
+          { label: "Configuración", href: "/admin/configuracion" },
           { label: "Turnos" },
         ]}
       />
