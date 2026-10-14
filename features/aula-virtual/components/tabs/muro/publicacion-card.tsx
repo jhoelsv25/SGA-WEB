@@ -125,9 +125,7 @@ export function PublicacionCard({
   return (
     <div
       className={`rounded-xl border p-4 transition-all duration-200 ${
-        pub.fijada
-          ? "border-primary/50 bg-primary/[0.03] shadow-xs"
-          : "border-border bg-card shadow-2xs"
+        pub.fijada ? "border-primary/50 bg-primary/3 shadow-xs" : "border-border bg-card shadow-2xs"
       }`}
     >
       {/* Banner de fijado */}
