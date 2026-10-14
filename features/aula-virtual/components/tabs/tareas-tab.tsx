@@ -3,6 +3,7 @@
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  Activity01Icon,
   Add01Icon,
   Calendar03Icon,
   CheckmarkCircle02Icon,
@@ -21,11 +22,21 @@ import { PageState } from "@/components/common/page-state";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { SelectOption } from "@/components/common/select";
 import { formatDate } from "@/lib/formatters/date";
-import { useCerrarTarea, useEliminarTarea, usePublicarTarea, useTareas } from "../hooks";
-import { TareaModal } from "./tarea-modal";
-import { EntregasTareaModal } from "./entregas-tarea-modal";
-import { ResolverTareaModal } from "./resolver-tarea-modal";
-import type { Tarea, TipoTarea, Unidad } from "../types";
+import {
+  useCerrarTarea,
+  useEliminarTarea,
+  usePublicarTarea,
+  useRegistrarActividad,
+  useTareas,
+} from "../../hooks";
+import { TareaModal } from "../modals/tarea-modal";
+import { EntregasTareaModal } from "../modals/entregas-tarea-modal";
+import { ResolverTareaModal } from "../modals/resolver-tarea-modal";
+import {
+  ActividadRecursoModal,
+  type RecursoActividadTarget,
+} from "../modals/actividad-recurso-modal";
+import type { Tarea, TipoTarea, Unidad } from "../../types";
 
 const TIPOS_FILTRO = [
   { value: "todos", label: "Todos los tipos" },
@@ -88,6 +99,11 @@ export function TareasTab({
   }>({ abierto: false, tareaId: null });
 
   const [tareaAEliminar, setTareaAEliminar] = React.useState<Tarea | null>(null);
+  const [recursoActividad, setRecursoActividad] = React.useState<RecursoActividadTarget | null>(
+    null,
+  );
+
+  const registrarActividad = useRegistrarActividad();
 
   // Filtrado de tareas
   const tareasFiltradas = React.useMemo(() => {
@@ -322,6 +338,23 @@ export function TareasTab({
                           Entregas
                         </Button>
 
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="min-h-9 gap-1.5"
+                          onClick={() =>
+                            setRecursoActividad({
+                              tipo: "tarea",
+                              id: tarea.id,
+                              titulo: tarea.titulo,
+                            })
+                          }
+                        >
+                          <HugeiconsIcon icon={Activity01Icon} size={16} />
+                          Actividad
+                        </Button>
+
                         {tarea.estado === "borrador" && (
                           <Button
                             type="button"
@@ -377,7 +410,10 @@ export function TareasTab({
                         variant={miEntrega ? "outline" : "default"}
                         size="sm"
                         className="min-h-9 gap-1.5"
-                        onClick={() => setModalResolver({ abierto: true, tareaId: tarea.id })}
+                        onClick={() => {
+                          registrarActividad.mutate({ tareaId: tarea.id, accion: "abrio" });
+                          setModalResolver({ abierto: true, tareaId: tarea.id });
+                        }}
                       >
                         {miEntrega?.estado === "calificada" ? (
                           <>
@@ -448,6 +484,12 @@ export function TareasTab({
             setTareaAEliminar(null);
           }
         }}
+      />
+
+      <ActividadRecursoModal
+        open={Boolean(recursoActividad)}
+        onOpenChange={(abierto) => !abierto && setRecursoActividad(null)}
+        recurso={recursoActividad}
       />
     </div>
   );

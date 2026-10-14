@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/status-badge";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageState } from "@/components/common/page-state";
-import { useLibroNotas } from "../hooks";
-import { descargarExcelLibroNotas } from "../api";
+import { useLibroNotas } from "../../hooks";
+import { descargarExcelLibroNotas } from "../../api";
 import { toast } from "@/lib/toast";
 
 export function LibroNotasTab({

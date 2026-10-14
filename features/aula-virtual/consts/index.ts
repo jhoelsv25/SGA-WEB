@@ -56,3 +56,5 @@ export const DIAS_SEMANA: Record<number, string> = {
 export function esTipoEnlace(tipo: TipoMaterial): boolean {
   return tipo === "enlace";
 }
+
+export * from "./interaccion.consts";

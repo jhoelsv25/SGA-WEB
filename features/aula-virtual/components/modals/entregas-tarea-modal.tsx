@@ -14,9 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/status-badge";
 import { formatDate } from "@/lib/formatters/date";
-import { useEntregasDeTarea } from "../hooks";
+import { useEntregasDeTarea } from "../../hooks";
 import { CalificarEntregaModal } from "./calificar-entrega-modal";
-import type { Entrega, Tarea } from "../types";
+import type { Entrega, Tarea } from "../../types";
 
 export function EntregasTareaModal({
   abierto,

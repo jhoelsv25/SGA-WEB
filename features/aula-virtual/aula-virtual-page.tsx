@@ -4,15 +4,19 @@ import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  Activity01Icon,
   Award01Icon,
   BookOpen01Icon,
+  BubbleChatIcon,
   Calendar03Icon,
   ChartBarLineIcon,
   CloudUploadIcon,
+  Comment01Icon,
   Delete02Icon,
   FileAddIcon,
   FileEditIcon,
   PlusSignIcon,
+  ShieldAlertIcon,
   Task01Icon,
 } from "@hugeicons/core-free-icons";
 import { EmptyState } from "@/components/common/empty-state";
@@ -27,17 +31,28 @@ import { formatDate } from "@/lib/formatters/date";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { urlDeArchivo } from "./api";
 import {
+  ActividadRecursoModal,
+  ChatTab,
   LibroNotasTab,
   MisNotasTab,
+  ModeracionTab,
+  MuroTab,
   PlanificarMaterialModal,
   PublicarExtraModal,
   PublicarMaterialModal,
   SolicitarCambioFechaModal,
   TareasTab,
   UnidadModal,
+  type RecursoActividadTarget,
 } from "./components";
 import { PLAZO_CONFIG } from "./consts";
-import { useAula, useMisCursos, useRetirarMaterial } from "./hooks";
+import {
+  useAula,
+  useChatNoLeidos,
+  useMisCursos,
+  useRegistrarActividad,
+  useRetirarMaterial,
+} from "./hooks";
 import type { Material, Unidad } from "./types";
 
 function MaterialFila({
@@ -46,12 +61,16 @@ function MaterialFila({
   onPublicar,
   onSolicitarCambio,
   onRetirar,
+  onVerActividad,
+  onRegistrarVisualizacion,
 }: {
   material: Material;
   puedeAdministrar: boolean;
   onPublicar: (material: Material) => void;
   onSolicitarCambio: (material: Material) => void;
   onRetirar: (material: Material) => void;
+  onVerActividad?: (material: Material) => void;
+  onRegistrarVisualizacion?: (material: Material, accion: "visualizo" | "descargo") => void;
 }) {
   const plazo = material.plazo ? PLAZO_CONFIG[material.plazo] : null;
   return (
@@ -73,10 +92,28 @@ function MaterialFila({
       </div>
       <div className="flex items-center gap-2">
         {material.url && (
-          <Button asChild variant="outline" size="sm" className="min-h-9">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="min-h-9"
+            onClick={() => onRegistrarVisualizacion?.(material, "descargo")}
+          >
             <Link href={urlDeArchivo(material.url)} target="_blank" rel="noreferrer">
               Ver
             </Link>
+          </Button>
+        )}
+        {puedeAdministrar && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-9 gap-1.5"
+            onClick={() => onVerActividad?.(material)}
+          >
+            <HugeiconsIcon icon={Activity01Icon} size={16} />
+            Actividad
           </Button>
         )}
         {puedeAdministrar && !material.publicadoEn && (
@@ -154,8 +191,14 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
   const [materialPublicar, setMaterialPublicar] = React.useState<Material | null>(null);
   const [materialCambio, setMaterialCambio] = React.useState<Material | null>(null);
   const [materialRetirar, setMaterialRetirar] = React.useState<Material | null>(null);
+  const [recursoActividad, setRecursoActividad] = React.useState<RecursoActividadTarget | null>(
+    null,
+  );
 
   const retirar = useRetirarMaterial();
+  const registrarActividad = useRegistrarActividad();
+  const { data: chatNoLeidos } = useChatNoLeidos(aula?.cursoSeccionId ?? "");
+  const anioCerrado = anio?.estado === "cerrado";
 
   const opcionesPeriodo = React.useMemo(
     () => [
@@ -239,11 +282,30 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
                   <HugeiconsIcon icon={Task01Icon} size={16} />
                   Tareas y Evaluaciones
                 </TabsTrigger>
+                <TabsTrigger value="muro" className="gap-2">
+                  <HugeiconsIcon icon={Comment01Icon} size={16} />
+                  Muro
+                </TabsTrigger>
+                <TabsTrigger value="chat" className="gap-2">
+                  <HugeiconsIcon icon={BubbleChatIcon} size={16} />
+                  <span>Chat</span>
+                  {Boolean(chatNoLeidos?.noLeidos && chatNoLeidos.noLeidos > 0) && (
+                    <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold">
+                      {chatNoLeidos?.noLeidos}
+                    </span>
+                  )}
+                </TabsTrigger>
                 {aula.puedeAdministrar ? (
-                  <TabsTrigger value="libro-notas" className="gap-2">
-                    <HugeiconsIcon icon={ChartBarLineIcon} size={16} />
-                    Libro de Calificaciones
-                  </TabsTrigger>
+                  <>
+                    <TabsTrigger value="libro-notas" className="gap-2">
+                      <HugeiconsIcon icon={ChartBarLineIcon} size={16} />
+                      Libro de Calificaciones
+                    </TabsTrigger>
+                    <TabsTrigger value="moderacion" className="gap-2">
+                      <HugeiconsIcon icon={ShieldAlertIcon} size={16} />
+                      Moderación
+                    </TabsTrigger>
+                  </>
                 ) : (
                   <TabsTrigger value="mis-notas" className="gap-2">
                     <HugeiconsIcon icon={Award01Icon} size={16} />
@@ -320,6 +382,20 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
                               onPublicar={setMaterialPublicar}
                               onSolicitarCambio={setMaterialCambio}
                               onRetirar={setMaterialRetirar}
+                              onVerActividad={(mat) =>
+                                setRecursoActividad({
+                                  tipo: "material",
+                                  id: mat.id,
+                                  titulo: mat.titulo,
+                                })
+                              }
+                              onRegistrarVisualizacion={(mat, accion) => {
+                                registrarActividad.mutate({
+                                  materialId: mat.id,
+                                  accion: "visualizo",
+                                });
+                                registrarActividad.mutate({ materialId: mat.id, accion });
+                              }}
                             />
                           ))
                         )}
@@ -338,13 +414,34 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
                 />
               </TabsContent>
 
+              <TabsContent value="muro">
+                <MuroTab
+                  cursoSeccionId={aula.cursoSeccionId}
+                  puedeAdministrar={aula.puedeAdministrar}
+                  anioCerrado={anioCerrado}
+                />
+              </TabsContent>
+
+              <TabsContent value="chat">
+                <ChatTab
+                  cursoSeccionId={aula.cursoSeccionId}
+                  puedeAdministrar={aula.puedeAdministrar}
+                  anioCerrado={anioCerrado}
+                />
+              </TabsContent>
+
               {aula.puedeAdministrar ? (
-                <TabsContent value="libro-notas">
-                  <LibroNotasTab
-                    cursoSeccionId={aula.cursoSeccionId}
-                    periodoId={periodoId || undefined}
-                  />
-                </TabsContent>
+                <>
+                  <TabsContent value="libro-notas">
+                    <LibroNotasTab
+                      cursoSeccionId={aula.cursoSeccionId}
+                      periodoId={periodoId || undefined}
+                    />
+                  </TabsContent>
+                  <TabsContent value="moderacion">
+                    <ModeracionTab cursoSeccionId={aula.cursoSeccionId} />
+                  </TabsContent>
+                </>
               ) : (
                 <TabsContent value="mis-notas">
                   <MisNotasTab periodoId={periodoId || undefined} />
@@ -404,6 +501,11 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
           if (materialRetirar) retirar.mutate(materialRetirar.id);
           setMaterialRetirar(null);
         }}
+      />
+      <ActividadRecursoModal
+        open={Boolean(recursoActividad)}
+        onOpenChange={(abierto) => !abierto && setRecursoActividad(null)}
+        recurso={recursoActividad}
       />
     </div>
   );

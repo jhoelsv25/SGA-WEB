@@ -304,3 +304,88 @@ export interface CursoNotasEstudiante {
   notaLiteral: "AD" | "A" | "B" | "C" | null;
   tareas?: TareaEstudianteNota[];
 }
+
+export type TipoModeracion = "publicacion" | "comentario" | "chat";
+
+export interface PublicacionMuro {
+  id: string;
+  cursoSeccionId: string;
+  autorId: string;
+  autorNombre: string;
+  autorRol?: string;
+  contenido: string;
+  adjuntoUrl: string | null;
+  fijada: boolean;
+  vigente: boolean;
+  creadoEn: string;
+  actualizadoEn: string;
+  ocultadoPorId: string | null;
+  ocultadoEn: string | null;
+  motivoOcultamiento: string | null;
+  comentariosCount?: number;
+}
+
+export interface ComentarioMuro {
+  id: string;
+  publicacionId: string;
+  autorId: string;
+  autorNombre: string;
+  autorRol?: string;
+  contenido: string;
+  vigente: boolean;
+  creadoEn: string;
+  actualizadoEn: string;
+  ocultadoPorId: string | null;
+  ocultadoEn: string | null;
+  motivoOcultamiento: string | null;
+}
+
+export interface MensajeChat {
+  id: string;
+  cursoSeccionId: string;
+  emisorId: string;
+  emisorNombre: string;
+  emisorRol?: string;
+  contenido: string;
+  adjuntoUrl: string | null;
+  vigente: boolean;
+  enviadoEn: string;
+  actualizadoEn?: string | null;
+  ocultadoPorId: string | null;
+  ocultadoEn: string | null;
+  motivoOcultamiento: string | null;
+}
+
+export interface HistorialModeracion {
+  id: string;
+  tipo: TipoModeracion;
+  cursoSeccionId: string;
+  contenido: string | null;
+  adjuntoUrl: string | null;
+  autorNombre: string;
+  ocultadoPorNombre: string;
+  ocultadoEn: string;
+  motivoOcultamiento: string;
+}
+
+export interface ActividadMaterialEstudiante {
+  matriculaId: string;
+  estudianteId: string;
+  codigo: string;
+  nombreCompleto: string;
+  visualizo: boolean;
+  visualizoEn: string | null;
+  descargo: boolean;
+  descargoEn: string | null;
+}
+
+export interface ActividadTareaEstudiante {
+  matriculaId: string;
+  estudianteId: string;
+  codigo: string;
+  nombreCompleto: string;
+  abrio: boolean;
+  abrioEn: string | null;
+  completo: boolean;
+  completoEn: string | null;
+}

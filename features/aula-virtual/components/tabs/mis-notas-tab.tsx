@@ -5,8 +5,8 @@ import { StatusBadge } from "@/components/common/status-badge";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageState } from "@/components/common/page-state";
 import { formatDate } from "@/lib/formatters/date";
-import { useMisNotas } from "../hooks";
-import type { CursoNotasEstudiante, TareaEstudianteNota } from "../types";
+import { useMisNotas } from "../../hooks";
+import type { CursoNotasEstudiante, TareaEstudianteNota } from "../../types";
 
 export function MisNotasTab({ periodoId }: { periodoId?: string }) {
   const { data: notas = [], isLoading, isError, error, refetch } = useMisNotas(periodoId);

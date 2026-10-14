@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Calendar03Icon } from "@hugeicons/core-free-icons";
-import { Modal } from "@/components/common/modal";
 import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,15 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SelectOption } from "@/components/common/select";
 import { DatePicker } from "@/components/common/date-picker";
-import { usePlanificarMaterial } from "../hooks";
-import { TIPOS_MATERIAL, DIAS_SEMANA } from "../consts";
-import type { BloqueCurso, TipoMaterial } from "../types";
+import { usePlanificarMaterial } from "../../hooks";
+import { TIPOS_MATERIAL, DIAS_SEMANA } from "../../consts";
+import type { BloqueCurso, TipoMaterial } from "../../types";
 
-interface PlanificarMaterialModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+export interface PlanificarMaterialFormProps {
   unidadId: string;
   bloques: BloqueCurso[];
+  onCancel: () => void;
+  onSuccess?: () => void;
 }
 
 function aISO(fecha: Date | undefined): string {
@@ -28,15 +26,12 @@ function aISO(fecha: Date | undefined): string {
   ).padStart(2, "0")}`;
 }
 
-function FormularioPlanificar({
+export function PlanificarMaterialForm({
   unidadId,
   bloques,
-  onCerrar,
-}: {
-  unidadId: string;
-  bloques: BloqueCurso[];
-  onCerrar: () => void;
-}) {
+  onCancel,
+  onSuccess,
+}: PlanificarMaterialFormProps) {
   const [titulo, setTitulo] = React.useState("");
   const [descripcion, setDescripcion] = React.useState("");
   const [tipo, setTipo] = React.useState<TipoMaterial>("documento");
@@ -72,7 +67,11 @@ function FormularioPlanificar({
         fechaClase: horarioId ? aISO(fechaClase) : undefined,
         fechaProgramada: !horarioId ? aISO(fechaProgramada) : undefined,
       },
-      { onSuccess: onCerrar },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+        },
+      },
     );
   };
 
@@ -146,7 +145,7 @@ function FormularioPlanificar({
       )}
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">
-        <Button type="button" variant="outline" className="min-h-10" onClick={onCerrar}>
+        <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
           Cancelar
         </Button>
         <Button type="submit" disabled={planificar.isPending} className="min-h-10 gap-2">
@@ -155,32 +154,5 @@ function FormularioPlanificar({
         </Button>
       </div>
     </form>
-  );
-}
-
-export function PlanificarMaterialModal({
-  open,
-  onOpenChange,
-  unidadId,
-  bloques,
-}: PlanificarMaterialModalProps) {
-  return (
-    <Modal
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Planificar material"
-      description="Compromete un material de reforzamiento con su fecha. Cuenta en el IGM."
-      icon={Calendar03Icon}
-      size="md"
-    >
-      {open && (
-        <FormularioPlanificar
-          key={unidadId}
-          unidadId={unidadId}
-          bloques={bloques}
-          onCerrar={() => onOpenChange(false)}
-        />
-      )}
-    </Modal>
   );
 }
