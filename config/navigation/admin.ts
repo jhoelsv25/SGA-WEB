@@ -17,6 +17,8 @@ import {
   ChartBarLineIcon,
   Settings02Icon,
   FileEditIcon,
+  AlertCircleIcon,
+  Task01Icon,
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
@@ -230,6 +232,23 @@ export const adminNavigation: NavSection[] = [
         roles: ["admin"],
         ocultarAlAdministrador: true,
         description: "Historial de mis sesiones, tema y justificaciones",
+      },
+      {
+        id: "admin-ausencias-docentes",
+        label: "Ausencias docentes",
+        link: "/admin/ausencias-docentes",
+        icon: AlertCircleIcon,
+        roles: ["admin"],
+        description: "Supervisión y control de ausencias de docentes en sesiones de clase",
+      },
+      {
+        id: "admin-mis-ausencias",
+        label: "Mis ausencias",
+        link: "/admin/mis-ausencias",
+        icon: Task01Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Historial de ausencias en sesiones de clase y presentación de descargos",
       },
       {
         id: "admin-sessions",
