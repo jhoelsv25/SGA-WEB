@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { FileAddIcon } from "@hugeicons/core-free-icons";
-import { Modal } from "@/components/common/modal";
 import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,26 +8,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SelectOption } from "@/components/common/select";
 import { FileDropzone } from "@/components/common/file-dropzone";
-import { usePublicarExtra } from "../hooks";
-import { TIPOS_MATERIAL, esTipoEnlace } from "../consts";
-import type { TipoMaterial } from "../types";
+import { usePublicarExtra } from "../../hooks";
+import { TIPOS_MATERIAL, esTipoEnlace } from "../../consts";
+import type { TipoMaterial } from "../../types";
 
-interface PublicarExtraModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+export interface PublicarExtraFormProps {
   unidadId: string;
   tamanoMaximoMb: number;
+  onCancel: () => void;
+  onSuccess?: () => void;
 }
 
-function FormularioExtra({
+export function PublicarExtraForm({
   unidadId,
   tamanoMaximoMb,
-  onCerrar,
-}: {
-  unidadId: string;
-  tamanoMaximoMb: number;
-  onCerrar: () => void;
-}) {
+  onCancel,
+  onSuccess,
+}: PublicarExtraFormProps) {
   const [titulo, setTitulo] = React.useState("");
   const [descripcion, setDescripcion] = React.useState("");
   const [tipo, setTipo] = React.useState<TipoMaterial>("documento");
@@ -64,7 +59,11 @@ function FormularioExtra({
         enlace: enlace.trim() || undefined,
         archivo,
       },
-      { onSuccess: onCerrar },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+        },
+      },
     );
   };
 
@@ -134,7 +133,7 @@ function FormularioExtra({
       )}
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">
-        <Button type="button" variant="outline" className="min-h-10" onClick={onCerrar}>
+        <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
           Cancelar
         </Button>
         <Button type="submit" disabled={publicarExtra.isPending} className="min-h-10 gap-2">
@@ -143,32 +142,5 @@ function FormularioExtra({
         </Button>
       </div>
     </form>
-  );
-}
-
-export function PublicarExtraModal({
-  open,
-  onOpenChange,
-  unidadId,
-  tamanoMaximoMb,
-}: PublicarExtraModalProps) {
-  return (
-    <Modal
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Publicar material extra"
-      description="Se ve igual que los demás, pero no cuenta en el IGM."
-      icon={FileAddIcon}
-      size="md"
-    >
-      {open && (
-        <FormularioExtra
-          key={unidadId}
-          unidadId={unidadId}
-          tamanoMaximoMb={tamanoMaximoMb}
-          onCerrar={() => onOpenChange(false)}
-        />
-      )}
-    </Modal>
   );
 }

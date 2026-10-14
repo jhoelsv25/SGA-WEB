@@ -1,33 +1,28 @@
 "use client";
 
 import * as React from "react";
-import { CloudUploadIcon } from "@hugeicons/core-free-icons";
-import { Modal } from "@/components/common/modal";
 import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileDropzone } from "@/components/common/file-dropzone";
-import { usePublicarMaterial, useReemplazarMaterial } from "../hooks";
-import { TIPOS_MATERIAL, esTipoEnlace } from "../consts";
-import type { Material } from "../types";
+import { usePublicarMaterial, useReemplazarMaterial } from "../../hooks";
+import { TIPOS_MATERIAL, esTipoEnlace } from "../../consts";
+import type { Material } from "../../types";
 
-interface PublicarMaterialModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  material: Material | null;
-  tamanoMaximoMb: number;
-}
-
-function FormularioPublicar({
-  material,
-  tamanoMaximoMb,
-  onCerrar,
-}: {
+export interface PublicarMaterialFormProps {
   material: Material;
   tamanoMaximoMb: number;
-  onCerrar: () => void;
-}) {
+  onCancel: () => void;
+  onSuccess?: () => void;
+}
+
+export function PublicarMaterialForm({
+  material,
+  tamanoMaximoMb,
+  onCancel,
+  onSuccess,
+}: PublicarMaterialFormProps) {
   const [enlace, setEnlace] = React.useState("");
   const [archivo, setArchivo] = React.useState<File | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -51,7 +46,11 @@ function FormularioPublicar({
     }
     mutacion.mutate(
       { id: material.id, enlace: enlace.trim() || undefined, archivo },
-      { onSuccess: onCerrar },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+        },
+      },
     );
   };
 
@@ -88,7 +87,7 @@ function FormularioPublicar({
       )}
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">
-        <Button type="button" variant="outline" className="min-h-10" onClick={onCerrar}>
+        <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
           Cancelar
         </Button>
         <Button type="submit" disabled={mutacion.isPending} className="min-h-10 gap-2">
@@ -97,32 +96,5 @@ function FormularioPublicar({
         </Button>
       </div>
     </form>
-  );
-}
-
-export function PublicarMaterialModal({
-  open,
-  onOpenChange,
-  material,
-  tamanoMaximoMb,
-}: PublicarMaterialModalProps) {
-  return (
-    <Modal
-      open={open}
-      onOpenChange={onOpenChange}
-      title={material?.publicadoEn ? "Reemplazar material" : "Publicar material"}
-      description={material?.titulo}
-      icon={CloudUploadIcon}
-      size="md"
-    >
-      {material && (
-        <FormularioPublicar
-          key={material.id}
-          material={material}
-          tamanoMaximoMb={tamanoMaximoMb}
-          onCerrar={() => onOpenChange(false)}
-        />
-      )}
-    </Modal>
   );
 }

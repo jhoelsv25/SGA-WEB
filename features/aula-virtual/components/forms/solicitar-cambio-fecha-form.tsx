@@ -1,21 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Calendar03Icon } from "@hugeicons/core-free-icons";
-import { Modal } from "@/components/common/modal";
-import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "@/components/common/spinner";
 import { DatePicker } from "@/components/common/date-picker";
-import { useSolicitarCambioFecha } from "../hooks";
-import type { Material } from "../types";
-
-interface SolicitarCambioFechaModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  material: Material | null;
-}
+import { useSolicitarCambioFecha } from "../../hooks";
+import type { Material } from "../../types";
 
 function aISO(fecha: Date | undefined): string {
   if (!fecha) return "";
@@ -24,7 +16,17 @@ function aISO(fecha: Date | undefined): string {
   ).padStart(2, "0")}`;
 }
 
-function FormularioCambio({ material, onCerrar }: { material: Material; onCerrar: () => void }) {
+interface SolicitarCambioFechaFormProps {
+  material: Material;
+  onCancel: () => void;
+  onSuccess?: () => void;
+}
+
+export function SolicitarCambioFechaForm({
+  material,
+  onCancel,
+  onSuccess,
+}: SolicitarCambioFechaFormProps) {
   const [fecha, setFecha] = React.useState<Date | undefined>();
   const [motivo, setMotivo] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
@@ -43,7 +45,7 @@ function FormularioCambio({ material, onCerrar }: { material: Material; onCerrar
     }
     solicitar.mutate(
       { id: material.id, fechaSolicitada: aISO(fecha), motivo: motivo.trim() },
-      { onSuccess: onCerrar },
+      { onSuccess },
     );
   };
 
@@ -68,7 +70,7 @@ function FormularioCambio({ material, onCerrar }: { material: Material; onCerrar
       </div>
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">
-        <Button type="button" variant="outline" className="min-h-10" onClick={onCerrar}>
+        <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
           Cancelar
         </Button>
         <Button type="submit" disabled={solicitar.isPending} className="min-h-10 gap-2">
@@ -77,30 +79,5 @@ function FormularioCambio({ material, onCerrar }: { material: Material; onCerrar
         </Button>
       </div>
     </form>
-  );
-}
-
-export function SolicitarCambioFechaModal({
-  open,
-  onOpenChange,
-  material,
-}: SolicitarCambioFechaModalProps) {
-  return (
-    <Modal
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Solicitar cambio de fecha"
-      description={material ? `${material.titulo} · fecha congelada` : undefined}
-      icon={Calendar03Icon}
-      size="md"
-    >
-      {material && (
-        <FormularioCambio
-          key={material.id}
-          material={material}
-          onCerrar={() => onOpenChange(false)}
-        />
-      )}
-    </Modal>
   );
 }

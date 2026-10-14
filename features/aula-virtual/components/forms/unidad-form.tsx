@@ -1,29 +1,27 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen01Icon } from "@hugeicons/core-free-icons";
-import { Modal } from "@/components/common/modal";
-import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Spinner } from "@/components/common/spinner";
 import { SelectOption } from "@/components/common/select";
 import { DatePicker } from "@/components/common/date-picker";
-import { useCrearUnidad, useActualizarUnidad } from "../hooks";
-import type { Unidad } from "../types";
+import { useCrearUnidad, useActualizarUnidad } from "../../hooks";
+import type { Unidad } from "../../types";
 
 interface Bimestre {
   id: string;
   nombre: string;
 }
 
-interface UnidadModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+interface UnidadFormProps {
   cursoSeccionId: string;
   bimestres: Bimestre[];
   unidad?: Unidad | null;
+  onCancel: () => void;
+  onSuccess?: () => void;
 }
 
 function aFecha(valor: string | null | undefined): Date | undefined {
@@ -39,17 +37,13 @@ function aISO(fecha: Date | undefined): string {
   ).padStart(2, "0")}`;
 }
 
-function FormularioUnidad({
+export function UnidadForm({
   cursoSeccionId,
   bimestres,
   unidad,
-  onCerrar,
-}: {
-  cursoSeccionId: string;
-  bimestres: Bimestre[];
-  unidad?: Unidad | null;
-  onCerrar: () => void;
-}) {
+  onCancel,
+  onSuccess,
+}: UnidadFormProps) {
   const [titulo, setTitulo] = React.useState(unidad?.titulo ?? "");
   const [descripcion, setDescripcion] = React.useState(unidad?.descripcion ?? "");
   const [periodoId, setPeriodoId] = React.useState(unidad?.periodoId ?? bimestres[0]?.id ?? "");
@@ -86,9 +80,9 @@ function FormularioUnidad({
       publicada: true,
     };
     if (unidad) {
-      actualizar.mutate({ id: unidad.id, ...payload }, { onSuccess: onCerrar });
+      actualizar.mutate({ id: unidad.id, ...payload }, { onSuccess });
     } else {
-      crear.mutate(payload, { onSuccess: onCerrar });
+      crear.mutate(payload, { onSuccess });
     }
   };
 
@@ -141,7 +135,7 @@ function FormularioUnidad({
       </div>
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">
-        <Button type="button" variant="outline" className="min-h-10" onClick={onCerrar}>
+        <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
           Cancelar
         </Button>
         <Button type="submit" disabled={mutacion.isPending} className="min-h-10 gap-2">
@@ -150,34 +144,5 @@ function FormularioUnidad({
         </Button>
       </div>
     </form>
-  );
-}
-
-export function UnidadModal({
-  open,
-  onOpenChange,
-  cursoSeccionId,
-  bimestres,
-  unidad,
-}: UnidadModalProps) {
-  return (
-    <Modal
-      open={open}
-      onOpenChange={onOpenChange}
-      title={unidad ? "Editar unidad" : "Nueva unidad"}
-      description="Organiza el aula virtual en unidades, como en tu plan de clase."
-      icon={BookOpen01Icon}
-      size="md"
-    >
-      {open && (
-        <FormularioUnidad
-          key={unidad?.id ?? "nueva"}
-          cursoSeccionId={cursoSeccionId}
-          bimestres={bimestres}
-          unidad={unidad}
-          onCerrar={() => onOpenChange(false)}
-        />
-      )}
-    </Modal>
   );
 }

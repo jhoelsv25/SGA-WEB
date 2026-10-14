@@ -4,13 +4,20 @@ import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  Activity01Icon,
+  Award01Icon,
   BookOpen01Icon,
+  BubbleChatIcon,
   Calendar03Icon,
+  ChartBarLineIcon,
   CloudUploadIcon,
+  Comment01Icon,
   Delete02Icon,
   FileAddIcon,
   FileEditIcon,
   PlusSignIcon,
+  ShieldAlertIcon,
+  Task01Icon,
 } from "@hugeicons/core-free-icons";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
@@ -19,18 +26,33 @@ import { SelectOption } from "@/components/common/select";
 import { StatusBadge } from "@/components/common/status-badge";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/formatters/date";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { urlDeArchivo } from "./api";
 import {
+  ActividadRecursoModal,
+  ChatTab,
+  LibroNotasTab,
+  MisNotasTab,
+  ModeracionTab,
+  MuroTab,
   PlanificarMaterialModal,
   PublicarExtraModal,
   PublicarMaterialModal,
   SolicitarCambioFechaModal,
+  TareasTab,
   UnidadModal,
+  type RecursoActividadTarget,
 } from "./components";
 import { PLAZO_CONFIG } from "./consts";
-import { useAula, useMisCursos, useRetirarMaterial } from "./hooks";
+import {
+  useAula,
+  useChatNoLeidos,
+  useMisCursos,
+  useRegistrarActividad,
+  useRetirarMaterial,
+} from "./hooks";
 import type { Material, Unidad } from "./types";
 
 function MaterialFila({
@@ -39,12 +61,16 @@ function MaterialFila({
   onPublicar,
   onSolicitarCambio,
   onRetirar,
+  onVerActividad,
+  onRegistrarVisualizacion,
 }: {
   material: Material;
   puedeAdministrar: boolean;
   onPublicar: (material: Material) => void;
   onSolicitarCambio: (material: Material) => void;
   onRetirar: (material: Material) => void;
+  onVerActividad?: (material: Material) => void;
+  onRegistrarVisualizacion?: (material: Material, accion: "visualizo" | "descargo") => void;
 }) {
   const plazo = material.plazo ? PLAZO_CONFIG[material.plazo] : null;
   return (
@@ -66,10 +92,28 @@ function MaterialFila({
       </div>
       <div className="flex items-center gap-2">
         {material.url && (
-          <Button asChild variant="outline" size="sm" className="min-h-9">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="min-h-9"
+            onClick={() => onRegistrarVisualizacion?.(material, "descargo")}
+          >
             <Link href={urlDeArchivo(material.url)} target="_blank" rel="noreferrer">
               Ver
             </Link>
+          </Button>
+        )}
+        {puedeAdministrar && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-9 gap-1.5"
+            onClick={() => onVerActividad?.(material)}
+          >
+            <HugeiconsIcon icon={Activity01Icon} size={16} />
+            Actividad
           </Button>
         )}
         {puedeAdministrar && !material.publicadoEn && (
@@ -131,6 +175,7 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
   const { data: cursos = [] } = useMisCursos();
   const { anio } = useAnioLectivo();
   const [cursoId, setCursoId] = React.useState(cursoSeccionId ?? "");
+  const [periodoId, setPeriodoId] = React.useState<string>("");
   const cursoActual = cursoId || cursos[0]?.cursoSeccionId || "";
 
   const { data: aula, isLoading, isError, error, refetch } = useAula(cursoActual);
@@ -146,14 +191,31 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
   const [materialPublicar, setMaterialPublicar] = React.useState<Material | null>(null);
   const [materialCambio, setMaterialCambio] = React.useState<Material | null>(null);
   const [materialRetirar, setMaterialRetirar] = React.useState<Material | null>(null);
+  const [recursoActividad, setRecursoActividad] = React.useState<RecursoActividadTarget | null>(
+    null,
+  );
 
   const retirar = useRetirarMaterial();
+  const registrarActividad = useRegistrarActividad();
+  const { data: chatNoLeidos } = useChatNoLeidos(aula?.cursoSeccionId ?? "");
+  const anioCerrado = anio?.estado === "cerrado";
+
+  const opcionesPeriodo = React.useMemo(
+    () => [
+      { value: "", label: "Todos los periodos" },
+      ...(anio?.bimestres ?? []).map((b) => ({
+        value: b.id,
+        label: `Bimestre ${b.nombre}`,
+      })),
+    ],
+    [anio?.bimestres],
+  );
 
   return (
     <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
       <PageHeader
         title="Aula virtual"
-        description="Unidades y materiales de reforzamiento del curso."
+        description="Materiales, tareas, evaluaciones y libro de calificaciones."
         icon={BookOpen01Icon}
         breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Aula virtual" }]}
         actions={
@@ -170,17 +232,29 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
         }
       />
 
-      <div className="w-full max-w-80">
-        <SelectOption
-          options={cursos.map((c) => ({
-            value: c.cursoSeccionId,
-            label: `${c.cursoNombre} · ${c.seccionNombre}`,
-          }))}
-          value={cursoActual}
-          onSelect={setCursoId}
-          placeholder="Curso"
-          searchPlaceholder="Buscar curso"
-        />
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="w-full max-w-80">
+          <SelectOption
+            options={cursos.map((c) => ({
+              value: c.cursoSeccionId,
+              label: `${c.cursoNombre} · ${c.seccionNombre}`,
+            }))}
+            value={cursoActual}
+            onSelect={setCursoId}
+            placeholder="Curso"
+            searchPlaceholder="Buscar curso"
+          />
+        </div>
+        {opcionesPeriodo.length > 1 && (
+          <div className="w-full max-w-56">
+            <SelectOption
+              options={opcionesPeriodo}
+              value={periodoId}
+              onSelect={setPeriodoId}
+              placeholder="Periodo"
+            />
+          </div>
+        )}
       </div>
 
       {!cursoActual ? (
@@ -198,82 +272,182 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
           errorTitle="No se pudo cargar el aula virtual"
         >
           {aula && (
-            <div className="space-y-4">
-              {aula.unidades.length === 0 ? (
-                <EmptyState
-                  title="Aún no hay unidades"
-                  description="Crea la primera unidad para empezar a planificar materiales."
-                  icon={BookOpen01Icon}
-                />
-              ) : (
-                aula.unidades.map((unidad) => (
-                  <div key={unidad.id} className="rounded-xl border p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <p className="font-semibold">{unidad.titulo}</p>
-                        {unidad.descripcion && (
-                          <p className="text-muted-foreground text-sm">{unidad.descripcion}</p>
-                        )}
-                        <p className="text-muted-foreground text-xs">
-                          {unidad.fechaInicio && formatDate(unidad.fechaInicio)} –{" "}
-                          {unidad.fechaFin && formatDate(unidad.fechaFin)}
-                          {!unidad.publicada && " · Oculta"}
-                        </p>
-                      </div>
-                      {aula.puedeAdministrar && (
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="min-h-9 gap-1.5"
-                            onClick={() => setUnidadParaMaterial(unidad.id)}
-                          >
-                            <HugeiconsIcon icon={Calendar03Icon} size={16} />
-                            Planificar
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="min-h-9 gap-1.5"
-                            onClick={() => setUnidadParaExtra(unidad.id)}
-                          >
-                            <HugeiconsIcon icon={FileAddIcon} size={16} />
-                            Material extra
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="min-h-9"
-                            onClick={() => setUnidadModal({ abierto: true, unidad })}
-                          >
-                            Editar
-                          </Button>
+            <Tabs defaultValue="materiales" className="w-full space-y-6">
+              <TabsList variant="line" className="w-full justify-start gap-4 border-b">
+                <TabsTrigger value="materiales" className="gap-2">
+                  <HugeiconsIcon icon={BookOpen01Icon} size={16} />
+                  Materiales de Reforzamiento
+                </TabsTrigger>
+                <TabsTrigger value="tareas" className="gap-2">
+                  <HugeiconsIcon icon={Task01Icon} size={16} />
+                  Tareas y Evaluaciones
+                </TabsTrigger>
+                <TabsTrigger value="muro" className="gap-2">
+                  <HugeiconsIcon icon={Comment01Icon} size={16} />
+                  Muro
+                </TabsTrigger>
+                <TabsTrigger value="chat" className="gap-2">
+                  <HugeiconsIcon icon={BubbleChatIcon} size={16} />
+                  <span>Chat</span>
+                  {Boolean(chatNoLeidos?.noLeidos && chatNoLeidos.noLeidos > 0) && (
+                    <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold">
+                      {chatNoLeidos?.noLeidos}
+                    </span>
+                  )}
+                </TabsTrigger>
+                {aula.puedeAdministrar ? (
+                  <>
+                    <TabsTrigger value="libro-notas" className="gap-2">
+                      <HugeiconsIcon icon={ChartBarLineIcon} size={16} />
+                      Libro de Calificaciones
+                    </TabsTrigger>
+                    <TabsTrigger value="moderacion" className="gap-2">
+                      <HugeiconsIcon icon={ShieldAlertIcon} size={16} />
+                      Moderación
+                    </TabsTrigger>
+                  </>
+                ) : (
+                  <TabsTrigger value="mis-notas" className="gap-2">
+                    <HugeiconsIcon icon={Award01Icon} size={16} />
+                    Mis Calificaciones
+                  </TabsTrigger>
+                )}
+              </TabsList>
+
+              <TabsContent value="materiales" className="space-y-4">
+                {aula.unidades.length === 0 ? (
+                  <EmptyState
+                    title="Aún no hay unidades"
+                    description="Crea la primera unidad para empezar a planificar materiales."
+                    icon={BookOpen01Icon}
+                  />
+                ) : (
+                  aula.unidades.map((unidad) => (
+                    <div key={unidad.id} className="rounded-xl border p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <p className="font-semibold">{unidad.titulo}</p>
+                          {unidad.descripcion && (
+                            <p className="text-muted-foreground text-sm">{unidad.descripcion}</p>
+                          )}
+                          <p className="text-muted-foreground text-xs">
+                            {unidad.fechaInicio && formatDate(unidad.fechaInicio)} –{" "}
+                            {unidad.fechaFin && formatDate(unidad.fechaFin)}
+                            {!unidad.publicada && " · Oculta"}
+                          </p>
                         </div>
-                      )}
+                        {aula.puedeAdministrar && (
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="min-h-9 gap-1.5"
+                              onClick={() => setUnidadParaMaterial(unidad.id)}
+                            >
+                              <HugeiconsIcon icon={Calendar03Icon} size={16} />
+                              Planificar
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="min-h-9 gap-1.5"
+                              onClick={() => setUnidadParaExtra(unidad.id)}
+                            >
+                              <HugeiconsIcon icon={FileAddIcon} size={16} />
+                              Material extra
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="min-h-9"
+                              onClick={() => setUnidadModal({ abierto: true, unidad })}
+                            >
+                              Editar
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 space-y-2">
+                        {unidad.materiales.length === 0 ? (
+                          <p className="text-muted-foreground text-sm">Sin materiales todavía.</p>
+                        ) : (
+                          unidad.materiales.map((material) => (
+                            <MaterialFila
+                              key={material.id}
+                              material={material}
+                              puedeAdministrar={aula.puedeAdministrar}
+                              onPublicar={setMaterialPublicar}
+                              onSolicitarCambio={setMaterialCambio}
+                              onRetirar={setMaterialRetirar}
+                              onVerActividad={(mat) =>
+                                setRecursoActividad({
+                                  tipo: "material",
+                                  id: mat.id,
+                                  titulo: mat.titulo,
+                                })
+                              }
+                              onRegistrarVisualizacion={(mat, accion) => {
+                                registrarActividad.mutate({
+                                  materialId: mat.id,
+                                  accion: "visualizo",
+                                });
+                                registrarActividad.mutate({ materialId: mat.id, accion });
+                              }}
+                            />
+                          ))
+                        )}
+                      </div>
                     </div>
-                    <div className="mt-3 space-y-2">
-                      {unidad.materiales.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">Sin materiales todavía.</p>
-                      ) : (
-                        unidad.materiales.map((material) => (
-                          <MaterialFila
-                            key={material.id}
-                            material={material}
-                            puedeAdministrar={aula.puedeAdministrar}
-                            onPublicar={setMaterialPublicar}
-                            onSolicitarCambio={setMaterialCambio}
-                            onRetirar={setMaterialRetirar}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </div>
-                ))
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="tareas">
+                <TareasTab
+                  cursoSeccionId={aula.cursoSeccionId}
+                  periodoId={periodoId || undefined}
+                  puedeAdministrar={aula.puedeAdministrar}
+                  unidades={aula.unidades}
+                />
+              </TabsContent>
+
+              <TabsContent value="muro">
+                <MuroTab
+                  cursoSeccionId={aula.cursoSeccionId}
+                  puedeAdministrar={aula.puedeAdministrar}
+                  anioCerrado={anioCerrado}
+                />
+              </TabsContent>
+
+              <TabsContent value="chat">
+                <ChatTab
+                  cursoSeccionId={aula.cursoSeccionId}
+                  puedeAdministrar={aula.puedeAdministrar}
+                  anioCerrado={anioCerrado}
+                />
+              </TabsContent>
+
+              {aula.puedeAdministrar ? (
+                <>
+                  <TabsContent value="libro-notas">
+                    <LibroNotasTab
+                      cursoSeccionId={aula.cursoSeccionId}
+                      periodoId={periodoId || undefined}
+                    />
+                  </TabsContent>
+                  <TabsContent value="moderacion">
+                    <ModeracionTab cursoSeccionId={aula.cursoSeccionId} />
+                  </TabsContent>
+                </>
+              ) : (
+                <TabsContent value="mis-notas">
+                  <MisNotasTab periodoId={periodoId || undefined} />
+                </TabsContent>
               )}
-            </div>
+            </Tabs>
           )}
         </PageState>
       )}
@@ -327,6 +501,11 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
           if (materialRetirar) retirar.mutate(materialRetirar.id);
           setMaterialRetirar(null);
         }}
+      />
+      <ActividadRecursoModal
+        open={Boolean(recursoActividad)}
+        onOpenChange={(abierto) => !abierto && setRecursoActividad(null)}
+        recurso={recursoActividad}
       />
     </div>
   );
