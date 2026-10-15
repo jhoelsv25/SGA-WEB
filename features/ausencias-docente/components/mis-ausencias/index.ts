@@ -8,6 +8,7 @@ export * from "./detalle-ausencia-descargo";
 export * from "./detalle-ausencia-modal";
 export * from "./mis-ausencias-resumen";
 export * from "./mis-ausencias-tabla";
+export * from "./mis-ausencias-columns";
 export * from "./mis-ausencias-tarjetas";
 export * from "./visor-foto-modal";
 export * from "./mis-ausencias-view";

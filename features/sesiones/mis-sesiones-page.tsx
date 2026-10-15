@@ -1,69 +1,22 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { BookOpen01Icon, FileEditIcon } from "@hugeicons/core-free-icons";
-import { EmptyState } from "@/components/common/empty-state";
+import { DataTable } from "@/components/common/data-table";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { SelectorBimestre, useRangoBimestre } from "@/features/asistencia/components";
-import { EstadoSesionBadge, HorasFirmadas, ModalTexto } from "./components";
+import { ModalTexto, getMisSesionesColumns } from "./components";
 import { useCorregirTema, useMisSesiones, useSolicitarJustificacion } from "./hooks";
 import type { Sesion } from "./types";
 
 type Accion = { tipo: "tema" | "justificar"; sesion: Sesion } | null;
-
-const fechaCorta = (iso: string): string => iso.slice(0, 10).split("-").reverse().join("/");
 
 function Total({ etiqueta, valor }: { etiqueta: string; valor: number }) {
   return (
     <div className="border-border/60 bg-card rounded-2xl border p-4 shadow-xs">
       <p className="text-muted-foreground text-xs font-medium">{etiqueta}</p>
       <p className="text-2xl font-extrabold tabular-nums">{valor}</p>
-    </div>
-  );
-}
-
-function Acciones({ sesion, onAccion }: { sesion: Sesion; onAccion: (a: Accion) => void }) {
-  const puedeJustificar =
-    sesion.estado === "no_cumplida" && sesion.justificacion?.estado !== "solicitada";
-  const conAsistencia = ["en_curso", "cumplida", "parcial"].includes(sesion.estado);
-  return (
-    <div className="flex flex-wrap justify-end gap-2">
-      {conAsistencia && (
-        <Button asChild variant="outline" className="min-h-10">
-          <Link href={`/admin/asistencia?sesionId=${sesion.id}`}>Asistencia</Link>
-        </Button>
-      )}
-      {(sesion.estado === "pendiente" || sesion.estado === "en_curso") && (
-        <Button
-          type="button"
-          variant="outline"
-          className="min-h-10"
-          onClick={() => onAccion({ tipo: "tema", sesion })}
-        >
-          Tema
-        </Button>
-      )}
-      {puedeJustificar && (
-        <Button
-          type="button"
-          variant="outline"
-          className="min-h-10"
-          onClick={() => onAccion({ tipo: "justificar", sesion })}
-        >
-          Justificar
-        </Button>
-      )}
     </div>
   );
 }
@@ -75,6 +28,23 @@ export function MisSesionesPage() {
   const tema = useCorregirTema();
   const justificar = useSolicitarJustificacion();
   const cerrar = () => setAccion(null);
+
+  const handleCorregirTema = React.useCallback((sesion: Sesion) => {
+    setAccion({ tipo: "tema", sesion });
+  }, []);
+
+  const handleSolicitarJustificacion = React.useCallback((sesion: Sesion) => {
+    setAccion({ tipo: "justificar", sesion });
+  }, []);
+
+  const columns = React.useMemo(
+    () =>
+      getMisSesionesColumns({
+        onCorregirTema: handleCorregirTema,
+        onSolicitarJustificacion: handleSolicitarJustificacion,
+      }),
+    [handleCorregirTema, handleSolicitarJustificacion],
+  );
 
   return (
     <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
@@ -101,56 +71,16 @@ export function MisSesionesPage() {
               <Total etiqueta="No cumplidas" valor={data.totales.noCumplidas} />
               <Total etiqueta="Justificadas" valor={data.totales.justificadas} />
             </div>
-            {data.sesiones.length === 0 ? (
-              <EmptyState
-                title="Sin sesiones en este periodo"
-                description="Elija otro bimestre para ver su historial."
-                icon={BookOpen01Icon}
-              />
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Curso y sección</TableHead>
-                    <TableHead>Tema</TableHead>
-                    <TableHead>Firmas</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.sesiones.map((s) => (
-                    <TableRow key={s.id}>
-                      <TableCell className="font-mono text-xs">
-                        {fechaCorta(s.fecha)}
-                        <br />
-                        {s.horaInicio}–{s.horaFin}
-                      </TableCell>
-                      <TableCell>
-                        <p className="font-medium">{s.cursoNombre}</p>
-                        <p className="text-muted-foreground text-xs">{s.seccionNombre}</p>
-                      </TableCell>
-                      <TableCell className="max-w-56 text-sm">{s.tema ?? "—"}</TableCell>
-                      <TableCell>
-                        <HorasFirmadas sesion={s} />
-                      </TableCell>
-                      <TableCell>
-                        <EstadoSesionBadge sesion={s} />
-                        {s.justificacion?.estado === "rechazada" && s.justificacion.comentario && (
-                          <p className="text-muted-foreground mt-1 text-xs">
-                            Rechazo: {s.justificacion.comentario}
-                          </p>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Acciones sesion={s} onAccion={setAccion} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
+
+            <DataTable
+              columns={columns}
+              data={data.sesiones}
+              pagination={false}
+              emptyState={{
+                title: "Sin sesiones en este periodo",
+                description: "Elija otro bimestre para ver su historial.",
+              }}
+            />
           </div>
         )}
       </PageState>
