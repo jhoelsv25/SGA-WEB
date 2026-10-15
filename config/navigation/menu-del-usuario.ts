@@ -48,6 +48,9 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/materiales-bimestre",
   "/admin/ausencias-docentes",
   "/admin/mis-ausencias",
+  "/admin/consolidado-bimestre",
+  "/admin/solicitudes-revision",
+  "/admin/mi-seguimiento",
 ]);
 
 interface OpcionesMenu {

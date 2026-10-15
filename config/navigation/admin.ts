@@ -19,6 +19,8 @@ import {
   FileEditIcon,
   AlertCircleIcon,
   Task01Icon,
+  Analytics01Icon,
+  UserCheck01Icon,
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
@@ -249,6 +251,32 @@ export const adminNavigation: NavSection[] = [
         roles: ["admin"],
         ocultarAlAdministrador: true,
         description: "Historial de ausencias en sesiones de clase y presentación de descargos",
+      },
+      {
+        id: "admin-consolidado-bimestre",
+        label: "Consolidado del bimestre",
+        link: "/admin/consolidado-bimestre",
+        icon: Analytics01Icon,
+        roles: ["admin"],
+        description:
+          "Supervisión de sesiones, firmas y ausencias docentes con control de versiones",
+      },
+      {
+        id: "admin-solicitudes-revision",
+        label: "Solicitudes de revisión",
+        link: "/admin/solicitudes-revision",
+        icon: FileEditIcon,
+        roles: ["admin"],
+        description: "Bandeja de solicitudes de revisión de consolidados emitidas por docentes",
+      },
+      {
+        id: "admin-mi-seguimiento",
+        label: "Mi seguimiento",
+        link: "/admin/mi-seguimiento",
+        icon: UserCheck01Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Historial de mi seguimiento docente, métricas por bimestre y solicitudes",
       },
       {
         id: "admin-sessions",
