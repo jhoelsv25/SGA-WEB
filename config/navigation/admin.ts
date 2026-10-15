@@ -251,6 +251,25 @@ export const adminNavigation: NavSection[] = [
         description: "Historial de ausencias en sesiones de clase y presentación de descargos",
       },
       {
+        id: "admin-consolidados-docentes",
+        label: "Consolidados docentes",
+        link: "/admin/consolidados-docentes",
+        icon: File01Icon,
+        roles: ["admin"],
+        description:
+          "Fichas de seguimiento bimestral, cumplimiento de horas y decisiones del Director",
+      },
+      {
+        id: "admin-mi-seguimiento",
+        label: "Mi seguimiento",
+        link: "/admin/mi-seguimiento",
+        icon: CheckmarkCircle02Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description:
+          "Consolidado de cumplimiento de mis clases por bimestre y solicitudes de revisión",
+      },
+      {
         id: "admin-sessions",
         label: "Seguimiento Docente",
         link: "/admin/sessions",
