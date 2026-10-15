@@ -3,23 +3,21 @@
 import * as React from "react";
 import { Download01Icon, ViewIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { DataTable } from "@/components/common/data-table";
 import { Modal } from "@/components/common/modal";
 import { Spinner } from "@/components/common/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { toast } from "@/lib/toast";
 import { descargarFichaPdf } from "../../api";
 import { DECISIONES_CONSOLIDADO_CONFIG, ESTADOS_CONSOLIDADO_CONFIG } from "../../consts";
 import { useDetalleConsolidadoQuery } from "../../hooks";
 import type { ConsolidadoResumenItem } from "../../types";
+import {
+  getDetalleAusenciasColumns,
+  getDetalleSesionesColumns,
+  type DetalleAusenciaFila,
+} from "../../views/columns";
 
 export interface ModalDetalleConsolidadoProps {
   consolidadoId: string | null;
@@ -51,7 +49,7 @@ export function ModalDetalleConsolidado({
   const consolidado = data?.consolidado;
   const sesiones = React.useMemo(() => data?.sesiones ?? [], [data?.sesiones]);
 
-  const todasLasAusencias = React.useMemo(() => {
+  const todasLasAusencias = React.useMemo<DetalleAusenciaFila[]>(() => {
     return sesiones.flatMap((s) =>
       s.ausencias.map((a) => ({
         ...a,
@@ -61,6 +59,9 @@ export function ModalDetalleConsolidado({
       })),
     );
   }, [sesiones]);
+
+  const sesionesColumns = React.useMemo(() => getDetalleSesionesColumns(), []);
+  const ausenciasColumns = React.useMemo(() => getDetalleAusenciasColumns(), []);
 
   const handleDescargarPdf = async () => {
     if (!consolidadoId) return;
@@ -250,114 +251,21 @@ export function ModalDetalleConsolidado({
           </div>
 
           {pestana === "sesiones" ? (
-            <div className="border-border/60 overflow-hidden rounded-xl border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Curso / Grado / Sección</TableHead>
-                    <TableHead>Tema</TableHead>
-                    <TableHead>Ingreso</TableHead>
-                    <TableHead>Salida</TableHead>
-                    <TableHead>Min. Perdidos</TableHead>
-                    <TableHead>Estado</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sesiones.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="text-muted-foreground py-6 text-center text-xs"
-                      >
-                        No hay sesiones registradas en este periodo.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    sesiones.map((s) => (
-                      <TableRow key={s.sesionId}>
-                        <TableCell className="font-mono text-xs">{s.fecha}</TableCell>
-                        <TableCell className="text-xs">
-                          {s.cursoNombre} — {s.gradoNombre} &ldquo;{s.seccionNombre}&rdquo;
-                        </TableCell>
-                        <TableCell className="max-w-xs truncate text-xs" title={s.tema ?? ""}>
-                          {s.tema || "—"}
-                        </TableCell>
-                        <TableCell className="font-mono text-xs">
-                          {s.horaIngresoFirmada || "—"}
-                        </TableCell>
-                        <TableCell className="font-mono text-xs">
-                          {s.horaSalidaFirmada || "—"}
-                        </TableCell>
-                        <TableCell className="font-mono text-xs">{s.minutosPerdidos} min</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="text-[10px]">
-                            {s.estado}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <DataTable
+              columns={sesionesColumns}
+              data={sesiones}
+              pagination={false}
+              caption="Registro de sesiones de clase del bimestre"
+              emptyMessage="No hay sesiones registradas en este periodo."
+            />
           ) : (
-            <div className="border-border/60 overflow-hidden rounded-xl border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Fecha Sesión</TableHead>
-                    <TableHead>Curso / Sección</TableHead>
-                    <TableHead>Tramo Horario</TableHead>
-                    <TableHead>Minutos</TableHead>
-                    <TableHead>Motivo</TableHead>
-                    <TableHead>Descargo</TableHead>
-                    <TableHead>Estado</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {todasLasAusencias.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        className="text-muted-foreground py-6 text-center text-xs"
-                      >
-                        No se registraron ausencias en el periodo.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    todasLasAusencias.map((a) => (
-                      <TableRow
-                        key={a.ausenciaId}
-                        className={a.anulada ? "line-through opacity-50" : ""}
-                      >
-                        <TableCell className="font-mono text-xs">{a.sesionFecha}</TableCell>
-                        <TableCell className="text-xs">
-                          {a.cursoNombre} ({a.seccionNombre})
-                        </TableCell>
-                        <TableCell className="font-mono text-xs">{a.tramoHorario}</TableCell>
-                        <TableCell className="font-mono text-xs">{a.minutos} min</TableCell>
-                        <TableCell className="text-xs">{a.motivo}</TableCell>
-                        <TableCell className="max-w-xs truncate text-xs" title={a.descargo ?? ""}>
-                          {a.descargo || "—"}
-                        </TableCell>
-                        <TableCell>
-                          {a.anulada ? (
-                            <Badge variant="destructive" className="text-[10px]">
-                              Anulada
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-[10px]">
-                              Efectiva
-                            </Badge>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+            <DataTable
+              columns={ausenciasColumns}
+              data={todasLasAusencias}
+              pagination={false}
+              caption="Registro de ausencias e incidencias del bimestre"
+              emptyMessage="No se registraron ausencias en el periodo."
+            />
           )}
         </div>
       )}

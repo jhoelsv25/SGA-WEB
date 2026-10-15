@@ -8,20 +8,13 @@ import {
   HelpCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { DataTable } from "@/components/common/data-table";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
 import { SelectOption } from "@/components/common/select";
 import { Spinner } from "@/components/common/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { toast } from "@/lib/toast";
 import { descargarFichaPdf } from "../api";
@@ -31,6 +24,7 @@ import {
   ESTADOS_SOLICITUD_CONFIG,
 } from "../consts";
 import { useMiSeguimientoQuery } from "../hooks";
+import { getDetalleSesionesColumns } from "../views/columns";
 import { ModalSolicitarRevision } from "./modals";
 
 export function MiSeguimientoVista() {
@@ -49,6 +43,8 @@ export function MiSeguimientoVista() {
   const sesiones = data?.sesiones ?? [];
   const solicitudPendiente = data?.solicitudPendiente;
   const periodoActual = bimestres.find((b) => b.id === periodoActivo);
+
+  const sesionesColumns = React.useMemo(() => getDetalleSesionesColumns(), []);
 
   const handleDescargarPdf = async () => {
     if (!consolidado) return;
@@ -245,8 +241,8 @@ export function MiSeguimientoVista() {
           </div>
 
           {/* Tabla de sesiones del docente */}
-          <div className="border-border/60 bg-card overflow-hidden rounded-2xl border shadow-xs">
-            <div className="border-border/60 border-b p-4">
+          <div className="space-y-3">
+            <div className="space-y-1">
               <h3 className="text-foreground text-sm font-semibold">
                 Registro de Sesiones Dictadas
               </h3>
@@ -255,61 +251,13 @@ export function MiSeguimientoVista() {
                 minutos computados.
               </p>
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Curso / Sección</TableHead>
-                  <TableHead>Tema</TableHead>
-                  <TableHead>Hora Ingreso</TableHead>
-                  <TableHead>Hora Salida</TableHead>
-                  <TableHead>Min. Perdidos</TableHead>
-                  <TableHead>Estado</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sesiones.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-muted-foreground py-8 text-center text-xs"
-                    >
-                      No hay sesiones asignadas o registradas en este periodo.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sesiones.map((s) => (
-                    <TableRow key={s.sesionId}>
-                      <TableCell className="font-mono text-xs">{s.fecha}</TableCell>
-                      <TableCell className="text-xs">
-                        {s.cursoNombre} — {s.gradoNombre} &ldquo;{s.seccionNombre}&rdquo;
-                      </TableCell>
-                      <TableCell className="max-w-xs truncate text-xs" title={s.tema ?? ""}>
-                        {s.tema || "—"}
-                      </TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {s.horaIngresoFirmada || "—"}
-                      </TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {s.horaSalidaFirmada || "—"}
-                      </TableCell>
-                      <TableCell className="font-mono text-xs font-semibold">
-                        {s.minutosPerdidos > 0 ? (
-                          <span className="text-destructive">{s.minutosPerdidos} min</span>
-                        ) : (
-                          <span className="text-muted-foreground">0 min</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-[10px]">
-                          {s.estado}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+            <DataTable
+              columns={sesionesColumns}
+              data={sesiones}
+              pagination={false}
+              caption="Listado detallado de clases programadas y minutos computados"
+              emptyMessage="No hay sesiones asignadas o registradas en este periodo."
+            />
           </div>
         </div>
       )}
