@@ -11,7 +11,6 @@ import { DescargoModal } from "./descargo-modal";
 import { DetalleAusenciaModal } from "./detalle-ausencia-modal";
 import { MisAusenciasResumen } from "./mis-ausencias-resumen";
 import { MisAusenciasTabla } from "./mis-ausencias-tabla";
-import { MisAusenciasTarjetas } from "./mis-ausencias-tarjetas";
 import { VisorFotoModal } from "./visor-foto-modal";
 
 /**
@@ -94,23 +93,12 @@ export function MisAusenciasView() {
           {/* Indicadores resumidos */}
           <MisAusenciasResumen ausencias={ausencias} />
 
-          {/* Tabla para dispositivos medianos y grandes (escritorio / tablet) */}
-          <div className="hidden md:block">
-            <MisAusenciasTabla
-              ausencias={ausencias}
-              onVerDetalle={handleVerDetalle}
-              onAbrirDescargo={handleAbrirDescargo}
-            />
-          </div>
-
-          {/* Tarjetas responsivas para móviles (diseño adaptable a 360 px) */}
-          <div className="block md:hidden">
-            <MisAusenciasTarjetas
-              ausencias={ausencias}
-              onVerDetalle={handleVerDetalle}
-              onAbrirDescargo={handleAbrirDescargo}
-            />
-          </div>
+          {/* Tabla institucional con tarjetas nativas en móvil mediante DataTable */}
+          <MisAusenciasTabla
+            ausencias={ausencias}
+            onVerDetalle={handleVerDetalle}
+            onAbrirDescargo={handleAbrirDescargo}
+          />
         </div>
       </PageState>
 
