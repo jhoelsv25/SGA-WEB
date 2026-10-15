@@ -22,7 +22,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "@/lib/toast";
 import { useSession } from "@/features/auth";
 import { urlDeArchivo } from "../../api";
-import { useMensajesChat, useEnviarMensajeChat, useMarcarChatLeido } from "../../hooks";
+import {
+  useMensajesChat,
+  useEnviarMensajeChat,
+  useMarcarChatLeido,
+  useChatSocket,
+} from "../../hooks";
 import type { MensajeChat } from "../../types";
 import {
   OcultarContenidoModal,
@@ -43,6 +48,8 @@ export function ChatTab({
 }) {
   const session = useSession();
   const usuarioActualId = session.data?.user?.id;
+
+  const { conectado } = useChatSocket(cursoSeccionId);
 
   const {
     data: mensajes = [],
@@ -119,6 +126,22 @@ export function ChatTab({
 
   return (
     <div className="bg-card flex h-162 flex-col overflow-hidden rounded-xl border shadow-xs">
+      {/* Barra de estado en vivo (WebSocket) */}
+      <div className="bg-muted/30 text-muted-foreground flex items-center justify-between border-b px-4 py-2 text-xs">
+        <div className="flex items-center gap-1.5 font-medium">
+          <HugeiconsIcon icon={BubbleChatIcon} size={14} />
+          <span>Chat de la clase</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px]">
+          <span
+            className={`size-2 rounded-full ${
+              conectado ? "animate-pulse bg-emerald-500" : "bg-muted-foreground/40"
+            }`}
+          />
+          <span className="font-medium">{conectado ? "En vivo (WebSocket)" : "Conectando..."}</span>
+        </div>
+      </div>
+
       {/* Alerta si el año está cerrado */}
       {anioCerrado && (
         <Alert className="border-warning/40 bg-warning/10 rounded-none border-x-0 border-t-0 border-b p-3">

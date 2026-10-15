@@ -135,7 +135,8 @@ export function useMensajesChat(cursoSeccionId: string) {
     queryKey: aulaKeys.chat(cursoSeccionId),
     queryFn: () => getMensajesChat(cursoSeccionId),
     enabled: Boolean(cursoSeccionId),
-    refetchInterval: 4_000,
+    staleTime: 60_000,
+    refetchOnWindowFocus: true,
   });
 }
 
