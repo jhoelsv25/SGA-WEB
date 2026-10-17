@@ -50,6 +50,8 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/mis-ausencias",
   "/admin/consolidados-docentes",
   "/admin/mi-seguimiento",
+  "/admin/indicadores",
+  "/admin/mis-indicadores",
 ]);
 
 interface OpcionesMenu {

@@ -270,6 +270,25 @@ export const adminNavigation: NavSection[] = [
           "Consolidado de cumplimiento de mis clases por bimestre y solicitudes de revisión",
       },
       {
+        id: "admin-indicadores",
+        label: "Indicadores",
+        link: "/admin/indicadores",
+        icon: ChartBarLineIcon,
+        roles: ["admin"],
+        description:
+          "Indicadores cuantitativos de la tesis (CSP, ISA, IGM) y panel directivo (RF-020)",
+      },
+      {
+        id: "admin-mis-indicadores",
+        label: "Mis indicadores",
+        link: "/admin/mis-indicadores",
+        icon: ChartBarLineIcon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description:
+          "Cumplimiento de sesiones planificadas y materiales propios del docente (RF-020)",
+      },
+      {
         id: "admin-sessions",
         label: "Seguimiento Docente",
         link: "/admin/sessions",
