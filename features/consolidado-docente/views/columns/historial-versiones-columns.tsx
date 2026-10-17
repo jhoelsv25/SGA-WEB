@@ -4,6 +4,7 @@ import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
+import { formatDate } from "@/lib/formatters/date";
 import { ESTADOS_CONSOLIDADO_CONFIG } from "../../consts";
 import type { HistorialVersionConsolidadoItem } from "../../types";
 
@@ -110,7 +111,7 @@ export function getHistorialVersionesColumns(): ColumnDef<HistorialVersionConsol
         const fecha = row.original.generadoEn;
         return (
           <div className="text-muted-foreground text-center font-mono text-xs">
-            {fecha ? new Date(fecha).toLocaleDateString("es-PE") : "—"}
+            {formatDate(fecha)}
           </div>
         );
       },

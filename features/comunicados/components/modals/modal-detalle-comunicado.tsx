@@ -2,6 +2,7 @@
 
 import { Megaphone01Icon } from "@hugeicons/core-free-icons";
 import { Modal } from "@/components/common/modal";
+import { formatDate } from "@/lib/formatters/date";
 import { ComunicadoDetalleView } from "../cards/comunicado-detalle-view";
 import type { ComunicadoItem } from "../../types";
 
@@ -29,11 +30,7 @@ export function ModalDetalleComunicado({
       title={comunicado.titulo}
       description={
         comunicado.publicadoEn
-          ? `Publicado: ${new Date(comunicado.publicadoEn).toLocaleDateString("es-PE", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}`
+          ? `Publicado: ${formatDate(comunicado.publicadoEn, "dd MMM yyyy")}`
           : "Borrador de comunicado oficial"
       }
       icon={Megaphone01Icon}

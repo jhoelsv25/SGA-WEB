@@ -81,3 +81,21 @@ export const OPCIONES_ACCION_SOLICITUD = [
   { value: "aceptar", label: "Aceptar solicitud (Reabrir para corrección)" },
   { value: "rechazar", label: "Rechazar solicitud" },
 ] as const;
+
+export const CONSOLIDADO_DOCENTE_ENDPOINTS = {
+  BASE: "/consolidado-docente",
+  GENERAR: "/consolidado-docente/generar",
+  PERIODO: "/consolidado-docente/periodo",
+  POR_ID: (id: string) => `/consolidado-docente/${id}`,
+  MI_SEGUIMIENTO: "/consolidado-docente/mi-seguimiento",
+  DECISION: (id: string) => `/consolidado-docente/${id}/decision`,
+  REABRIR: (id: string) => `/consolidado-docente/${id}/reabrir`,
+  CERRAR: (id: string) => `/consolidado-docente/${id}/cerrar`,
+  VERSIONES: (id: string) => `/consolidado-docente/${id}/versiones`,
+  SOLICITAR_REVISION: (id: string) => `/consolidado-docente/${id}/solicitar-revision`,
+  SOLICITUD_PENDIENTE: (id: string) => `/consolidado-docente/${id}/solicitud-pendiente`,
+  RESOLVER_SOLICITUD: (solicitudId: string) =>
+    `/consolidado-docente/solicitudes/${solicitudId}/resolver`,
+  FICHA_PDF: (id: string) => `/consolidado-docente/${id}/ficha-pdf`,
+  EXPORTAR_EXCEL: (periodoId: string) => `/consolidado-docente/periodo/${periodoId}/excel`,
+} as const;

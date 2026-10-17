@@ -1,4 +1,5 @@
-import { apiClient, API_BASE_URL } from "@/lib/api-client";
+import { apiClient, API_BASE_URL, handleApiError } from "@/lib/api-client";
+import { AUSENCIAS_ENDPOINTS } from "../consts";
 import type {
   AnularAusenciaDto,
   AusenciaResponseDto,
@@ -11,8 +12,6 @@ import type {
   RegistroAusenciaResponseDto,
   ResumenAusenciasSupervisorResponseDto,
 } from "../types";
-
-const RUTA_BASE_AUSENCIAS = "/ausencias-docente";
 
 /**
  * Resuelve la URL completa para previsualizar o descargar evidencias fotográficas.
@@ -34,36 +33,40 @@ export function urlDeEvidencia(url?: string | null): string {
 export async function registrarAusencia(
   payload: RegistrarAusenciaPayload,
 ): Promise<RegistroAusenciaResponseDto> {
-  const formulario = new FormData();
-  formulario.append("sesionClaseId", payload.datos.sesionClaseId);
-  formulario.append("horaDesde", payload.datos.horaDesde);
-  formulario.append("horaHasta", payload.datos.horaHasta);
-  formulario.append("motivo", payload.datos.motivo);
+  try {
+    const formulario = new FormData();
+    formulario.append("sesionClaseId", payload.datos.sesionClaseId);
+    formulario.append("horaDesde", payload.datos.horaDesde);
+    formulario.append("horaHasta", payload.datos.horaHasta);
+    formulario.append("motivo", payload.datos.motivo);
 
-  if (payload.datos.observacion !== undefined && payload.datos.observacion.trim() !== "") {
-    formulario.append("observacion", payload.datos.observacion.trim());
-  }
+    if (payload.datos.observacion !== undefined && payload.datos.observacion.trim() !== "") {
+      formulario.append("observacion", payload.datos.observacion.trim());
+    }
 
-  if (payload.datos.metadatosFotos) {
-    formulario.append("metadatosFotos", payload.datos.metadatosFotos);
-  }
+    if (payload.datos.metadatosFotos) {
+      formulario.append("metadatosFotos", payload.datos.metadatosFotos);
+    }
 
-  if (payload.fotos && payload.fotos.length > 0) {
-    payload.fotos.forEach((foto) => {
-      formulario.append("fotos", foto);
-    });
-  }
+    if (payload.fotos && payload.fotos.length > 0) {
+      payload.fotos.forEach((foto) => {
+        formulario.append("fotos", foto);
+      });
+    }
 
-  const { data } = await apiClient.post<RegistroAusenciaResponseDto>(
-    RUTA_BASE_AUSENCIAS,
-    formulario,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
+    const { data } = await apiClient.post<RegistroAusenciaResponseDto>(
+      AUSENCIAS_ENDPOINTS.BASE,
+      formulario,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       },
-    },
-  );
-  return data;
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al registrar la ausencia docente.");
+  }
 }
 
 /**
@@ -72,48 +75,52 @@ export async function registrarAusencia(
 export async function corregirAusencia(
   payload: CorregirAusenciaPayload,
 ): Promise<AusenciaResponseDto> {
-  const formulario = new FormData();
+  try {
+    const formulario = new FormData();
 
-  if (payload.datos.horaDesde) {
-    formulario.append("horaDesde", payload.datos.horaDesde);
-  }
-  if (payload.datos.horaHasta) {
-    formulario.append("horaHasta", payload.datos.horaHasta);
-  }
-  if (payload.datos.motivo) {
-    formulario.append("motivo", payload.datos.motivo);
-  }
-  if (payload.datos.observacion !== undefined) {
-    formulario.append("observacion", payload.datos.observacion.trim());
-  }
-  formulario.append("motivoCambio", payload.datos.motivoCambio.trim());
+    if (payload.datos.horaDesde) {
+      formulario.append("horaDesde", payload.datos.horaDesde);
+    }
+    if (payload.datos.horaHasta) {
+      formulario.append("horaHasta", payload.datos.horaHasta);
+    }
+    if (payload.datos.motivo) {
+      formulario.append("motivo", payload.datos.motivo);
+    }
+    if (payload.datos.observacion !== undefined) {
+      formulario.append("observacion", payload.datos.observacion.trim());
+    }
+    formulario.append("motivoCambio", payload.datos.motivoCambio.trim());
 
-  if (payload.datos.fotosRetiradasIds && payload.datos.fotosRetiradasIds.length > 0) {
-    payload.datos.fotosRetiradasIds.forEach((id) => {
-      formulario.append("fotosRetiradasIds", id);
-    });
-  }
+    if (payload.datos.fotosRetiradasIds && payload.datos.fotosRetiradasIds.length > 0) {
+      payload.datos.fotosRetiradasIds.forEach((id) => {
+        formulario.append("fotosRetiradasIds", id);
+      });
+    }
 
-  if (payload.datos.metadatosFotos) {
-    formulario.append("metadatosFotos", payload.datos.metadatosFotos);
-  }
+    if (payload.datos.metadatosFotos) {
+      formulario.append("metadatosFotos", payload.datos.metadatosFotos);
+    }
 
-  if (payload.fotos && payload.fotos.length > 0) {
-    payload.fotos.forEach((foto) => {
-      formulario.append("fotos", foto);
-    });
-  }
+    if (payload.fotos && payload.fotos.length > 0) {
+      payload.fotos.forEach((foto) => {
+        formulario.append("fotos", foto);
+      });
+    }
 
-  const { data } = await apiClient.patch<AusenciaResponseDto>(
-    `${RUTA_BASE_AUSENCIAS}/${payload.id}`,
-    formulario,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
+    const { data } = await apiClient.patch<AusenciaResponseDto>(
+      AUSENCIAS_ENDPOINTS.POR_ID(payload.id),
+      formulario,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       },
-    },
-  );
-  return data;
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al corregir la ausencia.");
+  }
 }
 
 /**
@@ -123,21 +130,29 @@ export async function anularAusencia(
   id: string,
   dto: AnularAusenciaDto,
 ): Promise<AusenciaResponseDto> {
-  const { data } = await apiClient.patch<AusenciaResponseDto>(
-    `${RUTA_BASE_AUSENCIAS}/${id}/anular`,
-    dto,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.patch<AusenciaResponseDto>(
+      AUSENCIAS_ENDPOINTS.ANULAR(id),
+      dto,
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al anular la ausencia.");
+  }
 }
 
 /**
  * HU2: Obtiene el historial completo de versiones de una ausencia (solo supervisores).
  */
 export async function getHistorialAusencia(id: string): Promise<HistorialAusenciaResponseDto> {
-  const { data } = await apiClient.get<HistorialAusenciaResponseDto>(
-    `${RUTA_BASE_AUSENCIAS}/${id}/historial`,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.get<HistorialAusenciaResponseDto>(
+      AUSENCIAS_ENDPOINTS.HISTORIAL(id),
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener el historial de la ausencia.");
+  }
 }
 
 /**
@@ -146,30 +161,43 @@ export async function getHistorialAusencia(id: string): Promise<HistorialAusenci
 export async function getAusenciasSupervisor(
   filtros?: FiltroAusenciasQueryDto,
 ): Promise<ResumenAusenciasSupervisorResponseDto> {
-  const { data } = await apiClient.get<ResumenAusenciasSupervisorResponseDto>(RUTA_BASE_AUSENCIAS, {
-    params: filtros,
-  });
-  return data;
+  try {
+    const { data } = await apiClient.get<ResumenAusenciasSupervisorResponseDto>(
+      AUSENCIAS_ENDPOINTS.BASE,
+      {
+        params: filtros,
+      },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener las ausencias de supervisión.");
+  }
 }
 
 /**
  * HU3: Lista las ausencias vigentes del docente autenticado.
  */
 export async function getMisAusencias(): Promise<AusenciaResponseDto[]> {
-  const { data } = await apiClient.get<AusenciaResponseDto[]>(
-    `${RUTA_BASE_AUSENCIAS}/mis-ausencias`,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.get<AusenciaResponseDto[]>(AUSENCIAS_ENDPOINTS.MIS_AUSENCIAS);
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener sus ausencias.");
+  }
 }
 
 /**
  * HU3: Obtiene el detalle de una ausencia vigente para el docente autenticado.
  */
 export async function getDetalleAusenciaDocente(id: string): Promise<AusenciaResponseDto> {
-  const { data } = await apiClient.get<AusenciaResponseDto>(
-    `${RUTA_BASE_AUSENCIAS}/mis-ausencias/${id}`,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.get<AusenciaResponseDto>(
+      AUSENCIAS_ENDPOINTS.DETALLE_DOCENTE(id),
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener el detalle de la ausencia.");
+  }
 }
 
 /**
@@ -179,9 +207,13 @@ export async function presentarDescargo(
   id: string,
   dto: RegistrarDescargoDto,
 ): Promise<MensajeAusenciaResponseDto> {
-  const { data } = await apiClient.post<MensajeAusenciaResponseDto>(
-    `${RUTA_BASE_AUSENCIAS}/mis-ausencias/${id}/descargo`,
-    dto,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.post<MensajeAusenciaResponseDto>(
+      AUSENCIAS_ENDPOINTS.DESCARGO(id),
+      dto,
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al registrar el descargo de la ausencia.");
+  }
 }

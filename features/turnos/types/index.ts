@@ -1,5 +1,25 @@
 export type TipoPersona = "estudiantes" | "docentes" | "administrativos";
 
+export interface RawTurnoResponse {
+  id: string;
+  aplicaA?: TipoPersona;
+  tipoPersona?: TipoPersona;
+  horaEntrada: string;
+  horaSalida: string;
+  ventanaEntradaInicio: string;
+  ventanaEntradaFin: string;
+  ventanaSalidaInicio: string;
+  ventanaSalidaFin: string;
+  toleranciaMin?: number;
+  toleranciaMinutos?: number;
+  diasLaborables: string | number[];
+  activo: boolean;
+  creadoEn?: string;
+  actualizadoEn?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Turno {
   id: string;
   tipoPersona: TipoPersona;

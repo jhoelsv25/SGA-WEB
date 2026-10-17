@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Spinner } from "@/components/common/spinner";
+import { formatDate } from "@/lib/formatters/date";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   IdCardIcon,
@@ -243,9 +244,7 @@ export function CarnetModal({ open, onOpenChange, personaId }: CarnetModalProps)
               {/* Pie institucional */}
               <div className="border-border/40 text-muted-foreground absolute right-4 bottom-2 left-4 flex items-center justify-between border-t pt-1 text-[7.5px]">
                 <span>{distritoColegio} · Angaraes · Huancavelica</span>
-                <span className="font-mono">
-                  Emisión: {new Date(carne.emitidaEn).toLocaleDateString("es-PE")}
-                </span>
+                <span className="font-mono">Emisión: {formatDate(carne.emitidaEn)}</span>
               </div>
             </div>
           </div>

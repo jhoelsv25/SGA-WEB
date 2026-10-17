@@ -6,7 +6,8 @@ import { DataTable } from "@/components/common/data-table";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { SelectorBimestre, useRangoBimestre } from "@/features/asistencia/components";
-import { ModalTexto, getMisSesionesColumns } from "./components";
+import { ModalTexto } from "./components";
+import { getMisSesionesColumns } from "./views";
 import { useCorregirTema, useMisSesiones, useSolicitarJustificacion } from "./hooks";
 import type { Sesion } from "./types";
 

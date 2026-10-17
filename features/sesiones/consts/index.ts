@@ -6,6 +6,21 @@ export const MENU_MIS_SESIONES = "/admin/mis-sesiones";
 
 export const INTERVALO_PANEL_SESIONES_MS = 30_000;
 
+export const SESIONES_ENDPOINTS = {
+  BASE: "/sesiones-clase",
+  HOY: "/sesiones-clase/hoy",
+  JUSTIFICACIONES: "/sesiones-clase/justificaciones",
+  MIS_SESIONES: "/sesiones-clase/mis-sesiones",
+  REEMPLAZO: (id: string) => `/sesiones-clase/${id}/reemplazo`,
+  APROBAR_JUSTIFICACION: (id: string) => `/sesiones-clase/${id}/justificacion/aprobar`,
+  RECHAZAR_JUSTIFICACION: (id: string) => `/sesiones-clase/${id}/justificacion/rechazar`,
+  CORREGIR_TEMA: (id: string) => `/sesiones-clase/${id}/tema`,
+  SOLICITAR_JUSTIFICACION: (id: string) => `/sesiones-clase/${id}/justificacion`,
+  KIOSKO_SESIONES: "/sesiones-clase/kiosko/sesiones",
+  KIOSKO_INGRESO: (sesionId: string) => `/sesiones-clase/kiosko/${sesionId}/ingreso`,
+  KIOSKO_SALIDA: (sesionId: string) => `/sesiones-clase/kiosko/${sesionId}/salida`,
+} as const;
+
 export const ESTADOS_SESION_CONFIG: Record<
   EstadoSesion,
   { label: string; tone: "success" | "warning" | "danger" | "info" | "neutral" }

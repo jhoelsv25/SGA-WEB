@@ -1,4 +1,5 @@
-import { apiClient } from "@/lib/api-client";
+import { apiClient, handleApiError } from "@/lib/api-client";
+import { CONSOLIDADO_DOCENTE_ENDPOINTS } from "../consts";
 import type {
   ActualizarDecisionDto,
   CerrarConsolidadoDto,
@@ -12,131 +13,190 @@ import type {
   SolicitudRevisionItem,
 } from "../types";
 
-const RUTA_BASE = "/consolidado-docente";
-
 export async function generarConsolidados(
   dto: GenerarConsolidadoDto,
 ): Promise<{ creados?: number; id?: string; mensaje: string }> {
-  const { data } = await apiClient.post<{ creados?: number; id?: string; mensaje: string }>(
-    `${RUTA_BASE}/generar`,
-    dto,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.post<{ creados?: number; id?: string; mensaje: string }>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.GENERAR,
+      dto,
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al generar los consolidados docentes.");
+  }
 }
 
 export async function listarConsolidadosPeriodo(
   query: ConsolidadoQueryDto,
 ): Promise<ConsolidadoResumenItem[]> {
-  const { data } = await apiClient.get<ConsolidadoResumenItem[]>(`${RUTA_BASE}/periodo`, {
-    params: {
-      periodoId: query.periodoId,
-      ordenarPor: query.ordenarPor,
-      orden: query.orden,
-    },
-  });
-  return data;
+  try {
+    const { data } = await apiClient.get<ConsolidadoResumenItem[]>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.PERIODO,
+      {
+        params: {
+          periodoId: query.periodoId,
+          ordenarPor: query.ordenarPor,
+          orden: query.orden,
+        },
+      },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al listar los consolidados del periodo.");
+  }
 }
 
 export async function obtenerDetalleConsolidado(
   consolidadoId: string,
 ): Promise<DetalleDocenteConsolidadoResponse> {
-  const { data } = await apiClient.get<DetalleDocenteConsolidadoResponse>(
-    `${RUTA_BASE}/${consolidadoId}`,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.get<DetalleDocenteConsolidadoResponse>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.POR_ID(consolidadoId),
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener el detalle del consolidado docente.");
+  }
 }
 
 export async function obtenerMiSeguimiento(
   periodoId: string,
 ): Promise<DetalleDocenteConsolidadoResponse> {
-  const { data } = await apiClient.get<DetalleDocenteConsolidadoResponse>(
-    `${RUTA_BASE}/mi-seguimiento`,
-    { params: { periodoId } },
-  );
-  return data;
+  try {
+    const { data } = await apiClient.get<DetalleDocenteConsolidadoResponse>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.MI_SEGUIMIENTO,
+      { params: { periodoId } },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener el seguimiento de sus horas.");
+  }
 }
 
 export async function registrarDecisionDirector(
   consolidadoId: string,
   dto: ActualizarDecisionDto,
 ): Promise<ConsolidadoResumenItem> {
-  const { data } = await apiClient.patch<ConsolidadoResumenItem>(
-    `${RUTA_BASE}/${consolidadoId}/decision`,
-    dto,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.patch<ConsolidadoResumenItem>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.DECISION(consolidadoId),
+      dto,
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al registrar la decisión del director.");
+  }
 }
 
 export async function reabrirConsolidado(
   consolidadoId: string,
 ): Promise<{ consolidado: ConsolidadoResumenItem; mensaje: string }> {
-  const { data } = await apiClient.post<{ consolidado: ConsolidadoResumenItem; mensaje: string }>(
-    `${RUTA_BASE}/${consolidadoId}/reabrir`,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.post<{ consolidado: ConsolidadoResumenItem; mensaje: string }>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.REABRIR(consolidadoId),
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al reabrir el consolidado docente.");
+  }
 }
 
 export async function cerrarConsolidado(
   consolidadoId: string,
   dto: CerrarConsolidadoDto,
 ): Promise<{ version: number; mensaje: string }> {
-  const { data } = await apiClient.post<{ version: number; mensaje: string }>(
-    `${RUTA_BASE}/${consolidadoId}/cerrar`,
-    dto,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.post<{ version: number; mensaje: string }>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.CERRAR(consolidadoId),
+      dto,
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al cerrar el consolidado docente.");
+  }
 }
 
 export async function obtenerHistorialVersiones(
   consolidadoId: string,
 ): Promise<HistorialVersionConsolidadoItem[]> {
-  const { data } = await apiClient.get<HistorialVersionConsolidadoItem[]>(
-    `${RUTA_BASE}/${consolidadoId}/versiones`,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.get<HistorialVersionConsolidadoItem[]>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.VERSIONES(consolidadoId),
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener el historial de versiones.");
+  }
 }
 
 export async function solicitarRevision(
   consolidadoId: string,
   dto: SolicitarRevisionDto,
 ): Promise<{ solicitud: SolicitudRevisionItem; mensaje: string }> {
-  const { data } = await apiClient.post<{ solicitud: SolicitudRevisionItem; mensaje: string }>(
-    `${RUTA_BASE}/${consolidadoId}/solicitar-revision`,
-    dto,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.post<{ solicitud: SolicitudRevisionItem; mensaje: string }>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.SOLICITAR_REVISION(consolidadoId),
+      dto,
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al enviar la solicitud de revisión.");
+  }
 }
 
 export async function obtenerSolicitudPendiente(
   consolidadoId: string,
 ): Promise<SolicitudRevisionItem | null> {
-  const { data } = await apiClient.get<SolicitudRevisionItem | null>(
-    `${RUTA_BASE}/${consolidadoId}/solicitud-pendiente`,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.get<SolicitudRevisionItem | null>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.SOLICITUD_PENDIENTE(consolidadoId),
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al consultar la solicitud pendiente.");
+  }
 }
 
 export async function resolverSolicitudRevision(
   solicitudId: string,
   dto: ResolverSolicitudRevisionDto,
 ): Promise<{ solicitud: SolicitudRevisionItem; mensaje: string }> {
-  const { data } = await apiClient.post<{ solicitud: SolicitudRevisionItem; mensaje: string }>(
-    `${RUTA_BASE}/solicitudes/${solicitudId}/resolver`,
-    dto,
-  );
-  return data;
+  try {
+    const { data } = await apiClient.post<{ solicitud: SolicitudRevisionItem; mensaje: string }>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.RESOLVER_SOLICITUD(solicitudId),
+      dto,
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al resolver la solicitud de revisión.");
+  }
 }
 
 export async function descargarFichaPdf(consolidadoId: string): Promise<Blob> {
-  const { data } = await apiClient.get<Blob>(`${RUTA_BASE}/${consolidadoId}/ficha-pdf`, {
-    responseType: "blob",
-  });
-  return data;
+  try {
+    const { data } = await apiClient.get<Blob>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.FICHA_PDF(consolidadoId),
+      {
+        responseType: "blob",
+      },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al descargar la ficha de seguimiento en PDF.");
+  }
 }
 
 export async function exportarExcel(periodoId: string): Promise<Blob> {
-  const { data } = await apiClient.get<Blob>(`${RUTA_BASE}/periodo/${periodoId}/excel`, {
-    responseType: "blob",
-  });
-  return data;
+  try {
+    const { data } = await apiClient.get<Blob>(
+      CONSOLIDADO_DOCENTE_ENDPOINTS.EXPORTAR_EXCEL(periodoId),
+      {
+        responseType: "blob",
+      },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al exportar el consolidado a Excel.");
+  }
 }

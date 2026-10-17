@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/formatters/date";
 import {
   COMUNICADO_DIRIGIDO_LABELS,
   COMUNICADO_ESTADO_CONFIG,
@@ -93,19 +94,7 @@ export function ComunicadoCard({
 
           <div className="text-muted-foreground flex shrink-0 items-center gap-2 text-xs">
             <HugeiconsIcon icon={Calendar03Icon} className="size-3.5" />
-            <span>
-              {comunicado.publicadoEn
-                ? new Date(comunicado.publicadoEn).toLocaleDateString("es-PE", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })
-                : new Date(comunicado.creadoEn).toLocaleDateString("es-PE", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-            </span>
+            <span>{formatDate(comunicado.publicadoEn || comunicado.creadoEn, "dd MMM yyyy")}</span>
           </div>
         </div>
 
