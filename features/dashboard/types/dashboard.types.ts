@@ -1,0 +1,168 @@
+export interface PeriodoActualInfo {
+  anioId: string;
+  anio: number;
+  periodoId?: string | null;
+  periodoNombre?: string | null;
+}
+
+export interface DirectivoKpis {
+  totalMatriculados: number;
+  totalDocentes: number;
+  totalSecciones: number;
+  porcentajeAsistencia: number;
+  asistenciaHoy: {
+    presentes: number;
+    tardanzas: number;
+    faltas: number;
+    justificados: number;
+    totalEsperado: number;
+    porcentaje: number;
+  };
+  aulaVirtual: {
+    totalTareas: number;
+    totalEntregas: number;
+    tareasPendientesCalificar: number;
+  };
+  sesionesHoy: {
+    programadas: number;
+    completadas: number;
+    enCurso: number;
+    porcentajeCumplimiento: number;
+  };
+}
+
+export interface DirectivoGraficoAsistencia {
+  etiqueta: string;
+  porcentaje: number;
+  presentes: number;
+  tardanzas: number;
+  faltas: number;
+}
+
+export interface DirectivoDistribucionGrados {
+  grado: string;
+  matriculados: number;
+  porcentaje: number;
+}
+
+export interface DirectivoDashboardData {
+  kpis: DirectivoKpis;
+  graficoAsistencia: DirectivoGraficoAsistencia[];
+  distribucionGrados: DirectivoDistribucionGrados[];
+}
+
+export interface DocenteKpis {
+  misCursos: number;
+  misSecciones: number;
+  misEstudiantes: number;
+  sesionesHoyTotal: number;
+  sesionesHoyCompletadas: number;
+  tareasActivas: number;
+  entregasPendientesCalificar: number;
+  porcentajeAsistenciaPromedio: number;
+}
+
+export interface DocenteEstadoEntregas {
+  estado: string;
+  cantidad: number;
+  fill: string;
+}
+
+export interface DocenteSesionHoy {
+  id: string;
+  curso: string;
+  seccion: string;
+  grado: string;
+  aula?: string | null;
+  horaInicio: string;
+  horaFin: string;
+  estado: string;
+}
+
+export interface DocenteTareaResumen {
+  id: string;
+  titulo: string;
+  curso: string;
+  seccion: string;
+  fechaLimite: string;
+  entregadas: number;
+  calificadas: number;
+  totalAlumnos: number;
+}
+
+export interface DocenteDashboardData {
+  kpis: DocenteKpis;
+  graficoEntregas: DocenteEstadoEntregas[];
+  sesionesHoy: DocenteSesionHoy[];
+  tareasPorCorregir: DocenteTareaResumen[];
+}
+
+export interface EstudianteKpis {
+  porcentajeAsistencia: number;
+  presentes: number;
+  tardanzas: number;
+  faltas: number;
+  justificadas: number;
+  cursosInscritos: number;
+  tareasPendientes: number;
+  tareasEntregadas: number;
+}
+
+export interface EstudianteTareaProxima {
+  id: string;
+  titulo: string;
+  curso: string;
+  fechaLimite: string;
+  tipo: string;
+  puntajeMaximo: number;
+  estadoEntrega: "pendiente" | "entregada" | "calificada";
+  nota?: number | null;
+}
+
+export interface EstudianteHorarioClase {
+  id: string;
+  curso: string;
+  docente?: string | null;
+  aula?: string | null;
+  horaInicio: string;
+  horaFin: string;
+  estado: string;
+}
+
+export interface EstudianteResumenTareasGrafico {
+  estado: string;
+  cantidad: number;
+  fill: string;
+}
+
+export interface EstudianteAsociado {
+  id: string;
+  nombreCompleto: string;
+  grado: string;
+  seccion: string;
+}
+
+export interface EstudianteDashboardData {
+  kpis: EstudianteKpis;
+  graficoTareas: EstudianteResumenTareasGrafico[];
+  proximasTareas: EstudianteTareaProxima[];
+  horarioHoy: EstudianteHorarioClase[];
+  estudiantesAsociados?: EstudianteAsociado[];
+}
+
+export interface DashboardResponse {
+  rolCategoria: "directivo" | "docente" | "estudiante" | "apoderado";
+  rolNombre: string;
+  periodoActual: PeriodoActualInfo;
+  directivo?: DirectivoDashboardData;
+  docente?: DocenteDashboardData;
+  estudiante?: EstudianteDashboardData;
+}
+
+export interface DashboardFiltrosParams {
+  anioAcademicoId?: string;
+  periodoId?: string;
+  fechaDesde?: string;
+  fechaHasta?: string;
+  estudianteId?: string;
+}
