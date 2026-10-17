@@ -7,6 +7,7 @@ import { AppHeader } from "./header/app-header";
 import type { UserProfileData } from "./sidebar/nav-user";
 import { AnioLectivoProvider } from "@/features/anio-escolar/anio-lectivo-context";
 import { useOptionalDashboardRole } from "./dashboard-role-context";
+import { PushNotificationPromptToast } from "@/features/notificaciones/components";
 
 export interface Props {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export function DashboardLayout({ children, user: userProp, defaultOpen = true }
             <div className="animate-in fade-in duration-300">{children}</div>
           </div>
         </SidebarInset>
+        <PushNotificationPromptToast />
       </SidebarProvider>
     </AnioLectivoProvider>
   );

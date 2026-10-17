@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useCursorPagination } from "@/hooks/use-cursor-pagination";
-import { NotificacionCard } from "./components/notificacion-card";
+import { NotificacionCard, PushNotificationBanner } from "./components";
 import {
   useEliminarNotificacionMutation,
   useEliminarTodasLeidasMutation,
@@ -20,6 +20,7 @@ import {
   useMarcarTodasLeidasMutation,
   useNotificacionesConteoQuery,
   useNotificacionesQuery,
+  usePushNotifications,
 } from "./hooks";
 import { NOTIFICACIONES_PAGINACION_DEFAULT, createNotificacionFilterDefs } from "./constants";
 import type { EstadoNotificacionFiltro, TipoNotificacion } from "./types";
@@ -96,6 +97,14 @@ export function NotificacionesPage() {
     }
   };
 
+  const {
+    isSupported: isPushSupported,
+    isSubscribed: isPushSubscribed,
+    isLoading: isPushLoading,
+    subscribe: subscribePush,
+    unsubscribe: unsubscribePush,
+  } = usePushNotifications();
+
   return (
     <div className="space-y-6">
       {/* Header estandarizado */}
@@ -110,6 +119,23 @@ export function NotificacionesPage() {
         }
         actions={
           <div className="flex items-center gap-2">
+            {isPushSupported && (
+              <Button
+                variant={isPushSubscribed ? "outline" : "default"}
+                size="sm"
+                onClick={() => (isPushSubscribed ? unsubscribePush() : subscribePush())}
+                disabled={isPushLoading}
+                className="h-9 gap-1.5 text-xs"
+              >
+                <HugeiconsIcon icon={Notification01Icon} className="h-4 w-4" />
+                {isPushLoading
+                  ? "Verificando..."
+                  : isPushSubscribed
+                    ? "Push activado en este equipo"
+                    : "Activar notificaciones push"}
+              </Button>
+            )}
+
             {unreadCount > 0 && (
               <Button
                 variant="outline"
@@ -138,6 +164,9 @@ export function NotificacionesPage() {
           </div>
         }
       />
+
+      {/* Banner interactivo de Notificaciones Push y PWA */}
+      <PushNotificationBanner />
 
       {/* Toolbar estandarizado con filtros y acciones */}
       <ListToolbar

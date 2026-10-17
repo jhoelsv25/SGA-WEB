@@ -59,3 +59,35 @@ export async function eliminarTodasLeidas(): Promise<{
   );
   return response.data;
 }
+
+export async function getVapidPublicKey(): Promise<{ publicKey: string }> {
+  const response = await apiClient.get<{ publicKey: string }>("/notificaciones/push/public-key");
+  return response.data;
+}
+
+export async function suscribirDispositivoPush(payload: {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+  dispositivo?: string;
+}): Promise<{ message: string }> {
+  const response = await apiClient.post<{ message: string }>(
+    "/notificaciones/push/subscribe",
+    payload,
+  );
+  return response.data;
+}
+
+export async function desuscribirDispositivoPush(payload: {
+  endpoint: string;
+}): Promise<{ message: string }> {
+  const response = await apiClient.post<{ message: string }>(
+    "/notificaciones/push/unsubscribe",
+    payload,
+  );
+  return response.data;
+}
+
+export async function enviarPruebaPush(): Promise<{ message: string }> {
+  const response = await apiClient.post<{ message: string }>("/notificaciones/push/test");
+  return response.data;
+}

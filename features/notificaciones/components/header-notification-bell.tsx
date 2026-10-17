@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Notification01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, Notification01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,28 @@ import {
   useNotificacionesConteoQuery,
   useNotificacionesQuery,
   useNotificacionesRealtime,
+  usePushNotifications,
 } from "../hooks";
 import type { NotificacionItem } from "../types";
 import { formatNotificacionFecha, getNotificacionVisualConfig } from "../utils";
 
+const PUSH_BELL_DISMISSED_KEY = "sga_push_bell_dismissed_until";
+
 export function HeaderNotificationBell() {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
+  const [pushDismissed, setPushDismissed] = React.useState(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const stored = localStorage.getItem(PUSH_BELL_DISMISSED_KEY);
+      if (stored) {
+        return Date.now() < Number(stored);
+      }
+    } catch {
+      // ignore
+    }
+    return false;
+  });
 
   // Escucha activa en tiempo real mediante SSE
   useNotificacionesRealtime();
@@ -36,6 +51,28 @@ export function HeaderNotificationBell() {
 
   const marcarLeidaMutation = useMarcarNotificacionLeidaMutation();
   const marcarTodasMutation = useMarcarTodasLeidasMutation();
+
+  const {
+    isSupported: isPushSupported,
+    isSubscribed: isPushSubscribed,
+    permission: pushPermission,
+    isLoading: isPushLoading,
+    subscribe: subscribePush,
+  } = usePushNotifications();
+
+  const handleDismissPush = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPushDismissed(true);
+    try {
+      // No volver a mostrar en la campanita durante 7 días
+      localStorage.setItem(
+        PUSH_BELL_DISMISSED_KEY,
+        (Date.now() + 7 * 24 * 60 * 60 * 1000).toString(),
+      );
+    } catch {
+      // ignore
+    }
+  };
 
   const handleNotificationClick = (item: NotificacionItem) => {
     if (!item.leida) {
@@ -96,6 +133,38 @@ export function HeaderNotificationBell() {
           )}
         </div>
 
+        {/* Banner para activar Notificaciones Push si no están activas y no fue descartado */}
+        {isPushSupported && !isPushSubscribed && !pushDismissed && pushPermission !== "denied" && (
+          <div className="bg-primary/10 border-primary/20 flex items-center justify-between gap-2 border-b px-3.5 py-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <HugeiconsIcon icon={Notification01Icon} className="text-primary size-3.5 shrink-0" />
+              <span className="text-foreground truncate text-[11px] font-medium">
+                Recibe alertas en este dispositivo
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => subscribePush()}
+                disabled={isPushLoading}
+                className="h-6 shrink-0 rounded-md px-2 text-[10px] font-semibold"
+              >
+                {isPushLoading ? "..." : "Activar"}
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handleDismissPush}
+                className="text-muted-foreground hover:text-foreground size-6 rounded-md p-0"
+                title="No mostrar por ahora"
+              >
+                <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Lista de Notificaciones */}
         <div className="divide-border/40 max-h-84 divide-y overflow-y-auto">
           {isLoading ? (
@@ -142,6 +211,21 @@ export function HeaderNotificationBell() {
               );
             })
           )}
+        </div>
+
+        {/* Pie del Popover */}
+        <div className="border-border/50 bg-muted/20 border-t p-2 text-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setOpen(false);
+              router.push("/admin/notificaciones");
+            }}
+            className="text-muted-foreground hover:text-foreground h-7 w-full text-xs font-medium"
+          >
+            Ver todas las notificaciones
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

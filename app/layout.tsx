@@ -49,6 +49,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: siteConfig.routes.home,
   },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: siteConfig.shortName,
+  },
   icons: {
     icon: [
       { url: siteConfig.branding.favicon },
