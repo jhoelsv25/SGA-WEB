@@ -52,7 +52,7 @@ export function ApoderadoActions({
             className="cursor-pointer gap-2"
           >
             <HugeiconsIcon icon={ShieldCheckIcon} className="h-4 w-4" />
-            Bitácora de correcciones (RF-007)
+            Bitácora de correcciones
           </DropdownMenuItem>
         )}
 

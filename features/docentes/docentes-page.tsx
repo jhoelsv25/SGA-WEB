@@ -98,7 +98,7 @@ export function DocentesPage() {
     <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
         title="Plana Docente"
-        description="Gestión de profesores, régimen laboral, credenciales de marcación y asignación académica (RF-007 V3)."
+        description="Gestión de profesores, régimen laboral, credenciales de marcación y asignación académica."
         icon={UserGroupIcon}
         breadcrumbs={[
           { label: "Dashboard", href: "/admin/dashboard" },

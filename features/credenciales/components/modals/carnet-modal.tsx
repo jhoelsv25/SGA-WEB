@@ -106,7 +106,7 @@ export function CarnetModal({ open, onOpenChange, personaId }: CarnetModalProps)
       open={open}
       onOpenChange={onOpenChange}
       title="Carné Oficial de Marcación y Asistencia"
-      description="Credencial digital oficial generada por el servidor para marcación en kioskos escolares (RF-007 HU5)."
+      description="Credencial digital oficial generada por el servidor para marcación en kioskos escolares."
       icon={IdCardIcon}
       size="lg"
     >

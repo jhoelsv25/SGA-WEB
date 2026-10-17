@@ -528,8 +528,7 @@ export function TareaForm({
           <HugeiconsIcon icon={InformationCircleIcon} size={16} className="shrink-0" />
           <span>
             Los trabajos y proyectos permiten una única entrega que el estudiante puede editar o
-            reemplazar libremente hasta la fecha límite o hasta que sea calificada por el docente
-            (CP-RF016-04).
+            reemplazar libremente hasta la fecha límite o hasta que sea calificada por el docente.
           </span>
         </div>
       )}

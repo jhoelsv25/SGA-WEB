@@ -150,7 +150,7 @@ export function ComunicadosPage() {
       {/* Cabecera institucional */}
       <PageHeader
         title="Comunicados Oficiales"
-        description="Publicación de avisos institucionales para la comunidad educativa y control de lectura en tiempo real (RF-019)."
+        description="Publicación de avisos institucionales para la comunidad educativa y control de lectura en tiempo real."
         icon={Megaphone01Icon}
         actions={
           <Button

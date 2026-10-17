@@ -87,7 +87,7 @@ export function ConductaPage() {
     <div className="space-y-6">
       {/* Cabecera principal */}
       <PageHeader
-        title="Conducta y Convivencia (RF-018)"
+        title="Conducta y Convivencia"
         description="Gestión integral de méritos, faltas formativas, compromisos y observaciones tutoriales del estudiante."
         icon={Award01Icon}
         actions={

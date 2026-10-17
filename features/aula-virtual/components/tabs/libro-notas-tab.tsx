@@ -90,8 +90,8 @@ export function LibroNotasTab({
             <HugeiconsIcon icon={InformationCircleIcon} size={16} className="shrink-0" />
             <span>
               Si un tipo de tarea no tiene actividades en el bimestre, su peso se redistribuye
-              proporcionalmente entre los tipos evaluados (CP-RF016-30, CP-RF016-31). Las notas se
-              convierten automáticamente a la escala literal oficial (AD, A, B, C).
+              proporcionalmente entre los tipos evaluados. Las notas se convierten automáticamente a
+              la escala literal oficial (AD, A, B, C).
             </span>
           </div>
 

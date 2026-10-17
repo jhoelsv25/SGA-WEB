@@ -47,7 +47,7 @@ export function HistorialCriticoModal({ persona, open, onOpenChange }: Historial
       onOpenChange={onOpenChange}
       size="3xl"
       title="Bitácora de Correcciones Críticas"
-      description={`Historial de modificaciones de identidad para ${persona.nombreCompleto} (RF-007 HU6).`}
+      description={`Historial de modificaciones de identidad para ${persona.nombreCompleto}.`}
       icon={ShieldCheckIcon}
     >
       <div className="space-y-4 pt-1">

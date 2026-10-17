@@ -20,7 +20,7 @@ export function ModalMatriculaIndividual({
       open={open}
       onOpenChange={onOpenChange}
       title="Matricular Estudiante"
-      description="Registra la matrícula de un estudiante activo asignándolo a un grado y sección con vacantes (RF-009 HU1)."
+      description="Registra la matrícula de un estudiante activo asignándolo a un grado y sección con vacantes."
       icon={UserAdd01Icon}
       size="lg"
     >

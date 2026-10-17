@@ -68,7 +68,7 @@ export function EstudiantesPage() {
     <div className="space-y-6">
       <PageHeader
         title="Padrón de Estudiantes"
-        description="Ficha escolar, códigos SIAGIE, condiciones médicas y credenciales de marcación según RF-007 V3."
+        description="Ficha escolar, códigos SIAGIE, condiciones médicas y credenciales de marcación."
         icon={StudentIcon}
       />
 

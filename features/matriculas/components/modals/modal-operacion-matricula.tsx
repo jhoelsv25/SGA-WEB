@@ -26,19 +26,18 @@ const MODAL_CONFIG: Record<
 > = {
   retirar: {
     title: "Registrar Retiro del Estudiante",
-    description: "Registra el retiro formal del colegio y revoca sus credenciales (RF-009 HU3).",
+    description: "Registra el retiro formal del colegio y revoca sus credenciales.",
     icon: UserRemove01Icon,
   },
   trasladar: {
     title: "Registrar Traslado a Otro Colegio",
-    description:
-      "Registra el traslado definitivo, libera la vacante y desactiva el acceso (RF-009 HU3).",
+    description: "Registra el traslado definitivo, libera la vacante y desactiva el acceso.",
     icon: SchoolIcon,
   },
   "cambiar-seccion": {
     title: "Cambiar de Sección",
     description:
-      "Reasigna al estudiante a otra sección dentro del mismo grado con vacantes disponibles (RF-009 HU3).",
+      "Reasigna al estudiante a otra sección dentro del mismo grado con vacantes disponibles.",
     icon: Exchange01Icon,
   },
   anular: {

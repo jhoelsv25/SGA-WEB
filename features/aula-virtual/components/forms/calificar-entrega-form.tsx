@@ -93,7 +93,7 @@ export function CalificarEntregaForm({
 
   const handleDevolverEntrega = async () => {
     if (!retroalimentacion.trim()) {
-      toast.error("Indique la retroalimentación para devolver la entrega (CP-RF016-24).");
+      toast.error("Indique la retroalimentación para devolver la entrega.");
       return;
     }
 
@@ -167,7 +167,7 @@ export function CalificarEntregaForm({
       {tienePreguntasAbiertas && tarea.preguntas && (
         <div className="space-y-3 rounded-xl border border-indigo-200 bg-indigo-50/30 p-4 dark:border-indigo-950 dark:bg-indigo-950/20">
           <h4 className="text-sm font-semibold text-indigo-950 dark:text-indigo-200">
-            Calificación de preguntas abiertas (CP-RF016-25)
+            Calificación de preguntas abiertas
           </h4>
           {tarea.preguntas
             .filter((p) => p.tipo === "respuesta_corta" && Boolean(p.id))

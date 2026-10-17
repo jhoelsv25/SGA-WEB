@@ -251,7 +251,7 @@ export function ResolverTareaForm({
             <div className="space-y-4 rounded-xl border p-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold">
-                  {miEntrega ? "Actualizar entrega (CP-RF016-10)" : "Enviar entrega"}
+                  {miEntrega ? "Actualizar entrega" : "Enviar entrega"}
                 </span>
                 {pasoFechaLimite && tarea.permiteEntregaTardia && (
                   <StatusBadge tone="warning">Entrega tardía</StatusBadge>
@@ -369,7 +369,7 @@ export function ResolverTareaForm({
 
           {sinIntentos && (
             <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-center text-sm font-medium text-amber-900 dark:border-amber-950 dark:bg-amber-950/20 dark:text-amber-200">
-              Ya usaste todos tus intentos (CP-RF016-18).
+              Ya usaste todos tus intentos.
             </div>
           )}
 

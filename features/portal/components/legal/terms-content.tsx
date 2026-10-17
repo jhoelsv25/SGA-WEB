@@ -52,7 +52,7 @@ export function TermsContent() {
           <span className="bg-primary/10 text-primary flex size-7 items-center justify-center rounded-lg text-xs">
             2
           </span>
-          Cuentas, Credenciales y Políticas de Seguridad (RF-001)
+          Cuentas, Credenciales y Políticas de Seguridad
         </h2>
         <p className="text-muted-foreground text-sm leading-relaxed">
           El acceso a la plataforma está sujeto a las siguientes condiciones de seguridad:
@@ -122,7 +122,7 @@ export function TermsContent() {
           <span className="bg-primary/10 text-primary flex size-7 items-center justify-center rounded-lg text-xs">
             4
           </span>
-          Auditoría de Operaciones y Bitácora (RF-003)
+          Auditoría de Operaciones y Bitácora
         </h2>
         <div className="bg-muted/40 rounded-xl p-4 text-xs leading-relaxed">
           <p className="text-muted-foreground m-0">

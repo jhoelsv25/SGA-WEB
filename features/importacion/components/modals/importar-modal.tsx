@@ -207,7 +207,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
       onOpenChange={handleOpenChange}
       size="5xl"
       title={`Carga Masiva — ${TITULOS_TIPO[tipo]}`}
-      description="Importación por lotes de hasta 500 registros con procesamiento asíncrono en BullMQ (RF-007 v3)."
+      description="Importación por lotes de hasta 500 registros con procesamiento en segundo plano."
     >
       <div className="space-y-6 pt-2">
         {/* Indicador de 4 pasos */}

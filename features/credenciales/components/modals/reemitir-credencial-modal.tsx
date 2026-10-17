@@ -91,7 +91,7 @@ export function ReemitirCredencialModal({
           <HugeiconsIcon icon={Alert02Icon} className="mt-0.5 h-4 w-4 shrink-0" />
           <p>
             Al confirmar, el código y PIN anteriores se anulan de forma irreversible y quedan
-            registrados en la bitácora de auditoría (RF-007 HU5).
+            registrados en la bitácora de auditoría.
           </p>
         </div>
 

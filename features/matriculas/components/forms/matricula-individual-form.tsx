@@ -91,7 +91,7 @@ export function MatriculaIndividualForm({
       return;
     }
     if (tipo === "traslado" && !colegioProcedencia.trim()) {
-      toast.error("Para traslados, el colegio de procedencia es obligatorio según RF-009.");
+      toast.error("Para traslados, el colegio de procedencia es obligatorio.");
       return;
     }
     if (vacantesDisponibles !== null && vacantesDisponibles <= 0) {

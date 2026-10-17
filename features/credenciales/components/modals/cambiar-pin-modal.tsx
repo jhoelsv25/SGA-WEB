@@ -67,7 +67,7 @@ export function CambiarPinModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Cambiar PIN de Marcación"
-      description="El PIN es personal y confidencial, utilizado para registrar asistencia en los kioskos escolares (RF-007 HU5)."
+      description="El PIN es personal y confidencial, utilizado para registrar asistencia en los kioskos escolares."
       icon={Key01Icon}
       size="sm"
     >

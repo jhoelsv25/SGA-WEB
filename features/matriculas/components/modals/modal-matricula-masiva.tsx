@@ -26,7 +26,7 @@ export function ModalMatriculaMasiva({ open, onOpenChange }: ModalMatriculaMasiv
       open={open}
       onOpenChange={handleClose}
       title="Matrícula Masiva de Continuadores"
-      description="Matricula masivamente a estudiantes promovidos en el grado superior respetando el tope de vacantes (RF-009 HU2)."
+      description="Matricula masivamente a estudiantes promovidos en el grado superior respetando el tope de vacantes."
       icon={UserGroupIcon}
       size="xl"
     >

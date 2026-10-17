@@ -29,7 +29,7 @@ export function PersonaActions({
       ? [
           {
             key: "cambiar-cargo",
-            label: "Cambiar cargo (RF-002)",
+            label: "Cambiar cargo",
             icon: IdVerifiedIcon,
             onClick: () => onChangeCargo(persona),
           },
@@ -39,7 +39,7 @@ export function PersonaActions({
       ? [
           {
             key: "historial-critico",
-            label: "Bitácora de correcciones (RF-007)",
+            label: "Bitácora de correcciones",
             icon: ShieldCheckIcon,
             onClick: () => onVerHistorial(persona),
           },
