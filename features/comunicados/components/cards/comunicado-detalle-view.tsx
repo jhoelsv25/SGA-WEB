@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatDate } from "@/lib/formatters/date";
 import { useAvanceLecturaQuery } from "../../hooks";
 import {
   COMUNICADO_DIRIGIDO_LABELS,
@@ -222,14 +223,7 @@ export function ComunicadoDetalleView({
                           <div className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
                             <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5" />
                             <span>
-                              {d.leidoEn
-                                ? new Date(d.leidoEn).toLocaleDateString("es-PE", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })
-                                : "Leído"}
+                              {d.leidoEn ? formatDate(d.leidoEn, "dd/MM HH:mm") : "Leído"}
                             </span>
                           </div>
                         ) : (

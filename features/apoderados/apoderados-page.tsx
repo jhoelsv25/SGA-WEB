@@ -78,7 +78,7 @@ export function ApoderadosPage() {
     <div className="space-y-6">
       <PageHeader
         title="Padrón de Apoderados"
-        description="Gestión de padres de familia, tutores legales, parentescos y responsabilidades escolares (RF-007 V3)."
+        description="Gestión de padres de familia, tutores legales, parentescos y responsabilidades escolares."
         icon={UserGroupIcon}
       />
 

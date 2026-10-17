@@ -11,7 +11,7 @@ import {
   useUpdateTurnoMutation,
   useToggleTurnoActivoMutation,
 } from "./hooks";
-import { TurnosGrid } from "./components/turnos-grid";
+import { TurnosGrid } from "./views";
 import { TurnoEditModal } from "./components/modals/turno-edit-modal";
 import type { TipoPersona, Turno } from "./types";
 import type { TurnoFormValues } from "./schemas";

@@ -1,11 +1,6 @@
 import { z } from "zod";
-
-const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
-function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(":").map(Number);
-  return hours * 60 + minutes;
-}
+import { TIME_REGEX } from "../consts";
+import { timeToMinutes } from "../utils";
 
 export const turnoSchema = z
   .object({
@@ -40,7 +35,7 @@ export const turnoSchema = z
     // 1. Validar orden de horas oficiales (salida > entrada)
     if (timeToMinutes(data.horaSalida) <= timeToMinutes(data.horaEntrada)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["horaSalida"],
         message: "La hora de salida debe ser posterior a la hora de entrada.",
       });
@@ -49,7 +44,7 @@ export const turnoSchema = z
     // 2. Ventana de entrada válida (fin > inicio)
     if (timeToMinutes(data.ventanaEntradaFin) <= timeToMinutes(data.ventanaEntradaInicio)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["ventanaEntradaFin"],
         message: "El fin de la ventana de entrada debe ser posterior al inicio.",
       });
@@ -61,7 +56,7 @@ export const turnoSchema = z
       timeToMinutes(data.horaEntrada) > timeToMinutes(data.ventanaEntradaFin)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["horaEntrada"],
         message: "La hora oficial debe estar dentro de su ventana de marcado.",
       });
@@ -70,7 +65,7 @@ export const turnoSchema = z
     // 4. Ventana de salida válida (fin > inicio)
     if (timeToMinutes(data.ventanaSalidaFin) <= timeToMinutes(data.ventanaSalidaInicio)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["ventanaSalidaFin"],
         message: "El fin de la ventana de salida debe ser posterior al inicio.",
       });
@@ -82,7 +77,7 @@ export const turnoSchema = z
       timeToMinutes(data.horaSalida) > timeToMinutes(data.ventanaSalidaFin)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["horaSalida"],
         message: "La hora oficial debe estar dentro de su ventana de marcado.",
       });
@@ -91,7 +86,7 @@ export const turnoSchema = z
     // 6. Ventana de salida debe empezar después de que termine la ventana de entrada
     if (timeToMinutes(data.ventanaSalidaInicio) < timeToMinutes(data.ventanaEntradaFin)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["ventanaSalidaInicio"],
         message: "La ventana de salida debe empezar después de la ventana de entrada.",
       });

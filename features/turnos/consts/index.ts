@@ -31,3 +31,12 @@ export const DIAS_SEMANA = [
 ] as const;
 
 export const DIAS_LABORABLES_DEFAULT = [1, 2, 3, 4, 5]; // Lunes a Viernes
+
+export const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+export const DEFAULT_TIPO_PERSONA: TipoPersona = "docentes";
+
+export const TURNOS_ENDPOINTS = {
+  BASE: "/turnos",
+  BY_ID: (id: string) => `/turnos/${id}`,
+} as const;

@@ -9,7 +9,8 @@ import { PageState } from "@/components/common/page-state";
 import { Button } from "@/components/ui/button";
 import { usePuedeGestionarAusencias } from "@/features/ausencias-docente/hooks";
 import { RegistrarAusenciaModal } from "@/features/ausencias-docente/components/registro";
-import { ModalReemplazo, getSesionesHoyColumns } from "./components";
+import { ModalReemplazo } from "./components";
+import { getSesionesHoyColumns } from "./views";
 import { usePanelSesionesHoy, usePuedeGestionarSesiones } from "./hooks";
 import type { Sesion, SesionPanel } from "./types";
 

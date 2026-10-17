@@ -76,7 +76,7 @@ export function DocenteActions({
           ? [
               {
                 key: "historial-critico",
-                label: "Bitácora de correcciones (RF-007)",
+                label: "Bitácora de correcciones",
                 icon: ShieldCheckIcon,
                 onClick: () => onVerHistorial(docente),
               },

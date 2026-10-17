@@ -1,4 +1,5 @@
-import { apiClient } from "@/lib/api-client";
+import { apiClient, handleApiError } from "@/lib/api-client";
+import { LIBRETAS_ENDPOINTS } from "../constants";
 import type {
   AlcanceLibreta,
   AlcanceRol,
@@ -12,8 +13,6 @@ import type {
   SeguimientoSeccion,
   VistaPreviaLibretas,
 } from "../types";
-
-const BASE = "/libretas";
 
 function aFormData(
   seccionId: string,
@@ -34,30 +33,42 @@ function aFormData(
 }
 
 export async function getContextoLibretas(): Promise<ContextoLibretas> {
-  const { data } = await apiClient.get<ContextoLibretas>(`${BASE}/contexto`);
-  return data;
+  try {
+    const { data } = await apiClient.get<ContextoLibretas>(LIBRETAS_ENDPOINTS.CONTEXTO);
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al cargar el contexto de libretas.");
+  }
 }
 
 export async function programarLibretas(
   periodoId: string,
   fechaLimite: string,
 ): Promise<ResultadoProgramacion> {
-  const { data } = await apiClient.post<ResultadoProgramacion>(`${BASE}/programar`, {
-    periodoId,
-    fechaLimite,
-  });
-  return data;
+  try {
+    const { data } = await apiClient.post<ResultadoProgramacion>(LIBRETAS_ENDPOINTS.PROGRAMAR, {
+      periodoId,
+      fechaLimite,
+    });
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al programar la fecha límite de libretas.");
+  }
 }
 
 export async function cambiarFechaLibretas(
   periodoId: string,
   fechaLimite: string,
 ): Promise<{ actualizadas: number; fechaLimite: string }> {
-  const { data } = await apiClient.patch<{ actualizadas: number; fechaLimite: string }>(
-    `${BASE}/programaciones/${periodoId}`,
-    { fechaLimite },
-  );
-  return data;
+  try {
+    const { data } = await apiClient.patch<{ actualizadas: number; fechaLimite: string }>(
+      LIBRETAS_ENDPOINTS.PROGRAMACIONES(periodoId),
+      { fechaLimite },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al actualizar la fecha límite de libretas.");
+  }
 }
 
 export async function vistaPreviaLibretas(
@@ -65,12 +76,16 @@ export async function vistaPreviaLibretas(
   periodoId: string,
   archivos: File[],
 ): Promise<VistaPreviaLibretas> {
-  const { data } = await apiClient.post<VistaPreviaLibretas>(
-    `${BASE}/vista-previa`,
-    aFormData(seccionId, periodoId, archivos),
-    { timeout: 120_000 },
-  );
-  return data;
+  try {
+    const { data } = await apiClient.post<VistaPreviaLibretas>(
+      LIBRETAS_ENDPOINTS.VISTA_PREVIA,
+      aFormData(seccionId, periodoId, archivos),
+      { timeout: 120_000 },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al generar la vista previa de las libretas.");
+  }
 }
 
 export async function publicarLibretas(
@@ -79,62 +94,99 @@ export async function publicarLibretas(
   archivos: File[],
   asignaciones: AsignacionManual[],
 ): Promise<ResultadoPublicacion> {
-  const { data } = await apiClient.post<ResultadoPublicacion>(
-    `${BASE}/publicar`,
-    aFormData(seccionId, periodoId, archivos, asignaciones),
-    { timeout: 120_000 },
-  );
-  return data;
+  try {
+    const { data } = await apiClient.post<ResultadoPublicacion>(
+      LIBRETAS_ENDPOINTS.PUBLICAR,
+      aFormData(seccionId, periodoId, archivos, asignaciones),
+      { timeout: 120_000 },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al publicar las libretas.");
+  }
 }
 
 export async function getAlcancesLibretas(): Promise<AlcanceRol[]> {
-  const { data } = await apiClient.get<AlcanceRol[]>(`${BASE}/alcances`);
-  return data;
+  try {
+    const { data } = await apiClient.get<AlcanceRol[]>(LIBRETAS_ENDPOINTS.ALCANCES);
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener los alcances de libretas.");
+  }
 }
 
 export async function cambiarAlcanceLibretas(
   rolId: string,
   alcance: AlcanceLibreta,
 ): Promise<{ rolId: string; alcance: AlcanceLibreta }> {
-  const { data } = await apiClient.patch<{ rolId: string; alcance: AlcanceLibreta }>(
-    `${BASE}/alcances`,
-    { rolId, alcance },
-  );
-  return data;
+  try {
+    const { data } = await apiClient.patch<{ rolId: string; alcance: AlcanceLibreta }>(
+      LIBRETAS_ENDPOINTS.ALCANCES,
+      { rolId, alcance },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al actualizar el alcance de libretas.");
+  }
 }
 
 export async function getSeguimientoLibretas(
   periodoId: string,
 ): Promise<{ secciones: SeguimientoSeccion[] }> {
-  const { data } = await apiClient.get<{ secciones: SeguimientoSeccion[] }>(`${BASE}/seguimiento`, {
-    params: { periodoId },
-  });
-  return data;
+  try {
+    const { data } = await apiClient.get<{ secciones: SeguimientoSeccion[] }>(
+      LIBRETAS_ENDPOINTS.SEGUIMIENTO,
+      {
+        params: { periodoId },
+      },
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener el seguimiento de libretas.");
+  }
 }
 
 export async function getDetalleLibretas(
   seccionId: string,
   periodoId: string,
 ): Promise<DetalleLibreta[]> {
-  const { data } = await apiClient.get<DetalleLibreta[]>(`${BASE}/seguimiento/${seccionId}`, {
-    params: { periodoId },
-  });
-  return data;
+  try {
+    const { data } = await apiClient.get<DetalleLibreta[]>(LIBRETAS_ENDPOINTS.DETALLE(seccionId), {
+      params: { periodoId },
+    });
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener el detalle de libretas de la sección.");
+  }
 }
 
 export async function getMisLibretas(): Promise<{ libretas: MiLibreta[] }> {
-  const { data } = await apiClient.get<{ libretas: MiLibreta[] }>(`${BASE}/mias`);
-  return data;
+  try {
+    const { data } = await apiClient.get<{ libretas: MiLibreta[] }>(LIBRETAS_ENDPOINTS.MIAS);
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al obtener sus libretas.");
+  }
 }
 
 export async function getHistorialLibreta(id: string): Promise<HistorialLibreta> {
-  const { data } = await apiClient.get<HistorialLibreta>(`${BASE}/${id}/historial`);
-  return data;
+  try {
+    const { data } = await apiClient.get<HistorialLibreta>(LIBRETAS_ENDPOINTS.HISTORIAL(id));
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al consultar el historial de la libreta.");
+  }
 }
 
 export async function abrirLibreta(id: string): Promise<void> {
-  const { data } = await apiClient.get<Blob>(`${BASE}/${id}/archivo`, { responseType: "blob" });
-  const url = URL.createObjectURL(data);
-  window.open(url, "_blank", "noopener,noreferrer");
-  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  try {
+    const { data } = await apiClient.get<Blob>(LIBRETAS_ENDPOINTS.ARCHIVO(id), {
+      responseType: "blob",
+    });
+    const url = URL.createObjectURL(data);
+    window.open(url, "_blank", "noopener,noreferrer");
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (error) {
+    handleApiError(error, "Error al abrir el archivo de la libreta.");
+  }
 }

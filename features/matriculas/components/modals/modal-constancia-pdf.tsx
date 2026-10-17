@@ -122,7 +122,7 @@ function ConstanciaPdfViewerContent({
       </div>
 
       {/* Visor de Documento o Estados de Carga/Error */}
-      <div className="bg-muted/20 relative flex min-h-[520px] w-full flex-col items-center justify-center overflow-hidden rounded-xl border">
+      <div className="bg-muted/20 relative flex min-h-130 w-full flex-col items-center justify-center overflow-hidden rounded-xl border">
         {isLoading && (
           <div className="flex flex-col items-center gap-3 p-8 text-center">
             <Spinner className="text-primary size-8" />
@@ -151,7 +151,7 @@ function ConstanciaPdfViewerContent({
             ref={iframeRef}
             src={pdfUrl}
             title={`Constancia de Matrícula ${matriculaCodigo}`}
-            className="h-[520px] w-full border-none"
+            className="h-130 w-full border-none"
           />
         )}
       </div>

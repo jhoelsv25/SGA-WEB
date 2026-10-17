@@ -66,7 +66,7 @@ export function CreateApoderadoModal({
       onOpenChange={onOpenChange}
       title="Registrar Apoderado"
       icon={User02FreeIcons}
-      description="Registro de ficha de apoderado, asignación de rol, cargo y vinculación escolar (RF-007 V3)."
+      description="Registro de ficha de apoderado, asignación de rol, cargo y vinculación escolar."
       size="2xl"
     >
       <CreateApoderadoForm

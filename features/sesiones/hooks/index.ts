@@ -16,6 +16,7 @@ import {
   solicitarJustificacion,
 } from "../api";
 import { INTERVALO_PANEL_SESIONES_MS, MENU_JUSTIFICACIONES_SESION } from "../consts";
+import { extraerMensajeSesion } from "../utils";
 
 export const sesionesKeys = {
   all: ["sesiones-clase"] as const,
@@ -73,11 +74,6 @@ function useMutacionSesion<TVariables>(
   });
 }
 
-const mensajeDe = (resultado: unknown, porDefecto: string): string =>
-  resultado && typeof resultado === "object" && "mensaje" in resultado
-    ? String((resultado as { mensaje: unknown }).mensaje)
-    : porDefecto;
-
 export function useAsignarReemplazo() {
   return useMutacionSesion(
     ({ id, docenteId }: { id: string; docenteId: string }) => asignarReemplazo(id, docenteId),
@@ -88,7 +84,7 @@ export function useAsignarReemplazo() {
 export function useAprobarJustificacion() {
   return useMutacionSesion(
     (id: string) => aprobarJustificacion(id),
-    (r) => mensajeDe(r, "Sesión justificada."),
+    (r) => extraerMensajeSesion(r, "Sesión justificada."),
   );
 }
 
@@ -96,7 +92,7 @@ export function useRechazarJustificacion() {
   return useMutacionSesion(
     ({ id, comentario }: { id: string; comentario: string }) =>
       rechazarJustificacion(id, comentario),
-    (r) => mensajeDe(r, "La justificación fue rechazada."),
+    (r) => extraerMensajeSesion(r, "La justificación fue rechazada."),
   );
 }
 
@@ -111,7 +107,7 @@ export function useSolicitarJustificacion() {
   return useMutacionSesion(
     ({ id, ...payload }: { id: string; motivo: string; documentoUrl?: string }) =>
       solicitarJustificacion(id, payload),
-    (r) => mensajeDe(r, "Su justificación fue enviada al subdirector."),
+    (r) => extraerMensajeSesion(r, "Su justificación fue enviada al subdirector."),
   );
 }
 

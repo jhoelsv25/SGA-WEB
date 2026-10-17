@@ -30,7 +30,7 @@ export function DetalleAusenciaDescargo({
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase">
           <HugeiconsIcon icon={FileEditIcon} className="size-3.5" />
-          Descargo del docente (HU3)
+          Descargo del docente
         </p>
         {fechaLimite !== "-" && (
           <span className="text-muted-foreground text-xs">

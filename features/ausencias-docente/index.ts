@@ -3,6 +3,7 @@ export * from "./consts";
 export * from "./api";
 export * from "./hooks";
 export * from "./utils";
+export * from "./views";
 export * from "./components/registro";
 export * from "./components/supervision";
 export * from "./components/mis-ausencias";

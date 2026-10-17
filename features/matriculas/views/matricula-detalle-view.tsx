@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/common/page-header";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { EmptyState } from "@/components/common/empty-state";
+import { formatDate } from "@/lib/formatters/date";
 import { useMatriculaDetailQuery } from "../hooks";
 import {
   ModalOperacionMatricula,
@@ -172,9 +173,7 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
               </div>
               <div className="border-border/40 flex justify-between border-b py-1">
                 <span className="text-muted-foreground">Fecha de Creación:</span>
-                <span className="text-foreground">
-                  {new Date(matricula.creadoEn).toLocaleDateString("es-PE")}
-                </span>
+                <span className="text-foreground">{formatDate(matricula.creadoEn)}</span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-muted-foreground">Documento Oficial:</span>

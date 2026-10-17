@@ -16,6 +16,7 @@ import { Spinner } from "@/components/common/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
+import { formatDate } from "@/lib/formatters/date";
 import { toast } from "@/lib/toast";
 import { descargarFichaPdf } from "../api";
 import {
@@ -155,8 +156,7 @@ export function MiSeguimientoVista() {
               Motivo: &ldquo;{solicitudPendiente.motivo}&rdquo;
             </p>
             <p className="text-muted-foreground font-mono text-[11px]">
-              Registrada el {new Date(solicitudPendiente.solicitadoEn).toLocaleDateString("es-PE")}{" "}
-              · En evaluación directiva.
+              Registrada el {formatDate(solicitudPendiente.solicitadoEn)} · En evaluación directiva.
             </p>
           </div>
         </div>

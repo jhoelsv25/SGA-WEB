@@ -83,7 +83,7 @@ export function EditPersonaForm({
         <div className="space-y-1.5 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3.5 text-xs">
           <div className="flex items-center gap-2 font-semibold text-amber-700 dark:text-amber-400">
             <HugeiconsIcon icon={ShieldCheckIcon} className="h-4 w-4 shrink-0" />
-            <span>Protección de Datos Críticos (RF-007 V3)</span>
+            <span>Protección de Datos Críticos</span>
           </div>
           <p className="text-muted-foreground leading-relaxed">
             Esta persona cuenta con fichas institucionales activas. Los datos de identidad están
@@ -286,7 +286,7 @@ export function EditPersonaForm({
       {!isProvisional && isAdmin && (
         <div className="border-primary/20 bg-primary/5 space-y-1.5 rounded-xl border p-3.5">
           <Label htmlFor="edit-motivo" className="text-foreground text-xs font-semibold">
-            Motivo de la corrección de datos críticos (Auditoría RF-007) *
+            Motivo de la corrección de datos críticos (Auditoría) *
           </Label>
           <Textarea
             id="edit-motivo"

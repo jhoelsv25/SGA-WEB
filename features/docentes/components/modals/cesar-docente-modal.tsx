@@ -38,7 +38,7 @@ export function CesarDocenteModal({ docente, open, onOpenChange }: CesarDocenteM
       open={open}
       onOpenChange={onOpenChange}
       title="Registrar Cese de Docente"
-      description="Concluye las labores del docente y actualiza sus accesos según RF-007."
+      description="Concluye las labores del docente y actualiza sus accesos."
       icon={UserRemove01Icon}
       size="md"
     >

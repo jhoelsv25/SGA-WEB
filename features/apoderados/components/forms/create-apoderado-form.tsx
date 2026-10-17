@@ -158,9 +158,6 @@ export function CreateApoderadoForm({
             </span>
             <p className="text-foreground text-sm font-medium">{estudianteNombre}</p>
           </div>
-          <span className="bg-primary/10 text-primary rounded-full px-2.5 py-1 text-xs font-medium">
-            RF-007 HU4
-          </span>
         </div>
       )}
 

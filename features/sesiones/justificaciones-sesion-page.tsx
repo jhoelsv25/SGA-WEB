@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/formatters/date";
 import { ModalTexto } from "./components";
 import {
   useAprobarJustificacion,
@@ -13,8 +14,6 @@ import {
   useRechazarJustificacion,
 } from "./hooks";
 import type { Sesion } from "./types";
-
-const fechaCorta = (iso: string): string => iso.slice(0, 10).split("-").reverse().join("/");
 
 export function JustificacionesSesionPage() {
   const { data = [], isLoading, isError, error, refetch } = useJustificacionesSolicitadas();
@@ -53,7 +52,7 @@ export function JustificacionesSesionPage() {
                 <div className="space-y-1">
                   <p className="font-semibold">{s.docenteNombre}</p>
                   <p className="text-muted-foreground text-sm">
-                    {fechaCorta(s.fecha)} · {s.horaInicio}–{s.horaFin} · {s.cursoNombre} ·{" "}
+                    {formatDate(s.fecha)} · {s.horaInicio}–{s.horaFin} · {s.cursoNombre} ·{" "}
                     {s.seccionNombre}
                   </p>
                   <p className="text-sm">
@@ -103,7 +102,7 @@ export function JustificacionesSesionPage() {
         onOpenChange={(abierto) => !abierto && setARechazar(null)}
         titulo="Rechazar justificación"
         descripcion={
-          aRechazar ? `${aRechazar.docenteNombre} · ${fechaCorta(aRechazar.fecha)}` : undefined
+          aRechazar ? `${aRechazar.docenteNombre} · ${formatDate(aRechazar.fecha)}` : undefined
         }
         icono={FileEditIcon}
         etiqueta="Comentario"

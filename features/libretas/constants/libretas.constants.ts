@@ -1,7 +1,23 @@
+import { formatDate } from "@/lib/formatters/date";
 import type { AlcanceLibreta, EstadoLibreta } from "../types";
 
 export const MAX_ARCHIVOS = 50;
 export const MAX_BYTES_PDF = 5 * 1024 * 1024;
+
+export const LIBRETAS_ENDPOINTS = {
+  BASE: "/libretas",
+  CONTEXTO: "/libretas/contexto",
+  PROGRAMAR: "/libretas/programar",
+  PROGRAMACIONES: (periodoId: string) => `/libretas/programaciones/${periodoId}`,
+  VISTA_PREVIA: "/libretas/vista-previa",
+  PUBLICAR: "/libretas/publicar",
+  ALCANCES: "/libretas/alcances",
+  SEGUIMIENTO: "/libretas/seguimiento",
+  DETALLE: (seccionId: string) => `/libretas/seguimiento/${seccionId}`,
+  MIAS: "/libretas/mias",
+  HISTORIAL: (id: string) => `/libretas/${id}/historial`,
+  ARCHIVO: (id: string) => `/libretas/${id}/archivo`,
+} as const;
 
 export const ETIQUETA_ESTADO: Record<EstadoLibreta, string> = {
   pendiente: "Pendiente",
@@ -29,9 +45,7 @@ export function tituloBimestre(nombre: string): string {
 
 export function formatearFecha(valor: string | null | undefined): string {
   if (!valor) return "—";
-  const [anio, mes, dia] = valor.slice(0, 10).split("-");
-  if (!anio || !mes || !dia) return valor;
-  return `${dia}/${mes}/${anio}`;
+  return formatDate(valor, "dd/MM/yyyy");
 }
 
 export function aFechaIso(fecha: Date): string {

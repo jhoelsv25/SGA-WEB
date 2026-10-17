@@ -31,7 +31,7 @@ export const teacherNavigation: NavSection[] = [
     ],
   },
   {
-    title: "Sesiones y Clases (RF-011)",
+    title: "Sesiones y Clases",
     items: [
       {
         id: "teacher-sessions",

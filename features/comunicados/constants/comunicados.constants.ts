@@ -60,3 +60,12 @@ export const OPCIONES_PRIORIDAD: SelectOptionItem<PrioridadComunicado>[] = [
   { value: "importante", label: "Importante" },
   { value: "urgente", label: "Urgente" },
 ];
+
+export const COMUNICADOS_ENDPOINTS = {
+  BASE: "/comunicados",
+  POR_ID: (id: string) => `/comunicados/${id}`,
+  PUBLICAR: (id: string) => `/comunicados/${id}/publicar`,
+  ARCHIVAR: (id: string) => `/comunicados/${id}/archivar`,
+  LECTURA: (id: string) => `/comunicados/${id}/lectura`,
+  AVANCE_LECTURA: (id: string) => `/comunicados/${id}/avance-lectura`,
+} as const;

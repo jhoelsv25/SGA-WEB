@@ -38,7 +38,7 @@ export function CreateEstudianteModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Registrar Estudiante"
-      description="Crea la ficha escolar, vincula o registra la persona y emite sus credenciales automáticas según RF-007."
+      description="Crea la ficha escolar, vincula o registra la persona y emite sus credenciales automáticas."
       icon={StudentIcon}
       size="2xl"
     >

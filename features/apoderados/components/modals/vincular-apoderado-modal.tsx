@@ -47,7 +47,7 @@ export function VincularApoderadoModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Vincular Apoderado con Estudiante"
-      description="Establecer parentesco y definir responsabilidades escolares y apoderado principal (RF-007 V3)."
+      description="Establecer parentesco y definir responsabilidades escolares y apoderado principal."
       className="max-w-md"
     >
       <VincularApoderadoForm
