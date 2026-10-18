@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { Modal } from "@/components/common/modal";
 import { CreateApoderadoForm } from "../forms/create-apoderado-form";
 import { useCreateApoderadoMutation } from "../../hooks/use-apoderados";
@@ -10,6 +12,8 @@ import { User02FreeIcons } from "@hugeicons/core-free-icons";
 interface CreateApoderadoModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Persona del padrón ya elegida en la búsqueda; sin ella se registra una persona nueva. */
+  persona?: Persona | null;
   estudianteId?: string;
   estudianteNombre?: string;
   onSuccess?: (response: CreateApoderadoResponse) => void;
@@ -18,6 +22,7 @@ interface CreateApoderadoModalProps {
 export function CreateApoderadoModal({
   open,
   onOpenChange,
+  persona,
   estudianteId,
   estudianteNombre,
   onSuccess,
@@ -70,6 +75,7 @@ export function CreateApoderadoModal({
       size="2xl"
     >
       <CreateApoderadoForm
+        persona={persona}
         estudianteId={estudianteId}
         estudianteNombre={estudianteNombre}
         onSubmit={handleSubmit}

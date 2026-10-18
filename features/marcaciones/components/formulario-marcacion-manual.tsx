@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { usePersonasQuery } from "@/features/personas/hooks/use-personas";
+import { PersonaBuscadorField } from "@/features/personas/components/persona-buscador-field";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { TIPOS_MARCACION_LABEL } from "../consts";
 import { useRegistrarMarcacionManual } from "../hooks";
 import { marcacionManualSchema, type MarcacionManualFormValues } from "../schemas";
@@ -21,9 +22,8 @@ function hoyIso(): string {
 }
 
 export function FormularioMarcacionManual() {
-  const [busqueda, setBusqueda] = React.useState("");
+  const [persona, setPersona] = React.useState<Persona | null>(null);
   const registrar = useRegistrarMarcacionManual();
-  const { data: personas } = usePersonasQuery({ search: busqueda.trim() || undefined, limit: 20 });
 
   const {
     register,
@@ -36,19 +36,12 @@ export function FormularioMarcacionManual() {
     defaultValues: { personaId: "", tipo: "entrada", fecha: hoyIso(), hora: "", observacion: "" },
   });
 
-  const opcionesPersona = React.useMemo(
-    () =>
-      (personas?.data ?? []).map((p) => ({
-        value: p.id,
-        label: p.nombreCompleto,
-        description: p.numeroDocumento,
-      })),
-    [personas],
-  );
-
   const enviar = (values: MarcacionManualFormValues) => {
     registrar.mutate(values, {
-      onSuccess: () => reset({ ...values, personaId: "", hora: "", observacion: "" }),
+      onSuccess: () => {
+        setPersona(null);
+        reset({ ...values, personaId: "", hora: "", observacion: "" });
+      },
     });
   };
 
@@ -62,24 +55,19 @@ export function FormularioMarcacionManual() {
         <Label htmlFor="busqueda-persona" className="text-sm font-medium">
           Persona *
         </Label>
-        <Input
-          id="busqueda-persona"
-          placeholder="Buscar por nombre o documento"
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          disabled={registrar.isPending}
-        />
         <Controller
           control={control}
           name="personaId"
           render={({ field }) => (
-            <SelectOption
-              options={opcionesPersona}
-              value={field.value}
-              onSelect={field.onChange}
-              placeholder="Seleccione la persona"
-              searchPlaceholder="Filtrar resultados"
-              emptyMessage="Sin resultados. Pruebe con otro nombre."
+            <PersonaBuscadorField
+              id="busqueda-persona"
+              destino="cualquiera"
+              value={persona}
+              onChange={(elegida) => {
+                setPersona(elegida);
+                field.onChange(elegida?.id ?? "");
+              }}
+              disabled={registrar.isPending}
             />
           )}
         />

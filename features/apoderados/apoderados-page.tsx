@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { RegistroPersonaAcciones } from "@/features/personas/components/registro-persona-acciones";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { UserGroupIcon, UserAdd01Icon, FileExportIcon } from "@hugeicons/core-free-icons";
+import { UserGroupIcon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
@@ -18,6 +20,12 @@ import type { Apoderado } from "./types/apoderados.types";
 
 export function ApoderadosPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
+  const [personaElegida, setPersonaElegida] = React.useState<Persona | null>(null);
+
+  const abrirRegistro = (persona: Persona | null) => {
+    setPersonaElegida(persona);
+    setCreateModalOpen(true);
+  };
 
   // Filtros sincronizados con la URL
   const listFilters = useListFilters(apoderadoFilterDefs);
@@ -101,14 +109,12 @@ export function ApoderadosPage() {
                 <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
                 {isExporting ? "Exportando..." : "Exportar"}
               </Button>
-              <Button
-                size="sm"
-                onClick={() => setCreateModalOpen(true)}
-                className="h-8 gap-1.5 text-xs"
-              >
-                <HugeiconsIcon icon={UserAdd01Icon} className="h-4 w-4" />
-                Registrar Apoderado
-              </Button>
+              <RegistroPersonaAcciones
+                destino="apoderado"
+                tipoImportacion="apoderados"
+                onVincular={(persona) => abrirRegistro(persona)}
+                onRegistrar={() => abrirRegistro(null)}
+              />
             </div>
           }
         />
@@ -127,7 +133,11 @@ export function ApoderadosPage() {
         />
       </div>
 
-      <CreateApoderadoModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
+      <CreateApoderadoModal
+        persona={personaElegida}
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+      />
     </div>
   );
 }

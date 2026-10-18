@@ -10,14 +10,8 @@ import { DatePicker } from "@/components/common/date-picker";
 import { SelectOption } from "@/components/common/select";
 import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Cancel01Icon,
-  CheckmarkCircle02Icon,
-  Search01Icon,
-  Alert02Icon,
-  UserCheck01Icon,
-} from "@hugeicons/core-free-icons";
-import { useSearchPersonasQuery } from "../../../personas/hooks/use-personas";
+import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
+import { PersonaVinculadaCard } from "../../../personas/components/persona-vinculada-card";
 import {
   createEstudianteSchema,
   type CreateEstudianteFormValues,
@@ -47,39 +41,28 @@ interface CreateEstudianteFormProps {
   onSubmit: (input: CreateEstudianteInput) => Promise<void> | void;
   isLoading?: boolean;
   onCancel: () => void;
+  /** Persona del padrón elegida en la búsqueda; sin ella se registra una persona nueva. */
+  persona?: Persona | null;
 }
 
 export function CreateEstudianteForm({
   onSubmit,
   isLoading = false,
   onCancel,
+  persona = null,
 }: CreateEstudianteFormProps) {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [debouncedSearch, setDebouncedSearch] = React.useState("");
-  const [personaVinculada, setPersonaVinculada] = React.useState<Persona | null>(null);
-
-  React.useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchTerm.trim());
-    }, 400);
-    return () => clearTimeout(handler);
-  }, [searchTerm]);
-
-  const { data: searchResult, isFetching: isSearching } = useSearchPersonasQuery(
-    { search: debouncedSearch, destinoFicha: "estudiante" },
-    Boolean(debouncedSearch.length >= 3 && !personaVinculada),
-  );
+  const personaVinculada = persona;
+  const modo = personaVinculada ? "buscar" : "registrar";
 
   const {
     register,
     handleSubmit,
     control,
-    setValue,
     formState: { errors },
   } = useForm<CreateEstudianteFormValues>({
     resolver: zodResolver(createEstudianteSchema),
     defaultValues: {
-      personaId: "",
+      personaId: persona?.id ?? "",
       codigo: "",
       fechaIngreso: formatToIsoDate(new Date()),
       lenguaMaterna: "Castellano",
@@ -90,48 +73,25 @@ export function CreateEstudianteForm({
       alergias: "",
       condicionesMedicas: "",
       seguroSalud: "",
-      nuevaPersona: {
-        tipoDocumento: "dni",
-        numeroDocumento: "",
-        nombres: "",
-        apellidoPaterno: "",
-        apellidoMaterno: "",
-        sexo: "M",
-        fechaNacimiento: "",
-        celular: "",
-        correo: "",
-      },
+      nuevaPersona: persona
+        ? undefined
+        : {
+            tipoDocumento: "dni",
+            numeroDocumento: "",
+            nombres: "",
+            apellidoPaterno: "",
+            apellidoMaterno: "",
+            sexo: "M",
+            fechaNacimiento: "",
+            celular: "",
+            correo: "",
+          },
     },
   });
 
   const tieneDiscapacidadValor = useWatch({ control, name: "tieneDiscapacidad" });
 
-  const handleVincularPersona = (persona: Persona) => {
-    setPersonaVinculada(persona);
-    setValue("personaId", persona.id, { shouldValidate: true });
-    setValue("nuevaPersona", undefined);
-  };
-
-  const handleDesvincularPersona = () => {
-    setPersonaVinculada(null);
-    setValue("personaId", "");
-    setValue("nuevaPersona", {
-      tipoDocumento: "dni",
-      numeroDocumento: "",
-      nombres: "",
-      apellidoPaterno: "",
-      apellidoMaterno: "",
-      sexo: "M",
-      fechaNacimiento: "",
-      celular: "",
-      correo: "",
-    });
-    setSearchTerm("");
-  };
-
   const handleFormSubmit = async (values: CreateEstudianteFormValues) => {
-    if (searchResult?.yaTieneFicha) return;
-
     if (personaVinculada) {
       await onSubmit({
         personaId: personaVinculada.id,
@@ -177,100 +137,12 @@ export function CreateEstudianteForm({
     }
   };
 
-  const yaTieneFicha = Boolean(searchResult?.yaTieneFicha);
-
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4" noValidate>
-      {/* 1. Búsqueda preventiva en el padrón */}
-      <div className="border-border/70 bg-card space-y-2.5 rounded-xl border p-3.5">
-        <Label className="text-foreground text-sm font-semibold">
-          1. Búsqueda preventiva en el padrón único
-        </Label>
-        <p className="text-muted-foreground text-xs">
-          Verifica primero si el estudiante ya existe en el padrón escolar antes de registrarlo.
-        </p>
-
-        {!personaVinculada ? (
-          <>
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Search01Icon}
-                className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
-              />
-              <Input
-                placeholder="Ingrese DNI o apellidos para verificar en padrón..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                disabled={isLoading}
-                className="pl-9 text-xs"
-              />
-              {isSearching && (
-                <Spinner className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
-              )}
-            </div>
-
-            {searchResult?.encontrada && searchResult.persona && (
-              <div
-                className={`flex items-start gap-2.5 rounded-lg border p-3 ${
-                  yaTieneFicha
-                    ? "border-destructive/40 bg-destructive/10 text-destructive"
-                    : "border-emerald-500/40 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300"
-                }`}
-              >
-                <HugeiconsIcon
-                  icon={yaTieneFicha ? Alert02Icon : CheckmarkCircle02Icon}
-                  className="mt-0.5 h-5 w-5 shrink-0"
-                />
-                <div className="flex-1 space-y-0.5">
-                  <p className="text-xs font-semibold">{searchResult.mensaje}</p>
-                  <p className="text-[11px] opacity-90">
-                    {searchResult.persona.nombreCompleto} (
-                    {searchResult.persona.tipoDocumento.toUpperCase()}:{" "}
-                    {searchResult.persona.numeroDocumento})
-                  </p>
-                </div>
-                {!yaTieneFicha && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="h-7 gap-1 px-2.5 text-xs"
-                    onClick={() => handleVincularPersona(searchResult.persona!)}
-                  >
-                    <HugeiconsIcon icon={UserCheck01Icon} className="size-3.5" />
-                    <span>Vincular</span>
-                  </Button>
-                )}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="border-primary/30 bg-primary/5 flex items-center justify-between rounded-lg border p-3 text-xs">
-            <div className="space-y-0.5">
-              <span className="text-primary block text-[11px] font-semibold">
-                Persona vinculada del padrón
-              </span>
-              <p className="text-foreground text-sm font-medium">
-                {personaVinculada.nombreCompleto}
-              </p>
-              <p className="text-muted-foreground font-mono text-xs">
-                {personaVinculada.tipoDocumento.toUpperCase()}: {personaVinculada.numeroDocumento}
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleDesvincularPersona}
-              className="h-7 text-xs"
-            >
-              Cambiar persona
-            </Button>
-          </div>
-        )}
-      </div>
+      {personaVinculada && <PersonaVinculadaCard persona={personaVinculada} />}
 
       {/* 2. Datos personales (Si es nueva persona) */}
-      {!personaVinculada && (
+      {modo === "registrar" && (
         <div className="border-border/70 space-y-3 rounded-xl border p-3.5">
           <Label className="text-foreground text-sm font-semibold">
             2. Datos del nuevo estudiante (Padrón Único)
@@ -401,172 +273,178 @@ export function CreateEstudianteForm({
         </div>
       )}
 
-      {/* 3. Ficha Escolar y Médica */}
-      <div className="border-border/70 space-y-3 rounded-xl border p-3.5">
-        <Label className="text-foreground text-sm font-semibold">
-          {personaVinculada ? "2. Ficha Escolar y Médica" : "3. Ficha Escolar y Médica"}
-        </Label>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="codigo" className="text-sm font-medium">
-              Código SIAGIE único *
+      {
+        <>
+          {/* 3. Ficha Escolar y Médica */}
+          <div className="border-border/70 space-y-3 rounded-xl border p-3.5">
+            <Label className="text-foreground text-sm font-semibold">
+              2. Ficha Escolar y Médica
             </Label>
-            <Input
-              id="codigo"
-              placeholder="Ej. 20261234567890"
-              disabled={isLoading}
-              {...register("codigo")}
-            />
-            <p className="text-muted-foreground text-xs">
-              Será el usuario de acceso al aula y portal escolar.
-            </p>
-            {errors.codigo && (
-              <p className="text-destructive text-xs font-medium">{errors.codigo.message}</p>
-            )}
-          </div>
 
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Fecha de ingreso *</Label>
-            <Controller
-              control={control}
-              name="fechaIngreso"
-              render={({ field }) => (
-                <DatePicker
-                  date={parseIsoDate(field.value)}
-                  onSelect={(date) => field.onChange(formatToIsoDate(date))}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="codigo" className="text-sm font-medium">
+                  Código SIAGIE único *
+                </Label>
+                <Input
+                  id="codigo"
+                  placeholder="Ej. 20261234567890"
                   disabled={isLoading}
-                  clearable={false}
-                  dateFormat="dd/MM/yyyy"
-                  placeholder="Seleccionar fecha de ingreso"
-                  className={
-                    errors.fechaIngreso
-                      ? "border-destructive ring-destructive/20 w-full ring-1"
-                      : "w-full"
-                  }
+                  {...register("codigo")}
                 />
-              )}
-            />
-            {errors.fechaIngreso && (
-              <p className="text-destructive text-xs font-medium">{errors.fechaIngreso.message}</p>
-            )}
-          </div>
-        </div>
+                <p className="text-muted-foreground text-xs">
+                  Será el usuario de acceso al aula y portal escolar.
+                </p>
+                {errors.codigo && (
+                  <p className="text-destructive text-xs font-medium">{errors.codigo.message}</p>
+                )}
+              </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="lenguaMaterna" className="text-sm font-medium">
-              Lengua materna (Opcional)
-            </Label>
-            <Input
-              id="lenguaMaterna"
-              placeholder="Ej. Castellano, Quechua..."
-              disabled={isLoading}
-              {...register("lenguaMaterna")}
-            />
-          </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium">Fecha de ingreso *</Label>
+                <Controller
+                  control={control}
+                  name="fechaIngreso"
+                  render={({ field }) => (
+                    <DatePicker
+                      date={parseIsoDate(field.value)}
+                      onSelect={(date) => field.onChange(formatToIsoDate(date))}
+                      disabled={isLoading}
+                      clearable={false}
+                      dateFormat="dd/MM/yyyy"
+                      placeholder="Seleccionar fecha de ingreso"
+                      className={
+                        errors.fechaIngreso
+                          ? "border-destructive ring-destructive/20 w-full ring-1"
+                          : "w-full"
+                      }
+                    />
+                  )}
+                />
+                {errors.fechaIngreso && (
+                  <p className="text-destructive text-xs font-medium">
+                    {errors.fechaIngreso.message}
+                  </p>
+                )}
+              </div>
+            </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="religion" className="text-sm font-medium">
-              Religión (Opcional)
-            </Label>
-            <Input
-              id="religion"
-              placeholder="Ej. Católica, Evangélica..."
-              disabled={isLoading}
-              {...register("religion")}
-            />
-          </div>
-        </div>
-
-        {/* Discapacidad */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Discapacidad certificada</Label>
-            <Controller
-              control={control}
-              name="tieneDiscapacidad"
-              render={({ field }) => (
-                <SelectOption
-                  options={discapacidadOptions}
-                  value={String(field.value)}
-                  onSelect={(val) => field.onChange(val === "true")}
-                  placeholder="Seleccionar condición..."
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="lenguaMaterna" className="text-sm font-medium">
+                  Lengua materna (Opcional)
+                </Label>
+                <Input
+                  id="lenguaMaterna"
+                  placeholder="Ej. Castellano, Quechua..."
                   disabled={isLoading}
+                  {...register("lenguaMaterna")}
                 />
-              )}
-            />
-          </div>
+              </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="detalleDiscapacidad" className="text-sm font-medium">
-              Detalle de discapacidad {tieneDiscapacidadValor ? "*" : "(Opcional)"}
-            </Label>
-            <Input
-              id="detalleDiscapacidad"
-              placeholder="Ej. Auditiva moderada, motriz..."
-              disabled={isLoading || !tieneDiscapacidadValor}
-              {...register("detalleDiscapacidad")}
-            />
-            {errors.detalleDiscapacidad && (
-              <p className="text-destructive text-xs font-medium">
-                {errors.detalleDiscapacidad.message}
-              </p>
-            )}
-          </div>
-        </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="religion" className="text-sm font-medium">
+                  Religión (Opcional)
+                </Label>
+                <Input
+                  id="religion"
+                  placeholder="Ej. Católica, Evangélica..."
+                  disabled={isLoading}
+                  {...register("religion")}
+                />
+              </div>
+            </div>
 
-        {/* Salud y emergencias */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="grupoSanguineo" className="text-sm font-medium">
-              Grupo sanguíneo
-            </Label>
-            <Input
-              id="grupoSanguineo"
-              placeholder="Ej. O+, A+"
-              disabled={isLoading}
-              {...register("grupoSanguineo")}
-            />
-          </div>
+            {/* Discapacidad */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium">Discapacidad certificada</Label>
+                <Controller
+                  control={control}
+                  name="tieneDiscapacidad"
+                  render={({ field }) => (
+                    <SelectOption
+                      options={discapacidadOptions}
+                      value={String(field.value)}
+                      onSelect={(val) => field.onChange(val === "true")}
+                      placeholder="Seleccionar condición..."
+                      disabled={isLoading}
+                    />
+                  )}
+                />
+              </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="alergias" className="text-sm font-medium">
-              Alergias
-            </Label>
-            <Input
-              id="alergias"
-              placeholder="Ej. Penicilina..."
-              disabled={isLoading}
-              {...register("alergias")}
-            />
-          </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="detalleDiscapacidad" className="text-sm font-medium">
+                  Detalle de discapacidad {tieneDiscapacidadValor ? "*" : "(Opcional)"}
+                </Label>
+                <Input
+                  id="detalleDiscapacidad"
+                  placeholder="Ej. Auditiva moderada, motriz..."
+                  disabled={isLoading || !tieneDiscapacidadValor}
+                  {...register("detalleDiscapacidad")}
+                />
+                {errors.detalleDiscapacidad && (
+                  <p className="text-destructive text-xs font-medium">
+                    {errors.detalleDiscapacidad.message}
+                  </p>
+                )}
+              </div>
+            </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="seguroSalud" className="text-sm font-medium">
-              Seguro de salud
-            </Label>
-            <Input
-              id="seguroSalud"
-              placeholder="Ej. SIS, EsSalud..."
-              disabled={isLoading}
-              {...register("seguroSalud")}
-            />
-          </div>
-        </div>
+            {/* Salud y emergencias */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="grupoSanguineo" className="text-sm font-medium">
+                  Grupo sanguíneo
+                </Label>
+                <Input
+                  id="grupoSanguineo"
+                  placeholder="Ej. O+, A+"
+                  disabled={isLoading}
+                  {...register("grupoSanguineo")}
+                />
+              </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="condicionesMedicas" className="text-sm font-medium">
-            Condiciones médicas relevantes (Opcional)
-          </Label>
-          <Input
-            id="condicionesMedicas"
-            placeholder="Ej. Asma bronquial controlada, tratamiento con inhalador..."
-            disabled={isLoading}
-            {...register("condicionesMedicas")}
-          />
-        </div>
-      </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="alergias" className="text-sm font-medium">
+                  Alergias
+                </Label>
+                <Input
+                  id="alergias"
+                  placeholder="Ej. Penicilina..."
+                  disabled={isLoading}
+                  {...register("alergias")}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="seguroSalud" className="text-sm font-medium">
+                  Seguro de salud
+                </Label>
+                <Input
+                  id="seguroSalud"
+                  placeholder="Ej. SIS, EsSalud..."
+                  disabled={isLoading}
+                  {...register("seguroSalud")}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="condicionesMedicas" className="text-sm font-medium">
+                Condiciones médicas relevantes (Opcional)
+              </Label>
+              <Input
+                id="condicionesMedicas"
+                placeholder="Ej. Asma bronquial controlada, tratamiento con inhalador..."
+                disabled={isLoading}
+                {...register("condicionesMedicas")}
+              />
+            </div>
+          </div>
+        </>
+      }
 
       {/* Botones de acción */}
       <div className="flex justify-end gap-2.5 pt-3">
@@ -582,7 +460,7 @@ export function CreateEstudianteForm({
         </Button>
         <Button
           type="submit"
-          disabled={isLoading || yaTieneFicha}
+          disabled={isLoading}
           className="shadow-primary/20 h-10 gap-1.5 rounded-full px-5 text-xs font-semibold shadow-md"
         >
           {isLoading ? (

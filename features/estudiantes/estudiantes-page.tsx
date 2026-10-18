@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { RegistroPersonaAcciones } from "@/features/personas/components/registro-persona-acciones";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { StudentIcon, UserAdd01Icon, FileExportIcon } from "@hugeicons/core-free-icons";
+import { StudentIcon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
@@ -15,7 +17,6 @@ import { useEstudiantesQuery } from "./hooks/use-estudiantes";
 import { EstudiantesTable } from "./views/estudiantes-table";
 import { CreateEstudianteModal } from "./components/modals/create-estudiante-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
-import { ImportarButton } from "@/features/importacion";
 import type {
   CreateEstudianteResponse,
   Estudiante,
@@ -24,6 +25,12 @@ import type {
 
 export function EstudiantesPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
+  const [personaElegida, setPersonaElegida] = React.useState<Persona | null>(null);
+
+  const abrirRegistro = (persona: Persona | null) => {
+    setPersonaElegida(persona);
+    setCreateModalOpen(true);
+  };
   const [credentialsModalOpen, setCredentialsModalOpen] = React.useState(false);
   const [createdData, setCreatedData] = React.useState<CreateEstudianteResponse | null>(null);
 
@@ -80,7 +87,6 @@ export function EstudiantesPage() {
           isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
-              <ImportarButton tipo="estudiantes" onSuccess={() => void refetch()} />
               <Button
                 variant="outline"
                 size="sm"
@@ -91,14 +97,12 @@ export function EstudiantesPage() {
                 <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
                 {isExporting ? "Exportando..." : "Exportar"}
               </Button>
-              <Button
-                size="sm"
-                onClick={() => setCreateModalOpen(true)}
-                className="h-8 gap-1.5 text-xs"
-              >
-                <HugeiconsIcon icon={UserAdd01Icon} className="h-4 w-4" />
-                Registrar Estudiante
-              </Button>
+              <RegistroPersonaAcciones
+                destino="estudiante"
+                tipoImportacion="estudiantes"
+                onVincular={(persona) => abrirRegistro(persona)}
+                onRegistrar={() => abrirRegistro(null)}
+              />
             </div>
           }
         />
@@ -116,6 +120,7 @@ export function EstudiantesPage() {
 
       {/* Modal para Crear Estudiante */}
       <CreateEstudianteModal
+        persona={personaElegida}
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         onCreatedSuccess={handleCreatedSuccess}

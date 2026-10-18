@@ -54,21 +54,25 @@ export function useLogin(options?: UseLoginOptions) {
       if (data.accessToken) {
         setAccessToken(data.accessToken);
       }
-      options?.onSuccess?.(data);
-      toast.success(data.message || "Bienvenido al sistema");
       queryClient.setQueryData(["auth", "session"], data);
-      queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
 
-      if (options?.redirect === false) return;
-
+      // Primer ingreso: antes de elegir rol debe cambiar la contraseña temporal
       if (data.user?.mustChangePassword) {
         toast.info(
           "Por seguridad institucional, debes actualizar tu contraseña antes de continuar.",
         );
         router.push("/change-password");
-      } else {
-        router.push(options?.redirectTo || "/admin/dashboard");
+        router.refresh();
+        return;
       }
+
+      options?.onSuccess?.(data);
+      toast.success(data.message || "Bienvenido al sistema");
+      queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
+
+      if (options?.redirect === false) return;
+
+      router.push(options?.redirectTo || "/admin/dashboard");
       router.refresh();
     },
     onError: (error) => {
@@ -121,11 +125,22 @@ export function useChangePassword(options?: UseChangePasswordOptions) {
   return useMutation<{ message?: string }, ApiClientError, ChangePasswordPayload>({
     mutationKey: ["auth", "change-password"],
     mutationFn: (payload) => authApi.changePassword(payload),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       options?.onSuccess?.(data);
-      toast.success(data.message || "Contraseña actualizada exitosamente.");
-      queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
-      router.push(options?.redirectTo || "/admin/dashboard");
+      // La sesión con clave temporal se cierra: debe ingresar con la contraseña nueva
+      try {
+        await authApi.logout();
+      } catch {
+        // Si falla el cierre en el servidor, igual se limpia la sesión local
+      }
+      setAccessToken(null);
+      queryClient.clear();
+      toast.success(
+        data.message
+          ? `${data.message} Ingresa con tu nueva contraseña.`
+          : "Contraseña actualizada. Ingresa con tu nueva contraseña.",
+      );
+      router.replace(options?.redirectTo || "/login");
       router.refresh();
     },
     onError: (error) => {

@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { Modal } from "@/components/common/modal";
 import { UserAdd01Icon } from "@hugeicons/core-free-icons";
 import { CreateDocenteForm } from "../forms/create-docente-form";
@@ -9,12 +11,15 @@ import type { CreateDocenteInput, CreateDocenteResponse } from "../../types/doce
 interface CreateDocenteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Persona del padrón ya elegida en la búsqueda; sin ella se registra una persona nueva. */
+  persona?: Persona | null;
   onCreatedSuccess?: (data: CreateDocenteResponse) => void;
 }
 
 export function CreateDocenteModal({
   open,
   onOpenChange,
+  persona,
   onCreatedSuccess,
 }: CreateDocenteModalProps) {
   const createMutation = useCreateDocenteMutation((data) => {
@@ -40,6 +45,7 @@ export function CreateDocenteModal({
       size="2xl"
     >
       <CreateDocenteForm
+        persona={persona}
         onSubmit={handleSubmit}
         isLoading={createMutation.isPending}
         onCancel={() => onOpenChange(false)}

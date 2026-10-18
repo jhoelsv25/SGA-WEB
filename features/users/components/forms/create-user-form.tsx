@@ -11,7 +11,8 @@ import { SelectOption } from "@/components/common/select";
 import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
-import { useEligiblePersonasQuery } from "../../hooks/use-users-query";
+import { PersonaBuscadorField } from "@/features/personas/components/persona-buscador-field";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { useRolesQuery } from "../../../roles/hooks/use-roles-query";
 import { useCargosQuery } from "../../../cargos/hooks/use-cargos-query";
 import { createUserSchema, type CreateUserFormValues } from "../../schemas/users.schema";
@@ -31,9 +32,7 @@ const TIPO_DOCUMENTO_OPTIONS = [
 ];
 
 export function CreateUserForm({ onSubmit, isLoading = false, onCancel }: Props) {
-  const [personaSearch] = React.useState("");
-  const { data: eligiblePersonas = [], isLoading: isLoadingPersonas } =
-    useEligiblePersonasQuery(personaSearch);
+  const [personaElegida, setPersonaElegida] = React.useState<Persona | null>(null);
   const { data: roles = [] } = useRolesQuery(true);
   const { data: cargos = [], isLoading: isLoadingCargos } = useCargosQuery(true);
 
@@ -62,12 +61,11 @@ export function CreateUserForm({ onSubmit, isLoading = false, onCancel }: Props)
   // Cuando se selecciona una persona existente, sugerir su número de documento como usuario
   React.useEffect(() => {
     if (tipoPersona === "existente" && selectedPersonaId) {
-      const persona = eligiblePersonas.find((p) => p.id === selectedPersonaId);
-      if (persona) {
-        setValue("nombreUsuario", persona.numeroDocumento, { shouldValidate: true });
+      if (personaElegida) {
+        setValue("nombreUsuario", personaElegida.numeroDocumento, { shouldValidate: true });
       }
     }
-  }, [tipoPersona, selectedPersonaId, eligiblePersonas, setValue]);
+  }, [tipoPersona, selectedPersonaId, personaElegida, setValue]);
 
   // Cuando se elige el cargo, sugerir automáticamente sus roles (el usuario puede ajustarlos)
   React.useEffect(() => {
@@ -82,13 +80,6 @@ export function CreateUserForm({ onSubmit, isLoading = false, onCancel }: Props)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCargoId]);
-
-  const personaOptions = React.useMemo(() => {
-    return eligiblePersonas.map((p) => ({
-      value: p.id,
-      label: `${p.apellidoPaterno} ${p.apellidoMaterno ?? ""}, ${p.nombres} (${p.tipoDocumento.toUpperCase()}: ${p.numeroDocumento})`,
-    }));
-  }, [eligiblePersonas]);
 
   const cargoOptions = React.useMemo(() => {
     return cargos.map((c) => ({ value: c.id, label: c.nombre }));
@@ -147,21 +138,20 @@ export function CreateUserForm({ onSubmit, isLoading = false, onCancel }: Props)
             control={control}
             name="personaId"
             render={({ field }) => (
-              <SelectOption
-                options={personaOptions}
-                value={field.value}
-                onSelect={(val) => field.onChange(val)}
-                placeholder={
-                  isLoadingPersonas ? "Cargando personas..." : "Seleccionar persona sin cuenta..."
-                }
-                searchPlaceholder="Buscar por nombre o documento..."
-                emptyMessage="No hay personas disponibles sin cuenta."
-                disabled={isLoading || isLoadingPersonas}
+              <PersonaBuscadorField
+                id="personaId"
+                destino="cuenta"
+                value={personaElegida}
+                onChange={(elegida) => {
+                  setPersonaElegida(elegida);
+                  field.onChange(elegida?.id ?? "");
+                }}
+                disabled={isLoading}
               />
             )}
           />
           <p className="text-muted-foreground text-xs">
-            Solo se muestran personas registradas que aún no tienen cuenta activa.
+            Busca por DNI o nombre; las personas que ya tienen cuenta aparecen bloqueadas.
           </p>
           {errors.personaId && (
             <p className="text-destructive text-xs font-medium">{errors.personaId.message}</p>

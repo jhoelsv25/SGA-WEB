@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { Modal } from "@/components/common/modal";
 import { StudentIcon } from "@hugeicons/core-free-icons";
 import { CreateEstudianteForm } from "../forms/create-estudiante-form";
@@ -12,12 +14,15 @@ import type {
 interface CreateEstudianteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Persona del padrón ya elegida en la búsqueda; sin ella se registra una persona nueva. */
+  persona?: Persona | null;
   onCreatedSuccess?: (data: CreateEstudianteResponse) => void;
 }
 
 export function CreateEstudianteModal({
   open,
   onOpenChange,
+  persona,
   onCreatedSuccess,
 }: CreateEstudianteModalProps) {
   const createMutation = useCreateEstudianteMutation((data) => {
@@ -43,6 +48,7 @@ export function CreateEstudianteModal({
       size="2xl"
     >
       <CreateEstudianteForm
+        persona={persona}
         onSubmit={handleSubmit}
         isLoading={createMutation.isPending}
         onCancel={() => onOpenChange(false)}

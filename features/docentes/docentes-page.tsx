@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { RegistroPersonaAcciones } from "@/features/personas/components/registro-persona-acciones";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { UserGroupIcon, UserAdd01Icon, FileExportIcon } from "@hugeicons/core-free-icons";
+import { UserGroupIcon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
@@ -14,7 +16,6 @@ import { useDocentesQuery } from "./hooks/use-docentes";
 import { DocentesTable } from "./views/docentes-table";
 import { CreateDocenteModal } from "./components/modals/create-docente-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
-import { ImportarButton } from "@/features/importacion";
 import type {
   CreateDocenteResponse,
   Docente,
@@ -24,6 +25,12 @@ import type {
 
 export function DocentesPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
+  const [personaElegida, setPersonaElegida] = React.useState<Persona | null>(null);
+
+  const abrirRegistro = (persona: Persona | null) => {
+    setPersonaElegida(persona);
+    setCreateModalOpen(true);
+  };
   const [credentialsModalOpen, setCredentialsModalOpen] = React.useState(false);
   const [createdData, setCreatedData] = React.useState<CreateDocenteResponse | null>(null);
 
@@ -115,7 +122,6 @@ export function DocentesPage() {
           isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
-              <ImportarButton tipo="docentes" onSuccess={() => void refetch()} />
               <Button
                 variant="outline"
                 size="sm"
@@ -126,10 +132,12 @@ export function DocentesPage() {
                 <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
                 Exportar Excel
               </Button>
-              <Button size="sm" onClick={() => setCreateModalOpen(true)} className="gap-2">
-                <HugeiconsIcon icon={UserAdd01Icon} className="h-4 w-4" />
-                Registrar Docente
-              </Button>
+              <RegistroPersonaAcciones
+                destino="docente"
+                tipoImportacion="docentes"
+                onVincular={(persona) => abrirRegistro(persona)}
+                onRegistrar={() => abrirRegistro(null)}
+              />
             </div>
           }
         />
@@ -150,6 +158,7 @@ export function DocentesPage() {
 
       {/* Modal para Crear Docente con Búsqueda Preventiva */}
       <CreateDocenteModal
+        persona={personaElegida}
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         onCreatedSuccess={handleCreatedSuccess}
