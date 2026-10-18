@@ -54,11 +54,30 @@ export interface IndicadorTesisItem {
   estado: "en_curso" | "cerrado" | "sin_datos";
 }
 
+export interface DirectivoAlertaDia {
+  tipo: string;
+  titulo: string;
+  detalle: string;
+  enlace: string;
+  nivel: "info" | "warning" | "danger";
+}
+
+export interface DocenteSemaforoItem {
+  docenteId: string;
+  docenteNombre: string;
+  porcentajeCumplimiento: number;
+  estado: "verde" | "amarillo" | "rojo";
+  sesionesRegistradas: number;
+  totalSesiones: number;
+}
+
 export interface DirectivoDashboardData {
   kpis: DirectivoKpis;
   graficoAsistencia: DirectivoGraficoAsistencia[];
   distribucionGrados: DirectivoDistribucionGrados[];
   indicadoresTesis?: IndicadorTesisItem[];
+  alertasDelDia?: DirectivoAlertaDia[];
+  docentesSemaforo?: DocenteSemaforoItem[];
 }
 
 export interface DocenteKpis {
@@ -186,10 +205,37 @@ export interface AuditoriaRecienteItem {
   ip?: string;
 }
 
+export interface AdminActividadSemanal {
+  dia: string;
+  fecha: string;
+  totalEventos: number;
+  iniciosSesion: number;
+  cambios: number;
+}
+
+export interface AdminEquipoReciente {
+  id: string;
+  nombre: string;
+  tipo: string;
+  ip?: string;
+  ultimoAcceso?: string;
+  autorizado: boolean;
+  activo: boolean;
+}
+
+export interface AdminServicioEstado {
+  nombre: string;
+  estado: "operacional" | "degradado" | "inactivo";
+  detalle: string;
+}
+
 export interface AdminDashboardData {
   kpis: AdminKpis;
   distribucionRoles: DistribucionUsuariosRol[];
   ultimasAuditorias: AuditoriaRecienteItem[];
+  actividadSemanal?: AdminActividadSemanal[];
+  equiposRecientes?: AdminEquipoReciente[];
+  servicios?: AdminServicioEstado[];
 }
 
 export interface SecretariaKpis {

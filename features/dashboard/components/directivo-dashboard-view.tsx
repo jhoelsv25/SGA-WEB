@@ -1,13 +1,17 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   StudentIcon,
   TeacherIcon,
   CheckmarkCircle02Icon,
   BookOpen01Icon,
   Clock01Icon,
+  AlertCircleIcon,
+  ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,6 +20,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { KpiCard } from "./kpi-card";
 import { DashboardChartEmpty } from "./dashboard-chart-empty";
 import type { DirectivoDashboardData } from "../types/dashboard.types";
@@ -39,10 +45,50 @@ const chartConfigGrados = {
 } satisfies ChartConfig;
 
 export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
-  const { kpis, graficoAsistencia, distribucionGrados } = data;
+  const { kpis, graficoAsistencia, distribucionGrados, alertasDelDia, docentesSemaforo } = data;
 
   return (
     <div className="space-y-6">
+      {/* Alertas del Día (RF-021 HU-021-02: aparecen primero) */}
+      {alertasDelDia && alertasDelDia.length > 0 && (
+        <div className="space-y-2">
+          {alertasDelDia.map((alerta, i) => (
+            <div
+              key={i}
+              className={`flex items-center justify-between rounded-xl border p-3.5 text-xs ${
+                alerta.nivel === "warning"
+                  ? "border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-300"
+                  : alerta.nivel === "danger"
+                    ? "border-rose-500/30 bg-rose-500/10 text-rose-800 dark:text-rose-300"
+                    : "border-blue-500/30 bg-blue-500/10 text-blue-800 dark:text-blue-300"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <HugeiconsIcon
+                  icon={AlertCircleIcon}
+                  className={`size-4 shrink-0 ${
+                    alerta.nivel === "warning"
+                      ? "text-amber-600 dark:text-amber-400"
+                      : alerta.nivel === "danger"
+                        ? "text-rose-600 dark:text-rose-400"
+                        : "text-blue-600 dark:text-blue-400"
+                  }`}
+                />
+                <div>
+                  <span className="font-semibold">{alerta.titulo}: </span>
+                  <span>{alerta.detalle}</span>
+                </div>
+              </div>
+              <Button asChild size="sm" variant="outline" className="bg-background/80 h-7 text-xs">
+                <Link href={alerta.enlace}>
+                  Ver detalle
+                  <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
+                </Link>
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Indicadores de la Tesis (RF-020 / RF-021) */}
       {data.indicadoresTesis && data.indicadoresTesis.length > 0 && (
         <section aria-labelledby="titulo-indicadores-tesis" className="space-y-2.5">
@@ -300,6 +346,86 @@ export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Semáforo de Cumplimiento por Docente (RF-021 HU-021-02 / RF-013) */}
+      {docentesSemaforo && docentesSemaforo.length > 0 && (
+        <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-semibold">
+                  Semáforo de Cumplimiento por Docente
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Seguimiento del registro de sesiones planificadas (RF-013 / RF-021)
+                </CardDescription>
+              </div>
+              <Button asChild variant="ghost" size="sm" className="text-primary h-7 text-xs">
+                <Link href="/admin/consolidado-docente">
+                  Ficha completa
+                  <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
+                </Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {docentesSemaforo.map((doc) => (
+                <div
+                  key={doc.docenteId}
+                  className="bg-muted/30 border-border/40 hover:border-primary/40 flex flex-col justify-between rounded-xl border p-3 text-xs transition-all"
+                >
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="text-foreground truncate font-semibold">
+                      {doc.docenteNombre}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] font-bold uppercase ${
+                        doc.estado === "verde"
+                          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600"
+                          : doc.estado === "amarillo"
+                            ? "border-amber-500/40 bg-amber-500/10 text-amber-600"
+                            : "border-rose-500/40 bg-rose-500/10 text-rose-600"
+                      }`}
+                    >
+                      {doc.porcentajeCumplimiento}%
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {/* Barra de progreso visual */}
+                    <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
+                      <div
+                        className={`h-full rounded-full ${
+                          doc.estado === "verde"
+                            ? "bg-emerald-500"
+                            : doc.estado === "amarillo"
+                              ? "bg-amber-500"
+                              : "bg-rose-500"
+                        }`}
+                        style={{ width: `${Math.min(100, doc.porcentajeCumplimiento)}%` }}
+                      />
+                    </div>
+                    <div className="text-muted-foreground flex items-center justify-between text-[11px]">
+                      <span>
+                        {doc.sesionesRegistradas} de {doc.totalSesiones} sesiones
+                      </span>
+                      <Link
+                        href={`/admin/consolidado-docente?docenteId=${doc.docenteId}`}
+                        className="text-primary inline-flex items-center gap-0.5 font-medium hover:underline"
+                      >
+                        Seguimiento
+                        <HugeiconsIcon icon={ArrowRight01Icon} className="size-2.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
