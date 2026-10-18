@@ -12,10 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  AdminDashboardView,
   DashboardHeaderFilters,
   DirectivoDashboardView,
   DocenteDashboardView,
   EstudianteDashboardView,
+  SecretariaDashboardView,
   useDashboard,
 } from "@/features/dashboard";
 
@@ -120,6 +122,24 @@ export default function DashboardPage() {
         "/admin/mis-libretas",
         "/admin/comunicados",
       ];
+    } else if (rol.includes("secretaria") || rol.includes("secretario")) {
+      prioridades = [
+        "/admin/matriculas",
+        "/admin/estudiantes",
+        "/admin/apoderados",
+        "/admin/libretas",
+        "/admin/comunicados",
+        "/admin/asistencia",
+      ];
+    } else if (rol.includes("admin") || rol.includes("soporte") || rol.includes("ti")) {
+      prioridades = [
+        "/admin/users",
+        "/admin/roles",
+        "/admin/bitacora-auditoria",
+        "/admin/institucion",
+        "/admin/equipos",
+        "/admin/anio-escolar",
+      ];
     }
 
     return [...accesos].sort((a, b) => {
@@ -144,6 +164,12 @@ export default function DashboardPage() {
     }
     if (rol.includes("apoderado") || rol.includes("padre")) {
       return "Monitorea la asistencia, horarios y tareas escolares de tus hijos.";
+    }
+    if (rol.includes("secretaria") || rol.includes("secretario")) {
+      return "Supervisa matrículas, gestión documentaria, asistencia escolar y comunicados.";
+    }
+    if (rol.includes("admin") || rol.includes("soporte") || rol.includes("ti")) {
+      return "Monitorea la seguridad del sistema, cuentas de usuario y auditoría.";
     }
     return "Supervisa en tiempo real el progreso institucional, asistencia y actividades.";
   }, [rolActivo]);
@@ -193,6 +219,10 @@ export default function DashboardPage() {
       ) : (
         <>
           {/* Vista según rol */}
+          {dashboardData?.admin && <AdminDashboardView data={dashboardData.admin} />}
+
+          {dashboardData?.secretaria && <SecretariaDashboardView data={dashboardData.secretaria} />}
+
           {dashboardData?.directivo && <DirectivoDashboardView data={dashboardData.directivo} />}
 
           {dashboardData?.docente && <DocenteDashboardView data={dashboardData.docente} />}

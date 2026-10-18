@@ -43,6 +43,66 @@ export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
 
   return (
     <div className="space-y-6">
+      {/* Indicadores de la Tesis (RF-020 / RF-021) */}
+      {data.indicadoresTesis && data.indicadoresTesis.length > 0 && (
+        <section aria-labelledby="titulo-indicadores-tesis" className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <h2
+              id="titulo-indicadores-tesis"
+              className="text-foreground text-sm font-semibold tracking-tight"
+            >
+              Indicadores Principales de Gestión (Tesis)
+            </h2>
+            <span className="text-muted-foreground text-[11px]">
+              Seguimiento antes (Pretest) vs con sistema (Postest)
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-3">
+            {data.indicadoresTesis.map((ind) => (
+              <Card
+                key={ind.codigo}
+                className="border-border/50 bg-card/80 hover:bg-card rounded-2xl p-4 shadow-2xs transition-all"
+              >
+                <div className="mb-1.5 flex items-center justify-between gap-2">
+                  <span className="text-primary bg-primary/10 rounded-md px-2 py-0.5 text-xs font-bold tracking-wide">
+                    {ind.codigo}
+                  </span>
+                  <span className="text-muted-foreground bg-muted/50 rounded-full px-2 py-0.5 text-[10px] font-medium">
+                    {ind.estado === "cerrado" ? "Medición congelada" : "En curso"}
+                  </span>
+                </div>
+                <p className="text-foreground mb-2 line-clamp-1 text-xs font-semibold">
+                  {ind.nombre}
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-foreground text-2xl font-bold tracking-tight">
+                    {ind.porcentaje}%
+                  </span>
+                  {ind.variacionPuntos != null && (
+                    <span
+                      className={`text-xs font-semibold ${
+                        ind.variacionPuntos >= 0
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-rose-600 dark:text-rose-400"
+                      }`}
+                    >
+                      {ind.variacionPuntos >= 0 ? `+${ind.variacionPuntos}` : ind.variacionPuntos}{" "}
+                      pts
+                    </span>
+                  )}
+                </div>
+                {ind.pretestPorcentaje != null && (
+                  <p className="text-muted-foreground mt-1 text-[11px]">
+                    Pretest histórico:{" "}
+                    <span className="text-foreground font-medium">{ind.pretestPorcentaje}%</span>
+                  </p>
+                )}
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Tarjetas de KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <KpiCard

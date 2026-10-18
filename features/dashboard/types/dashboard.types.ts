@@ -45,10 +45,20 @@ export interface DirectivoDistribucionGrados {
   porcentaje: number;
 }
 
+export interface IndicadorTesisItem {
+  codigo: "CSP" | "ISA" | "IGM";
+  nombre: string;
+  porcentaje: number;
+  pretestPorcentaje?: number | null;
+  variacionPuntos?: number | null;
+  estado: "en_curso" | "cerrado" | "sin_datos";
+}
+
 export interface DirectivoDashboardData {
   kpis: DirectivoKpis;
   graficoAsistencia: DirectivoGraficoAsistencia[];
   distribucionGrados: DirectivoDistribucionGrados[];
+  indicadoresTesis?: IndicadorTesisItem[];
 }
 
 export interface DocenteKpis {
@@ -150,13 +160,83 @@ export interface EstudianteDashboardData {
   estudiantesAsociados?: EstudianteAsociado[];
 }
 
+export interface AdminKpis {
+  totalUsuarios: number;
+  usuariosActivos: number;
+  usuariosBloqueados: number;
+  usuariosInactivos: number;
+  intentosFallidosHoy: number;
+  sinAcceso30Dias: number;
+  totalEquipos: number;
+  equiposActivos: number;
+}
+
+export interface DistribucionUsuariosRol {
+  rol: string;
+  cantidad: number;
+  fill: string;
+}
+
+export interface AuditoriaRecienteItem {
+  id: number;
+  accion: string;
+  tabla: string;
+  usuarioNombre: string;
+  fecha: string;
+  ip?: string;
+}
+
+export interface AdminDashboardData {
+  kpis: AdminKpis;
+  distribucionRoles: DistribucionUsuariosRol[];
+  ultimasAuditorias: AuditoriaRecienteItem[];
+}
+
+export interface SecretariaKpis {
+  matriculasMes: number;
+  retiradosMes: number;
+  trasladadosMes: number;
+  estudiantesSinApoderado: number;
+  estudiantesSinDocumento: number;
+  libretasPendientes: number;
+  asistenciaHoyPorcentaje: number;
+}
+
+export interface SecretariaMatriculasGrado {
+  grado: string;
+  matriculados: number;
+}
+
+export interface SecretariaEstudianteAlerta {
+  id: string;
+  nombreCompleto: string;
+  grado: string;
+  seccion: string;
+  tipoAlerta: "sin_apoderado" | "sin_documento";
+}
+
+export interface SecretariaComunicadoReciente {
+  id: string;
+  titulo: string;
+  publicadoEn: string;
+}
+
+export interface SecretariaDashboardData {
+  kpis: SecretariaKpis;
+  matriculasPorGrado: SecretariaMatriculasGrado[];
+  estudiantesConAlerta: SecretariaEstudianteAlerta[];
+  comunicadosRecientes: SecretariaComunicadoReciente[];
+}
+
 export interface DashboardResponse {
-  rolCategoria: "directivo" | "docente" | "estudiante" | "apoderado";
+  rolCategoria: "directivo" | "docente" | "estudiante" | "apoderado" | "admin" | "secretaria";
   rolNombre: string;
   periodoActual: PeriodoActualInfo;
   directivo?: DirectivoDashboardData;
   docente?: DocenteDashboardData;
   estudiante?: EstudianteDashboardData;
+  admin?: AdminDashboardData;
+  secretaria?: SecretariaDashboardData;
 }
 
 export interface DashboardFiltrosParams {
