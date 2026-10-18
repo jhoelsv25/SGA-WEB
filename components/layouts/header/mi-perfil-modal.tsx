@@ -9,6 +9,7 @@ import {
   School01Icon,
   CheckmarkCircle02Icon,
   Key01Icon,
+  Cancel01Icon,
 } from "@hugeicons/core-free-icons";
 import { Modal } from "@/components/common/modal";
 import { Button } from "@/components/ui/button";
@@ -91,9 +92,10 @@ export function MiPerfilModal({
             variant="default"
             size="sm"
             onClick={() => onOpenChange(false)}
-            className="h-8 text-xs"
+            className="h-8 gap-1.5 text-xs font-semibold"
           >
-            Cerrar
+            <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+            <span>Cerrar</span>
           </Button>
         </div>
       }

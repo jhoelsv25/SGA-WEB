@@ -10,6 +10,8 @@ import {
   CheckmarkCircle02Icon,
   Cancel01Icon,
   AlertCircleIcon,
+  Key01Icon,
+  LockIcon,
 } from "@hugeicons/core-free-icons";
 import { Modal } from "@/components/common/modal";
 import { Button } from "@/components/ui/button";
@@ -118,7 +120,13 @@ export function CambiarPasswordModal({ open, onOpenChange }: CambiarPasswordModa
 
         {/* Contraseña Actual */}
         <div className="space-y-1.5">
-          <Label htmlFor="currentPassword">Contraseña actual *</Label>
+          <Label
+            htmlFor="currentPassword"
+            className="flex items-center gap-1.5 text-xs font-semibold"
+          >
+            <HugeiconsIcon icon={LockIcon} className="text-primary size-3.5" />
+            <span>Contraseña actual *</span>
+          </Label>
           <PasswordInput
             id="currentPassword"
             autoComplete="current-password"
@@ -134,7 +142,10 @@ export function CambiarPasswordModal({ open, onOpenChange }: CambiarPasswordModa
 
         {/* Nueva Contraseña */}
         <div className="space-y-1.5">
-          <Label htmlFor="newPassword">Nueva contraseña *</Label>
+          <Label htmlFor="newPassword" className="flex items-center gap-1.5 text-xs font-semibold">
+            <HugeiconsIcon icon={Key01Icon} className="text-primary size-3.5" />
+            <span>Nueva contraseña *</span>
+          </Label>
           <PasswordInput
             id="newPassword"
             autoComplete="new-password"
@@ -150,7 +161,13 @@ export function CambiarPasswordModal({ open, onOpenChange }: CambiarPasswordModa
 
         {/* Confirmar Nueva Contraseña */}
         <div className="space-y-1.5">
-          <Label htmlFor="confirmPassword">Confirmar nueva contraseña *</Label>
+          <Label
+            htmlFor="confirmPassword"
+            className="flex items-center gap-1.5 text-xs font-semibold"
+          >
+            <HugeiconsIcon icon={CheckmarkCircle02Icon} className="text-primary size-3.5" />
+            <span>Confirmar nueva contraseña *</span>
+          </Label>
           <PasswordInput
             id="confirmPassword"
             autoComplete="new-password"
@@ -226,7 +243,7 @@ export function CambiarPasswordModal({ open, onOpenChange }: CambiarPasswordModa
           </div>
         </div>
 
-        {/* Botones de acción */}
+        {/* Botones de acción con iconos */}
         <div className="flex items-center justify-end gap-2 pt-2">
           <Button
             type="button"
@@ -234,24 +251,28 @@ export function CambiarPasswordModal({ open, onOpenChange }: CambiarPasswordModa
             size="sm"
             disabled={isPending}
             onClick={() => onOpenChange(false)}
-            className="h-8 text-xs"
+            className="h-8 gap-1.5 text-xs font-medium"
           >
-            Cancelar
+            <HugeiconsIcon icon={Cancel01Icon} className="size-3.5" />
+            <span>Cancelar</span>
           </Button>
 
           <Button
             type="submit"
             size="sm"
             disabled={isPending}
-            className="h-8 text-xs font-semibold"
+            className="h-8 gap-1.5 text-xs font-semibold"
           >
             {isPending ? (
               <span className="flex items-center gap-1.5">
                 <Spinner size="xs" />
-                Actualizando...
+                <span>Actualizando...</span>
               </span>
             ) : (
-              "Actualizar contraseña"
+              <>
+                <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5" />
+                <span>Actualizar contraseña</span>
+              </>
             )}
           </Button>
         </div>
