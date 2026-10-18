@@ -11,6 +11,7 @@ import {
   ComputerIcon,
   SecurityLockIcon,
   Notification01Icon,
+  ArrowRight01Icon,
   CheckmarkCircle02Icon,
   Edit02Icon,
 } from "@hugeicons/core-free-icons";
@@ -19,12 +20,67 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { siteConfig } from "@/config";
 import { toast } from "@/lib/toast";
 
+type TabConfiguracion =
+  "institucion" | "variables" | "turnos" | "equipos" | "seguridad" | "notificaciones";
+
+interface ItemMenuConfig {
+  id: TabConfiguracion;
+  label: string;
+  descripcion: string;
+  icono: typeof Settings02Icon;
+  grupo: "general" | "politicas";
+}
+
+const MENU_ITEMS: ItemMenuConfig[] = [
+  {
+    id: "institucion",
+    label: "Institución y Sede",
+    descripcion: "Identificación, códigos y ubicación",
+    icono: School01Icon,
+    grupo: "general",
+  },
+  {
+    id: "variables",
+    label: "Variables y Reglas",
+    descripcion: "Tolerancias, plazos y asistencias",
+    icono: SlidersHorizontalIcon,
+    grupo: "general",
+  },
+  {
+    id: "turnos",
+    label: "Turnos y Horarios",
+    descripcion: "Jornadas, entrada y salida oficial",
+    icono: Clock01Icon,
+    grupo: "general",
+  },
+  {
+    id: "equipos",
+    label: "Equipos en Red",
+    descripcion: "Kioskos y terminales autorizados",
+    icono: ComputerIcon,
+    grupo: "general",
+  },
+  {
+    id: "seguridad",
+    label: "Seguridad y Cuentas",
+    descripcion: "Bloqueos, PIN y sesiones",
+    icono: SecurityLockIcon,
+    grupo: "politicas",
+  },
+  {
+    id: "notificaciones",
+    label: "Notificaciones",
+    descripcion: "Avisos por inasistencia y alertas",
+    icono: Notification01Icon,
+    grupo: "politicas",
+  },
+];
+
 export function ConfiguracionPage() {
-  const [tabActiva, setTabActiva] = React.useState("institucion");
+  const [tabActiva, setTabActiva] = React.useState<TabConfiguracion>("institucion");
 
   // Estados de configuración de seguridad interactiva
   const [seguridadSettings, setSeguridadSettings] = React.useState({
@@ -57,6 +113,9 @@ export function ConfiguracionPage() {
     });
   };
 
+  const itemsGeneral = MENU_ITEMS.filter((i) => i.grupo === "general");
+  const itemsPoliticas = MENU_ITEMS.filter((i) => i.grupo === "politicas");
+
   return (
     <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
@@ -66,85 +125,123 @@ export function ConfiguracionPage() {
         breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Configuración" }]}
       />
 
-      {/* Layout de Settings de Verdad con Tabs y Panel */}
-      <Tabs
-        value={tabActiva}
-        onValueChange={setTabActiva}
-        className="flex flex-col gap-6 lg:flex-row lg:items-start"
-      >
-        {/* Navegación lateral de Ajustes */}
-        <div className="w-full lg:w-64 lg:shrink-0">
-          <div className="bg-card border-border/60 rounded-2xl border p-2 shadow-2xs">
-            <div className="px-3 py-2">
-              <span className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+      {/* Layout de Settings de Verdad: Grid 12 columnas */}
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+        {/* Menú de Navegación Lateral de Settings (col-span-4 en desktop) */}
+        <nav
+          aria-label="Secciones de configuración"
+          className="space-y-4 lg:col-span-4 xl:col-span-3"
+        >
+          <div className="bg-card border-border/60 space-y-4 rounded-2xl border p-3 shadow-2xs">
+            {/* Grupo 1: Ajustes Generales */}
+            <div className="space-y-1">
+              <span className="text-muted-foreground block px-2.5 text-[10px] font-bold tracking-wider uppercase">
                 Ajustes Generales
               </span>
-            </div>
-            <TabsList
-              variant="line"
-              className="flex w-full flex-row gap-1 overflow-x-auto lg:flex-col lg:items-stretch lg:overflow-visible"
-            >
-              <TabsTrigger
-                value="institucion"
-                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary justify-start gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold"
-              >
-                <HugeiconsIcon icon={School01Icon} className="size-4 shrink-0" />
-                <span>Institución y Sede</span>
-              </TabsTrigger>
-
-              <TabsTrigger
-                value="variables"
-                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary justify-start gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold"
-              >
-                <HugeiconsIcon icon={SlidersHorizontalIcon} className="size-4 shrink-0" />
-                <span>Variables y Reglas</span>
-              </TabsTrigger>
-
-              <TabsTrigger
-                value="turnos"
-                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary justify-start gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold"
-              >
-                <HugeiconsIcon icon={Clock01Icon} className="size-4 shrink-0" />
-                <span>Turnos y Horarios</span>
-              </TabsTrigger>
-
-              <TabsTrigger
-                value="equipos"
-                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary justify-start gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold"
-              >
-                <HugeiconsIcon icon={ComputerIcon} className="size-4 shrink-0" />
-                <span>Equipos en Red</span>
-              </TabsTrigger>
-
-              <div className="my-1 border-t px-3 pt-2">
-                <span className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
-                  Políticas y Sistema
-                </span>
+              <div className="space-y-0.5">
+                {itemsGeneral.map((item) => {
+                  const activa = tabActiva === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setTabActiva(item.id)}
+                      className={`group flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all ${
+                        activa
+                          ? "bg-primary/10 text-primary font-semibold shadow-2xs"
+                          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground font-medium"
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <span
+                          className={`flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                            activa
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground group-hover:text-foreground"
+                          }`}
+                        >
+                          <HugeiconsIcon icon={item.icono} className="size-3.5" />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-xs">{item.label}</p>
+                          <p className="text-muted-foreground hidden truncate text-[10px] xl:block">
+                            {item.descripcion}
+                          </p>
+                        </div>
+                      </div>
+                      <HugeiconsIcon
+                        icon={ArrowRight01Icon}
+                        className={`size-3.5 shrink-0 transition-transform ${
+                          activa
+                            ? "text-primary translate-x-0.5 opacity-100"
+                            : "opacity-0 group-hover:opacity-60"
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
               </div>
+            </div>
 
-              <TabsTrigger
-                value="seguridad"
-                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary justify-start gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold"
-              >
-                <HugeiconsIcon icon={SecurityLockIcon} className="size-4 shrink-0" />
-                <span>Seguridad y Cuentas</span>
-              </TabsTrigger>
+            {/* Separador */}
+            <div className="border-border/40 border-t" />
 
-              <TabsTrigger
-                value="notificaciones"
-                className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary justify-start gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold"
-              >
-                <HugeiconsIcon icon={Notification01Icon} className="size-4 shrink-0" />
-                <span>Notificaciones</span>
-              </TabsTrigger>
-            </TabsList>
+            {/* Grupo 2: Políticas y Sistema */}
+            <div className="space-y-1">
+              <span className="text-muted-foreground block px-2.5 text-[10px] font-bold tracking-wider uppercase">
+                Políticas y Sistema
+              </span>
+              <div className="space-y-0.5">
+                {itemsPoliticas.map((item) => {
+                  const activa = tabActiva === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setTabActiva(item.id)}
+                      className={`group flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left transition-all ${
+                        activa
+                          ? "bg-primary/10 text-primary font-semibold shadow-2xs"
+                          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground font-medium"
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <span
+                          className={`flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                            activa
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground group-hover:text-foreground"
+                          }`}
+                        >
+                          <HugeiconsIcon icon={item.icono} className="size-3.5" />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-xs">{item.label}</p>
+                          <p className="text-muted-foreground hidden truncate text-[10px] xl:block">
+                            {item.descripcion}
+                          </p>
+                        </div>
+                      </div>
+                      <HugeiconsIcon
+                        icon={ArrowRight01Icon}
+                        className={`size-3.5 shrink-0 transition-transform ${
+                          activa
+                            ? "text-primary translate-x-0.5 opacity-100"
+                            : "opacity-0 group-hover:opacity-60"
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        </div>
+        </nav>
 
-        {/* Panel de Contenido de Configuración */}
-        <div className="min-w-0 flex-1 space-y-6">
-          {/* TAB 1: INSTITUCIÓN Y SEDE */}
-          <TabsContent value="institucion" className="m-0 space-y-4 outline-none">
+        {/* Panel de Contenido de Ajustes (col-span-8 en desktop) */}
+        <div className="min-w-0 space-y-6 lg:col-span-8 xl:col-span-9">
+          {/* SECCIÓN 1: INSTITUCIÓN Y SEDE */}
+          {tabActiva === "institucion" && (
             <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
               <CardHeader className="border-border/40 flex flex-row items-center justify-between border-b pb-4">
                 <div>
@@ -222,10 +319,10 @@ export function ConfiguracionPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          {/* TAB 2: VARIABLES Y REGLAS */}
-          <TabsContent value="variables" className="m-0 space-y-4 outline-none">
+          {/* SECCIÓN 2: VARIABLES Y REGLAS */}
+          {tabActiva === "variables" && (
             <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
               <CardHeader className="border-border/40 flex flex-row items-center justify-between border-b pb-4">
                 <div>
@@ -306,10 +403,10 @@ export function ConfiguracionPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          {/* TAB 3: TURNOS Y HORARIOS */}
-          <TabsContent value="turnos" className="m-0 space-y-4 outline-none">
+          {/* SECCIÓN 3: TURNOS Y HORARIOS */}
+          {tabActiva === "turnos" && (
             <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
               <CardHeader className="border-border/40 flex flex-row items-center justify-between border-b pb-4">
                 <div>
@@ -378,10 +475,10 @@ export function ConfiguracionPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          {/* TAB 4: EQUIPOS EN RED */}
-          <TabsContent value="equipos" className="m-0 space-y-4 outline-none">
+          {/* SECCIÓN 4: EQUIPOS EN RED */}
+          {tabActiva === "equipos" && (
             <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
               <CardHeader className="border-border/40 flex flex-row items-center justify-between border-b pb-4">
                 <div>
@@ -418,10 +515,10 @@ export function ConfiguracionPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          {/* TAB 5: SEGURIDAD Y CUENTAS */}
-          <TabsContent value="seguridad" className="m-0 space-y-4 outline-none">
+          {/* SECCIÓN 5: SEGURIDAD Y CUENTAS */}
+          {tabActiva === "seguridad" && (
             <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
               <CardHeader className="border-border/40 border-b pb-4">
                 <CardTitle className="text-base font-bold">
@@ -497,10 +594,10 @@ export function ConfiguracionPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          {/* TAB 6: NOTIFICACIONES */}
-          <TabsContent value="notificaciones" className="m-0 space-y-4 outline-none">
+          {/* SECCIÓN 6: NOTIFICACIONES */}
+          {tabActiva === "notificaciones" && (
             <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
               <CardHeader className="border-border/40 border-b pb-4">
                 <CardTitle className="text-base font-bold">
@@ -562,9 +659,9 @@ export function ConfiguracionPage() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
         </div>
-      </Tabs>
+      </div>
     </div>
   );
 }
