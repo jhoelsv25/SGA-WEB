@@ -1,8 +1,16 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Key01Icon, Logout01Icon, School01Icon } from "@hugeicons/core-free-icons";
+import {
+  Key01Icon,
+  Logout01Icon,
+  School01Icon,
+  UserIcon,
+  SecurityLockIcon,
+  Settings02Icon,
+} from "@hugeicons/core-free-icons";
 import { siteConfig } from "@/config";
 import { useLogout } from "@/features/auth";
 import { CambiarPinModal } from "@/features/credenciales";
@@ -18,6 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { MiPerfilModal } from "./mi-perfil-modal";
+import { CambiarPasswordModal } from "./cambiar-password-modal";
 import type { UserProfileData } from "../sidebar/nav-user";
 
 export interface HeaderUserMenuProps {
@@ -25,8 +35,11 @@ export interface HeaderUserMenuProps {
 }
 
 export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
+  const [perfilModalOpen, setPerfilModalOpen] = React.useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = React.useState(false);
   const [pinModalOpen, setPinModalOpen] = React.useState(false);
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
+
   // RF-001 V3: el rol se elige al iniciar sesión; aquí solo se muestra el activo
   const dashboard = useOptionalDashboardRole();
   const nombre = user?.name ?? "";
@@ -92,6 +105,24 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
 
           <DropdownMenuSeparator className="my-1.5" />
 
+          {/* Opción Mi Perfil */}
+          <DropdownMenuItem
+            onClick={() => setPerfilModalOpen(true)}
+            className="flex h-10 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium"
+          >
+            <HugeiconsIcon icon={UserIcon} className="text-primary size-4 shrink-0" />
+            <span>Mi perfil</span>
+          </DropdownMenuItem>
+
+          {/* Opción Cambiar Contraseña */}
+          <DropdownMenuItem
+            onClick={() => setPasswordModalOpen(true)}
+            className="flex h-10 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium"
+          >
+            <HugeiconsIcon icon={SecurityLockIcon} className="text-primary size-4 shrink-0" />
+            <span>Cambiar contraseña</span>
+          </DropdownMenuItem>
+
           {/* Opción Mi credencial: Cambiar PIN de marcación (RF-007 HU5) */}
           <DropdownMenuItem
             onClick={() => setPinModalOpen(true)}
@@ -99,6 +130,17 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
           >
             <HugeiconsIcon icon={Key01Icon} className="text-primary size-4 shrink-0" />
             <span>Mi credencial (PIN)</span>
+          </DropdownMenuItem>
+
+          {/* Opción Configuración del Sistema */}
+          <DropdownMenuItem asChild>
+            <Link
+              href="/admin/configuracion"
+              className="flex h-10 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium"
+            >
+              <HugeiconsIcon icon={Settings02Icon} className="text-primary size-4 shrink-0" />
+              <span>Configuración</span>
+            </Link>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="my-1.5" />
@@ -114,6 +156,21 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Modal Mi Perfil */}
+      <MiPerfilModal
+        open={perfilModalOpen}
+        onOpenChange={setPerfilModalOpen}
+        user={user}
+        currentUser={dashboard?.currentUser}
+        rolActivo={rolActivo}
+        onOpenCambiarPassword={() => setPasswordModalOpen(true)}
+        onOpenCambiarPin={() => setPinModalOpen(true)}
+      />
+
+      {/* Modal Cambiar Contraseña */}
+      <CambiarPasswordModal open={passwordModalOpen} onOpenChange={setPasswordModalOpen} />
+
+      {/* Modal Cambiar PIN */}
       <CambiarPinModal
         open={pinModalOpen}
         onOpenChange={setPinModalOpen}
