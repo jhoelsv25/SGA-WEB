@@ -59,7 +59,7 @@ export function GrillaSemanal({
   return (
     <div className="border-border/80 bg-card w-full overflow-x-auto rounded-xl border shadow-sm">
       <table
-        className="w-full min-w-[720px] border-collapse text-left"
+        className="w-full min-w-180 border-collapse text-left"
         aria-label="Horario semanal de clases"
       >
         <caption className="sr-only">

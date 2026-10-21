@@ -30,7 +30,7 @@ export function ListaCursosCarga({
         </div>
         <div className="space-y-1">
           <p className="text-foreground text-xs font-semibold">Sin carga académica</p>
-          <p className="text-muted-foreground mx-auto max-w-[210px] text-[11px] leading-relaxed">
+          <p className="text-muted-foreground mx-auto max-w-52 text-[11px] leading-relaxed">
             Esta sección no tiene cursos registrados para este ciclo escolar.
           </p>
         </div>
@@ -107,7 +107,7 @@ export function ListaCursosCarga({
                 if (!puedeGestionar) return;
                 onSelectCurso(isSelected ? null : item);
               }}
-              className={`group flex min-h-[48px] cursor-pointer items-center justify-between rounded-lg border p-2.5 text-xs transition-all ${
+              className={`group flex min-h-12 cursor-pointer items-center justify-between rounded-lg border p-2.5 text-xs transition-all ${
                 isSelected
                   ? "border-primary bg-primary/5 ring-primary ring-2"
                   : "border-border/70 bg-muted/20 hover:border-primary/50 hover:bg-muted/40"

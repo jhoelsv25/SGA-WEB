@@ -39,7 +39,7 @@ export function CeldaPropuesta({
 
   if (esReceso) {
     return (
-      <div className="group flex h-full min-h-[58px] flex-col justify-between rounded-xl border border-dashed border-amber-500/30 bg-amber-500/5 p-2 text-xs transition-colors hover:bg-amber-500/10">
+      <div className="group flex h-full min-h-14 flex-col justify-between rounded-xl border border-dashed border-amber-500/30 bg-amber-500/5 p-2 text-xs transition-colors hover:bg-amber-500/10">
         <div className="flex items-center justify-between gap-1">
           <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
             <HugeiconsIcon icon={Clock01Icon} className="size-3.5" />
@@ -93,7 +93,7 @@ export function CeldaPropuesta({
   return (
     <div
       className={cn(
-        "group flex h-full min-h-[62px] cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed p-2 transition-all",
+        "group flex h-full min-h-15 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed p-2 transition-all",
         cursoSeleccionado
           ? "border-primary/60 bg-primary/10 hover:border-primary hover:bg-primary/20 ring-primary/30 ring-1"
           : "border-border/40 bg-muted/5 hover:border-primary/40 hover:bg-muted/20",

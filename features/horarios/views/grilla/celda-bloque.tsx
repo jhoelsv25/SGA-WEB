@@ -34,7 +34,7 @@ export function CeldaBloque({
 
   if (esReceso) {
     return (
-      <div className="group relative flex h-full min-h-[58px] flex-col justify-between rounded-xl border border-amber-500/40 bg-amber-500/10 p-2 text-xs transition-colors hover:bg-amber-500/15">
+      <div className="group relative flex h-full min-h-14 flex-col justify-between rounded-xl border border-amber-500/40 bg-amber-500/10 p-2 text-xs transition-colors hover:bg-amber-500/15">
         <div className="flex items-center justify-between gap-1">
           <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-300">
             <HugeiconsIcon
@@ -80,7 +80,7 @@ export function CeldaBloque({
 
   return (
     <div
-      className="group relative flex h-full min-h-[76px] flex-col justify-between rounded-lg p-2.5 shadow-xs transition-shadow hover:shadow-md"
+      className="group relative flex h-full min-h-19 flex-col justify-between rounded-lg p-2.5 shadow-xs transition-shadow hover:shadow-md"
       style={{
         backgroundColor: contraste.backgroundColor,
         color: contraste.color,
