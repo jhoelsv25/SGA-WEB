@@ -110,7 +110,7 @@ function TableroIndicadoresContenido() {
       <div className="container mx-auto space-y-6 px-4 py-6 sm:px-6">
         <PageHeader
           title="Indicadores de la Tesis"
-          description="Panel de evaluación de impacto del sistema web de gestión académica (RF-020)"
+          description="Panel de evaluación de impacto del sistema web de gestión académica"
           breadcrumbs={[
             { label: "Inicio", href: "/admin/dashboard" },
             { label: "Reportes" },
@@ -135,7 +135,7 @@ function TableroIndicadoresContenido() {
       <div className="container mx-auto space-y-6 px-4 py-6 sm:px-6">
         <PageHeader
           title="Indicadores de la Tesis"
-          description="Panel de evaluación de impacto del sistema web de gestión académica (RF-020)"
+          description="Panel de evaluación de impacto del sistema web de gestión académica"
           breadcrumbs={[
             { label: "Inicio", href: "/admin/dashboard" },
             { label: "Reportes" },
@@ -153,7 +153,7 @@ function TableroIndicadoresContenido() {
       <div className="container mx-auto space-y-6 px-4 py-6 sm:px-6">
         <PageHeader
           title="Indicadores de la Tesis"
-          description="Panel de evaluación de impacto del sistema web de gestión académica (RF-020)"
+          description="Panel de evaluación de impacto del sistema web de gestión académica"
           breadcrumbs={[
             { label: "Inicio", href: "/admin/dashboard" },
             { label: "Reportes" },

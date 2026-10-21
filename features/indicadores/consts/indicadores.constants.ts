@@ -8,21 +8,21 @@ export const METADATA_INDICADORES: Record<Indicador, MetadataIndicador> = {
     codigo: "CSP",
     nombre: "Cumplimiento de sesiones planificadas",
     dimension: "Prácticas pedagógicas",
-    fuente: "Sesiones de clase (RF-011)",
+    fuente: "Sesiones de clase",
     formula: "(cumplidas + parciales) ÷ (planificadas − justificadas) × 100",
   },
   ISA: {
     codigo: "ISA",
     nombre: "Informes de seguimiento académico",
     dimension: "Seguimiento académico",
-    fuente: "Libretas (RF-014)",
+    fuente: "Libretas",
     formula: "libretas publicadas a tiempo ÷ libretas programadas × 100",
   },
   IGM: {
     codigo: "IGM",
     nombre: "Gestión de materiales",
     dimension: "Aula virtual",
-    fuente: "Materiales (RF-015)",
+    fuente: "Materiales del aula virtual",
     formula: "materiales planificados publicados a tiempo ÷ materiales planificados × 100",
   },
 } as const;
@@ -46,7 +46,7 @@ export const FORMULAS_INDICADORES: Record<Indicador, string> = {
 };
 
 export const FUENTES_INDICADORES: Record<Indicador, string> = {
-  CSP: "Sesiones de clase (RF-011)",
-  ISA: "Libretas (RF-014)",
-  IGM: "Materiales (RF-015)",
+  CSP: "Sesiones de clase",
+  ISA: "Libretas",
+  IGM: "Materiales del aula virtual",
 };

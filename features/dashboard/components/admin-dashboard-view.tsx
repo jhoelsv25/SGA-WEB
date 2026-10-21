@@ -107,7 +107,7 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
         </Link>
 
         <Link
-          href="/admin/bitacora-auditoria"
+          href="/admin/audit"
           className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
         >
           <span className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white">
@@ -140,7 +140,7 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
         </Link>
 
         <Link
-          href="/admin/anio-escolar"
+          href="/admin/academic-years"
           className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
         >
           <span className="flex size-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-600 transition-colors group-hover:bg-cyan-600 group-hover:text-white">
@@ -383,7 +383,7 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
                   Inmutable
                 </Badge>
                 <Button asChild variant="ghost" size="sm" className="text-primary h-7 text-xs">
-                  <Link href="/admin/bitacora-auditoria">
+                  <Link href="/admin/audit">
                     Ver todo
                     <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
                   </Link>

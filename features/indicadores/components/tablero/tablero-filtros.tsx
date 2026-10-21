@@ -47,15 +47,37 @@ export function TableroFiltros({
   const { data: cursosResponse } = useCursosQuery();
   const { data: seccionesResponse } = useSeccionesQuery();
 
-  // Opciones de bimestres
+  // Opciones de bimestres con nombres claros y formato legible
   const opcionesBimestres = React.useMemo<SelectOptionItem<string>[]>(() => {
     return [
-      { value: "all", label: "Todos los bimestres (Año completo)" },
-      ...bimestres.map((b) => ({
-        value: b.id,
-        label: `${b.nombre}`,
-        description: b.estado === "en_curso" ? "En curso" : `Estado: ${b.estado}`,
-      })),
+      {
+        value: "all",
+        label: "Año completo (Todos los bimestres)",
+        description: "Métricas consolidadas del ciclo lectivo",
+      },
+      ...bimestres.map((b) => {
+        const nombreLimpio = b.nombre.toLowerCase().includes("bimestre")
+          ? b.nombre
+          : `Bimestre ${b.nombre}`;
+
+        const estadoDesc =
+          b.estado === "en_curso"
+            ? "En curso actualmente"
+            : b.estado === "cerrado"
+              ? "Cerrado"
+              : "Planificado";
+
+        const rangoFechas =
+          b.fechaInicio && b.fechaFin
+            ? ` · (${b.fechaInicio.slice(5).replace("-", "/")} al ${b.fechaFin.slice(5).replace("-", "/")})`
+            : "";
+
+        return {
+          value: b.id,
+          label: nombreLimpio,
+          description: `${estadoDesc}${rangoFechas}`,
+        };
+      }),
     ];
   }, [bimestres]);
 
@@ -164,7 +186,7 @@ export function TableroFiltros({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             {/* Selector de Bimestre */}
-            <div className="w-full sm:w-64">
+            <div className="w-full sm:w-72 lg:w-80">
               <label htmlFor="select-bimestre-indicadores" className="sr-only">
                 Seleccionar Bimestre
               </label>

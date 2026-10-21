@@ -357,11 +357,11 @@ export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
                   Semáforo de Cumplimiento por Docente
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Seguimiento del registro de sesiones planificadas (RF-013 / RF-021)
+                  Seguimiento del registro de sesiones planificadas
                 </CardDescription>
               </div>
               <Button asChild variant="ghost" size="sm" className="text-primary h-7 text-xs">
-                <Link href="/admin/consolidado-docente">
+                <Link href="/admin/consolidados-docentes">
                   Ficha completa
                   <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
                 </Link>
