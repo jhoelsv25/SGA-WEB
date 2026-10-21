@@ -1,6 +1,10 @@
-"use client";
-
-import { CheckmarkCircle02Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
+import Link from "next/link";
+import {
+  CheckmarkCircle02Icon,
+  Cancel01Icon,
+  Book02Icon,
+  ArrowRight01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import type { CargaItemHorario } from "../types";
@@ -20,8 +24,24 @@ export function ListaCursosCarga({
 }: ListaCursosCargaProps) {
   if (cargaItems.length === 0) {
     return (
-      <div className="border-border/80 text-muted-foreground rounded-xl border border-dashed p-4 text-center text-xs">
-        Esta sección no tiene cursos registrados en su carga académica.
+      <div className="border-border/60 bg-card space-y-3 rounded-2xl border p-5 text-center shadow-xs">
+        <div className="bg-muted/40 text-muted-foreground mx-auto flex size-10 items-center justify-center rounded-xl">
+          <HugeiconsIcon icon={Book02Icon} className="size-5" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-foreground text-xs font-semibold">Sin carga académica</p>
+          <p className="text-muted-foreground mx-auto max-w-[210px] text-[11px] leading-relaxed">
+            Esta sección no tiene cursos registrados para este ciclo escolar.
+          </p>
+        </div>
+        {puedeGestionar && (
+          <Button asChild variant="outline" size="sm" className="h-8 w-full gap-1.5 text-xs">
+            <Link href="/admin/secciones">
+              <span>Gestionar secciones</span>
+              <HugeiconsIcon icon={ArrowRight01Icon} className="size-3" />
+            </Link>
+          </Button>
+        )}
       </div>
     );
   }

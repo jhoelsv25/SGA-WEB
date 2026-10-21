@@ -1,5 +1,5 @@
-"use client";
-
+import { Clock01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { BloqueHorario, BloquePropuesta, CargaItemHorario } from "../../types";
 import { DIAS_SEMANA, convertirHoraAMinutos } from "../../utils";
 import { CeldaBloque } from "./celda-bloque";
@@ -66,34 +66,39 @@ export function GrillaSemanal({
           Horario semanal de clases por día y franja horaria de la sección
         </caption>
         <thead>
-          <tr className="border-border/80 bg-muted/40 border-b">
+          <tr className="border-border/60 bg-muted/30 border-b">
             <th
               scope="col"
-              className="border-border/80 bg-muted/60 text-muted-foreground sticky left-0 z-10 w-24 border-r p-3 text-center text-xs font-semibold"
+              className="border-border/60 bg-muted/50 text-muted-foreground sticky left-0 z-10 w-24 border-r p-3 text-center text-xs font-semibold"
             >
-              Hora
+              <div className="flex items-center justify-center gap-1.5">
+                <HugeiconsIcon icon={Clock01Icon} className="text-muted-foreground size-3.5" />
+                <span>Hora</span>
+              </div>
             </th>
             {DIAS_SEMANA.map((dia) => (
               <th
                 key={dia.dia}
                 scope="col"
-                className="border-border/60 text-foreground w-[18%] border-r p-3 text-center text-xs font-semibold last:border-r-0"
+                className="border-border/60 text-foreground w-[18%] border-r p-3 text-center text-xs font-bold tracking-wider uppercase last:border-r-0"
               >
                 <span>{dia.nombre}</span>
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-border/60 divide-y text-xs">
+        <tbody className="divide-border/50 divide-y text-xs">
           {franjas.map((franja, indexFranja) => (
             <tr key={`${franja.inicio}-${franja.fin}`} className="hover:bg-muted/10">
               {/* Encabezado de fila con hora */}
               <th
                 scope="row"
-                className="border-border/80 bg-card text-muted-foreground sticky left-0 z-10 border-r p-2 text-center font-mono text-[11px] font-medium shadow-xs"
+                className="border-border/60 bg-muted/10 text-foreground sticky left-0 z-10 border-r p-2 text-center font-mono shadow-xs"
               >
-                <div>{franja.inicio}</div>
-                <div className="text-muted-foreground/70 text-[10px]">{franja.fin}</div>
+                <div className="text-foreground text-xs font-bold tracking-tight">
+                  {franja.inicio}
+                </div>
+                <div className="text-muted-foreground text-[10px] font-medium">{franja.fin}</div>
               </th>
 
               {/* Celdas por día escolar (lunes a viernes) */}

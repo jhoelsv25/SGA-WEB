@@ -34,13 +34,16 @@ export function CeldaBloque({
 
   if (esReceso) {
     return (
-      <div className="group border-border/80 bg-muted/60 hover:bg-muted relative flex h-full min-h-[58px] flex-col justify-between rounded-lg border border-dashed p-2 text-xs transition-colors">
+      <div className="group relative flex h-full min-h-[58px] flex-col justify-between rounded-xl border border-amber-500/40 bg-amber-500/10 p-2 text-xs transition-colors hover:bg-amber-500/15">
         <div className="flex items-center justify-between gap-1">
-          <div className="text-muted-foreground flex items-center gap-1.5 font-medium">
-            <HugeiconsIcon icon={Clock01Icon} className="size-3.5" />
+          <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-300">
+            <HugeiconsIcon
+              icon={Clock01Icon}
+              className="size-3.5 text-amber-600 dark:text-amber-400"
+            />
             <span>Receso escolar</span>
           </div>
-          <span className="text-muted-foreground font-mono text-[11px]">
+          <span className="font-mono text-[10px] font-semibold text-amber-800/80 dark:text-amber-300/80">
             {formatearRangoHora(bloque.horaInicio, bloque.horaFin)}
           </span>
         </div>
@@ -52,20 +55,20 @@ export function CeldaBloque({
               variant="ghost"
               size="icon"
               onClick={() => onEditar(bloque)}
-              className="text-muted-foreground hover:bg-background/80 hover:text-foreground size-11 min-h-11 min-w-11 rounded-md"
+              className="size-7 rounded-md text-amber-700 hover:bg-amber-500/20 hover:text-amber-900 dark:text-amber-300"
               aria-label="Editar receso escolar"
             >
-              <HugeiconsIcon icon={Edit01Icon} className="size-4" />
+              <HugeiconsIcon icon={Edit01Icon} className="size-3.5" />
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="icon"
               onClick={() => onEliminar(bloque)}
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive size-11 min-h-11 min-w-11 rounded-md"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive size-7 rounded-md"
               aria-label="Eliminar receso escolar"
             >
-              <HugeiconsIcon icon={Delete02Icon} className="size-4" />
+              <HugeiconsIcon icon={Delete02Icon} className="size-3.5" />
             </Button>
           </div>
         )}
