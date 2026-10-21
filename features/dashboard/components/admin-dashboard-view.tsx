@@ -436,12 +436,12 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
 
         {/* Panel Lateral: Estado de Salud del Sistema + Equipos Recientes */}
         <div className="space-y-6 lg:col-span-5">
-          {/* Estado de Servicios del Sistema */}
+          {/* Estado Operativo del Sistema */}
           <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold">Salud del Sistema</CardTitle>
+              <CardTitle className="text-base font-semibold">Estado Operativo</CardTitle>
               <CardDescription className="text-xs">
-                Disponibilidad y estado de los servicios clave
+                Disponibilidad y estado de los servicios institucionales
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2.5 pt-0">
@@ -455,13 +455,35 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
                     <p className="text-muted-foreground truncate text-[11px]">{s.detalle}</p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1.5">
-                    <span className="relative flex size-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-                    </span>
-                    <span className="text-[11px] font-medium text-emerald-600 capitalize dark:text-emerald-400">
-                      {s.estado}
-                    </span>
+                    {s.estado === "operacional" ? (
+                      <>
+                        <span className="relative flex size-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                          <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+                        </span>
+                        <span className="text-[11px] font-medium text-emerald-600 capitalize dark:text-emerald-400">
+                          Operacional
+                        </span>
+                      </>
+                    ) : s.estado === "degradado" ? (
+                      <>
+                        <span className="relative flex size-2">
+                          <span className="relative inline-flex size-2 rounded-full bg-amber-500" />
+                        </span>
+                        <span className="text-[11px] font-medium text-amber-600 capitalize dark:text-amber-400">
+                          Atención
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="relative flex size-2">
+                          <span className="relative inline-flex size-2 rounded-full bg-rose-500" />
+                        </span>
+                        <span className="text-[11px] font-medium text-rose-600 capitalize dark:text-rose-400">
+                          Inactivo
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
