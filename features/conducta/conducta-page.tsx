@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import { Add01Icon, Award01Icon, Note01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeader } from "@/components/common/page-header";
@@ -27,8 +28,13 @@ import { createIncidenciasFilterDefs } from "./constants";
 import type { GravedadFalta, IncidenciaItem, TipoIncidencia } from "./types";
 
 export function ConductaPage() {
+  const searchParams = useSearchParams();
+  const matriculaIdParam = searchParams.get("matriculaId") ?? undefined;
   const { data: sessionData } = useSession();
   const currentUserId = sessionData?.user?.id;
+  const activeRole = (sessionData?.user?.activeRoleName ?? "").toLowerCase();
+  const puedeRegistrar =
+    activeRole !== "estudiante" && activeRole !== "apoderado" && Boolean(activeRole);
 
   const [activeTab, setActiveTab] = React.useState<"incidencias" | "observaciones">("incidencias");
 
@@ -65,6 +71,7 @@ export function ConductaPage() {
   } = useIncidenciasQuery({
     cursor: incidenciasPagination.cursor,
     limit: 15,
+    matriculaId: matriculaIdParam,
     tipo: tipo && tipo !== "all" ? tipo : undefined,
     gravedad: gravedad && gravedad !== "all" ? gravedad : undefined,
   });
@@ -78,6 +85,7 @@ export function ConductaPage() {
   } = useObservacionesQuery({
     cursor: observacionesPagination.cursor,
     limit: 15,
+    matriculaId: matriculaIdParam,
   });
 
   const incidencias = incidenciasData?.data ?? [];
@@ -91,26 +99,28 @@ export function ConductaPage() {
         description="Gestión integral de méritos, faltas formativas, compromisos y observaciones tutoriales del estudiante."
         icon={Award01Icon}
         actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => setModalCrearIncidenciaOpen(true)}
-              className="gap-1.5 text-xs font-medium"
-            >
-              <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
-              Registrar Incidencia
-            </Button>
+          puedeRegistrar ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                size="sm"
+                onClick={() => setModalCrearIncidenciaOpen(true)}
+                className="gap-1.5 text-xs font-medium"
+              >
+                <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
+                Registrar Incidencia
+              </Button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setModalCrearObservacionOpen(true)}
-              className="gap-1.5 text-xs font-medium"
-            >
-              <HugeiconsIcon icon={Note01Icon} className="h-4 w-4" />
-              Registrar Observación
-            </Button>
-          </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setModalCrearObservacionOpen(true)}
+                className="gap-1.5 text-xs font-medium"
+              >
+                <HugeiconsIcon icon={Note01Icon} className="h-4 w-4" />
+                Registrar Observación
+              </Button>
+            </div>
+          ) : undefined
         }
       />
 
@@ -155,10 +165,12 @@ export function ConductaPage() {
               title="No se encontraron incidencias"
               description="No hay méritos o faltas registradas con los filtros seleccionados."
               action={
-                <Button onClick={() => setModalCrearIncidenciaOpen(true)} className="gap-2">
-                  <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
-                  Registrar la primera incidencia
-                </Button>
+                puedeRegistrar ? (
+                  <Button onClick={() => setModalCrearIncidenciaOpen(true)} className="gap-2">
+                    <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
+                    Registrar la primera incidencia
+                  </Button>
+                ) : undefined
               }
             />
           ) : (
@@ -169,8 +181,8 @@ export function ConductaPage() {
                     key={inc.id}
                     incidencia={inc}
                     currentUserId={currentUserId}
-                    onEditar={(item) => setIncidenciaAEditar(item)}
-                    onAnular={(item) => setIncidenciaAAnular(item)}
+                    onEditar={puedeRegistrar ? (item) => setIncidenciaAEditar(item) : undefined}
+                    onAnular={puedeRegistrar ? (item) => setIncidenciaAAnular(item) : undefined}
                     onVerResumen={(matId) => setResumenMatriculaId(matId)}
                   />
                 ))}
@@ -200,10 +212,12 @@ export function ConductaPage() {
               title="No se encontraron observaciones"
               description="No hay observaciones tutoriales o psicopedagógicas registradas."
               action={
-                <Button onClick={() => setModalCrearObservacionOpen(true)} className="gap-2">
-                  <HugeiconsIcon icon={Note01Icon} className="h-4 w-4" />
-                  Registrar la primera observación
-                </Button>
+                puedeRegistrar ? (
+                  <Button onClick={() => setModalCrearObservacionOpen(true)} className="gap-2">
+                    <HugeiconsIcon icon={Note01Icon} className="h-4 w-4" />
+                    Registrar la primera observación
+                  </Button>
+                ) : undefined
               }
             />
           ) : (

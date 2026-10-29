@@ -145,14 +145,26 @@ export async function solicitarRevision(
   }
 }
 
+function descargarBlobEnNavegador(blob: Blob, filename: string) {
+  if (typeof window === "undefined") return;
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+}
+
 export async function obtenerSolicitudPendiente(
   consolidadoId: string,
 ): Promise<SolicitudRevisionItem | null> {
   try {
-    const { data } = await apiClient.get<SolicitudRevisionItem | null>(
+    const { data } = await apiClient.get<DetalleDocenteConsolidadoResponse>(
       CONSOLIDADO_DOCENTE_ENDPOINTS.SOLICITUD_PENDIENTE(consolidadoId),
     );
-    return data;
+    return data.solicitudPendiente ?? null;
   } catch (error) {
     handleApiError(error, "Error al consultar la solicitud pendiente.");
   }
@@ -163,7 +175,7 @@ export async function resolverSolicitudRevision(
   dto: ResolverSolicitudRevisionDto,
 ): Promise<{ solicitud: SolicitudRevisionItem; mensaje: string }> {
   try {
-    const { data } = await apiClient.post<{ solicitud: SolicitudRevisionItem; mensaje: string }>(
+    const { data } = await apiClient.patch<{ solicitud: SolicitudRevisionItem; mensaje: string }>(
       CONSOLIDADO_DOCENTE_ENDPOINTS.RESOLVER_SOLICITUD(solicitudId),
       dto,
     );
@@ -181,6 +193,7 @@ export async function descargarFichaPdf(consolidadoId: string): Promise<Blob> {
         responseType: "blob",
       },
     );
+    descargarBlobEnNavegador(data, `ficha-seguimiento-${consolidadoId}.pdf`);
     return data;
   } catch (error) {
     handleApiError(error, "Error al descargar la ficha de seguimiento en PDF.");
@@ -190,11 +203,13 @@ export async function descargarFichaPdf(consolidadoId: string): Promise<Blob> {
 export async function exportarExcel(periodoId: string): Promise<Blob> {
   try {
     const { data } = await apiClient.get<Blob>(
-      CONSOLIDADO_DOCENTE_ENDPOINTS.EXPORTAR_EXCEL(periodoId),
+      CONSOLIDADO_DOCENTE_ENDPOINTS.EXPORTAR_EXCEL,
       {
+        params: { periodoId },
         responseType: "blob",
       },
     );
+    descargarBlobEnNavegador(data, "consolidados-docentes.xlsx");
     return data;
   } catch (error) {
     handleApiError(error, "Error al exportar el consolidado a Excel.");

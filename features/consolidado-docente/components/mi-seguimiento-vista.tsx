@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Download01Icon,
   AlertCircleIcon,
@@ -29,6 +30,8 @@ import { getDetalleSesionesColumns } from "../views/columns";
 import { ModalSolicitarRevision } from "./modals";
 
 export function MiSeguimientoVista() {
+  const searchParams = useSearchParams();
+  const periodoUrl = searchParams.get("periodoId") ?? "";
   const { anio } = useAnioLectivo();
   const bimestres = anio?.bimestres ?? [];
   const primerBimestreId = bimestres[0]?.id ?? "";
@@ -36,7 +39,7 @@ export function MiSeguimientoVista() {
   const [descargandoPdf, setDescargandoPdf] = React.useState(false);
   const [abrirSolicitud, setAbrirSolicitud] = React.useState(false);
 
-  const periodoActivo = periodoSeleccionado || primerBimestreId;
+  const periodoActivo = periodoSeleccionado || periodoUrl || primerBimestreId;
 
   const { data, isLoading } = useMiSeguimientoQuery(periodoActivo, Boolean(periodoActivo));
 

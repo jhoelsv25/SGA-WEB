@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { UserGroupIcon } from "@hugeicons/core-free-icons";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
@@ -106,6 +107,11 @@ export function AsistenciaSesionPage({ sesionId }: AsistenciaSesionPageProps) {
           title="Elija una sesión de clase"
           description="La asistencia se toma desde la sesión que firmó. Abra «Asistencia» desde esa sesión."
           icon={UserGroupIcon}
+          action={
+            <Button asChild size="sm">
+              <Link href="/admin/mis-sesiones">Ir a Mis sesiones</Link>
+            </Button>
+          }
         />
       ) : (
         <PageState

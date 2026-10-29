@@ -194,15 +194,6 @@ export const adminNavigation: NavSection[] = [
         ocultarAlAdministrador: true,
         description: "Asistencia al colegio y por curso del estudiante",
       },
-      {
-        id: "admin-attendance",
-        label: "Asistencia y Marcaciones",
-        link: "/admin/attendance",
-        icon: Clock01Icon,
-        permissions: ["admin:attendance:manage"],
-        roles: ["admin"],
-        description: "Marcaciones en kiosko, tardanzas y justificaciones",
-      },
     ],
   },
   {
@@ -288,15 +279,6 @@ export const adminNavigation: NavSection[] = [
         description:
           "Cumplimiento de sesiones planificadas y materiales propios del docente (RF-020)",
       },
-      {
-        id: "admin-sessions",
-        label: "Seguimiento Docente",
-        link: "/admin/sessions",
-        icon: TeacherIcon,
-        permissions: ["admin:sessions:manage"],
-        roles: ["admin"],
-        description: "Sesiones de clase, ausencias, evidencias y consolidados",
-      },
     ],
   },
   {
@@ -339,7 +321,6 @@ export const adminNavigation: NavSection[] = [
         link: "/admin/aula-virtual",
         icon: BookOpen01Icon,
         roles: ["admin"],
-        ocultarAlAdministrador: true,
         description: "Unidades y materiales de reforzamiento del curso",
       },
       {
@@ -357,15 +338,6 @@ export const adminNavigation: NavSection[] = [
         icon: FileEditIcon,
         roles: ["admin"],
         description: "Pedidos de los docentes para mover la fecha de un material congelado",
-      },
-      {
-        id: "admin-virtual-classroom",
-        label: "Aula Virtual (Refuerzo)",
-        link: "/admin/virtual-classroom",
-        icon: File01Icon,
-        permissions: ["admin:virtual-classroom:manage"],
-        roles: ["admin"],
-        description: "Supervisión de unidades, tareas, entregas y foros",
       },
     ],
   },

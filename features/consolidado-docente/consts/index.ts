@@ -83,19 +83,19 @@ export const OPCIONES_ACCION_SOLICITUD = [
 ] as const;
 
 export const CONSOLIDADO_DOCENTE_ENDPOINTS = {
-  BASE: "/consolidado-docente",
-  GENERAR: "/consolidado-docente/generar",
-  PERIODO: "/consolidado-docente/periodo",
-  POR_ID: (id: string) => `/consolidado-docente/${id}`,
-  MI_SEGUIMIENTO: "/consolidado-docente/mi-seguimiento",
-  DECISION: (id: string) => `/consolidado-docente/${id}/decision`,
-  REABRIR: (id: string) => `/consolidado-docente/${id}/reabrir`,
-  CERRAR: (id: string) => `/consolidado-docente/${id}/cerrar`,
-  VERSIONES: (id: string) => `/consolidado-docente/${id}/versiones`,
-  SOLICITAR_REVISION: (id: string) => `/consolidado-docente/${id}/solicitar-revision`,
-  SOLICITUD_PENDIENTE: (id: string) => `/consolidado-docente/${id}/solicitud-pendiente`,
+  BASE: "/consolidados-docente",
+  GENERAR: "/consolidados-docente/generar",
+  PERIODO: "/consolidados-docente",
+  POR_ID: (id: string) => `/consolidados-docente/${id}`,
+  MI_SEGUIMIENTO: "/consolidados-docente/mi-seguimiento",
+  DECISION: (id: string) => `/consolidados-docente/${id}/decision`,
+  REABRIR: (id: string) => `/consolidados-docente/${id}/reabrir`,
+  CERRAR: (id: string) => `/consolidados-docente/${id}/cerrar`,
+  VERSIONES: (id: string) => `/consolidados-docente/${id}/historial`,
+  SOLICITAR_REVISION: (id: string) => `/consolidados-docente/${id}/solicitudes`,
+  SOLICITUD_PENDIENTE: (id: string) => `/consolidados-docente/${id}`,
   RESOLVER_SOLICITUD: (solicitudId: string) =>
-    `/consolidado-docente/solicitudes/${solicitudId}/resolver`,
-  FICHA_PDF: (id: string) => `/consolidado-docente/${id}/ficha-pdf`,
-  EXPORTAR_EXCEL: (periodoId: string) => `/consolidado-docente/periodo/${periodoId}/excel`,
+    `/consolidados-docente/solicitudes/${solicitudId}/resolver`,
+  FICHA_PDF: (id: string) => `/consolidados-docente/${id}/ficha-pdf`,
+  EXPORTAR_EXCEL: "/consolidados-docente/exportar/excel",
 } as const;

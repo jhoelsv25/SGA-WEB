@@ -6,9 +6,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AlertCircleIcon,
   Analytics01Icon,
+  Archive02Icon,
   ChartHistogramIcon,
   CheckmarkCircle02Icon,
   Clock01Icon,
+  DashboardSquare01Icon,
   RefreshIcon,
 } from "@hugeicons/core-free-icons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -31,6 +33,8 @@ import { GraficoEvolucionBimestres } from "./grafico-evolucion-bimestres";
 import { TableroFiltros } from "./tablero-filtros";
 import { TableroSkeleton } from "./tablero-skeleton";
 import { TarjetasIndicadoresGrid } from "./tarjetas-indicadores-grid";
+import { GestionMedicionPanel } from "../medicion/gestion-medicion-panel";
+import { PanelGeneralVista } from "../panel/panel-general-vista";
 
 /**
  * Componente principal interactivo del Tablero de Indicadores de la Tesis (RF-020).
@@ -247,10 +251,14 @@ function TableroIndicadoresContenido() {
 
       {/* Pestañas de Navegación del Módulo */}
       <Tabs value={pestanaActiva} onValueChange={setPestanaActiva} className="space-y-6">
-        <TabsList className="bg-muted/80 p-1">
+        <TabsList className="bg-muted/80 flex-wrap p-1">
           <TabsTrigger value="tablero" className="gap-2">
             <HugeiconsIcon icon={Analytics01Icon} size={15} />
             <span>Tablero de Indicadores</span>
+          </TabsTrigger>
+          <TabsTrigger value="medicion" className="gap-2">
+            <HugeiconsIcon icon={Archive02Icon} size={15} />
+            <span>Mediciones, Pretest y Exportación</span>
           </TabsTrigger>
           <TabsTrigger value="comparacion" className="gap-2">
             <HugeiconsIcon icon={ChartHistogramIcon} size={15} />
@@ -259,6 +267,10 @@ function TableroIndicadoresContenido() {
           <TabsTrigger value="evolucion" className="gap-2">
             <HugeiconsIcon icon={CheckmarkCircle02Icon} size={15} />
             <span>Evolución Bimestral</span>
+          </TabsTrigger>
+          <TabsTrigger value="panel-general" className="gap-2">
+            <HugeiconsIcon icon={DashboardSquare01Icon} size={15} />
+            <span>Panel Operativo</span>
           </TabsTrigger>
         </TabsList>
 
@@ -294,7 +306,14 @@ function TableroIndicadoresContenido() {
         </TabsContent>
 
         {/* ================================================================= */}
-        {/* PESTAÑA 2: Comparación Pretest vs Postest con Gráfico de Barras   */}
+        {/* PESTAÑA 2: Gestión de Medición (Pretest, Cierre, Exportación)     */}
+        {/* ================================================================= */}
+        <TabsContent value="medicion" className="space-y-6 focus-visible:outline-none">
+          <GestionMedicionPanel />
+        </TabsContent>
+
+        {/* ================================================================= */}
+        {/* PESTAÑA 3: Comparación Pretest vs Postest con Gráfico de Barras   */}
         {/* ================================================================= */}
         <TabsContent value="comparacion" className="space-y-6 focus-visible:outline-none">
           <ComparacionPretestPostest
@@ -304,7 +323,7 @@ function TableroIndicadoresContenido() {
         </TabsContent>
 
         {/* ================================================================= */}
-        {/* PESTAÑA 3: Evolución por Bimestre del Año Lectivo                 */}
+        {/* PESTAÑA 4: Evolución por Bimestre del Año Lectivo                 */}
         {/* ================================================================= */}
         <TabsContent value="evolucion" className="space-y-6 focus-visible:outline-none">
           {comparacionData?.evolucionBimestres ? (
@@ -314,6 +333,13 @@ function TableroIndicadoresContenido() {
               Sin datos de evolución para los períodos del año académico.
             </Card>
           )}
+        </TabsContent>
+
+        {/* ================================================================= */}
+        {/* PESTAÑA 5: Panel General Operativo (HU4)                          */}
+        {/* ================================================================= */}
+        <TabsContent value="panel-general" className="space-y-6 focus-visible:outline-none">
+          <PanelGeneralVista />
         </TabsContent>
       </Tabs>
     </div>

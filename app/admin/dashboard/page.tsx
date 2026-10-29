@@ -124,21 +124,21 @@ export default function DashboardPage() {
       ];
     } else if (rol.includes("secretaria") || rol.includes("secretario")) {
       prioridades = [
-        "/admin/matriculas",
+        "/admin/enrollment",
         "/admin/estudiantes",
         "/admin/apoderados",
         "/admin/libretas",
         "/admin/comunicados",
-        "/admin/asistencia",
+        "/admin/asistencia-seccion",
       ];
     } else if (rol.includes("admin") || rol.includes("soporte") || rol.includes("ti")) {
       prioridades = [
         "/admin/users",
         "/admin/roles",
-        "/admin/bitacora-auditoria",
+        "/admin/audit",
         "/admin/institucion",
         "/admin/equipos",
-        "/admin/anio-escolar",
+        "/admin/academic-years",
       ];
     }
 

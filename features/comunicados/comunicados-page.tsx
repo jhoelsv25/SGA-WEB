@@ -32,6 +32,9 @@ export function ComunicadosPage() {
 
   const { data: sessionData } = useSession();
   const currentUserId = sessionData?.user?.id;
+  const activeRole = (sessionData?.user?.activeRoleName ?? "").toLowerCase();
+  const puedeRedactar =
+    activeRole !== "estudiante" && activeRole !== "apoderado" && Boolean(activeRole);
 
   // Estados de modales
   const [modalCrearOpen, setModalCrearOpen] = React.useState(false);
@@ -153,14 +156,16 @@ export function ComunicadosPage() {
         description="Publicación de avisos institucionales para la comunidad educativa y control de lectura en tiempo real."
         icon={Megaphone01Icon}
         actions={
-          <Button
-            size="sm"
-            onClick={() => setModalCrearOpen(true)}
-            className="h-9 gap-1.5 text-xs font-medium shadow-xs"
-          >
-            <HugeiconsIcon icon={Add01Icon} className="size-4" />
-            Redactar Comunicado
-          </Button>
+          puedeRedactar ? (
+            <Button
+              size="sm"
+              onClick={() => setModalCrearOpen(true)}
+              className="h-9 gap-1.5 text-xs font-medium shadow-xs"
+            >
+              <HugeiconsIcon icon={Add01Icon} className="size-4" />
+              Redactar Comunicado
+            </Button>
+          ) : undefined
         }
       />
 
@@ -206,12 +211,12 @@ export function ComunicadosPage() {
               >
                 Restablecer filtros
               </Button>
-            ) : (
+            ) : puedeRedactar ? (
               <Button size="sm" onClick={() => setModalCrearOpen(true)} className="gap-1.5 text-xs">
                 <HugeiconsIcon icon={Add01Icon} className="size-4" />
                 Redactar primer comunicado
               </Button>
-            )
+            ) : undefined
           }
         />
       ) : (
