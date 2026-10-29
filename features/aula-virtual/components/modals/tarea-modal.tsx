@@ -12,6 +12,7 @@ export interface TareaModalProps {
   onOpenChange: (abierto: boolean) => void;
   cursoSeccionId: string;
   tarea?: Tarea | null;
+  unidades?: Array<{ id: string; titulo: string }>;
   unidadIdDefecto?: string;
   periodoIdDefecto?: string;
 }
@@ -22,6 +23,7 @@ export function TareaModal({
   onOpenChange,
   cursoSeccionId,
   tarea,
+  unidades = [],
   unidadIdDefecto,
   periodoIdDefecto,
 }: TareaModalProps) {
@@ -42,6 +44,7 @@ export function TareaModal({
           key={tarea?.id ?? "nueva"}
           cursoSeccionId={cursoSeccionId}
           tarea={tarea}
+          unidades={unidades}
           unidadIdDefecto={unidadIdDefecto}
           periodoIdDefecto={periodoIdDefecto}
           onCancel={() => onOpenChange(false)}

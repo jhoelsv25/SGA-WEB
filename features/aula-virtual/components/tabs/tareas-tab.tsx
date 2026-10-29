@@ -58,11 +58,17 @@ export function TareasTab({
   periodoId,
   puedeAdministrar,
   unidades = [],
+  initialTareaId,
+  soloLectura = false,
+  estudianteId,
 }: {
   cursoSeccionId: string;
   periodoId?: string;
   puedeAdministrar: boolean;
   unidades?: Unidad[];
+  initialTareaId?: string;
+  soloLectura?: boolean;
+  estudianteId?: string;
 }) {
   const {
     data: tareas = [],
@@ -70,7 +76,7 @@ export function TareasTab({
     isError,
     error,
     refetch,
-  } = useTareas(cursoSeccionId, periodoId);
+  } = useTareas(cursoSeccionId, periodoId, estudianteId);
 
   const publicar = usePublicarTarea();
   const cerrar = useCerrarTarea();
@@ -96,9 +102,13 @@ export function TareasTab({
   const [modalResolver, setModalResolver] = React.useState<{
     abierto: boolean;
     tareaId: string | null;
-  }>({ abierto: false, tareaId: null });
+  }>({ abierto: Boolean(initialTareaId && !puedeAdministrar), tareaId: initialTareaId ?? null });
 
   const [tareaAEliminar, setTareaAEliminar] = React.useState<Tarea | null>(null);
+  const [tareaACerrar, setTareaACerrar] = React.useState<{
+    tarea: Tarea;
+    asignarCero: boolean;
+  } | null>(null);
   const [recursoActividad, setRecursoActividad] = React.useState<RecursoActividadTarget | null>(
     null,
   );
@@ -374,7 +384,12 @@ export function TareasTab({
                             variant="outline"
                             size="sm"
                             className="min-h-9 gap-1.5 text-amber-600 hover:text-amber-700"
-                            onClick={() => cerrar.mutate(tarea.id)}
+                            onClick={() =>
+                              setTareaACerrar({
+                                tarea,
+                                asignarCero: new Date(tarea.fechaLimite).getTime() <= Date.now(),
+                              })
+                            }
                             disabled={cerrar.isPending}
                           >
                             <HugeiconsIcon icon={LockIcon} size={16} />
@@ -404,18 +419,25 @@ export function TareasTab({
                         </Button>
                       </>
                     ) : (
-                      // Estudiante
+                      // Estudiante o Apoderado
                       <Button
                         type="button"
-                        variant={miEntrega ? "outline" : "default"}
+                        variant={miEntrega || soloLectura ? "outline" : "default"}
                         size="sm"
                         className="min-h-9 gap-1.5"
                         onClick={() => {
-                          registrarActividad.mutate({ tareaId: tarea.id, accion: "abrio" });
+                          if (!soloLectura) {
+                            registrarActividad.mutate({ tareaId: tarea.id, accion: "abrio" });
+                          }
                           setModalResolver({ abierto: true, tareaId: tarea.id });
                         }}
                       >
-                        {miEntrega?.estado === "calificada" ? (
+                        {soloLectura ? (
+                          <>
+                            <HugeiconsIcon icon={Task01Icon} size={16} />
+                            Ver detalle y entrega
+                          </>
+                        ) : miEntrega?.estado === "calificada" ? (
                           <>
                             <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} />
                             Ver retroalimentación
@@ -450,6 +472,7 @@ export function TareasTab({
           onOpenChange={(abierto) => setModalTarea({ abierto, tarea: modalTarea.tarea })}
           cursoSeccionId={cursoSeccionId}
           tarea={modalTarea.tarea}
+          unidades={unidades}
           unidadIdDefecto={unidades[0]?.id}
           periodoIdDefecto={periodoId}
         />
@@ -468,8 +491,50 @@ export function TareasTab({
           abierto={modalResolver.abierto}
           onOpenChange={(abierto) => setModalResolver({ abierto, tareaId: modalResolver.tareaId })}
           tareaId={modalResolver.tareaId}
+          soloLectura={soloLectura}
+          estudianteId={estudianteId}
         />
       )}
+
+      <ConfirmDialog
+        open={Boolean(tareaACerrar)}
+        onOpenChange={(abierto) => !abierto && setTareaACerrar(null)}
+        title="Cerrar actividad evaluativa"
+        description={
+          tareaACerrar
+            ? `¿Deseas cerrar "${tareaACerrar.tarea.titulo}"? Ya no se recibirán nuevas entregas.`
+            : ""
+        }
+        confirmText="Cerrar actividad"
+        onConfirm={() => {
+          if (tareaACerrar) {
+            cerrar.mutate({
+              tareaId: tareaACerrar.tarea.id,
+              asignarCeroSinEntrega: tareaACerrar.asignarCero,
+            });
+            setTareaACerrar(null);
+          }
+        }}
+      >
+        {tareaACerrar && (
+          <label className="mt-2 flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-xs">
+            <input
+              type="checkbox"
+              checked={tareaACerrar.asignarCero}
+              onChange={(e) =>
+                setTareaACerrar((prev) =>
+                  prev ? { ...prev, asignarCero: e.target.checked } : null,
+                )
+              }
+              className="accent-primary"
+            />
+            <span>
+              Asignar nota <strong>00</strong> automáticamente a los estudiantes que no registraron
+              entrega.
+            </span>
+          </label>
+        )}
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={Boolean(tareaAEliminar)}

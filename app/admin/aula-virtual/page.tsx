@@ -7,14 +7,20 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: Promise<{ cursoSeccionId?: string | string[] }>;
+  searchParams: Promise<{
+    cursoSeccionId?: string | string[];
+    tab?: string | string[];
+    tareaId?: string | string[];
+  }>;
 }
 
 export default async function AulaVirtualRoute({ searchParams }: PageProps) {
-  const { cursoSeccionId } = await searchParams;
+  const { cursoSeccionId, tab, tareaId } = await searchParams;
   return (
     <AulaVirtualPage
       cursoSeccionId={typeof cursoSeccionId === "string" ? cursoSeccionId : undefined}
+      initialTab={typeof tab === "string" ? tab : undefined}
+      initialTareaId={typeof tareaId === "string" ? tareaId : undefined}
     />
   );
 }

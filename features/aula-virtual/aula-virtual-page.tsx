@@ -59,6 +59,7 @@ function MaterialFila({
   material,
   puedeAdministrar,
   onPublicar,
+  onEditar,
   onSolicitarCambio,
   onRetirar,
   onVerActividad,
@@ -67,40 +68,70 @@ function MaterialFila({
   material: Material;
   puedeAdministrar: boolean;
   onPublicar: (material: Material) => void;
+  onEditar?: (material: Material) => void;
   onSolicitarCambio: (material: Material) => void;
   onRetirar: (material: Material) => void;
   onVerActividad?: (material: Material) => void;
   onRegistrarVisualizacion?: (material: Material, accion: "visualizo" | "descargo") => void;
 }) {
   const plazo = material.plazo ? PLAZO_CONFIG[material.plazo] : null;
+  const ultimoCambio =
+    material.cambiosDeFecha.length > 0
+      ? material.cambiosDeFecha[material.cambiosDeFecha.length - 1]
+      : null;
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
       <div className="min-w-0 space-y-1">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <p className="truncate text-sm font-medium">{material.titulo}</p>
           {material.esExtra && <StatusBadge tone="brand">Extra</StatusBadge>}
           {plazo && <StatusBadge tone={plazo.tone}>{plazo.label}</StatusBadge>}
+          {puedeAdministrar && !material.visible && (
+            <StatusBadge tone="neutral">Oculto</StatusBadge>
+          )}
           {material.solicitudAbierta && (
             <StatusBadge tone="warning">Solicitud pendiente</StatusBadge>
           )}
+          {!material.solicitudAbierta && ultimoCambio?.estado === "aprobada" && (
+            <StatusBadge tone="success">Cambio de fecha aprobado</StatusBadge>
+          )}
+          {!material.solicitudAbierta && ultimoCambio?.estado === "rechazada" && (
+            <StatusBadge tone="danger">Cambio de fecha rechazado</StatusBadge>
+          )}
         </div>
+        {material.descripcion && (
+          <p className="text-muted-foreground text-xs">{material.descripcion}</p>
+        )}
         <p className="text-muted-foreground text-xs">
           {material.fechaProgramada && `Programado: ${formatDate(material.fechaProgramada)}`}
           {material.publicadoEn && ` · Publicado: ${formatDate(material.publicadoEn)}`}
           {material.sesionClase?.fecha && ` · Clase: ${formatDate(material.sesionClase.fecha)}`}
         </p>
+        {puedeAdministrar && ultimoCambio && (
+          <p className="text-muted-foreground text-[11px]">
+            Historial de fecha: {formatDate(ultimoCambio.fechaAnterior)} →{" "}
+            {formatDate(ultimoCambio.fechaSolicitada)} ({ultimoCambio.estado})
+            {ultimoCambio.respuesta ? ` · Respuesta: ${ultimoCambio.respuesta}` : ""}
+          </p>
+        )}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {material.url && (
           <Button
             asChild
             variant="outline"
             size="sm"
             className="min-h-9"
-            onClick={() => onRegistrarVisualizacion?.(material, "descargo")}
+            onClick={() =>
+              onRegistrarVisualizacion?.(
+                material,
+                material.tipo === "enlace" ? "visualizo" : "descargo",
+              )
+            }
           >
             <Link href={urlDeArchivo(material.url)} target="_blank" rel="noreferrer">
-              Ver
+              {material.tipo === "enlace" ? "Abrir enlace" : "Ver"}
             </Link>
           </Button>
         )}
@@ -114,6 +145,18 @@ function MaterialFila({
           >
             <HugeiconsIcon icon={Activity01Icon} size={16} />
             Actividad
+          </Button>
+        )}
+        {puedeAdministrar && onEditar && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="min-h-9 gap-1.5"
+            onClick={() => onEditar(material)}
+          >
+            <HugeiconsIcon icon={FileEditIcon} size={16} />
+            Editar
           </Button>
         )}
         {puedeAdministrar && !material.publicadoEn && (
@@ -171,11 +214,23 @@ function MaterialFila({
   );
 }
 
-export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string }) {
+export function AulaVirtualPage({
+  cursoSeccionId,
+  initialTab,
+  initialTareaId,
+}: {
+  cursoSeccionId?: string;
+  initialTab?: string;
+  initialTareaId?: string;
+}) {
   const { data: cursos = [] } = useMisCursos();
   const { anio } = useAnioLectivo();
   const [cursoId, setCursoId] = React.useState(cursoSeccionId ?? "");
   const [periodoId, setPeriodoId] = React.useState<string>("");
+  const [tabActiva, setTabActiva] = React.useState<string>(
+    initialTareaId ? "tareas" : initialTab || "materiales",
+  );
+  const [estudianteIdSeleccionado, setEstudianteIdSeleccionado] = React.useState<string>("");
   const cursoActual = cursoId || cursos[0]?.cursoSeccionId || "";
 
   const { data: aula, isLoading, isError, error, refetch } = useAula(cursoActual);
@@ -187,6 +242,10 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
     abierto: false,
   });
   const [unidadParaMaterial, setUnidadParaMaterial] = React.useState<string | null>(null);
+  const [materialEditar, setMaterialEditar] = React.useState<{
+    unidadId: string;
+    material: Material;
+  } | null>(null);
   const [unidadParaExtra, setUnidadParaExtra] = React.useState<string | null>(null);
   const [materialPublicar, setMaterialPublicar] = React.useState<Material | null>(null);
   const [materialCambio, setMaterialCambio] = React.useState<Material | null>(null);
@@ -197,8 +256,24 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
 
   const retirar = useRetirarMaterial();
   const registrarActividad = useRegistrarActividad();
-  const { data: chatNoLeidos } = useChatNoLeidos(aula?.cursoSeccionId ?? "");
+  const esApoderado = aula?.rolEnAula === "apoderado";
+  const esDirectivo = aula?.rolEnAula === "directivo";
+  const { data: chatNoLeidos } = useChatNoLeidos(
+    !esApoderado && aula?.cursoSeccionId ? aula.cursoSeccionId : "",
+  );
   const anioCerrado = anio?.estado === "cerrado";
+
+  const estudianteActivoId = React.useMemo(() => {
+    if (!esApoderado || !aula?.hijosEnCurso?.length) return undefined;
+    const existe = aula.hijosEnCurso.some((h) => h.estudianteId === estudianteIdSeleccionado);
+    return existe ? estudianteIdSeleccionado : aula.hijosEnCurso[0]?.estudianteId;
+  }, [esApoderado, aula?.hijosEnCurso, estudianteIdSeleccionado]);
+
+  const unidadesFiltradas = React.useMemo(() => {
+    if (!aula) return [];
+    if (!periodoId) return aula.unidades;
+    return aula.unidades.filter((u) => !u.periodoId || u.periodoId === periodoId);
+  }, [aula, periodoId]);
 
   const opcionesPeriodo = React.useMemo(
     () => [
@@ -255,6 +330,19 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
             />
           </div>
         )}
+        {esApoderado && aula?.hijosEnCurso && aula.hijosEnCurso.length > 0 && (
+          <div className="w-full max-w-64">
+            <SelectOption
+              options={aula.hijosEnCurso.map((h) => ({
+                value: h.estudianteId,
+                label: `Estudiante: ${h.nombreCompleto}`,
+              }))}
+              value={estudianteActivoId ?? ""}
+              onSelect={setEstudianteIdSeleccionado}
+              placeholder="Estudiante"
+            />
+          </div>
+        )}
       </div>
 
       {!cursoActual ? (
@@ -272,7 +360,7 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
           errorTitle="No se pudo cargar el aula virtual"
         >
           {aula && (
-            <Tabs defaultValue="materiales" className="w-full space-y-6">
+            <Tabs value={tabActiva} onValueChange={setTabActiva} className="w-full space-y-6">
               <TabsList variant="line" className="w-full justify-start gap-4 border-b">
                 <TabsTrigger value="materiales" className="gap-2">
                   <HugeiconsIcon icon={BookOpen01Icon} size={16} />
@@ -282,47 +370,53 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
                   <HugeiconsIcon icon={Task01Icon} size={16} />
                   Tareas y Evaluaciones
                 </TabsTrigger>
-                <TabsTrigger value="muro" className="gap-2">
-                  <HugeiconsIcon icon={Comment01Icon} size={16} />
-                  Muro
-                </TabsTrigger>
-                <TabsTrigger value="chat" className="gap-2">
-                  <HugeiconsIcon icon={BubbleChatIcon} size={16} />
-                  <span>Chat</span>
-                  {Boolean(chatNoLeidos?.noLeidos && chatNoLeidos.noLeidos > 0) && (
-                    <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold">
-                      {chatNoLeidos?.noLeidos}
-                    </span>
-                  )}
-                </TabsTrigger>
-                {aula.puedeAdministrar ? (
+                {!esApoderado && (
+                  <>
+                    <TabsTrigger value="muro" className="gap-2">
+                      <HugeiconsIcon icon={Comment01Icon} size={16} />
+                      Muro
+                    </TabsTrigger>
+                    <TabsTrigger value="chat" className="gap-2">
+                      <HugeiconsIcon icon={BubbleChatIcon} size={16} />
+                      <span>Chat</span>
+                      {Boolean(chatNoLeidos?.noLeidos && chatNoLeidos.noLeidos > 0) && (
+                        <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold">
+                          {chatNoLeidos?.noLeidos}
+                        </span>
+                      )}
+                    </TabsTrigger>
+                  </>
+                )}
+                {aula.puedeAdministrar || esDirectivo ? (
                   <>
                     <TabsTrigger value="libro-notas" className="gap-2">
                       <HugeiconsIcon icon={ChartBarLineIcon} size={16} />
                       Libro de Calificaciones
                     </TabsTrigger>
-                    <TabsTrigger value="moderacion" className="gap-2">
-                      <HugeiconsIcon icon={ShieldAlertIcon} size={16} />
-                      Moderación
-                    </TabsTrigger>
+                    {(aula.puedeAdministrar || aula.puedeVerModeracion) && (
+                      <TabsTrigger value="moderacion" className="gap-2">
+                        <HugeiconsIcon icon={ShieldAlertIcon} size={16} />
+                        Moderación
+                      </TabsTrigger>
+                    )}
                   </>
                 ) : (
                   <TabsTrigger value="mis-notas" className="gap-2">
                     <HugeiconsIcon icon={Award01Icon} size={16} />
-                    Mis Calificaciones
+                    {esApoderado ? "Calificaciones" : "Mis Calificaciones"}
                   </TabsTrigger>
                 )}
               </TabsList>
 
               <TabsContent value="materiales" className="space-y-4">
-                {aula.unidades.length === 0 ? (
+                {unidadesFiltradas.length === 0 ? (
                   <EmptyState
                     title="Aún no hay unidades"
                     description="Crea la primera unidad para empezar a planificar materiales."
                     icon={BookOpen01Icon}
                   />
                 ) : (
-                  aula.unidades.map((unidad) => (
+                  unidadesFiltradas.map((unidad) => (
                     <div key={unidad.id} className="rounded-xl border p-4">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div>
@@ -380,6 +474,9 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
                               material={material}
                               puedeAdministrar={aula.puedeAdministrar}
                               onPublicar={setMaterialPublicar}
+                              onEditar={(mat) =>
+                                setMaterialEditar({ unidadId: unidad.id, material: mat })
+                              }
                               onSolicitarCambio={setMaterialCambio}
                               onRetirar={setMaterialRetirar}
                               onVerActividad={(mat) =>
@@ -390,10 +487,6 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
                                 })
                               }
                               onRegistrarVisualizacion={(mat, accion) => {
-                                registrarActividad.mutate({
-                                  materialId: mat.id,
-                                  accion: "visualizo",
-                                });
                                 registrarActividad.mutate({ materialId: mat.id, accion });
                               }}
                             />
@@ -411,26 +504,35 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
                   periodoId={periodoId || undefined}
                   puedeAdministrar={aula.puedeAdministrar}
                   unidades={aula.unidades}
+                  initialTareaId={initialTareaId}
+                  soloLectura={esApoderado || esDirectivo}
+                  estudianteId={esApoderado ? estudianteActivoId : undefined}
                 />
               </TabsContent>
 
-              <TabsContent value="muro">
-                <MuroTab
-                  cursoSeccionId={aula.cursoSeccionId}
-                  puedeAdministrar={aula.puedeAdministrar}
-                  anioCerrado={anioCerrado}
-                />
-              </TabsContent>
+              {!esApoderado && (
+                <>
+                  <TabsContent value="muro">
+                    <MuroTab
+                      cursoSeccionId={aula.cursoSeccionId}
+                      puedeAdministrar={aula.puedeAdministrar}
+                      anioCerrado={anioCerrado}
+                      soloLectura={esDirectivo}
+                    />
+                  </TabsContent>
 
-              <TabsContent value="chat">
-                <ChatTab
-                  cursoSeccionId={aula.cursoSeccionId}
-                  puedeAdministrar={aula.puedeAdministrar}
-                  anioCerrado={anioCerrado}
-                />
-              </TabsContent>
+                  <TabsContent value="chat">
+                    <ChatTab
+                      cursoSeccionId={aula.cursoSeccionId}
+                      puedeAdministrar={aula.puedeAdministrar}
+                      anioCerrado={anioCerrado}
+                      soloLectura={esDirectivo}
+                    />
+                  </TabsContent>
+                </>
+              )}
 
-              {aula.puedeAdministrar ? (
+              {aula.puedeAdministrar || esDirectivo ? (
                 <>
                   <TabsContent value="libro-notas">
                     <LibroNotasTab
@@ -438,13 +540,18 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
                       periodoId={periodoId || undefined}
                     />
                   </TabsContent>
-                  <TabsContent value="moderacion">
-                    <ModeracionTab cursoSeccionId={aula.cursoSeccionId} />
-                  </TabsContent>
+                  {(aula.puedeAdministrar || aula.puedeVerModeracion) && (
+                    <TabsContent value="moderacion">
+                      <ModeracionTab cursoSeccionId={aula.cursoSeccionId} />
+                    </TabsContent>
+                  )}
                 </>
               ) : (
                 <TabsContent value="mis-notas">
-                  <MisNotasTab periodoId={periodoId || undefined} />
+                  <MisNotasTab
+                    periodoId={periodoId || undefined}
+                    estudianteId={esApoderado ? estudianteActivoId : undefined}
+                  />
                 </TabsContent>
               )}
             </Tabs>
@@ -461,12 +568,18 @@ export function AulaVirtualPage({ cursoSeccionId }: { cursoSeccionId?: string })
           unidad={unidadModal.unidad}
         />
       )}
-      {aula && unidadParaMaterial && (
+      {aula && (unidadParaMaterial || materialEditar) && (
         <PlanificarMaterialModal
-          open={Boolean(unidadParaMaterial)}
-          onOpenChange={(abierto) => !abierto && setUnidadParaMaterial(null)}
-          unidadId={unidadParaMaterial}
+          open={Boolean(unidadParaMaterial || materialEditar)}
+          onOpenChange={(abierto) => {
+            if (!abierto) {
+              setUnidadParaMaterial(null);
+              setMaterialEditar(null);
+            }
+          }}
+          unidadId={materialEditar?.unidadId ?? unidadParaMaterial ?? ""}
           bloques={aula.bloques}
+          material={materialEditar?.material ?? null}
         />
       )}
       {aula && unidadParaExtra && (

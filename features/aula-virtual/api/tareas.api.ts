@@ -10,9 +10,16 @@ import type {
 
 const BASE = "/aula-virtual";
 
-export async function getTareas(cursoSeccionId: string, periodoId?: string): Promise<Tarea[]> {
+export async function getTareas(
+  cursoSeccionId: string,
+  periodoId?: string,
+  estudianteId?: string,
+): Promise<Tarea[]> {
+  const params: Record<string, string> = {};
+  if (periodoId) params.periodoId = periodoId;
+  if (estudianteId) params.estudianteId = estudianteId;
   const { data } = await apiClient.get<Tarea[]>(`${BASE}/cursos/${cursoSeccionId}/tareas`, {
-    params: periodoId ? { periodoId } : undefined,
+    params: Object.keys(params).length > 0 ? params : undefined,
   });
   return data;
 }
@@ -28,8 +35,10 @@ export async function crearTarea(
   return data;
 }
 
-export async function getDetalleTarea(tareaId: string): Promise<Tarea> {
-  const { data } = await apiClient.get<Tarea>(`${BASE}/tareas/${tareaId}`);
+export async function getDetalleTarea(tareaId: string, estudianteId?: string): Promise<Tarea> {
+  const { data } = await apiClient.get<Tarea>(`${BASE}/tareas/${tareaId}`, {
+    params: estudianteId ? { estudianteId } : undefined,
+  });
   return data;
 }
 
@@ -51,9 +60,13 @@ export async function publicarTarea(tareaId: string): Promise<{ mensaje: string;
   return data;
 }
 
-export async function cerrarTarea(tareaId: string): Promise<{ mensaje: string; tarea: Tarea }> {
+export async function cerrarTarea(
+  tareaId: string,
+  asignarCeroSinEntrega?: boolean,
+): Promise<{ mensaje: string; tarea: Tarea }> {
   const { data } = await apiClient.post<{ mensaje: string; tarea: Tarea }>(
     `${BASE}/tareas/${tareaId}/cerrar`,
+    asignarCeroSinEntrega !== undefined ? { asignarCeroSinEntrega } : undefined,
   );
   return data;
 }
@@ -176,5 +189,18 @@ export async function getMisNotas(periodoId?: string): Promise<CursoNotasEstudia
   const { data } = await apiClient.get<CursoNotasEstudiante[]>(`${BASE}/mis-notas`, {
     params: periodoId ? { periodoId } : undefined,
   });
+  return data;
+}
+
+export async function getNotasEstudiante(
+  estudianteId: string,
+  periodoId?: string,
+): Promise<CursoNotasEstudiante[]> {
+  const { data } = await apiClient.get<CursoNotasEstudiante[]>(
+    `${BASE}/estudiantes/${estudianteId}/notas`,
+    {
+      params: periodoId ? { periodoId } : undefined,
+    },
+  );
   return data;
 }

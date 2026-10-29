@@ -15,6 +15,7 @@ import {
   getEntregasDeTarea,
   getLibroNotas,
   getMisNotas,
+  getNotasEstudiante,
   getTareas,
   guardarProgreso,
   iniciarIntento,
@@ -24,20 +25,20 @@ import type { CalificarEntregaPayload, CrearTareaPayload } from "../types";
 import { aulaKeys } from "./query-keys";
 import { useMutacionAula } from "./use-aula-virtual";
 
-export function useTareas(cursoSeccionId: string, periodoId?: string) {
+export function useTareas(cursoSeccionId: string, periodoId?: string, estudianteId?: string) {
   const { anio } = useAnioLectivo();
   return useQuery({
-    queryKey: aulaKeys.tareas(anio?.id, cursoSeccionId, periodoId),
-    queryFn: () => getTareas(cursoSeccionId, periodoId),
+    queryKey: aulaKeys.tareas(anio?.id, cursoSeccionId, periodoId, estudianteId),
+    queryFn: () => getTareas(cursoSeccionId, periodoId, estudianteId),
     enabled: Boolean(cursoSeccionId),
     staleTime: 30_000,
   });
 }
 
-export function useDetalleTarea(tareaId: string) {
+export function useDetalleTarea(tareaId: string, estudianteId?: string) {
   return useQuery({
-    queryKey: aulaKeys.tarea(tareaId),
-    queryFn: () => getDetalleTarea(tareaId),
+    queryKey: aulaKeys.tarea(tareaId, estudianteId),
+    queryFn: () => getDetalleTarea(tareaId, estudianteId),
     enabled: Boolean(tareaId),
     staleTime: 15_000,
   });
@@ -61,10 +62,11 @@ export function useLibroNotas(cursoSeccionId: string, periodoId?: string) {
   });
 }
 
-export function useMisNotas(periodoId?: string) {
+export function useMisNotas(periodoId?: string, estudianteId?: string) {
   return useQuery({
-    queryKey: aulaKeys.misNotas(periodoId),
-    queryFn: () => getMisNotas(periodoId),
+    queryKey: aulaKeys.misNotas(periodoId, estudianteId),
+    queryFn: () =>
+      estudianteId ? getNotasEstudiante(estudianteId, periodoId) : getMisNotas(periodoId),
     staleTime: 30_000,
   });
 }
@@ -84,7 +86,12 @@ export function usePublicarTarea() {
 }
 
 export function useCerrarTarea() {
-  return useMutacionAula((tareaId: string) => cerrarTarea(tareaId));
+  return useMutacionAula((input: string | { tareaId: string; asignarCeroSinEntrega?: boolean }) => {
+    if (typeof input === "string") {
+      return cerrarTarea(input);
+    }
+    return cerrarTarea(input.tareaId, input.asignarCeroSinEntrega);
+  });
 }
 
 export function useEliminarTarea() {

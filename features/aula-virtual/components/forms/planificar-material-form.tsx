@@ -8,15 +8,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SelectOption } from "@/components/common/select";
 import { DatePicker } from "@/components/common/date-picker";
-import { usePlanificarMaterial } from "../../hooks";
+import { Switch } from "@/components/ui/switch";
+import { useActualizarMaterial, usePlanificarMaterial } from "../../hooks";
 import { TIPOS_MATERIAL, DIAS_SEMANA } from "../../consts";
-import type { BloqueCurso, TipoMaterial } from "../../types";
+import type { BloqueCurso, Material, TipoMaterial } from "../../types";
 
 export interface PlanificarMaterialFormProps {
   unidadId: string;
   bloques: BloqueCurso[];
+  material?: Material | null;
   onCancel: () => void;
   onSuccess?: () => void;
+}
+
+function aFecha(valor: string | null | undefined): Date | undefined {
+  if (!valor) return undefined;
+  const [a, m, d] = valor.slice(0, 10).split("-").map(Number);
+  return new Date(a, m - 1, d);
 }
 
 function aISO(fecha: Date | undefined): string {
@@ -29,18 +37,30 @@ function aISO(fecha: Date | undefined): string {
 export function PlanificarMaterialForm({
   unidadId,
   bloques,
+  material,
   onCancel,
   onSuccess,
 }: PlanificarMaterialFormProps) {
-  const [titulo, setTitulo] = React.useState("");
-  const [descripcion, setDescripcion] = React.useState("");
-  const [tipo, setTipo] = React.useState<TipoMaterial>("documento");
-  const [horarioId, setHorarioId] = React.useState<string>("");
-  const [fechaClase, setFechaClase] = React.useState<Date | undefined>();
-  const [fechaProgramada, setFechaProgramada] = React.useState<Date | undefined>();
+  const esEdicion = Boolean(material);
+  const puedeEditarFecha =
+    !material || (material.esPlanificado && !material.fechaCongelada && !material.publicadoEn);
+
+  const [titulo, setTitulo] = React.useState(material?.titulo ?? "");
+  const [descripcion, setDescripcion] = React.useState(material?.descripcion ?? "");
+  const [tipo, setTipo] = React.useState<TipoMaterial>(material?.tipo ?? "documento");
+  const [horarioId, setHorarioId] = React.useState<string>(material?.horarioId ?? "");
+  const [fechaClase, setFechaClase] = React.useState<Date | undefined>(
+    material?.horarioId ? aFecha(material.fechaProgramada) : undefined,
+  );
+  const [fechaProgramada, setFechaProgramada] = React.useState<Date | undefined>(
+    !material?.horarioId ? aFecha(material?.fechaProgramada) : undefined,
+  );
+  const [visible, setVisible] = React.useState<boolean>(material?.visible ?? true);
   const [error, setError] = React.useState<string | null>(null);
 
   const planificar = usePlanificarMaterial();
+  const actualizar = useActualizarMaterial();
+  const isPending = planificar.isPending || actualizar.isPending;
   const bloqueElegido = bloques.find((b) => b.id === horarioId);
 
   const enviar = (event: React.FormEvent) => {
@@ -49,14 +69,41 @@ export function PlanificarMaterialForm({
       setError("Ingrese el título del material.");
       return;
     }
-    if (horarioId && !fechaClase) {
-      setError("Indique la fecha de la clase del bloque elegido.");
+    if (puedeEditarFecha) {
+      if (horarioId && !fechaClase) {
+        setError("Indique la fecha de la clase del bloque elegido.");
+        return;
+      }
+      if (!horarioId && !fechaProgramada) {
+        setError("Indique la fecha programada del material.");
+        return;
+      }
+    }
+
+    if (esEdicion && material) {
+      actualizar.mutate(
+        {
+          id: material.id,
+          titulo: titulo.trim(),
+          descripcion: descripcion.trim() || undefined,
+          visible,
+          ...(puedeEditarFecha
+            ? {
+                horarioId: horarioId || undefined,
+                fechaClase: horarioId ? aISO(fechaClase) : undefined,
+                fechaProgramada: !horarioId ? aISO(fechaProgramada) : undefined,
+              }
+            : {}),
+        },
+        {
+          onSuccess: () => {
+            onSuccess?.();
+          },
+        },
+      );
       return;
     }
-    if (!horarioId && !fechaProgramada) {
-      setError("Indique la fecha programada del material.");
-      return;
-    }
+
     planificar.mutate(
       {
         unidadId,
@@ -87,7 +134,7 @@ export function PlanificarMaterialForm({
           onChange={(e) => setTitulo(e.target.value)}
           placeholder="Ej. Video de repaso de ecuaciones"
           maxLength={150}
-          disabled={planificar.isPending}
+          disabled={isPending}
         />
       </div>
       <div className="space-y-1.5">
@@ -99,48 +146,65 @@ export function PlanificarMaterialForm({
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
           maxLength={1000}
-          disabled={planificar.isPending}
+          disabled={isPending}
         />
       </div>
-      <div className="space-y-1.5">
-        <Label className="text-sm font-medium">Tipo *</Label>
-        <SelectOption
-          options={TIPOS_MATERIAL.map((t) => ({ value: t.value, label: t.label }))}
-          value={tipo}
-          onSelect={(v) => setTipo(v as TipoMaterial)}
-          disabled={planificar.isPending}
-        />
-      </div>
-      <div className="space-y-1.5">
-        <Label className="text-sm font-medium">Bloque del horario (opcional)</Label>
-        <SelectOption
-          options={[
-            { value: "", label: "Sin clase (fecha libre)" },
-            ...bloques.map((b) => ({
-              value: b.id,
-              label: `${DIAS_SEMANA[b.diaSemana]} ${b.horaInicio.slice(0, 5)}-${b.horaFin.slice(0, 5)}`,
-            })),
-          ]}
-          value={horarioId}
-          onSelect={setHorarioId}
-          disabled={planificar.isPending}
-        />
-      </div>
-      {horarioId ? (
+      {!esEdicion && (
         <div className="space-y-1.5">
-          <Label className="text-sm font-medium">
-            Fecha de la clase ({bloqueElegido ? DIAS_SEMANA[bloqueElegido.diaSemana] : ""}) *
-          </Label>
-          <DatePicker date={fechaClase} onSelect={setFechaClase} disabled={planificar.isPending} />
-        </div>
-      ) : (
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium">Fecha programada *</Label>
-          <DatePicker
-            date={fechaProgramada}
-            onSelect={setFechaProgramada}
-            disabled={planificar.isPending}
+          <Label className="text-sm font-medium">Tipo *</Label>
+          <SelectOption
+            options={TIPOS_MATERIAL.map((t) => ({ value: t.value, label: t.label }))}
+            value={tipo}
+            onSelect={(v) => setTipo(v as TipoMaterial)}
+            disabled={isPending}
           />
+        </div>
+      )}
+      {puedeEditarFecha && (
+        <>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Bloque del horario (opcional)</Label>
+            <SelectOption
+              options={[
+                { value: "", label: "Sin clase (fecha libre)" },
+                ...bloques.map((b) => ({
+                  value: b.id,
+                  label: `${DIAS_SEMANA[b.diaSemana]} ${b.horaInicio.slice(0, 5)}-${b.horaFin.slice(0, 5)}`,
+                })),
+              ]}
+              value={horarioId}
+              onSelect={setHorarioId}
+              disabled={isPending}
+            />
+          </div>
+          {horarioId ? (
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">
+                Fecha de la clase ({bloqueElegido ? DIAS_SEMANA[bloqueElegido.diaSemana] : ""}) *
+              </Label>
+              <DatePicker date={fechaClase} onSelect={setFechaClase} disabled={isPending} />
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Fecha programada *</Label>
+              <DatePicker
+                date={fechaProgramada}
+                onSelect={setFechaProgramada}
+                disabled={isPending}
+              />
+            </div>
+          )}
+        </>
+      )}
+      {esEdicion && (
+        <div className="flex items-center justify-between rounded-md border p-3">
+          <div>
+            <p className="text-sm font-medium">Visible para los estudiantes</p>
+            <p className="text-muted-foreground text-xs">
+              Permite ocultar temporalmente el material sin retirarlo.
+            </p>
+          </div>
+          <Switch checked={visible} onCheckedChange={setVisible} disabled={isPending} />
         </div>
       )}
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
@@ -148,9 +212,9 @@ export function PlanificarMaterialForm({
         <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={planificar.isPending} className="min-h-10 gap-2">
-          {planificar.isPending && <Spinner className="size-4" />}
-          Planificar
+        <Button type="submit" disabled={isPending} className="min-h-10 gap-2">
+          {isPending && <Spinner className="size-4" />}
+          {esEdicion ? "Guardar cambios" : "Planificar"}
         </Button>
       </div>
     </form>

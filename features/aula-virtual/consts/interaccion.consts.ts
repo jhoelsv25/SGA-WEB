@@ -2,10 +2,13 @@ import type { TipoModeracion } from "../types";
 
 export const LIMITE_ADJUNTO_BYTES = 10 * 1024 * 1024; // 10 MB
 export const LIMITE_EDICION_MS = 15 * 60 * 1000; // 15 minutos
+export const ACCEPT_ADJUNTO_INTERACCION = ".pdf,.png,.jpg,.jpeg,.webp,.gif";
 
 export const MENSAJES_VALIDACION = {
   VACIO: "Escriba un texto o agregue un adjunto.",
   ADJUNTO_PESADO: "El adjunto supera el máximo de 10 MB.",
+  FORMATO_NO_PERMITIDO:
+    "Solo se permiten imágenes (PNG, JPG, WEBP, GIF) o archivos PDF en el muro y chat.",
   EDICION_FUERA_DE_PLAZO: "Solo puede editar dentro de los 15 minutos de publicado.",
   MOTIVO_REQUERIDO: "Indique el motivo para ocultar el contenido.",
   ANIO_CERRADO: "El año escolar está cerrado. El muro y el chat son de solo lectura.",

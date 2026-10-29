@@ -17,6 +17,21 @@ export function esTamanoValido(file: File): boolean {
 }
 
 /**
+ * Valida que el archivo adjunto en el muro o chat sea imagen o PDF.
+ */
+export function esFormatoAdjuntoValido(file: File): boolean {
+  const nombre = file.name.toLowerCase();
+  return (
+    nombre.endsWith(".pdf") ||
+    nombre.endsWith(".png") ||
+    nombre.endsWith(".jpg") ||
+    nombre.endsWith(".jpeg") ||
+    nombre.endsWith(".webp") ||
+    nombre.endsWith(".gif")
+  );
+}
+
+/**
  * Formatea una fecha ISO en hora legible (HH:mm).
  */
 export function formatearHora(iso: string): string {

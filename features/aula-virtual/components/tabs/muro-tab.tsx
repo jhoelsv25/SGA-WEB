@@ -18,8 +18,8 @@ import { Spinner } from "@/components/common/spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "@/lib/toast";
 import { useSession } from "@/features/auth";
-import { MENSAJES_VALIDACION } from "../../consts";
-import { esTamanoValido } from "../../utils";
+import { ACCEPT_ADJUNTO_INTERACCION, MENSAJES_VALIDACION } from "../../consts";
+import { esFormatoAdjuntoValido, esTamanoValido } from "../../utils";
 import { usePublicacionesMuro, useCrearPublicacionMuro } from "../../hooks";
 import {
   OcultarContenidoModal,
@@ -31,10 +31,12 @@ export function MuroTab({
   cursoSeccionId,
   puedeAdministrar,
   anioCerrado,
+  soloLectura = false,
 }: {
   cursoSeccionId: string;
   puedeAdministrar: boolean;
   anioCerrado: boolean;
+  soloLectura?: boolean;
 }) {
   const session = useSession();
   const usuarioActualId = session.data?.user?.id;
@@ -62,6 +64,11 @@ export function MuroTab({
   const handleArchivoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!esFormatoAdjuntoValido(file)) {
+      toast.error(MENSAJES_VALIDACION.FORMATO_NO_PERMITIDO);
+      e.target.value = "";
+      return;
+    }
     if (!esTamanoValido(file)) {
       toast.error(MENSAJES_VALIDACION.ADJUNTO_PESADO);
       e.target.value = "";
@@ -128,7 +135,7 @@ export function MuroTab({
       )}
 
       {/* Compositor de publicación */}
-      {!anioCerrado && (
+      {!anioCerrado && !soloLectura && (
         <form
           onSubmit={handlePublicar}
           className="bg-card space-y-3 rounded-xl border p-4 shadow-2xs"
@@ -147,6 +154,7 @@ export function MuroTab({
               <input
                 type="file"
                 ref={fileInputRef}
+                accept={ACCEPT_ADJUNTO_INTERACCION}
                 className="hidden"
                 onChange={handleArchivoChange}
               />

@@ -12,6 +12,8 @@ export interface ResolverTareaModalProps {
   abierto?: boolean;
   onOpenChange: (abierto: boolean) => void;
   tareaId?: string | null;
+  soloLectura?: boolean;
+  estudianteId?: string;
 }
 
 export function ResolverTareaModal({
@@ -19,9 +21,11 @@ export function ResolverTareaModal({
   abierto,
   onOpenChange,
   tareaId,
+  soloLectura = false,
+  estudianteId,
 }: ResolverTareaModalProps) {
   const isOpen = abierto ?? open ?? false;
-  const { data: tarea, refetch } = useDetalleTarea(isOpen && tareaId ? tareaId : "");
+  const { data: tarea, refetch } = useDetalleTarea(isOpen && tareaId ? tareaId : "", estudianteId);
 
   return (
     <Modal
@@ -40,6 +44,7 @@ export function ResolverTareaModal({
         <ResolverTareaForm
           key={`${tarea.id}-${tarea.miEntrega?.id ?? "nueva"}`}
           tarea={tarea}
+          soloLectura={soloLectura}
           onCancel={() => onOpenChange(false)}
           onSuccess={() => onOpenChange(false)}
           refetchDetalle={() => void refetch()}

@@ -23,6 +23,7 @@ import type { Tarea } from "../../types";
 
 export interface ResolverTareaFormProps {
   tarea: Tarea;
+  soloLectura?: boolean;
   onCancel: () => void;
   onSuccess?: () => void;
   refetchDetalle?: () => void;
@@ -30,6 +31,7 @@ export interface ResolverTareaFormProps {
 
 export function ResolverTareaForm({
   tarea,
+  soloLectura = false,
   onCancel,
   onSuccess,
   refetchDetalle,
@@ -239,7 +241,49 @@ export function ResolverTareaForm({
       {/* Lógica para TRABAJO o PROYECTO */}
       {!esEvaluacion ? (
         <div className="space-y-4">
-          {entregaCalificada ? (
+          {miEntrega && (entregaCalificada || noAceptaTardia || soloLectura) && (
+            <div className="bg-muted/20 space-y-2.5 rounded-xl border p-4 text-xs">
+              <p className="text-foreground text-sm font-semibold">Detalle de la entrega enviada</p>
+              {miEntrega.archivoUrl && (
+                <div className="bg-background flex items-center justify-between rounded-lg border p-2.5">
+                  <div className="flex items-center gap-2">
+                    <HugeiconsIcon icon={File01Icon} size={16} />
+                    <span className="max-w-xs truncate font-medium">
+                      {miEntrega.archivoNombre || "Archivo entregado"}
+                    </span>
+                  </div>
+                  <Button asChild variant="outline" size="sm" className="h-7 text-xs">
+                    <Link href={urlDeArchivo(miEntrega.archivoUrl)} target="_blank">
+                      Ver archivo
+                    </Link>
+                  </Button>
+                </div>
+              )}
+              {miEntrega.enlaceUrl && (
+                <div className="bg-background flex items-center justify-between rounded-lg border p-2.5">
+                  <span className="truncate font-medium">{miEntrega.enlaceUrl}</span>
+                  <Button asChild variant="outline" size="sm" className="h-7 text-xs">
+                    <Link href={miEntrega.enlaceUrl} target="_blank" rel="noopener noreferrer">
+                      Abrir enlace
+                    </Link>
+                  </Button>
+                </div>
+              )}
+              {miEntrega.texto && (
+                <div className="bg-background rounded-lg border p-2.5 whitespace-pre-line">
+                  {miEntrega.texto}
+                </div>
+              )}
+            </div>
+          )}
+
+          {soloLectura ? (
+            !miEntrega && (
+              <div className="bg-muted/40 text-muted-foreground rounded-lg border p-4 text-center text-sm">
+                Aún no se ha registrado una entrega para esta actividad.
+              </div>
+            )
+          ) : entregaCalificada ? (
             <div className="bg-muted/40 text-muted-foreground rounded-lg border p-4 text-center text-sm">
               La entrega ya fue calificada. Pide al docente que te la devuelva para corregir.
             </div>
@@ -346,7 +390,7 @@ export function ResolverTareaForm({
           </div>
 
           {/* Botón para iniciar intento si no está en progreso */}
-          {!intentoActivoId && !sinIntentos && (
+          {!soloLectura && !intentoActivoId && !sinIntentos && (
             <div className="rounded-xl border border-dashed p-6 text-center">
               <p className="text-sm font-semibold">¿Listo para resolver la evaluación?</p>
               <p className="text-muted-foreground mt-1 text-xs">
@@ -372,6 +416,113 @@ export function ResolverTareaForm({
               Ya usaste todos tus intentos.
             </div>
           )}
+
+          {/* Revisión del intento entregado cuando no hay intento activo */}
+          {!intentoActivoId &&
+            miEntrega &&
+            miEntrega.estado !== "en_progreso" &&
+            miEntrega.respuestas &&
+            tarea.preguntas &&
+            tarea.preguntas.length > 0 && (
+              <div className="space-y-3 rounded-xl border p-4">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h4 className="text-sm font-semibold">
+                    Revisión del intento #{miEntrega.intento}
+                  </h4>
+                  {miEntrega.nota !== null && (
+                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                      Nota obtenida: {miEntrega.nota.toFixed(2)} / 20
+                    </span>
+                  )}
+                </div>
+                {tarea.preguntas.map((preg, pIdx) => {
+                  const pregId = preg.id || `preg_${pIdx}`;
+                  const detalle = (
+                    miEntrega.respuestas as Record<
+                      string,
+                      | {
+                          respuesta?: string | string[];
+                          esCorrecta?: boolean | null;
+                          puntajeObtenido?: number;
+                          comentario?: string;
+                        }
+                      | undefined
+                    >
+                  )[pregId];
+                  const valorMarcado = detalle?.respuesta;
+                  const respuestasReveladas = Boolean(preg.opciones?.some((o) => o.esCorrecta));
+
+                  return (
+                    <div
+                      key={pregId}
+                      className="bg-muted/20 space-y-2 rounded-lg border p-3 text-xs"
+                    >
+                      <div className="flex items-center justify-between font-semibold">
+                        <span>
+                          Pregunta {pIdx + 1}: {preg.enunciado}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {detalle?.puntajeObtenido !== undefined
+                            ? `${detalle.puntajeObtenido} / ${preg.puntaje} pts`
+                            : `${preg.puntaje} pts`}
+                        </span>
+                      </div>
+
+                      {preg.tipo !== "respuesta_corta" && preg.opciones ? (
+                        <div className="space-y-1.5 pt-1">
+                          {preg.opciones.map((opt) => {
+                            const marcada = Array.isArray(valorMarcado)
+                              ? valorMarcado.includes(opt.id || "")
+                              : valorMarcado === opt.id;
+                            const esCorrectaRevelada = respuestasReveladas && opt.esCorrecta;
+                            return (
+                              <div
+                                key={opt.id}
+                                className={`flex items-center justify-between rounded-md border px-2.5 py-1.5 ${
+                                  esCorrectaRevelada
+                                    ? "border-emerald-500 bg-emerald-50/70 font-semibold text-emerald-950 dark:bg-emerald-950/30 dark:text-emerald-200"
+                                    : marcada
+                                      ? "border-primary/50 bg-primary/5 font-medium"
+                                      : "border-border/60 text-muted-foreground"
+                                }`}
+                              >
+                                <span>{opt.texto}</span>
+                                <div className="flex items-center gap-1.5">
+                                  {marcada && (
+                                    <span className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                                      Tu respuesta
+                                    </span>
+                                  )}
+                                  {esCorrectaRevelada && (
+                                    <span className="rounded bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                      Correcta
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="space-y-1 pt-1">
+                          <div className="bg-background rounded border p-2 whitespace-pre-line">
+                            {typeof valorMarcado === "string" && valorMarcado.trim()
+                              ? valorMarcado
+                              : "Sin respuesta"}
+                          </div>
+                          {detalle?.comentario && (
+                            <p className="text-emerald-700 dark:text-emerald-400">
+                              <span className="font-semibold">Comentario del docente: </span>
+                              {detalle.comentario}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
           {/* Formulario de Preguntas activo */}
           {intentoActivoId && tarea.preguntas && (
@@ -487,7 +638,7 @@ export function ResolverTareaForm({
           Cerrar
         </Button>
 
-        {!esEvaluacion && !entregaCalificada && !noAceptaTardia && (
+        {!soloLectura && !esEvaluacion && !entregaCalificada && !noAceptaTardia && (
           <Button
             type="button"
             id="btn-enviar-trabajo"
@@ -500,7 +651,7 @@ export function ResolverTareaForm({
           </Button>
         )}
 
-        {esEvaluacion && intentoActivoId && (
+        {!soloLectura && esEvaluacion && intentoActivoId && (
           <Button
             type="button"
             id="btn-finalizar-intento"

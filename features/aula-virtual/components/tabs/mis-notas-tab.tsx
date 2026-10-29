@@ -8,8 +8,20 @@ import { formatDate } from "@/lib/formatters/date";
 import { useMisNotas } from "../../hooks";
 import type { CursoNotasEstudiante, TareaEstudianteNota } from "../../types";
 
-export function MisNotasTab({ periodoId }: { periodoId?: string }) {
-  const { data: notas = [], isLoading, isError, error, refetch } = useMisNotas(periodoId);
+export function MisNotasTab({
+  periodoId,
+  estudianteId,
+}: {
+  periodoId?: string;
+  estudianteId?: string;
+}) {
+  const {
+    data: notas = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useMisNotas(periodoId, estudianteId);
 
   return (
     <PageState

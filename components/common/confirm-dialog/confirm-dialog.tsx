@@ -66,6 +66,7 @@ export function ConfirmDialog({
   onCancel,
   variant = "danger",
   isLoading = false,
+  children,
 }: ConfirmDialogProps) {
   const [internalLoading, setInternalLoading] = React.useState(false);
   const loading = isLoading || internalLoading;
@@ -123,6 +124,8 @@ export function ConfirmDialog({
             </DialogHeader>
           </div>
         </div>
+
+        {children}
 
         <DialogFooter className="border-border/60 bg-muted/30 -mx-6 mt-4 -mb-6 flex flex-col-reverse gap-2 rounded-b-2xl border-t px-6 py-4 sm:flex-row sm:justify-end sm:gap-2.5">
           <Button

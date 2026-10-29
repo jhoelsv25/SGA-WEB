@@ -63,11 +63,21 @@ export interface BloqueCurso {
   horaFin: string;
 }
 
+export interface HijoAula {
+  estudianteId: string;
+  personaId: string;
+  matriculaId: string;
+  nombreCompleto: string;
+}
+
 export interface AulaVirtual {
   cursoSeccionId: string;
   cursoNombre: string;
   seccionNombre: string;
   puedeAdministrar: boolean;
+  rolEnAula?: "docente" | "estudiante" | "directivo" | "apoderado";
+  puedeVerModeracion?: boolean;
+  hijosEnCurso?: HijoAula[];
   diasPlanificacion: number;
   tamanoMaximoMb: number;
   bloques: BloqueCurso[];

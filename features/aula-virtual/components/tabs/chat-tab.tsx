@@ -34,17 +34,19 @@ import {
   type OcultarContenidoTarget,
 } from "../modals/ocultar-contenido-modal";
 
-import { MENSAJES_VALIDACION } from "../../consts";
-import { esTamanoValido, formatearHora } from "../../utils";
+import { ACCEPT_ADJUNTO_INTERACCION, MENSAJES_VALIDACION } from "../../consts";
+import { esFormatoAdjuntoValido, esTamanoValido, formatearHora } from "../../utils";
 
 export function ChatTab({
   cursoSeccionId,
   puedeAdministrar,
   anioCerrado,
+  soloLectura = false,
 }: {
   cursoSeccionId: string;
   puedeAdministrar: boolean;
   anioCerrado: boolean;
+  soloLectura?: boolean;
 }) {
   const session = useSession();
   const usuarioActualId = session.data?.user?.id;
@@ -86,6 +88,11 @@ export function ChatTab({
   const handleArchivoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!esFormatoAdjuntoValido(file)) {
+      toast.error(MENSAJES_VALIDACION.FORMATO_NO_PERMITIDO);
+      e.target.value = "";
+      return;
+    }
     if (!esTamanoValido(file)) {
       toast.error(MENSAJES_VALIDACION.ADJUNTO_PESADO);
       e.target.value = "";
@@ -273,7 +280,7 @@ export function ChatTab({
       </div>
 
       {/* Barra de entrada de mensajes */}
-      {!anioCerrado && (
+      {!anioCerrado && !soloLectura && (
         <form onSubmit={handleEnviar} className="bg-muted/20 space-y-2 border-t p-3">
           {archivo && (
             <div className="bg-muted flex items-center gap-2 rounded-md px-2.5 py-1 text-xs">
@@ -296,6 +303,7 @@ export function ChatTab({
             <input
               type="file"
               ref={fileInputRef}
+              accept={ACCEPT_ADJUNTO_INTERACCION}
               className="hidden"
               onChange={handleArchivoChange}
             />

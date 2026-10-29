@@ -50,6 +50,7 @@ const TIPOS_TAREA_OPCIONES: Array<{ value: TipoTarea; label: string; desc: strin
 export interface TareaFormProps {
   cursoSeccionId: string;
   tarea?: Tarea | null;
+  unidades?: Array<{ id: string; titulo: string }>;
   unidadIdDefecto?: string;
   periodoIdDefecto?: string;
   onCancel: () => void;
@@ -59,6 +60,7 @@ export interface TareaFormProps {
 export function TareaForm({
   cursoSeccionId,
   tarea,
+  unidades = [],
   unidadIdDefecto,
   periodoIdDefecto,
   onCancel,
@@ -71,6 +73,7 @@ export function TareaForm({
   const [titulo, setTitulo] = React.useState(tarea?.titulo ?? "");
   const [instrucciones, setInstrucciones] = React.useState(tarea?.instrucciones ?? "");
   const [tipo, setTipo] = React.useState<TipoTarea>(tarea?.tipo ?? "trabajo");
+  const [unidadId, setUnidadId] = React.useState<string>(tarea?.unidadId ?? unidadIdDefecto ?? "");
   const [fechaLimite, setFechaLimite] = React.useState(() => {
     if (tarea?.fechaLimite) return tarea.fechaLimite.slice(0, 16);
     const manana = new Date();
@@ -187,7 +190,7 @@ export function TareaForm({
       revelarRespuestas,
       tiposArchivo: !esEvaluacionConPreguntas ? tiposArchivo : undefined,
       publicar,
-      unidadId: unidadIdDefecto,
+      unidadId: unidadId || undefined,
       periodoId: periodoIdDefecto,
       preguntas: esEvaluacionConPreguntas ? preguntas : undefined,
     };
@@ -257,6 +260,25 @@ export function TareaForm({
             className="mt-1 resize-y"
           />
         </div>
+
+        {unidades.length > 0 && (
+          <div>
+            <Label htmlFor="select-unidad-tarea">Unidad de aprendizaje (opcional)</Label>
+            <select
+              id="select-unidad-tarea"
+              value={unidadId}
+              onChange={(e) => setUnidadId(e.target.value)}
+              className="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm"
+            >
+              <option value="">Sin unidad asignada</option>
+              {unidades.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.titulo}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Parámetros de Entrega y Plazo */}

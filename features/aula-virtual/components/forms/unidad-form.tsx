@@ -4,6 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/common/spinner";
 import { SelectOption } from "@/components/common/select";
@@ -52,6 +53,7 @@ export function UnidadForm({
     aFecha(unidad?.fechaInicio),
   );
   const [fechaFin, setFechaFin] = React.useState<Date | undefined>(aFecha(unidad?.fechaFin));
+  const [publicada, setPublicada] = React.useState(unidad?.publicada ?? true);
   const [error, setError] = React.useState<string | null>(null);
 
   const crear = useCrearUnidad(cursoSeccionId);
@@ -78,7 +80,7 @@ export function UnidadForm({
       periodoId,
       fechaInicio: aISO(fechaInicio),
       fechaFin: aISO(fechaFin),
-      publicada: true,
+      publicada,
     };
     if (unidad) {
       actualizar.mutate({ id: unidad.id, ...payload }, { onSuccess });
@@ -133,6 +135,15 @@ export function UnidadForm({
           <Label className="text-sm font-medium">Fecha de fin *</Label>
           <DatePicker date={fechaFin} onSelect={setFechaFin} disabled={mutacion.isPending} />
         </div>
+      </div>
+      <div className="flex items-center justify-between rounded-md border p-3">
+        <div>
+          <p className="text-sm font-medium">Visible para los estudiantes</p>
+          <p className="text-muted-foreground text-xs">
+            Si se desactiva, la unidad y sus materiales quedan ocultos para los estudiantes.
+          </p>
+        </div>
+        <Switch checked={publicada} onCheckedChange={setPublicada} disabled={mutacion.isPending} />
       </div>
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">

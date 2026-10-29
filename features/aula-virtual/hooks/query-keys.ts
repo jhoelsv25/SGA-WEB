@@ -9,13 +9,27 @@ export const aulaKeys = {
     [...aulaKeys.all, anioId ?? "vigente", "solicitudes", estado ?? "todas"] as const,
   seguimiento: (anioId: string | undefined, periodoId?: string) =>
     [...aulaKeys.all, anioId ?? "vigente", "seguimiento", periodoId ?? "en-curso"] as const,
-  tareas: (anioId: string | undefined, cursoSeccionId: string, periodoId?: string) =>
-    [...aulaKeys.all, anioId ?? "vigente", "tareas", cursoSeccionId, periodoId ?? "todos"] as const,
-  tarea: (tareaId: string) => [...aulaKeys.all, "tarea", tareaId] as const,
+  tareas: (
+    anioId: string | undefined,
+    cursoSeccionId: string,
+    periodoId?: string,
+    estudianteId?: string,
+  ) =>
+    [
+      ...aulaKeys.all,
+      anioId ?? "vigente",
+      "tareas",
+      cursoSeccionId,
+      periodoId ?? "todos",
+      estudianteId ?? "propio",
+    ] as const,
+  tarea: (tareaId: string, estudianteId?: string) =>
+    [...aulaKeys.all, "tarea", tareaId, estudianteId ?? "propio"] as const,
   entregas: (tareaId: string) => [...aulaKeys.all, "entregas", tareaId] as const,
   libroNotas: (cursoSeccionId: string, periodoId?: string) =>
     [...aulaKeys.all, "libro-notas", cursoSeccionId, periodoId ?? "en-curso"] as const,
-  misNotas: (periodoId?: string) => [...aulaKeys.all, "mis-notas", periodoId ?? "todos"] as const,
+  misNotas: (periodoId?: string, estudianteId?: string) =>
+    [...aulaKeys.all, "mis-notas", periodoId ?? "todos", estudianteId ?? "propio"] as const,
   muro: (cursoSeccionId: string) => [...aulaKeys.all, "muro", cursoSeccionId] as const,
   comentarios: (publicacionId: string) => [...aulaKeys.all, "comentarios", publicacionId] as const,
   chat: (cursoSeccionId: string) => [...aulaKeys.all, "chat", cursoSeccionId] as const,
