@@ -6,6 +6,9 @@ import { toast } from "@/lib/toast";
 import {
   asignarCodigoBiometrico,
   asignarPendiente,
+  crearOrdenReloj,
+  getOrdenesReloj,
+  guardarConfigReloj,
   descartarPendiente,
   getCodigoBiometrico,
   getEstadoRelojes,
@@ -15,6 +18,9 @@ import {
 import { INTERVALO_ESTADO_RELOJES_MS } from "../consts";
 import type {
   AsignarPendientePayload,
+  GuardarConfigRelojPayload,
+  OrdenApi,
+  TipoOrdenApi,
   DescartarPendientePayload,
   EstadoPendienteApi,
 } from "../types";
@@ -24,6 +30,7 @@ export const biometricoKeys = {
   estado: () => [...biometricoKeys.all, "estado"] as const,
   pendientes: (estado: EstadoPendienteApi) =>
     [...biometricoKeys.all, "pendientes", estado] as const,
+  ordenes: (equipoId: string) => [...biometricoKeys.all, "ordenes", equipoId] as const,
   codigo: (personaId: string) => [...biometricoKeys.all, "codigo", personaId] as const,
 };
 
@@ -103,6 +110,44 @@ export function useQuitarCodigoBiometrico() {
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: biometricoKeys.codigo(data.personaId) });
       toast.success(data.mensaje);
+    },
+    onError: (error: ApiClientError) => toast.error(error.message),
+  });
+}
+
+export function useGuardarConfigReloj() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ equipoId, ...payload }: GuardarConfigRelojPayload & { equipoId: string }) =>
+      guardarConfigReloj(equipoId, payload),
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: biometricoKeys.estado() });
+      toast.success(data.mensaje);
+    },
+    onError: (error: ApiClientError) => toast.error(error.message),
+  });
+}
+
+/** Últimas órdenes a la app puente; consulta cada pocos segundos mientras haya alguna pendiente. */
+export function useOrdenesReloj(equipoId: string) {
+  return useQuery({
+    queryKey: biometricoKeys.ordenes(equipoId),
+    queryFn: () => getOrdenesReloj(equipoId),
+    refetchInterval: (query) =>
+      (query.state.data as OrdenApi[] | undefined)?.some((o) => o.estado === "pendiente")
+        ? 3_000
+        : false,
+    retry: false,
+  });
+}
+
+export function useCrearOrdenReloj() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ equipoId, tipo }: { equipoId: string; tipo: TipoOrdenApi }) =>
+      crearOrdenReloj(equipoId, tipo),
+    onSuccess: (_orden, { equipoId }) => {
+      void queryClient.invalidateQueries({ queryKey: biometricoKeys.ordenes(equipoId) });
     },
     onError: (error: ApiClientError) => toast.error(error.message),
   });

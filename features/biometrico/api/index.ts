@@ -5,6 +5,10 @@ import type {
   DescartarPendientePayload,
   EstadoPendienteApi,
   EstadoRelojApiDto,
+  GuardarConfigRelojPayload,
+  GuardarConfigRelojResponse,
+  OrdenApi,
+  TipoOrdenApi,
   PendienteApi,
   ResolverPendienteResponse,
 } from "../types";
@@ -65,5 +69,28 @@ export async function quitarCodigoBiometrico(personaId: string): Promise<CodigoB
   const { data } = await apiClient.delete<CodigoBiometricoApi>(
     `/biometrico/personas/${personaId}/codigo`,
   );
+  return data;
+}
+
+export async function guardarConfigReloj(
+  equipoId: string,
+  payload: GuardarConfigRelojPayload,
+): Promise<GuardarConfigRelojResponse> {
+  const { data } = await apiClient.put<GuardarConfigRelojResponse>(
+    `/biometrico/relojes/${equipoId}/config`,
+    payload,
+  );
+  return data;
+}
+
+export async function crearOrdenReloj(equipoId: string, tipo: TipoOrdenApi): Promise<OrdenApi> {
+  const { data } = await apiClient.post<OrdenApi>(`/biometrico/relojes/${equipoId}/ordenes`, {
+    tipo,
+  });
+  return data;
+}
+
+export async function getOrdenesReloj(equipoId: string): Promise<OrdenApi[]> {
+  const { data } = await apiClient.get<OrdenApi[]>(`/biometrico/relojes/${equipoId}/ordenes`);
   return data;
 }

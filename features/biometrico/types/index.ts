@@ -38,6 +38,7 @@ export interface EstadoRelojApiDto {
   ultimoLatidoEn: string | null;
   relojRespondioEn: string | null;
   desfaseMinutos: number | null;
+  config: ConfigRelojApi;
   estado: EstadoRelojApi;
   alertas: string[];
 }
@@ -47,4 +48,36 @@ export interface CodigoBiometricoApi {
   nombreCompleto: string;
   codigoBiometrico: string | null;
   mensaje: string;
+}
+
+export interface ConfigRelojApi {
+  relojIp: string | null;
+  relojPuerto: number;
+  relojClaveComunicacion: number;
+  intervaloSegundos: number;
+}
+
+export interface GuardarConfigRelojPayload {
+  relojIp: string;
+  relojPuerto: number;
+  relojClaveComunicacion: number;
+  intervaloSegundos: number;
+}
+
+export interface GuardarConfigRelojResponse {
+  mensaje: string;
+  config: ConfigRelojApi;
+}
+
+export type TipoOrdenApi = "probar_reloj" | "leer_reloj" | "sincronizar";
+export type EstadoOrdenApi = "pendiente" | "completada" | "error";
+
+export interface OrdenApi {
+  id: string;
+  tipo: TipoOrdenApi;
+  estado: EstadoOrdenApi;
+  mensaje: string | null;
+  datos: { recientes?: { codigo: string; fechaHora: string }[]; total?: number } | null;
+  creadoEn: string;
+  resueltaEn: string | null;
 }

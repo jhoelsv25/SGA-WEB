@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEstadoRelojes, type EstadoRelojApi } from "@/features/biometrico";
+import { ConexionRelojCard, useEstadoRelojes, type EstadoRelojApi } from "@/features/biometrico";
 
 const ETIQUETA_ESTADO: Record<EstadoRelojApi, string> = {
   ok: "Comunicando",
@@ -24,8 +24,9 @@ function formatearMomento(iso: string | null): string {
 
 const PASOS = [
   "Registre el reloj en Equipos como tipo «Biométrico» con su número de serie.",
+  "Escriba aquí su IP, puerto y clave de comunicación, y guarde: la app puente los toma sola.",
   "Genere la clave de la app puente (se muestra una sola vez) y péguela en la app puente del colegio.",
-  "En la app puente use «Probar conexión con el reloj» y «Probar conexión con el servidor».",
+  "Pruebe con «Probar conexión con el reloj»: el resultado aparece en esta misma pantalla.",
   "Asigne el ID del reloj de cada docente en Plana Docente → «Código biométrico».",
   "Las marcaciones que no se puedan asignar quedan en «Marcaciones pendientes».",
 ];
@@ -94,6 +95,7 @@ export function TabBiometrico() {
                     </dd>
                   </div>
                 </dl>
+                <ConexionRelojCard reloj={r} />
                 {r.alertas.length > 0 && (
                   <ul className="text-warning list-disc space-y-0.5 pl-4 text-xs">
                     {r.alertas.map((a) => (
