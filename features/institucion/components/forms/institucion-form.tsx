@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { useForm, Controller } from "react-hook-form";
+import { resolveBackendUrl } from "@/lib/api-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -125,16 +126,7 @@ export function InstitucionForm({
     }
   };
 
-  const getFullLogoUrl = (url: string | null | undefined) => {
-    if (!url) return null;
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      return url;
-    }
-    const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:3000";
-    return `${apiBase}${url.startsWith("/") ? "" : "/"}${url}`;
-  };
-
-  const logoDisplayUrl = getFullLogoUrl(institucion.logoUrl);
+  const logoDisplayUrl = institucion.logoUrl ? resolveBackendUrl(institucion.logoUrl) : null;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

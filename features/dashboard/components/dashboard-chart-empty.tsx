@@ -3,7 +3,7 @@
 import * as React from "react";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import { Folder01Icon } from "@hugeicons/core-free-icons";
-import { cn } from "cn";
+import { cn } from "@/lib/utils";
 
 interface DashboardChartEmptyProps {
   title?: string;

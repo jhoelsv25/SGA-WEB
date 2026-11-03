@@ -1,12 +1,15 @@
 import type { NextConfig } from "next";
 
+// Origen del backend para next/image (logos y fotos en /uploads)
+const apiUrl = new URL(process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api");
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "3000",
+        protocol: apiUrl.protocol.replace(":", "") as "http" | "https",
+        hostname: apiUrl.hostname,
+        ...(apiUrl.port ? { port: apiUrl.port } : {}),
         pathname: "/uploads/**",
       },
     ],

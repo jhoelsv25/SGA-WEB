@@ -3,19 +3,9 @@
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { io, type Socket } from "socket.io-client";
-import { API_BASE_URL, getAccessToken } from "@/lib/api-client";
+import { getAccessToken, getBackendOrigin } from "@/lib/api-client";
 import { aulaKeys } from "./query-keys";
 import type { MensajeChat } from "../types";
-
-function obtenerSocketUrl(): string {
-  // Extrae la URL base del backend desde API_BASE_URL (ej. http://localhost:3000/api -> http://localhost:3000)
-  try {
-    const url = new URL(API_BASE_URL);
-    return `${url.protocol}//${url.host}`;
-  } catch {
-    return "http://localhost:3000";
-  }
-}
 
 export function useChatSocket(cursoSeccionId: string) {
   const queryClient = useQueryClient();
@@ -25,7 +15,7 @@ export function useChatSocket(cursoSeccionId: string) {
   React.useEffect(() => {
     if (!cursoSeccionId) return;
 
-    const baseUrl = obtenerSocketUrl();
+    const baseUrl = getBackendOrigin();
     const token = getAccessToken();
 
     const socket = io(`${baseUrl}/chat-aula`, {

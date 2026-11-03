@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -54,7 +54,6 @@ export function FormularioMarcacionManual() {
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<MarcacionManualFormValues>({
     resolver: zodResolver(marcacionManualSchema),
@@ -67,9 +66,9 @@ export function FormularioMarcacionManual() {
     },
   });
 
-  const tipoMarcacion = watch("tipo");
-  const observacionValor = watch("observacion") || "";
-  const horaValor = watch("hora") || "";
+  const tipoMarcacion = useWatch({ control, name: "tipo" });
+  const observacionValor = useWatch({ control, name: "observacion" }) || "";
+  const horaValor = useWatch({ control, name: "hora" }) || "";
 
   const ponerHoraActual = () => {
     const d = new Date();

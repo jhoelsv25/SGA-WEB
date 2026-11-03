@@ -29,6 +29,24 @@ type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
+/**
+ * Origen del backend (protocolo + host), derivado de API_BASE_URL.
+ * Se usa para archivos estáticos (/uploads) y sockets, que no cuelgan de /api.
+ */
+export function getBackendOrigin(): string {
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return "http://localhost:3000";
+  }
+}
+
+/** Convierte una ruta relativa del backend (ej. /uploads/logo.png) en URL absoluta. */
+export function resolveBackendUrl(url: string): string {
+  if (/^https?:\/\//.test(url)) return url;
+  return `${getBackendOrigin()}${url.startsWith("/") ? "" : "/"}${url}`;
+}
+
 const TOKEN_STORAGE_KEY = "sga_access_token";
 
 export function getAccessToken(): string | null {

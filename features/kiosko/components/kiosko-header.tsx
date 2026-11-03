@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/common/status-badge";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { siteConfig } from "@/config/site";
+import { resolveBackendUrl } from "@/lib/api-client";
 import type { Institucion } from "@/features/institucion/types";
 import type { Equipo, ValidarEquipoResponse } from "@/features/equipos/types";
 
@@ -34,11 +35,7 @@ export function KioskoHeader({
         {institucion?.logoUrl ? (
           <div className="border-border/60 bg-muted/40 relative flex size-14 shrink-0 items-center justify-center rounded-2xl border p-2 shadow-2xs">
             <Image
-              src={
-                institucion.logoUrl.startsWith("http")
-                  ? institucion.logoUrl
-                  : `${process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:3000"}${institucion.logoUrl}`
-              }
+              src={resolveBackendUrl(institucion.logoUrl)}
               alt="Insignia institucional"
               width={56}
               height={56}
