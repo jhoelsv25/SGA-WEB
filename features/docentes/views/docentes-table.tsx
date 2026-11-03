@@ -8,6 +8,7 @@ import { CesarDocenteModal } from "../components/modals/cesar-docente-modal";
 import { CredentialsModal } from "../components/modals/credentials-modal";
 import { CarnetModal } from "../../credenciales/components/modals/carnet-modal";
 import { ReemitirCredencialModal } from "../../credenciales/components/modals/reemitir-credencial-modal";
+import { CodigoBiometricoModal } from "@/features/biometrico";
 import { HistorialCriticoModal } from "@/features/personas";
 import type { Docente } from "../types/docentes.types";
 import type { CredencialResponse } from "../../credenciales/types/credenciales.types";
@@ -32,6 +33,7 @@ export function DocentesTable({ docentes, isLoading, cursorPagination }: Docente
   const [carneModalOpen, setCarneModalOpen] = React.useState(false);
   const [reemitirModalOpen, setReemitirModalOpen] = React.useState(false);
   const [historialModalOpen, setHistorialModalOpen] = React.useState(false);
+  const [codigoBiometricoDe, setCodigoBiometricoDe] = React.useState<Docente | null>(null);
   const [reemitidaData, setReemitidaData] = React.useState<{
     nombreCompleto: string;
     codigoDocente: string;
@@ -88,6 +90,7 @@ export function DocentesTable({ docentes, isLoading, cursorPagination }: Docente
         onPrintCarne: handlePrintCarne,
         onReemitirCredencial: handleReemitir,
         onVerHistorial: handleVerHistorial,
+        onCodigoBiometrico: setCodigoBiometricoDe,
       }),
     [handleEdit, handleCesar, handlePrintCarne, handleReemitir, handleVerHistorial],
   );
@@ -100,6 +103,13 @@ export function DocentesTable({ docentes, isLoading, cursorPagination }: Docente
         isLoading={isLoading}
         cursorPagination={cursorPagination}
         emptyMessage="No se encontraron docentes con los criterios seleccionados."
+      />
+
+      {/* Código biométrico del reloj (RF-022) */}
+      <CodigoBiometricoModal
+        personaId={codigoBiometricoDe?.personaId ?? null}
+        nombreCompleto={codigoBiometricoDe?.persona.nombreCompleto ?? ""}
+        onOpenChange={(abierto) => !abierto && setCodigoBiometricoDe(null)}
       />
 
       {/* Modal para Editar Docente */}

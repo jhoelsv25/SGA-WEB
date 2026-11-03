@@ -13,6 +13,7 @@ interface GetDocenteColumnsOptions {
   onPrintCarne?: (docente: Docente) => void;
   onReemitirCredencial?: (docente: Docente) => void;
   onVerHistorial?: (docente: Docente) => void;
+  onCodigoBiometrico?: (docente: Docente) => void;
 }
 
 export function getDocenteColumns({
@@ -21,6 +22,7 @@ export function getDocenteColumns({
   onPrintCarne,
   onReemitirCredencial,
   onVerHistorial,
+  onCodigoBiometrico,
 }: GetDocenteColumnsOptions): ColumnDef<Docente>[] {
   return [
     {
@@ -155,6 +157,7 @@ export function getDocenteColumns({
           onPrintCarne={onPrintCarne}
           onReemitirCredencial={onReemitirCredencial}
           onVerHistorial={onVerHistorial}
+          onCodigoBiometrico={onCodigoBiometrico}
         />
       ),
     },
