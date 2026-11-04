@@ -41,3 +41,32 @@ export interface UpdateSeccionPayload {
   vacantes?: number;
   tutorId?: string | null;
 }
+
+export interface ClonarSeccionesPayload {
+  anioOrigenId: string;
+  copiarTutores?: boolean;
+  copiarAulas?: boolean;
+}
+
+export interface SeccionClonadaDetalle {
+  id: string;
+  gradoNombre: string;
+  nombre: string;
+  aula: string | null;
+  vacantes: number;
+  tutorAsignado: boolean;
+}
+
+export interface SeccionOmitidaDetalle {
+  gradoNombre: string;
+  nombre: string;
+  motivo: string;
+}
+
+export interface ClonarSeccionesResultado {
+  mensaje: string;
+  totalClonadas: number;
+  totalOmitidas: number;
+  clonadas: SeccionClonadaDetalle[];
+  omitidas: SeccionOmitidaDetalle[];
+}

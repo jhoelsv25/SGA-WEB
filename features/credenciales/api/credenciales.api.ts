@@ -79,4 +79,34 @@ export const credencialesApi = {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   },
+
+  async descargarCarnesSeccionPdf(seccionId: string, nombreArchivo?: string): Promise<void> {
+    const response = await apiClient.get(`/credenciales/secciones/${seccionId}/carnes/pdf`, {
+      responseType: "blob",
+    });
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nombreArchivo || `carnes-seccion-${seccionId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
+
+  async descargarCarnesDocentesPdf(nombreArchivo?: string): Promise<void> {
+    const response = await apiClient.get(`/credenciales/docentes/carnes/pdf`, {
+      responseType: "blob",
+    });
+    const blob = new Blob([response.data], { type: "application/pdf" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nombreArchivo || "carnes-docentes.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
 };
