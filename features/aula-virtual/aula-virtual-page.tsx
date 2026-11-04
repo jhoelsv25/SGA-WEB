@@ -405,31 +405,31 @@ export function AulaVirtualPage({
 
       {/* Hero Banner estilo Google Classroom */}
       <div
-        className={`relative overflow-hidden rounded-2xl bg-gradient-to-r p-6 md:p-8 ${estiloCurso.gradient} text-white shadow-md`}
+        className={`relative overflow-hidden rounded-2xl bg-gradient-to-r p-6 md:p-8 ${estiloCurso.gradient} border border-white/10 text-white shadow-md`}
       >
         <div className="pointer-events-none absolute right-4 -bottom-6 opacity-15">
           <HugeiconsIcon icon={BookOpen01Icon} size={150} />
         </div>
         <div className="relative z-10 flex flex-col justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-bold tracking-wide backdrop-blur-md">
+            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-bold tracking-wide !text-white shadow-xs backdrop-blur-md">
               {cursoInfo?.seccionNombre || aula?.seccionNombre}
             </span>
-            <span className="text-xs font-medium text-white/90">
+            <span className="text-xs font-medium !text-white/90">
               {cursoInfo?.gradoNombre || "Secundaria"}
             </span>
             {periodoActualLabel && periodoId !== "" && (
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
+              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium !text-white/95 shadow-xs backdrop-blur-sm">
                 {periodoActualLabel}
               </span>
             )}
           </div>
 
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-white drop-shadow-sm md:text-3xl">
+            <h1 className="text-2xl font-extrabold tracking-tight !text-white drop-shadow-md md:text-3xl">
               {cursoInfo?.cursoNombre || aula?.cursoNombre}
             </h1>
-            <p className="mt-1 flex items-center gap-2 text-sm text-white/80">
+            <p className="mt-1 flex items-center gap-2 text-sm font-medium !text-white/90">
               <HugeiconsIcon icon={TeacherIcon} size={16} />
               <span>Docente: {cursoInfo?.docenteNombre || "Docente asignado"}</span>
             </p>
@@ -446,52 +446,81 @@ export function AulaVirtualPage({
       >
         {aula && (
           <Tabs value={tabActiva} onValueChange={setTabActiva} className="w-full space-y-6">
-            <TabsList variant="line" className="w-full justify-start gap-4 border-b">
-              <TabsTrigger value="materiales" className="gap-2">
-                <HugeiconsIcon icon={BookOpen01Icon} size={16} />
-                Materiales de Reforzamiento
-              </TabsTrigger>
-              <TabsTrigger value="tareas" className="gap-2">
-                <HugeiconsIcon icon={Task01Icon} size={16} />
-                Tareas y Evaluaciones
-              </TabsTrigger>
-              {!esApoderado && (
-                <>
-                  <TabsTrigger value="muro" className="gap-2">
-                    <HugeiconsIcon icon={Comment01Icon} size={16} />
-                    Muro
-                  </TabsTrigger>
-                  <TabsTrigger value="chat" className="gap-2">
-                    <HugeiconsIcon icon={BubbleChatIcon} size={16} />
-                    <span>Chat</span>
-                    {Boolean(chatNoLeidos?.noLeidos && chatNoLeidos.noLeidos > 0) && (
-                      <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold">
-                        {chatNoLeidos?.noLeidos}
-                      </span>
-                    )}
-                  </TabsTrigger>
-                </>
-              )}
-              {aula.puedeAdministrar || esDirectivo ? (
-                <>
-                  <TabsTrigger value="libro-notas" className="gap-2">
-                    <HugeiconsIcon icon={ChartBarLineIcon} size={16} />
-                    Libro de Calificaciones
-                  </TabsTrigger>
-                  {(aula.puedeAdministrar || aula.puedeVerModeracion) && (
-                    <TabsTrigger value="moderacion" className="gap-2">
-                      <HugeiconsIcon icon={ShieldAlertIcon} size={16} />
-                      Moderación
-                    </TabsTrigger>
-                  )}
-                </>
-              ) : (
-                <TabsTrigger value="mis-notas" className="gap-2">
-                  <HugeiconsIcon icon={Award01Icon} size={16} />
-                  {esApoderado ? "Calificaciones" : "Mis Calificaciones"}
+            {/* Navegación por pestañas moderna estilo Google Classroom */}
+            <div className="w-full scrollbar-none overflow-x-auto pt-1 pb-2">
+              <TabsList className="border-border/80 bg-card inline-flex !h-12 w-max items-center justify-start gap-1 rounded-2xl border p-1.5 shadow-xs backdrop-blur-md">
+                <TabsTrigger
+                  value="materiales"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                >
+                  <HugeiconsIcon icon={BookOpen01Icon} size={18} />
+                  <span>Materiales de Reforzamiento</span>
                 </TabsTrigger>
-              )}
-            </TabsList>
+
+                <TabsTrigger
+                  value="tareas"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                >
+                  <HugeiconsIcon icon={Task01Icon} size={18} />
+                  <span>Tareas y Evaluaciones</span>
+                </TabsTrigger>
+
+                {!esApoderado && (
+                  <>
+                    <TabsTrigger
+                      value="muro"
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                    >
+                      <HugeiconsIcon icon={Comment01Icon} size={18} />
+                      <span>Muro</span>
+                    </TabsTrigger>
+
+                    <TabsTrigger
+                      value="chat"
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                    >
+                      <HugeiconsIcon icon={BubbleChatIcon} size={18} />
+                      <span>Chat en vivo</span>
+                      {Boolean(chatNoLeidos?.noLeidos && chatNoLeidos.noLeidos > 0) && (
+                        <span className="bg-destructive text-destructive-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold shadow-xs">
+                          {chatNoLeidos?.noLeidos}
+                        </span>
+                      )}
+                    </TabsTrigger>
+                  </>
+                )}
+
+                {aula.puedeAdministrar || esDirectivo ? (
+                  <>
+                    <TabsTrigger
+                      value="libro-notas"
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                    >
+                      <HugeiconsIcon icon={ChartBarLineIcon} size={18} />
+                      <span>Libro de Calificaciones</span>
+                    </TabsTrigger>
+
+                    {(aula.puedeAdministrar || aula.puedeVerModeracion) && (
+                      <TabsTrigger
+                        value="moderacion"
+                        className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                      >
+                        <HugeiconsIcon icon={ShieldAlertIcon} size={18} />
+                        <span>Moderación</span>
+                      </TabsTrigger>
+                    )}
+                  </>
+                ) : (
+                  <TabsTrigger
+                    value="mis-notas"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                  >
+                    <HugeiconsIcon icon={Award01Icon} size={18} />
+                    <span>{esApoderado ? "Calificaciones" : "Mis Calificaciones"}</span>
+                  </TabsTrigger>
+                )}
+              </TabsList>
+            </div>
 
             <TabsContent value="materiales" className="space-y-4">
               {unidadesFiltradas.length === 0 ? (

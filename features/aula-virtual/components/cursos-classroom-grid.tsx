@@ -15,43 +15,43 @@ interface CursosClassroomGridProps {
 // Paletas inspiradas en Google Classroom según área curricular o nombre
 const PALETAS_AREA: Record<string, { gradient: string; accent: string }> = {
   matematica: {
-    gradient: "from-blue-600 via-blue-700 to-indigo-800",
+    gradient: "from-blue-600 via-indigo-700 to-slate-900",
     accent: "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
   },
   comunicacion: {
-    gradient: "from-red-600 via-rose-700 to-pink-800",
+    gradient: "from-rose-600 via-red-700 to-neutral-900",
     accent: "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300",
   },
   ingles: {
-    gradient: "from-purple-600 via-violet-700 to-indigo-900",
+    gradient: "from-purple-600 via-violet-800 to-slate-900",
     accent: "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",
   },
   arte_cultura: {
-    gradient: "from-pink-500 via-fuchsia-600 to-purple-700",
+    gradient: "from-fuchsia-600 via-purple-700 to-indigo-950",
     accent: "bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
   },
   ciencias_sociales: {
-    gradient: "from-amber-600 via-orange-700 to-yellow-800",
+    gradient: "from-amber-600 via-orange-700 to-stone-900",
     accent: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
   },
   ciencia_tecnologia: {
-    gradient: "from-emerald-600 via-teal-700 to-cyan-800",
+    gradient: "from-emerald-600 via-teal-700 to-slate-900",
     accent: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
   },
   dpcc: {
-    gradient: "from-teal-600 via-emerald-700 to-green-800",
+    gradient: "from-teal-600 via-emerald-700 to-slate-900",
     accent: "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300",
   },
   educacion_fisica: {
-    gradient: "from-orange-500 via-amber-600 to-red-700",
+    gradient: "from-orange-600 via-amber-700 to-stone-900",
     accent: "bg-orange-50 text-orange-700 dark:bg-orange-950/60 dark:text-orange-300",
   },
   educacion_religiosa: {
-    gradient: "from-indigo-600 via-blue-700 to-sky-800",
+    gradient: "from-indigo-600 via-blue-700 to-slate-900",
     accent: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
   },
   ept: {
-    gradient: "from-cyan-600 via-sky-700 to-blue-800",
+    gradient: "from-cyan-600 via-sky-700 to-slate-900",
     accent: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300",
   },
 };
