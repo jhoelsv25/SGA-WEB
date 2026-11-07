@@ -3,6 +3,7 @@
 import { Edit01Icon, Delete02Icon, Clock01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { BloqueHorario } from "../../types";
 import { getContrasteColor, formatearRangoHora, convertirHoraAMinutos } from "../../utils";
 
@@ -11,6 +12,7 @@ interface CeldaBloqueProps {
   duracionBaseClase?: number;
   puedeGestionar: boolean;
   span?: number;
+  dimmed?: boolean;
   onEditar: (bloque: BloqueHorario) => void;
   onEliminar: (bloque: BloqueHorario) => void;
 }
@@ -23,6 +25,7 @@ export function CeldaBloque({
   duracionBaseClase,
   puedeGestionar,
   span,
+  dimmed = false,
   onEditar,
   onEliminar,
 }: CeldaBloqueProps) {
@@ -119,7 +122,10 @@ export function CeldaBloque({
 
   return (
     <div
-      className="group relative flex h-full min-h-16 flex-col justify-between rounded-lg p-2.5 shadow-xs transition-shadow hover:shadow-md"
+      className={cn(
+        "group relative flex h-full min-h-16 flex-col justify-between rounded-lg p-2.5 shadow-xs transition-all hover:shadow-md",
+        dimmed && "opacity-25 grayscale-[70%] hover:opacity-90 hover:grayscale-0",
+      )}
       style={{
         backgroundColor: contraste.backgroundColor,
         color: contraste.color,

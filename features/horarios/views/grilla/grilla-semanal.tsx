@@ -13,7 +13,8 @@ interface GrillaSemanalProps {
   bloques: BloqueHorario[];
   bloquesPropuestos: BloquePropuesta[];
   puedeGestionar: boolean;
-  cursoSeleccionado: CargaItemHorario | null;
+  docenteFiltroNombre?: string | null;
+  cursoSeleccionado?: CargaItemHorario | null;
   onAsignarCursoASlot: (
     diaSemana: number,
     horaInicio: string,
@@ -36,7 +37,8 @@ export function GrillaSemanal({
   bloques,
   bloquesPropuestos,
   puedeGestionar,
-  cursoSeleccionado,
+  docenteFiltroNombre,
+  cursoSeleccionado = null,
   onAsignarCursoASlot,
   onAbrirNuevoBloque,
   onEditarBloque,
@@ -161,6 +163,11 @@ export function GrillaSemanal({
                           bloque={bloqueExistente}
                           duracionBaseClase={duracionBaseClase}
                           span={span}
+                          dimmed={Boolean(
+                            docenteFiltroNombre &&
+                            bloqueExistente.tipoBloque === "clase" &&
+                            bloqueExistente.docenteNombre !== docenteFiltroNombre,
+                          )}
                           puedeGestionar={puedeGestionar}
                           onEditar={onEditarBloque}
                           onEliminar={onEliminarBloque}

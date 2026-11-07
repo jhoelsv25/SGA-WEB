@@ -13,7 +13,6 @@ import {
   AvisosYAdvertencias,
   HorariosDialogsContainer,
   HorariosHeaderActions,
-  ListaCursosCarga,
   ModalResumenHoras,
   SelectorGradoSeccion,
 } from "./components";
@@ -27,7 +26,6 @@ import {
   useHorariosSeleccion,
   usePuedeGestionarHorarios,
 } from "./hooks";
-import type { CargaItemHorario } from "./types";
 import { GrillaSemanal } from "./views";
 
 export function HorariosPage() {
@@ -78,7 +76,6 @@ export function HorariosPage() {
   );
 
   const [mensajeVigencia, setMensajeVigencia] = useState<string | null>(null);
-  const [cursoSeleccionado, setCursoSeleccionado] = useState<CargaItemHorario | null>(null);
 
   const dialogs = useHorariosDialogs();
   const crearBloqueMutation = useCreateBloqueMutation();
@@ -107,11 +104,6 @@ export function HorariosPage() {
       .map(([id, nombre]) => ({ id, nombre }))
       .sort((a, b) => a.nombre.localeCompare(b.nombre));
   }, [cargaItems]);
-
-  const cargaItemsFiltrados = useMemo(() => {
-    if (!docenteFiltroId) return cargaItems;
-    return cargaItems.filter((item) => item.docente?.id === docenteFiltroId);
-  }, [cargaItems, docenteFiltroId]);
 
   const totalesHoras = useMemo(() => {
     return resumenHoras.reduce(
@@ -146,7 +138,6 @@ export function HorariosPage() {
         },
       });
       if (res.mensaje) setMensajeVigencia(res.mensaje);
-      setCursoSeleccionado(null);
     } catch {
       // Notificado en toast
     }
@@ -182,9 +173,7 @@ export function HorariosPage() {
             onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
             onDescartarPropuesta={() => setGrillaPropuestaActiva(false)}
             onCopiarHorario={() => dialogs.setCopiarModalOpen(true)}
-            onNuevoBloque={() =>
-              dialogs.abrirNuevoBloque(1, "", "", "clase", cursoSeleccionado?.id)
-            }
+            onNuevoBloque={() => dialogs.abrirNuevoBloque(1, "", "", "clase", null)}
           />
         }
       />
@@ -283,32 +272,24 @@ export function HorariosPage() {
               mensajeVigencia={mensajeVigencia}
             />
 
-            <div className="grid gap-6 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr]">
-              <aside className="max-h-[calc(100vh-80px)] space-y-4 self-start overflow-y-auto pr-1 lg:sticky lg:top-4">
-                <ListaCursosCarga
-                  cargaItems={cargaItemsFiltrados}
-                  cursoSeleccionado={cursoSeleccionado}
-                  onSelectCurso={(c) => setCursoSeleccionado(c)}
-                  puedeGestionar={puedeGestionar}
-                />
-              </aside>
-
-              <section className="min-w-0">
-                <GrillaSemanal
-                  bloques={bloquesHorario}
-                  bloquesPropuestos={bloquesPropuestos}
-                  puedeGestionar={puedeGestionar}
-                  cursoSeleccionado={cursoSeleccionado}
-                  onAsignarCursoASlot={handleAsignarCursoASlot}
-                  onAbrirNuevoBloque={(d, ini, fin, tipo) =>
-                    dialogs.abrirNuevoBloque(d, ini, fin, tipo, cursoSeleccionado?.id)
-                  }
-                  onEditarBloque={(b) => dialogs.abrirEditarBloque(b)}
-                  onEliminarBloque={(b) => dialogs.abrirEliminarBloque(b)}
-                  onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
-                />
-              </section>
-            </div>
+            {/* Grilla semanal de clases ocupando el 100% del ancho */}
+            <section className="w-full min-w-0">
+              <GrillaSemanal
+                bloques={bloquesHorario}
+                bloquesPropuestos={bloquesPropuestos}
+                puedeGestionar={puedeGestionar}
+                docenteFiltroNombre={
+                  docentesDeLaSeccion.find((d) => d.id === docenteFiltroId)?.nombre
+                }
+                onAsignarCursoASlot={handleAsignarCursoASlot}
+                onAbrirNuevoBloque={(d, ini, fin, tipo) =>
+                  dialogs.abrirNuevoBloque(d, ini, fin, tipo, null)
+                }
+                onEditarBloque={(b) => dialogs.abrirEditarBloque(b)}
+                onEliminarBloque={(b) => dialogs.abrirEliminarBloque(b)}
+                onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
+              />
+            </section>
           </div>
         )}
       </PageState>
