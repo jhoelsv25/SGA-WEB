@@ -2,24 +2,17 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Award01Icon,
-  BookOpen01Icon,
-  ChartBarLineIcon,
-  Comment01Icon,
-  ShieldAlertIcon,
-  Task01Icon,
-} from "@hugeicons/core-free-icons";
+import { BookOpen01Icon } from "@hugeicons/core-free-icons";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import {
   ActividadRecursoModal,
   AulaNavHeader,
+  AulaTabsNav,
   ChatFlotante,
   CursoHeroBanner,
   CursosClassroomGrid,
@@ -188,65 +181,13 @@ export function AulaVirtualPage({
         {aula && (
           <Tabs value={tabActiva} onValueChange={setTabActiva} className="w-full space-y-6">
             {/* Navegación por pestañas moderna estilo Google Classroom */}
-            <div className="w-full scrollbar-none overflow-x-auto pt-1 pb-2">
-              <TabsList className="border-border/80 bg-card inline-flex h-12! w-max items-center justify-start gap-1 rounded-2xl border p-1.5 shadow-xs backdrop-blur-md">
-                <TabsTrigger
-                  value="materiales"
-                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
-                >
-                  <HugeiconsIcon icon={BookOpen01Icon} size={18} />
-                  <span>Materiales de Reforzamiento</span>
-                </TabsTrigger>
-
-                <TabsTrigger
-                  value="tareas"
-                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
-                >
-                  <HugeiconsIcon icon={Task01Icon} size={18} />
-                  <span>Tareas y Evaluaciones</span>
-                </TabsTrigger>
-
-                {!esApoderado && (
-                  <TabsTrigger
-                    value="muro"
-                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
-                  >
-                    <HugeiconsIcon icon={Comment01Icon} size={18} />
-                    <span>Muro</span>
-                  </TabsTrigger>
-                )}
-
-                {aula.puedeAdministrar || esDirectivo ? (
-                  <>
-                    <TabsTrigger
-                      value="libro-notas"
-                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
-                    >
-                      <HugeiconsIcon icon={ChartBarLineIcon} size={18} />
-                      <span>Libro de Calificaciones</span>
-                    </TabsTrigger>
-
-                    {(aula.puedeAdministrar || aula.puedeVerModeracion) && (
-                      <TabsTrigger
-                        value="moderacion"
-                        className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
-                      >
-                        <HugeiconsIcon icon={ShieldAlertIcon} size={18} />
-                        <span>Moderación</span>
-                      </TabsTrigger>
-                    )}
-                  </>
-                ) : (
-                  <TabsTrigger
-                    value="mis-notas"
-                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
-                  >
-                    <HugeiconsIcon icon={Award01Icon} size={18} />
-                    <span>{esApoderado ? "Calificaciones" : "Mis Calificaciones"}</span>
-                  </TabsTrigger>
-                )}
-              </TabsList>
-            </div>
+            <AulaTabsNav
+              unidadesCount={unidadesFiltradas.length}
+              puedeAdministrar={aula.puedeAdministrar}
+              puedeVerModeracion={aula.puedeVerModeracion}
+              esDirectivo={esDirectivo}
+              esApoderado={esApoderado}
+            />
 
             {/* Pestaña: Materiales de Reforzamiento */}
             <TabsContent value="materiales" className="space-y-4">
@@ -396,7 +337,7 @@ export function AulaVirtualPage({
           seccionNombre={cursoInfo?.seccionNombre || aula.seccionNombre}
           puedeAdministrar={aula.puedeAdministrar}
           anioCerrado={anioCerrado}
-          soloLectura={esDirectivo}
+          soloLectura={false}
         />
       )}
     </div>
