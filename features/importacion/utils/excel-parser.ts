@@ -21,22 +21,45 @@ function normalizeHeaderKey(header: string): string {
   if (clean.includes("direccion")) return "direccion";
   if (clean.includes("distrito")) return "distrito";
 
+  if (
+    clean === "n°" ||
+    clean === "nro" ||
+    clean === "n" ||
+    clean === "item" ||
+    clean === "orden" ||
+    clean === "#"
+  ) {
+    return "numeroOrden";
+  }
+
   if (clean.includes("siagie") && clean.includes("estudiante")) return "codigoSiagieEstudiante";
   if (clean.includes("siagie")) return "codigoSiagie";
-  if (clean.includes("codigo") && clean.includes("docente")) return "codigoDocente";
-  if (clean.includes("tipo") && clean.includes("documento")) return "tipoDocumento";
-  if (clean.includes("numero") && clean.includes("documento")) return "numeroDocumento";
+  if (clean.includes("docente") && (clean.includes("codigo") || clean.includes("cod")))
+    return "codigoDocente";
+  if (clean.includes("estudiante") && (clean.includes("codigo") || clean.includes("cod")))
+    return "codigoSiagieEstudiante";
+  if (clean === "codigo" || clean === "cod" || clean === "cod.") return "codigo";
+  if (clean.includes("tipo") && (clean.includes("documento") || clean.includes("doc")))
+    return "tipoDocumento";
+  if (
+    clean.includes("documento") ||
+    clean.includes("dni") ||
+    clean.includes("num_doc") ||
+    clean.includes("nro_doc") ||
+    clean === "doc"
+  )
+    return "numeroDocumento";
   if (clean.includes("paterno")) return "apellidoPaterno";
   if (clean.includes("materno")) return "apellidoMaterno";
   if (clean.includes("nombres") || clean === "nombre") return "nombres";
-  if (clean.includes("sexo")) return "sexo";
-  if (clean.includes("nacimiento")) return "fechaNacimiento";
-  if (clean.includes("celular") || clean.includes("telefono")) return "celular";
+  if (clean.includes("sexo") || clean === "genero") return "sexo";
+  if (clean.includes("nacimiento") || clean === "fec_nac") return "fechaNacimiento";
+  if (clean.includes("celular") || clean.includes("telefono") || clean === "cel") return "celular";
   if (clean.includes("correo") || clean.includes("email")) return "correo";
-  if (clean.includes("ingreso")) return "fechaIngreso";
+  if (clean.includes("ingreso") || clean === "fec_ingreso") return "fechaIngreso";
   if (clean.includes("especialidad")) return "especialidad";
   if (clean.includes("contrato")) return "tipoContrato";
-  if (clean.includes("jornada")) return "jornada";
+  if (clean.includes("jornada") || clean.includes("horas")) return "jornada";
   if (clean.includes("parentesco")) return "parentesco";
   if (clean.includes("principal")) return "esPrincipal";
 
