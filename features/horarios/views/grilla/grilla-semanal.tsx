@@ -72,7 +72,7 @@ export function GrillaSemanal({
           <tr className="border-border/60 bg-muted/30 border-b">
             <th
               scope="col"
-              className="border-border/60 bg-muted/50 text-muted-foreground sticky left-0 z-10 w-24 border-r p-3 text-center text-xs font-semibold"
+              className="border-border/60 bg-muted/50 text-muted-foreground sticky left-0 z-10 w-36 min-w-36 border-r p-3 text-center text-xs font-semibold"
             >
               <div className="flex items-center justify-center gap-1.5">
                 <HugeiconsIcon icon={Clock01Icon} className="text-muted-foreground size-3.5" />
@@ -106,22 +106,32 @@ export function GrillaSemanal({
                 <th
                   scope="row"
                   className={cn(
-                    "border-border/60 bg-muted/10 text-foreground sticky left-0 z-10 border-r px-2 py-0.5 text-center font-mono shadow-xs select-none",
+                    "border-border/60 bg-muted/10 text-foreground sticky left-0 z-10 w-36 min-w-36 border-r px-2 py-1 text-center font-mono shadow-xs select-none",
                     esHoraEnPunto && "bg-muted/25 font-bold",
                   )}
                 >
-                  <div
-                    className={cn(
-                      "text-xs tracking-tight",
-                      esHoraEnPunto
-                        ? "text-foreground font-bold"
-                        : "text-muted-foreground font-normal",
-                    )}
-                  >
-                    {franja.inicio}
-                  </div>
-                  <div className="text-muted-foreground/70 text-[10px] leading-none">
-                    {franja.fin}
+                  <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <span
+                      className={cn(
+                        "text-xs tracking-tight",
+                        esHoraEnPunto
+                          ? "text-foreground font-bold"
+                          : "text-foreground/80 font-medium",
+                      )}
+                    >
+                      {franja.inicio}
+                    </span>
+                    <span className="text-muted-foreground/50 text-[10px] select-none">–</span>
+                    <span
+                      className={cn(
+                        "text-xs tracking-tight",
+                        esHoraEnPunto
+                          ? "text-foreground/90 font-semibold"
+                          : "text-muted-foreground font-medium",
+                      )}
+                    >
+                      {franja.fin}
+                    </span>
                   </div>
                 </th>
 
