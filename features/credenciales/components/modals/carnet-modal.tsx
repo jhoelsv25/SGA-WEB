@@ -170,7 +170,7 @@ export function CarnetModal({ open, onOpenChange, personaId }: CarnetModalProps)
               {/* Cuerpo del carné: Avatar + Datos + QR */}
               <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 pt-3">
                 {/* 1. Avatar / Foto oficial */}
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center">
                   <div className="bg-muted border-primary/30 dark:border-primary/40 relative size-16 shrink-0 overflow-hidden rounded-xl border-2 shadow-xs">
                     {carne.fotoUrl ? (
                       <Avatar className="size-full rounded-none">
@@ -189,9 +189,6 @@ export function CarnetModal({ open, onOpenChange, personaId }: CarnetModalProps)
                       </div>
                     )}
                   </div>
-                  <span className="text-muted-foreground font-mono text-[8px] font-semibold">
-                    OFICIAL
-                  </span>
                 </div>
 
                 {/* 2. Datos personales y código de marcación */}
@@ -235,9 +232,6 @@ export function CarnetModal({ open, onOpenChange, personaId }: CarnetModalProps)
                       <Spinner className="text-muted-foreground size-5" />
                     </div>
                   )}
-                  <span className="pt-0.5 font-mono text-[7px] font-bold text-slate-800">
-                    ESCANEABLE
-                  </span>
                 </div>
               </div>
 
