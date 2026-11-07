@@ -52,9 +52,13 @@ export function RegistroPersonaAcciones({
 
   return (
     <>
-      <Button size="sm" onClick={onRegistrar} className="h-10 gap-2">
+      <Button variant="outline" size="sm" onClick={onRegistrar} className="h-10 gap-2">
         <HugeiconsIcon icon={UserAdd01Icon} className="h-4 w-4" />
         Registrar {destino}
+      </Button>
+      <Button size="sm" onClick={() => setBuscarOpen(true)} className="h-10 gap-2">
+        <HugeiconsIcon icon={Search01Icon} className="h-4 w-4" />
+        Buscar persona
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -63,10 +67,6 @@ export function RegistroPersonaAcciones({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
-          <DropdownMenuItem onSelect={() => setBuscarOpen(true)}>
-            <HugeiconsIcon icon={Search01Icon} className="h-4 w-4" />
-            Buscar persona existente
-          </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setMasivoOpen(true)}>
             <HugeiconsIcon icon={FileImportIcon} className="h-4 w-4" />
             Cargar masivo (Excel)

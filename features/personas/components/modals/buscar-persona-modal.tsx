@@ -35,7 +35,7 @@ export function BuscarPersonaModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Buscar en el padrón único"
-      description="Busca por DNI, nombres o apellidos y elige la persona a vincular."
+      description="Busca por DNI, nombres o apellidos y haz clic en una fila y pulsa Aceptar."
       size="4xl"
     >
       <div className="space-y-3">

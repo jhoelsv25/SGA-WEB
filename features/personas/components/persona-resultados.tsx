@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cn } from "@/lib/utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, ArrowRight01Icon, UserCheck01Icon } from "@hugeicons/core-free-icons";
 import { Spinner } from "@/components/common/spinner";
@@ -56,6 +57,7 @@ interface PersonaResultadosProps {
 export function PersonaResultados({ busqueda, destino, onSeleccionar }: PersonaResultadosProps) {
   const [cursores, setCursores] = React.useState<(string | null)[]>([null]);
   const [pagina, setPagina] = React.useState(0);
+  const [elegida, setElegida] = React.useState<Persona | null>(null);
 
   const { data, isFetching } = usePersonasQuery({
     search: busqueda || undefined,
@@ -80,50 +82,50 @@ export function PersonaResultados({ busqueda, destino, onSeleccionar }: PersonaR
               <TableHead>Documento</TableHead>
               <TableHead>Nombre completo</TableHead>
               <TableHead>Cargo</TableHead>
-              <TableHead className="text-right">Acción</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isFetching && personas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="py-8 text-center">
+                <TableCell colSpan={3} className="py-8 text-center">
                   <Spinner className="mx-auto size-5" />
                 </TableCell>
               </TableRow>
             ) : personas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-muted-foreground py-8 text-center text-sm">
+                <TableCell colSpan={3} className="text-muted-foreground py-8 text-center text-sm">
                   No se encontraron personas en el padrón.
                 </TableCell>
               </TableRow>
             ) : (
               personas.map((persona) => {
                 const bloqueo = motivoBloqueo(persona, destino);
+                const seleccionada = elegida?.id === persona.id;
                 return (
-                  <TableRow key={persona.id}>
+                  <TableRow
+                    key={persona.id}
+                    data-state={seleccionada ? "selected" : undefined}
+                    aria-selected={seleccionada}
+                    onClick={() => !bloqueo && setElegida(persona)}
+                    onDoubleClick={() => !bloqueo && onSeleccionar(persona)}
+                    className={cn(
+                      bloqueo ? "opacity-60" : "cursor-pointer",
+                      seleccionada && "bg-primary/10 hover:bg-primary/10",
+                    )}
+                  >
                     <TableCell className="font-mono text-xs">
                       {persona.tipoDocumento.toUpperCase()}: {persona.numeroDocumento}
                     </TableCell>
-                    <TableCell className="text-xs font-medium">{persona.nombreCompleto}</TableCell>
-                    <TableCell className="text-muted-foreground text-xs">
-                      {persona.cargoVigente ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-xs font-medium">
+                      {persona.nombreCompleto}
                       {bloqueo ? (
-                        <Badge variant="outline" className="text-[11px]">
+                        <Badge variant="outline" className="ml-2 text-[11px]">
                           {bloqueo}
                         </Badge>
-                      ) : (
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-7 gap-1 px-2.5 text-xs"
-                          onClick={() => onSeleccionar(persona)}
-                        >
-                          <HugeiconsIcon icon={UserCheck01Icon} className="size-3.5" />
-                          Vincular
-                        </Button>
-                      )}
+                      ) : null}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs">
+                      {persona.cargoVigente ?? "—"}
                     </TableCell>
                   </TableRow>
                 );
@@ -161,6 +163,24 @@ export function PersonaResultados({ busqueda, destino, onSeleccionar }: PersonaR
             <HugeiconsIcon icon={ArrowRight01Icon} className="size-3.5" />
           </Button>
         </div>
+      </div>
+
+      <div className="flex items-center justify-between border-t pt-3">
+        <span className="text-muted-foreground truncate text-xs">
+          {elegida
+            ? `Seleccionada: ${elegida.nombreCompleto}`
+            : "Selecciona una persona de la lista."}
+        </span>
+        <Button
+          type="button"
+          size="sm"
+          disabled={!elegida}
+          onClick={() => elegida && onSeleccionar(elegida)}
+          className="h-9 gap-1.5 px-5 text-xs"
+        >
+          <HugeiconsIcon icon={UserCheck01Icon} className="size-3.5" />
+          Aceptar
+        </Button>
       </div>
     </div>
   );

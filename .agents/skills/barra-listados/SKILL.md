@@ -24,7 +24,7 @@ La barra tiene como máximo 4 controles:
 - **`secondaryActions` recibe `DropdownMenuItem`s** (`@/components/ui/dropdown-menu`). No pases `Button`s ni envuelvas en otro `DropdownMenu`: el menú ya lo pone el toolbar.
 - **Alturas**: los botones de la barra usan `h-10` (igual que el buscador y el icono ⋯). No uses `h-8` ni `h-9`.
 - **Etiquetas**: la acción principal nombra lo que crea y va en minúscula tras la primera palabra ("Registrar persona", no "Registrar Persona").
-- **Listados de personas** (docentes, estudiantes, apoderados): usa `RegistroPersonaAcciones`. Ya trae el botón principal `Registrar <destino>` y el menú ⋯ con Buscar persona existente, Cargar masivo y Actualizar. Agrega Exportar con `extraMenuItems`.
+- **Listados de personas** (docentes, estudiantes, apoderados): usa `RegistroPersonaAcciones`. Ya trae dos formas de ingreso visibles: el principal `Buscar persona` (color primario, a la derecha, vincula una persona existente) y `Registrar <destino>` (outline, persona nueva); y el menú ⋯ con Cargar masivo y Actualizar. Agrega Exportar con `extraMenuItems`.
 - Los filtros siguen sincronizados con la URL vía `useListFilters`. No crees `Select` sueltos fuera de `filterDefs`.
 
 ## Ejemplo
