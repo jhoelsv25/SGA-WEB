@@ -37,7 +37,10 @@ export function AulaTabsNav({
           className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground hover:bg-muted/70 group flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-xs font-medium transition-all duration-200 data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
         >
           <HugeiconsIcon icon={BookOpen01Icon} size={18} />
-          <span>Materiales de Reforzamiento</span>
+          <span>
+            <span className="hidden xl:inline">Materiales de Reforzamiento</span>
+            <span className="inline xl:hidden">Materiales</span>
+          </span>
           {unidadesCount > 0 && (
             <span className="bg-muted text-muted-foreground ml-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold data-[state=active]:bg-white/20 data-[state=active]:text-white">
               {unidadesCount}
@@ -51,7 +54,10 @@ export function AulaTabsNav({
           className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground hover:bg-muted/70 group flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-xs font-medium transition-all duration-200 data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
         >
           <HugeiconsIcon icon={Task01Icon} size={18} />
-          <span>Tareas y Evaluaciones</span>
+          <span>
+            <span className="hidden xl:inline">Tareas y Evaluaciones</span>
+            <span className="inline xl:hidden">Tareas</span>
+          </span>
         </TabsTrigger>
 
         {/* Pestaña: Muro */}
@@ -73,7 +79,10 @@ export function AulaTabsNav({
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground hover:bg-muted/70 group flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-xs font-medium transition-all duration-200 data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
             >
               <HugeiconsIcon icon={ChartBarLineIcon} size={18} />
-              <span>Libro de Calificaciones</span>
+              <span>
+                <span className="hidden xl:inline">Libro de Calificaciones</span>
+                <span className="inline xl:hidden">Calificaciones</span>
+              </span>
             </TabsTrigger>
 
             {(puedeAdministrar || puedeVerModeracion) && (
@@ -92,7 +101,12 @@ export function AulaTabsNav({
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground hover:bg-muted/70 group flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-xs font-medium transition-all duration-200 data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
           >
             <HugeiconsIcon icon={Award01Icon} size={18} />
-            <span>{esApoderado ? "Calificaciones" : "Mis Calificaciones"}</span>
+            <span>
+              <span className="hidden xl:inline">
+                {esApoderado ? "Calificaciones" : "Mis Calificaciones"}
+              </span>
+              <span className="inline xl:hidden">{esApoderado ? "Notas" : "Mis Notas"}</span>
+            </span>
           </TabsTrigger>
         )}
       </TabsList>

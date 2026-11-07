@@ -49,7 +49,7 @@ export function PushNotificationPromptToast() {
     return () => clearTimeout(timer);
   }, [isSupported, isSubscribed, permission]);
 
-  const handleDismiss = () => {
+  const handleDismiss = React.useCallback(() => {
     setIsClosing(true);
     setTimeout(() => {
       setIsVisible(false);
@@ -64,7 +64,16 @@ export function PushNotificationPromptToast() {
         // ignore
       }
     }, 250);
-  };
+  }, []);
+
+  // Auto-descarte de cortesía tras 15 segundos si el usuario no interactúa
+  React.useEffect(() => {
+    if (!isVisible) return;
+    const autoDismissTimer = setTimeout(() => {
+      handleDismiss();
+    }, 15000);
+    return () => clearTimeout(autoDismissTimer);
+  }, [isVisible, handleDismiss]);
 
   const handleSubscribe = async () => {
     const success = await subscribe();
@@ -79,7 +88,7 @@ export function PushNotificationPromptToast() {
 
   return (
     <div
-      className={`fixed right-5 bottom-5 z-50 w-90 max-w-[calc(100vw-2.5rem)] transition-all duration-300 ${
+      className={`fixed right-4 bottom-20 z-40 w-90 max-w-[calc(100vw-2rem)] transition-all duration-300 sm:right-6 sm:bottom-22 ${
         isClosing
           ? "animate-out fade-out slide-out-to-bottom-4 zoom-out-95"
           : "animate-in fade-in slide-in-from-bottom-5 duration-500"
