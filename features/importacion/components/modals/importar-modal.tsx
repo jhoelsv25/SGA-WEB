@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   FileExportIcon,
@@ -109,6 +110,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
   );
   const [activeJobId, setActiveJobId] = React.useState<string | null>(null);
   const hasNotifiedRef = React.useRef(false);
+  const queryClient = useQueryClient();
 
   const descargarMutation = useDescargarPlantilla();
   const descargarReporteMutation = useDescargarReporteCredenciales();
@@ -143,6 +145,9 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
       setResultadoFinal(null);
       setActiveJobId(null);
       hasNotifiedRef.current = false;
+      // Invalida y refresca inmediatamente la lista de la pantalla
+      queryClient.invalidateQueries({ queryKey: [tipo] });
+      queryClient.invalidateQueries({ queryKey: ["personas"] });
     }
     onOpenChange(newOpen);
   };
@@ -153,13 +158,15 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
       if (estadoJobQuery.data.estado === "completado") {
         hasNotifiedRef.current = true;
         toast.success(estadoJobQuery.data.mensaje || "Importación masiva completada con éxito.");
+        queryClient.invalidateQueries({ queryKey: [tipo] });
+        queryClient.invalidateQueries({ queryKey: ["personas"] });
         onSuccess?.();
       } else if (estadoJobQuery.data.estado === "fallido") {
         hasNotifiedRef.current = true;
         toast.error(estadoJobQuery.data.error || "Falló la importación masiva en segundo plano.");
       }
     }
-  }, [paso, estadoJobQuery.data, onSuccess]);
+  }, [paso, estadoJobQuery.data, onSuccess, queryClient, tipo]);
 
   // Manejar subida y análisis previo del archivo Excel
   const handleFileSelect = async (file: File | null) => {
