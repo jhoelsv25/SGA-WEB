@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
-import { Add01Icon, Award01Icon, Note01Icon } from "@hugeicons/core-free-icons";
+import { Add01Icon, Award01Icon, Note01Icon, Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { ModalBuscarMatricula } from "@/features/matriculas/components/modals/modal-buscar-matricula";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { DataTableCursorPagination } from "@/components/common/data-table";
@@ -43,6 +44,7 @@ export function ConductaPage() {
   const [modalCrearObservacionOpen, setModalCrearObservacionOpen] = React.useState(false);
   const [incidenciaAEditar, setIncidenciaAEditar] = React.useState<IncidenciaItem | null>(null);
   const [incidenciaAAnular, setIncidenciaAAnular] = React.useState<IncidenciaItem | null>(null);
+  const [buscarEstudianteOpen, setBuscarEstudianteOpen] = React.useState(false);
   const [resumenMatriculaId, setResumenMatriculaId] = React.useState<string | null>(null);
 
   // Filtros reactivos con URL
@@ -102,6 +104,7 @@ export function ConductaPage() {
           puedeRegistrar ? (
             <div className="flex flex-wrap items-center gap-2">
               <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setModalCrearIncidenciaOpen(true)}
                 className="gap-1.5 text-xs font-medium"
@@ -118,6 +121,15 @@ export function ConductaPage() {
               >
                 <HugeiconsIcon icon={Note01Icon} className="h-4 w-4" />
                 Registrar Observación
+              </Button>
+
+              <Button
+                size="sm"
+                onClick={() => setBuscarEstudianteOpen(true)}
+                className="gap-1.5 text-xs font-medium"
+              >
+                <HugeiconsIcon icon={Search01Icon} className="h-4 w-4" />
+                Buscar estudiante
               </Button>
             </div>
           ) : undefined
@@ -261,6 +273,13 @@ export function ConductaPage() {
         open={Boolean(incidenciaAAnular)}
         onOpenChange={(open) => !open && setIncidenciaAAnular(null)}
         incidencia={incidenciaAAnular}
+      />
+
+      <ModalBuscarMatricula
+        open={buscarEstudianteOpen}
+        onOpenChange={setBuscarEstudianteOpen}
+        description="Elige al estudiante para ver su resumen de conducta."
+        onSeleccionar={(m) => setResumenMatriculaId(m.id)}
       />
 
       <ModalResumenEstudiante

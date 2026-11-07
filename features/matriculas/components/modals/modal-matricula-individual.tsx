@@ -2,18 +2,21 @@
 
 import { Modal } from "@/components/common/modal";
 import { UserAdd01Icon } from "@hugeicons/core-free-icons";
+import type { Estudiante } from "@/features/estudiantes/types/estudiantes.types";
 import { MatriculaIndividualForm } from "../forms/matricula-individual-form";
 
 interface ModalMatriculaIndividualProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   anioAcademicoId?: string;
+  estudianteInicial?: Estudiante | null;
 }
 
 export function ModalMatriculaIndividual({
   open,
   onOpenChange,
   anioAcademicoId,
+  estudianteInicial,
 }: ModalMatriculaIndividualProps) {
   return (
     <Modal
@@ -26,6 +29,7 @@ export function ModalMatriculaIndividual({
     >
       <MatriculaIndividualForm
         anioAcademicoId={anioAcademicoId}
+        estudianteInicial={estudianteInicial}
         onSuccess={() => onOpenChange(false)}
         onCancel={() => onOpenChange(false)}
       />

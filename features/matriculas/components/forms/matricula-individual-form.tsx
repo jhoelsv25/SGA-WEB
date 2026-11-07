@@ -16,6 +16,8 @@ import type { TipoMatricula } from "../../types";
 
 interface MatriculaIndividualFormProps {
   anioAcademicoId?: string;
+  /** Estudiante ya elegido en el buscador. */
+  estudianteInicial?: Estudiante | null;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -28,10 +30,11 @@ const TIPO_OPTIONS: SelectOptionItem<TipoMatricula>[] = [
 
 export function MatriculaIndividualForm({
   anioAcademicoId,
+  estudianteInicial,
   onSuccess,
   onCancel,
 }: MatriculaIndividualFormProps) {
-  const [estudianteId, setEstudianteId] = React.useState("");
+  const [estudianteId, setEstudianteId] = React.useState(estudianteInicial?.id ?? "");
   const [seccionId, setSeccionId] = React.useState("");
   const [tipo, setTipo] = React.useState<TipoMatricula>("nuevo");
   const [esRepitente, setEsRepitente] = React.useState(false);
@@ -49,12 +52,17 @@ export function MatriculaIndividualForm({
 
   // Opciones de estudiantes para SelectOption
   const estudianteOptions: SelectOptionItem<string>[] = React.useMemo(() => {
-    return (estudiantesData?.data ?? []).map((est: Estudiante) => ({
+    const lista = estudiantesData?.data ?? [];
+    const base =
+      estudianteInicial && !lista.some((e) => e.id === estudianteInicial.id)
+        ? [estudianteInicial, ...lista]
+        : lista;
+    return base.map((est: Estudiante) => ({
       value: est.id,
       label: est.persona.nombreCompleto || `${est.persona.apellidoPaterno}, ${est.persona.nombres}`,
       description: `Doc: ${est.persona.numeroDocumento} ${est.codigo ? `· SIAGIE: ${est.codigo}` : ""}`,
     }));
-  }, [estudiantesData]);
+  }, [estudiantesData, estudianteInicial]);
 
   // Opciones de secciones con vacantes disponibles
   const seccionOptions: SelectOptionItem<string>[] = React.useMemo(() => {

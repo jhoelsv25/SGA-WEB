@@ -12,12 +12,13 @@ import {
   CheckmarkCircle02Icon,
   UserRemove01Icon,
   ArrowRight01Icon,
-  Add01Icon,
+  Search01Icon,
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { getMatriculaColumns } from "./columns";
 import {
+  ModalBuscarEstudiante,
   ModalMatriculaIndividual,
   ModalMatriculaMasiva,
   ModalOperacionMatricula,
@@ -29,6 +30,7 @@ import { useSeccionesQuery } from "@/features/secciones";
 import type { Seccion } from "@/features/secciones/types";
 import { useGradosQuery } from "@/features/grados/hooks";
 import type { Grado } from "@/features/grados/types";
+import type { Estudiante } from "@/features/estudiantes/types/estudiantes.types";
 import type { EstadoMatricula, MatriculaItem, TipoMatricula } from "../types";
 import { createMatriculaFilterDefs } from "./matricula-filters.config";
 
@@ -39,6 +41,8 @@ interface MatriculasTableProps {
 export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps) {
   // Estado de modales
   const [modalIndividualOpen, setModalIndividualOpen] = React.useState(false);
+  const [buscarOpen, setBuscarOpen] = React.useState(false);
+  const [estudianteElegido, setEstudianteElegido] = React.useState<Estudiante | null>(null);
   const [modalMasivaOpen, setModalMasivaOpen] = React.useState(false);
   const [operacionActiva, setOperacionActiva] = React.useState<{
     matricula: MatriculaItem | null;
@@ -196,9 +200,9 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         isRefreshing={isFetching}
         actions={
           puedeGestionar ? (
-            <Button size="sm" className="h-10 gap-2" onClick={() => setModalIndividualOpen(true)}>
-              <HugeiconsIcon icon={Add01Icon} className="size-4" />
-              Matricular estudiante
+            <Button size="sm" className="h-10 gap-2" onClick={() => setBuscarOpen(true)}>
+              <HugeiconsIcon icon={Search01Icon} className="size-4" />
+              Buscar estudiante
             </Button>
           ) : undefined
         }
@@ -226,7 +230,21 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
       />
 
       {/* Modales de Gestión */}
-      <ModalMatriculaIndividual open={modalIndividualOpen} onOpenChange={setModalIndividualOpen} />
+      <ModalBuscarEstudiante
+        open={buscarOpen}
+        onOpenChange={setBuscarOpen}
+        onSeleccionar={(est) => {
+          setEstudianteElegido(est);
+          setModalIndividualOpen(true);
+        }}
+      />
+
+      <ModalMatriculaIndividual
+        key={estudianteElegido?.id ?? "sin-estudiante"}
+        open={modalIndividualOpen}
+        onOpenChange={setModalIndividualOpen}
+        estudianteInicial={estudianteElegido}
+      />
 
       <ModalMatriculaMasiva open={modalMasivaOpen} onOpenChange={setModalMasivaOpen} />
 
