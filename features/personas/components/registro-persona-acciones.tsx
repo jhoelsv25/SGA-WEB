@@ -2,8 +2,21 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { FileImportIcon, Search01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
+import {
+  FileImportIcon,
+  MoreHorizontalIcon,
+  RefreshIcon,
+  Search01Icon,
+  UserAdd01Icon,
+} from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ImportarModal } from "@/features/importacion/components/modals/importar-modal";
 import type { TipoImportacion } from "@/features/importacion/types/importacion.types";
 import { BuscarPersonaModal, type DestinoFichaUnica } from "./modals/buscar-persona-modal";
@@ -17,6 +30,10 @@ interface RegistroPersonaAccionesProps {
   /** Abre el registro directo, con los campos de una persona nueva. */
   onRegistrar: () => void;
   onImportSuccess?: () => void;
+  /** Ítems extra del menú ⋯ (p. ej. Exportar Excel). */
+  extraMenuItems?: React.ReactNode;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 /** Botones estándar de la barra de cada listado de personas: Buscar, Registrar y Cargar masivo. */
@@ -26,29 +43,46 @@ export function RegistroPersonaAcciones({
   onVincular,
   onRegistrar,
   onImportSuccess,
+  extraMenuItems,
+  onRefresh,
+  isRefreshing = false,
 }: RegistroPersonaAccionesProps) {
   const [buscarOpen, setBuscarOpen] = React.useState(false);
   const [masivoOpen, setMasivoOpen] = React.useState(false);
 
   return (
     <>
-      <Button size="sm" onClick={() => setBuscarOpen(true)} className="h-8 gap-1.5 text-xs">
-        <HugeiconsIcon icon={Search01Icon} className="h-4 w-4" />
-        Buscar
-      </Button>
-      <Button size="sm" variant="outline" onClick={onRegistrar} className="h-8 gap-1.5 text-xs">
+      <Button size="sm" onClick={onRegistrar} className="h-10 gap-2">
         <HugeiconsIcon icon={UserAdd01Icon} className="h-4 w-4" />
-        Registrar
+        Registrar {destino}
       </Button>
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => setMasivoOpen(true)}
-        className="h-8 gap-1.5 text-xs"
-      >
-        <HugeiconsIcon icon={FileImportIcon} className="h-4 w-4" />
-        Cargar masivo
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon" className="size-10" aria-label="Más acciones">
+            <HugeiconsIcon icon={MoreHorizontalIcon} className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuItem onSelect={() => setBuscarOpen(true)}>
+            <HugeiconsIcon icon={Search01Icon} className="h-4 w-4" />
+            Buscar persona existente
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setMasivoOpen(true)}>
+            <HugeiconsIcon icon={FileImportIcon} className="h-4 w-4" />
+            Cargar masivo (Excel)
+          </DropdownMenuItem>
+          {extraMenuItems}
+          {onRefresh ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem disabled={isRefreshing} onSelect={() => onRefresh()}>
+                <HugeiconsIcon icon={RefreshIcon} className="h-4 w-4" />
+                Actualizar lista
+              </DropdownMenuItem>
+            </>
+          ) : null}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {buscarOpen && (
         <BuscarPersonaModal

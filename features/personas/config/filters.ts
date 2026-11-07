@@ -9,6 +9,7 @@ export const personaFilterDefs: readonly ListFilterDef[] = [
   {
     type: "select",
     key: "tipoDocumento",
+    inline: false,
     label: "Tipo Documento",
     options: [
       { label: "Todos los tipos", value: "all" },
@@ -21,6 +22,7 @@ export const personaFilterDefs: readonly ListFilterDef[] = [
   {
     type: "select",
     key: "provisional",
+    inline: false,
     label: "Ficha Vinculada",
     options: [
       { label: "Todas las personas", value: "all" },

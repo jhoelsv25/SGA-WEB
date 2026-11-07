@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useCursorPagination } from "@/hooks/use-cursor-pagination";
@@ -195,25 +196,18 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         isRefreshing={isFetching}
         actions={
           puedeGestionar ? (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-10 gap-2 rounded-full px-4 text-xs"
-                onClick={() => setModalMasivaOpen(true)}
-              >
-                <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
-                Matrícula Masiva
-              </Button>
-              <Button
-                size="sm"
-                className="h-10 gap-2 rounded-full px-4 text-xs shadow-sm"
-                onClick={() => setModalIndividualOpen(true)}
-              >
-                <HugeiconsIcon icon={Add01Icon} className="size-4" />
-                Matricular Estudiante
-              </Button>
-            </div>
+            <Button size="sm" className="h-10 gap-2" onClick={() => setModalIndividualOpen(true)}>
+              <HugeiconsIcon icon={Add01Icon} className="size-4" />
+              Matricular estudiante
+            </Button>
+          ) : undefined
+        }
+        secondaryActions={
+          puedeGestionar ? (
+            <DropdownMenuItem onSelect={() => setModalMasivaOpen(true)}>
+              <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
+              Matrícula masiva
+            </DropdownMenuItem>
           ) : undefined
         }
       />

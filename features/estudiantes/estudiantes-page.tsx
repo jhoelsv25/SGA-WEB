@@ -7,21 +7,16 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { StudentIcon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
-import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useCursorPagination } from "@/hooks/use-cursor-pagination";
-import { useExportExcel } from "@/hooks/use-export-excel";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { estudianteFilterDefs } from "./config/filters";
-import { estudianteExportColumns } from "./config/export";
 import { useEstudiantesQuery } from "./hooks/use-estudiantes";
 import { EstudiantesTable } from "./views/estudiantes-table";
 import { CreateEstudianteModal } from "./components/modals/create-estudiante-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
-import type {
-  CreateEstudianteResponse,
-  Estudiante,
-  EstadoEstudiante,
-} from "./types/estudiantes.types";
+import type { CreateEstudianteResponse, EstadoEstudiante } from "./types/estudiantes.types";
 
 export function EstudiantesPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -56,14 +51,10 @@ export function EstudiantesPage() {
 
   const estudiantes = data?.data ?? [];
 
-  const { exportToExcel, isExporting } = useExportExcel<Estudiante>({
-    columns: estudianteExportColumns,
-    filenamePrefix: "Padron_Estudiantes",
-    sheetName: "Estudiantes",
-  });
+  const { exportar, isExporting } = useExportarReporte("estudiantes");
 
   const handleExport = async () => {
-    await exportToExcel(estudiantes);
+    await exportar({ search: search?.trim(), estado });
   };
 
   const handleCreatedSuccess = (res: CreateEstudianteResponse) => {
@@ -83,25 +74,25 @@ export function EstudiantesPage() {
         <ListToolbar
           filterDefs={estudianteFilterDefs}
           listFilters={listFilters}
-          onRefresh={refetch}
-          isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={isExporting || estudiantes.length === 0}
-                className="h-8 gap-1.5 text-xs"
-              >
-                <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
-                {isExporting ? "Exportando..." : "Exportar"}
-              </Button>
               <RegistroPersonaAcciones
                 destino="estudiante"
                 tipoImportacion="estudiantes"
                 onVincular={(persona) => abrirRegistro(persona)}
                 onRegistrar={() => abrirRegistro(null)}
+                onImportSuccess={() => void refetch()}
+                onRefresh={() => void refetch()}
+                isRefreshing={isFetching}
+                extraMenuItems={
+                  <DropdownMenuItem
+                    disabled={isExporting || estudiantes.length === 0}
+                    onSelect={() => void handleExport()}
+                  >
+                    <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
+                    Exportar Excel
+                  </DropdownMenuItem>
+                }
               />
             </div>
           }

@@ -7,21 +7,15 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { UserGroupIcon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
-import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useListFilters } from "@/hooks/use-list-filters";
-import { useExportExcel } from "@/hooks/use-export-excel";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { docenteFilterDefs } from "./config/filters";
-import { docenteExportColumns } from "./config/export";
 import { useDocentesQuery } from "./hooks/use-docentes";
 import { DocentesTable } from "./views/docentes-table";
 import { CreateDocenteModal } from "./components/modals/create-docente-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
-import type {
-  CreateDocenteResponse,
-  Docente,
-  EstadoDocente,
-  TipoContrato,
-} from "./types/docentes.types";
+import type { CreateDocenteResponse, EstadoDocente, TipoContrato } from "./types/docentes.types";
 
 export function DocentesPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -90,11 +84,7 @@ export function DocentesPage() {
   };
 
   // Exportar Excel
-  const { exportToExcel, isExporting } = useExportExcel<Docente>({
-    columns: docenteExportColumns,
-    filenamePrefix: "plana-docente-sga",
-    sheetName: "Docentes",
-  });
+  const { exportar, isExporting } = useExportarReporte("docentes");
 
   const handleCreatedSuccess = (res: CreateDocenteResponse) => {
     setCreatedData(res);
@@ -118,25 +108,25 @@ export function DocentesPage() {
         <ListToolbar
           filterDefs={docenteFilterDefs}
           listFilters={listFilters}
-          onRefresh={() => refetch()}
-          isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => exportToExcel(docentes)}
-                disabled={isExporting || docentes.length === 0}
-                className="gap-2"
-              >
-                <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
-                Exportar Excel
-              </Button>
               <RegistroPersonaAcciones
                 destino="docente"
                 tipoImportacion="docentes"
                 onVincular={(persona) => abrirRegistro(persona)}
                 onRegistrar={() => abrirRegistro(null)}
+                onImportSuccess={() => void refetch()}
+                onRefresh={() => void refetch()}
+                isRefreshing={isFetching}
+                extraMenuItems={
+                  <DropdownMenuItem
+                    disabled={isExporting || docentes.length === 0}
+                    onSelect={() => void exportar({ search: search?.trim(), tipoContrato, estado })}
+                  >
+                    <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
+                    Exportar Excel
+                  </DropdownMenuItem>
+                }
               />
             </div>
           }

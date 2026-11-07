@@ -4,9 +4,22 @@ import type { ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Search01Icon, Cancel01Icon, RefreshIcon, FilterIcon } from "@hugeicons/core-free-icons";
+import {
+  Search01Icon,
+  Cancel01Icon,
+  RefreshIcon,
+  FilterIcon,
+  MoreHorizontalIcon,
+} from "@hugeicons/core-free-icons";
 import { useContainerCompact } from "@/hooks/use-container-compact";
 import { cn } from "@/lib/utils";
 import type { ListToolbarProps } from "../types";
@@ -20,8 +33,8 @@ import { ListToolbarFilterFields } from "./filter-fields";
 
 /** Ancho del toolbar por debajo del cual los filtros van a popover */
 const LIST_TOOLBAR_COMPACT_BREAKPOINT = 960;
-/** Filtros visibles junto a la búsqueda. El resto va al menú. */
-const MAX_INLINE_FILTERS = 2;
+/** Filtros visibles junto a la búsqueda. Por defecto todos van al popover "Filtros". */
+const MAX_INLINE_FILTERS = 0;
 
 function splitToolbarFilters(defs: readonly ListFilterDef[]): {
   inline: ListFilterDef[];
@@ -126,6 +139,7 @@ export function ListToolbar({
   extraFilters,
   leadingActions,
   actions,
+  secondaryActions,
   className,
 }: ListToolbarProps) {
   const { ref, isCompact } = useContainerCompact<HTMLDivElement>(LIST_TOOLBAR_COMPACT_BREAKPOINT);
@@ -271,7 +285,33 @@ export function ListToolbar({
 
       <div className="flex w-full shrink-0 items-center justify-end gap-2 sm:w-auto xl:self-center">
         {leadingActions}
-        {onRefresh ? (
+        {secondaryActions ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Más acciones"
+                className="border-border/80 bg-background hover:bg-muted dark:border-border/70 dark:bg-card/40 size-10 shrink-0 rounded-xl shadow-2xs"
+              >
+                <HugeiconsIcon icon={MoreHorizontalIcon} size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              {secondaryActions}
+              {onRefresh ? (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem disabled={isRefreshing} onSelect={() => onRefresh()}>
+                    <HugeiconsIcon icon={RefreshIcon} size={16} />
+                    {refreshLabel === "Recargar" ? "Actualizar lista" : refreshLabel}
+                  </DropdownMenuItem>
+                </>
+              ) : null}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+        {onRefresh && !secondaryActions ? (
           <Button
             variant="outline"
             size="icon"

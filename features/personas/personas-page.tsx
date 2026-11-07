@@ -2,22 +2,28 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { UserGroupIcon, UserAdd01Icon, FileExportIcon } from "@hugeicons/core-free-icons";
+import {
+  UserGroupIcon,
+  UserAdd01Icon,
+  FileExportIcon,
+  FileImportIcon,
+} from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
 import { useListFilters } from "@/hooks/use-list-filters";
-import { useExportExcel } from "@/hooks/use-export-excel";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { personaFilterDefs } from "./config/filters";
-import { personaExportColumns } from "./config/export";
 import { usePersonasQuery } from "./hooks/use-personas";
 import { PersonasTable } from "./views/personas-table";
 import { CreatePersonaModal } from "./components/modals/create-persona-modal";
-import { ImportarButton } from "@/features/importacion";
-import type { Persona, TipoDocumento } from "./types/personas.types";
+import { ImportarModal } from "@/features/importacion";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import type { TipoDocumento } from "./types/personas.types";
 
 export function PersonasPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
+  const [importOpen, setImportOpen] = React.useState(false);
 
   // Filtros sincronizados con la URL mediante el hook del sistema
   const listFilters = useListFilters(personaFilterDefs);
@@ -75,11 +81,7 @@ export function PersonasPage() {
   };
 
   // Exportación a Excel estandarizada
-  const { exportToExcel, isExporting } = useExportExcel<Persona>({
-    columns: personaExportColumns,
-    filenamePrefix: "padron-personas-sga",
-    sheetName: "Personas",
-  });
+  const { exportar, isExporting } = useExportarReporte("personas");
 
   return (
     <div className="animate-in fade-in-50 space-y-6 duration-300">
@@ -99,26 +101,30 @@ export function PersonasPage() {
         <ListToolbar
           filterDefs={personaFilterDefs}
           listFilters={listFilters}
-          onRefresh={() => refetch()}
+          onRefresh={() => void refetch()}
           isRefreshing={isFetching}
           actions={
-            <div className="flex items-center gap-2">
-              <ImportarButton tipo="personas" onSuccess={() => void refetch()} />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => exportToExcel(personas)}
+            <Button size="sm" onClick={() => setCreateModalOpen(true)} className="h-10 gap-2">
+              <HugeiconsIcon icon={UserAdd01Icon} className="h-4 w-4" />
+              Registrar persona
+            </Button>
+          }
+          secondaryActions={
+            <>
+              <DropdownMenuItem onSelect={() => setImportOpen(true)}>
+                <HugeiconsIcon icon={FileImportIcon} className="h-4 w-4" />
+                Importar Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 disabled={isExporting || personas.length === 0}
-                className="gap-2"
+                onSelect={() =>
+                  void exportar({ search: search?.trim(), tipoDocumento, esProvisional })
+                }
               >
                 <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
                 Exportar Excel
-              </Button>
-              <Button size="sm" onClick={() => setCreateModalOpen(true)} className="gap-2">
-                <HugeiconsIcon icon={UserAdd01Icon} className="h-4 w-4" />
-                Registrar Persona
-              </Button>
-            </div>
+              </DropdownMenuItem>
+            </>
           }
         />
 
@@ -136,6 +142,13 @@ export function PersonasPage() {
           }}
         />
       </div>
+
+      <ImportarModal
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        tipo="personas"
+        onSuccess={() => void refetch()}
+      />
 
       {/* Modal para Crear Persona */}
       <CreatePersonaModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
