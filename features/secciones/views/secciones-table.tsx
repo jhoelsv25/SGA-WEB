@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { PlusSignIcon, FilterIcon, RefreshIcon } from "@hugeicons/core-free-icons";
+import { PlusSignIcon, FilterIcon, RefreshIcon, Copy01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DataTable } from "@/components/common/data-table";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
 } from "../hooks";
 import { CreateSeccionModal } from "../components/modals/create-seccion-modal";
 import { EditSeccionModal } from "../components/modals/edit-seccion-modal";
+import { ClonarSeccionesModal } from "../components/modals/clonar-secciones-modal";
 import { getSeccionColumns } from "./columns/seccion-columns";
 import type { EstadoSeccion, Seccion } from "../types";
 import type { CreateSeccionFormValues, UpdateSeccionFormValues } from "../schemas";
@@ -58,6 +59,7 @@ export function SeccionesTable() {
   // Estados de modales
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
+  const [clonarModalOpen, setClonarModalOpen] = React.useState(false);
   const [seccionToEdit, setSeccionToEdit] = React.useState<Seccion | null>(null);
 
   // Handlers
@@ -193,14 +195,27 @@ export function SeccionesTable() {
           </Button>
 
           {puedeGestionar && (
-            <Button
-              type="button"
-              onClick={() => setCreateModalOpen(true)}
-              className="shadow-primary/20 h-10 min-h-[44px] w-full gap-1.5 rounded-xl px-4 text-xs font-semibold shadow-md sm:h-9 sm:min-h-9 sm:w-auto"
-            >
-              <HugeiconsIcon icon={PlusSignIcon} className="size-4" strokeWidth={2.5} />
-              <span>Nueva sección</span>
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setClonarModalOpen(true)}
+                className="h-10 min-h-[44px] gap-1.5 rounded-xl px-3 text-xs font-semibold sm:h-9 sm:min-h-9"
+              >
+                <HugeiconsIcon icon={Copy01Icon} className="size-3.5" />
+                <span className="hidden sm:inline">Clonar de año anterior</span>
+                <span className="sm:hidden">Clonar</span>
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setCreateModalOpen(true)}
+                className="shadow-primary/20 h-10 min-h-[44px] w-full gap-1.5 rounded-xl px-4 text-xs font-semibold shadow-md sm:h-9 sm:min-h-9 sm:w-auto"
+              >
+                <HugeiconsIcon icon={PlusSignIcon} className="size-4" strokeWidth={2.5} />
+                <span>Nueva sección</span>
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -276,6 +291,8 @@ export function SeccionesTable() {
         onSubmit={handleUpdateSubmit}
         isLoading={updateMutation.isPending}
       />
+
+      <ClonarSeccionesModal open={clonarModalOpen} onOpenChange={setClonarModalOpen} />
     </div>
   );
 }

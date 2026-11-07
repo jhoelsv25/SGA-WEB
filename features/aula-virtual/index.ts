@@ -2,6 +2,7 @@ export * from "./aula-virtual-page";
 export * from "./solicitudes-cambio-fecha-page";
 export * from "./materiales-bimestre-page";
 export * from "./components";
+export * from "./views";
 export * from "./consts";
 export * from "./utils";
 export * from "./types";

@@ -5,8 +5,20 @@ import { useSession } from "@/features/auth";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
-import { cerrarSeccion, createSeccion, getSeccionById, getSecciones, updateSeccion } from "../api";
-import type { CreateSeccionPayload, SeccionQueryParams, UpdateSeccionPayload } from "../types";
+import {
+  cerrarSeccion,
+  clonarSecciones,
+  createSeccion,
+  getSeccionById,
+  getSecciones,
+  updateSeccion,
+} from "../api";
+import type {
+  ClonarSeccionesPayload,
+  CreateSeccionPayload,
+  SeccionQueryParams,
+  UpdateSeccionPayload,
+} from "../types";
 
 export const seccionesKeys = {
   all: ["secciones"] as const,
@@ -91,6 +103,22 @@ export function useCerrarSeccionMutation() {
     },
     onError: (error: unknown) => {
       const msg = error instanceof ApiClientError ? error.message : "Error al cerrar la sección.";
+      toast.error(msg);
+    },
+  });
+}
+
+export function useClonarSeccionesMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: ClonarSeccionesPayload) => clonarSecciones(payload),
+    onSuccess: (resultado) => {
+      queryClient.invalidateQueries({ queryKey: seccionesKeys.all });
+      toast.success(resultado.mensaje);
+    },
+    onError: (error: unknown) => {
+      const msg =
+        error instanceof ApiClientError ? error.message : "Error al clonar las secciones.";
       toast.error(msg);
     },
   });

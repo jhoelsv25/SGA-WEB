@@ -58,3 +58,4 @@ export function esTipoEnlace(tipo: TipoMaterial): boolean {
 }
 
 export * from "./interaccion.consts";
+export * from "./paletas-cursos.consts";

@@ -46,8 +46,8 @@ export function UserActions({
 
   const actionItems = [];
 
-  // Gestionar roles (no puede cambiar sus propios roles)
-  if (!isSelf && !isInactive) {
+  // Gestionar roles (un usuario activo puede agregar o cambiar sus roles secundarios)
+  if (!isInactive) {
     actionItems.push({
       label: "Gestionar roles",
       icon: ShieldCheckIcon,

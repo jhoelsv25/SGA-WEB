@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen01Icon } from "@hugeicons/core-free-icons";
+import { BookOpen01Icon, Download01Icon } from "@hugeicons/core-free-icons";
 import { TableRowActions } from "@/components/common/row-actions";
 import type { RowActionCustomItem } from "@/components/common/row-actions/types";
+import { credencialesApi } from "@/features/credenciales/api/credenciales.api";
 import type { Seccion } from "../../types";
 
 interface SeccionActionsProps {
@@ -32,6 +33,17 @@ export function SeccionActions({
       href: `/admin/secciones/${seccion.id}/carga`,
       onClick: () => {
         router.push(`/admin/secciones/${seccion.id}/carga`);
+      },
+    },
+    {
+      key: "descargar-carnes",
+      label: "Descargar Carnés en PDF",
+      icon: Download01Icon,
+      onClick: async () => {
+        await credencialesApi.descargarCarnesSeccionPdf(
+          seccion.id,
+          `carnes-${seccion.gradoNombre.replace(/\s+/g, "_")}_${seccion.nombre}.pdf`,
+        );
       },
     },
   ];

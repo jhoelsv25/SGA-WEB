@@ -203,7 +203,22 @@ function LoginFormInner() {
     mutate: login,
     isPending: isSubmitting,
     error,
-  } = useLogin({ redirectTo, redirect: false, onSuccess: setAutenticado });
+  } = useLogin({
+    redirectTo,
+    redirect: false,
+    onSuccess: (data) => {
+      const roles = data.user?.userRoles ?? [];
+      if (roles.length > 1) {
+        setAutenticado(data);
+      } else {
+        if (data.user?.mustChangePassword) {
+          router.replace("/change-password");
+        } else {
+          router.replace(redirectTo);
+        }
+      }
+    },
+  });
 
   const onSubmit = (values: LoginFormValues) => {
     saveRememberedUsername(values.username, values.rememberUser);
@@ -214,7 +229,7 @@ function LoginFormInner() {
     });
   };
 
-  if (autenticado) {
+  if (autenticado && (autenticado.user?.userRoles?.length ?? 0) > 1) {
     return (
       <PantallaSeleccionRol
         session={autenticado}

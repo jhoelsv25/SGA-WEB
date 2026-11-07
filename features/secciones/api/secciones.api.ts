@@ -1,5 +1,7 @@
 import { apiClient } from "@/lib/api-client";
 import type {
+  ClonarSeccionesPayload,
+  ClonarSeccionesResultado,
   CreateSeccionPayload,
   Seccion,
   SeccionQueryParams,
@@ -38,5 +40,12 @@ export async function updateSeccion(id: string, payload: UpdateSeccionPayload): 
 
 export async function cerrarSeccion(id: string): Promise<Seccion> {
   const response = await apiClient.patch<Seccion>(`/secciones/${id}/cerrar`);
+  return response.data;
+}
+
+export async function clonarSecciones(
+  payload: ClonarSeccionesPayload,
+): Promise<ClonarSeccionesResultado> {
+  const response = await apiClient.post<ClonarSeccionesResultado>("/secciones/clonar", payload);
   return response.data;
 }

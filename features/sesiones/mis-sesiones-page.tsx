@@ -1,7 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen01Icon, FileEditIcon } from "@hugeicons/core-free-icons";
+import Link from "next/link";
+import { BookOpen01Icon, FileEditIcon, AlertCircleIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { buttonVariants } from "@/components/ui/button";
 import { DataTable } from "@/components/common/data-table";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
@@ -47,6 +50,11 @@ export function MisSesionesPage() {
     [handleCorregirTema, handleSolicitarJustificacion],
   );
 
+  const esNoDocente =
+    error &&
+    ((error as unknown as { status?: number }).status === 403 ||
+      error.message?.toLowerCase().includes("docente"));
+
   return (
     <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
       <PageHeader
@@ -57,34 +65,55 @@ export function MisSesionesPage() {
       />
       <SelectorBimestre bimestres={bimestres} valor={bimestreId} onCambiar={setElegido} />
 
-      <PageState
-        isLoading={isLoading}
-        isError={isError}
-        error={error}
-        onRetry={() => void refetch()}
-        errorTitle="No se pudieron cargar sus sesiones"
-      >
-        {data && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Total etiqueta="Cumplidas" valor={data.totales.cumplidas} />
-              <Total etiqueta="Parciales" valor={data.totales.parciales} />
-              <Total etiqueta="No cumplidas" valor={data.totales.noCumplidas} />
-              <Total etiqueta="Justificadas" valor={data.totales.justificadas} />
-            </div>
-
-            <DataTable
-              columns={columns}
-              data={data.sesiones}
-              pagination={false}
-              emptyState={{
-                title: "Sin sesiones en este periodo",
-                description: "Elija otro bimestre para ver su historial.",
-              }}
-            />
+      {esNoDocente ? (
+        <div className="bg-card border-border/60 flex flex-col items-center justify-center rounded-2xl border p-8 text-center shadow-xs">
+          <div className="bg-warning/10 text-warning mb-3 flex size-12 items-center justify-center rounded-full">
+            <HugeiconsIcon icon={AlertCircleIcon} className="size-6" />
           </div>
-        )}
-      </PageState>
+          <h3 className="text-foreground text-base font-bold">Vista exclusiva para docentes</h3>
+          <p className="text-muted-foreground mt-1 max-w-md text-xs leading-relaxed">
+            Tu cuenta no está vinculada a un docente activo. Como personal directivo o de
+            administración, puedes supervisar las clases de todo el colegio en el panel general.
+          </p>
+          <div className="mt-4 flex gap-2">
+            <Link
+              href="/admin/sesiones-hoy"
+              className={buttonVariants({ variant: "default", size: "sm" })}
+            >
+              Ir a Sesiones de hoy
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <PageState
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+          onRetry={() => void refetch()}
+          errorTitle="No se pudieron cargar sus sesiones"
+        >
+          {data && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <Total etiqueta="Cumplidas" valor={data.totales.cumplidas} />
+                <Total etiqueta="Parciales" valor={data.totales.parciales} />
+                <Total etiqueta="No cumplidas" valor={data.totales.noCumplidas} />
+                <Total etiqueta="Justificadas" valor={data.totales.justificadas} />
+              </div>
+
+              <DataTable
+                columns={columns}
+                data={data.sesiones}
+                pagination={false}
+                emptyState={{
+                  title: "Sin sesiones en este periodo",
+                  description: "Elija otro bimestre para ver su historial.",
+                }}
+              />
+            </div>
+          )}
+        </PageState>
+      )}
 
       <ModalTexto
         abierto={accion?.tipo === "tema"}
