@@ -1,4 +1,5 @@
 import { apiClient, handleApiError } from "@/lib/api-client";
+import type { DarBajaFichaActualInput } from "../../personas/types/personas.types";
 import type {
   CreateEstudianteInput,
   CreateEstudianteResponse,
@@ -53,6 +54,32 @@ export const estudiantesApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al eliminar la ficha del estudiante.");
+    }
+  },
+
+  async darDeBajaEstudiante(
+    id: string,
+    input: DarBajaFichaActualInput,
+  ): Promise<{ estudiante: Estudiante; message: string }> {
+    try {
+      const { data } = await apiClient.post<{ estudiante: Estudiante; message: string }>(
+        `/estudiantes/${id}/baja`,
+        input,
+      );
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al dar de baja la ficha del estudiante.");
+    }
+  },
+
+  async reactivarEstudiante(id: string): Promise<{ estudiante: Estudiante; message: string }> {
+    try {
+      const { data } = await apiClient.post<{ estudiante: Estudiante; message: string }>(
+        `/estudiantes/${id}/reactivar`,
+      );
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al reactivar al estudiante.");
     }
   },
 };

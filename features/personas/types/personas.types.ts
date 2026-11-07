@@ -5,6 +5,11 @@ export interface FichasPersona {
   esEstudiante: boolean;
   esApoderado: boolean;
   tieneUsuario: boolean;
+  /** RF-007 V4: id y estado de cada ficha académica (null si no la tiene). */
+  docenteId?: string | null;
+  estudianteId?: string | null;
+  estadoDocente?: string | null;
+  estadoEstudiante?: string | null;
 }
 
 export interface Persona {
@@ -51,6 +56,14 @@ export interface SearchPersonaResult {
   persona?: Persona | null;
   mensaje?: string;
   yaTieneFicha?: boolean;
+  /** Ficha vigente que debe darse de baja para registrar a la persona en la otra condición. */
+  requiereBajaDe?: "docente" | "estudiante";
+}
+
+/** RF-007 V4: baja de la ficha académica vigente al cambiar de condición (docente ↔ estudiante). */
+export interface DarBajaFichaActualInput {
+  motivo: string;
+  fecha?: string;
 }
 
 export interface CreatePersonaInput {

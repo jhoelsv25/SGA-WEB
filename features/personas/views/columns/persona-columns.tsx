@@ -6,12 +6,20 @@ import { UserAvatar } from "@/components/common/user-avatar";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
 import { PersonaActions } from "./persona-actions";
 import type { Persona } from "../../types/personas.types";
+import {
+  esFichaVigente,
+  estadoFicha,
+  etiquetaBaja,
+  type TipoFichaAcademica,
+} from "../../utils/ficha-academica";
+import type { AccionFicha } from "../../components/modals/ficha-baja-modal";
 
 interface GetPersonaColumnsOptions {
   onEdit: (persona: Persona) => void;
   onDelete: (persona: Persona) => void;
   onVerHistorial?: (persona: Persona) => void;
   onChangeCargo?: (persona: Persona) => void;
+  onFichaAccion?: (persona: Persona, tipo: TipoFichaAcademica, accion: AccionFicha) => void;
   isDeleting?: boolean;
 }
 
@@ -20,6 +28,7 @@ export function getPersonaColumns({
   onDelete,
   onVerHistorial,
   onChangeCargo,
+  onFichaAccion,
   isDeleting,
 }: GetPersonaColumnsOptions): ColumnDef<Persona>[] {
   return [
@@ -82,17 +91,31 @@ export function getPersonaColumns({
       cell: ({ row }) => {
         const f = row.original.fichas;
         const fichasActivas: Array<{ label: string; color: string }> = [];
+        const COLOR_BAJA = "border-slate-400/40 bg-transparent text-muted-foreground line-through";
 
-        if (f.esDocente)
-          fichasActivas.push({
-            label: "Docente",
-            color: "border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400",
-          });
-        if (f.esEstudiante)
-          fichasActivas.push({
-            label: "Estudiante",
-            color: "border-purple-500/30 bg-purple-500/10 text-purple-600 dark:text-purple-400",
-          });
+        // RF-007 V4: una ficha académica dada de baja se muestra apagada y con su estado
+        (
+          [
+            {
+              tipo: "docente",
+              label: "Docente",
+              color: "border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400",
+            },
+            {
+              tipo: "estudiante",
+              label: "Estudiante",
+              color: "border-purple-500/30 bg-purple-500/10 text-purple-600 dark:text-purple-400",
+            },
+          ] as Array<{ tipo: TipoFichaAcademica; label: string; color: string }>
+        ).forEach(({ tipo, label, color }) => {
+          const estado = estadoFicha(row.original, tipo);
+          if (!estado) return;
+          fichasActivas.push(
+            esFichaVigente(tipo, estado)
+              ? { label, color }
+              : { label: `${label} (${etiquetaBaja(tipo, estado)})`, color: COLOR_BAJA },
+          );
+        });
         if (f.esApoderado)
           fichasActivas.push({
             label: "Apoderado",
@@ -154,6 +177,7 @@ export function getPersonaColumns({
           onDelete={onDelete}
           onVerHistorial={onVerHistorial}
           onChangeCargo={onChangeCargo}
+          onFichaAccion={onFichaAccion}
           isDeleting={isDeleting}
         />
       ),
