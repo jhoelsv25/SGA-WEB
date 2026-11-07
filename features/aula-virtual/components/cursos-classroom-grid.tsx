@@ -370,7 +370,7 @@ export function CursosClassroomGrid({
                   </div>
 
                   <div>
-                    <h3 className="line-clamp-2 text-lg leading-snug font-bold text-white drop-shadow-sm group-hover:underline">
+                    <h3 className="line-clamp-2 text-lg leading-snug font-bold text-white drop-shadow-sm">
                       {curso.cursoNombre}
                     </h3>
                   </div>

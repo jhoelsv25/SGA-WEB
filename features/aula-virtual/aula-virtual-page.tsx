@@ -1,42 +1,30 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Activity01Icon,
-  ArrowLeft01Icon,
   Award01Icon,
   BookOpen01Icon,
-  Calendar03Icon,
   ChartBarLineIcon,
-  CloudUploadIcon,
   Comment01Icon,
-  Delete02Icon,
-  FileAddIcon,
-  FileEditIcon,
-  PlusSignIcon,
   ShieldAlertIcon,
   Task01Icon,
-  TeacherIcon,
 } from "@hugeicons/core-free-icons";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
-import { SelectOption } from "@/components/common/select";
-import { StatusBadge } from "@/components/common/status-badge";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatDate } from "@/lib/formatters/date";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
-import { urlDeArchivo } from "./api";
 import {
   ActividadRecursoModal,
+  AulaNavHeader,
   ChatFlotante,
+  CursoHeroBanner,
   CursosClassroomGrid,
   LibroNotasTab,
+  MaterialesTab,
   MisNotasTab,
   ModeracionTab,
   MuroTab,
@@ -46,171 +34,11 @@ import {
   SolicitarCambioFechaModal,
   TareasTab,
   UnidadModal,
-  obtenerEstiloCurso,
   type RecursoActividadTarget,
 } from "./components";
-import { PLAZO_CONFIG } from "./consts";
+import { obtenerEstiloCurso } from "./utils";
 import { useAula, useMisCursos, useRegistrarActividad, useRetirarMaterial } from "./hooks";
 import type { Material, Unidad } from "./types";
-
-function MaterialFila({
-  material,
-  puedeAdministrar,
-  onPublicar,
-  onEditar,
-  onSolicitarCambio,
-  onRetirar,
-  onVerActividad,
-  onRegistrarVisualizacion,
-}: {
-  material: Material;
-  puedeAdministrar: boolean;
-  onPublicar: (material: Material) => void;
-  onEditar?: (material: Material) => void;
-  onSolicitarCambio: (material: Material) => void;
-  onRetirar: (material: Material) => void;
-  onVerActividad?: (material: Material) => void;
-  onRegistrarVisualizacion?: (material: Material, accion: "visualizo" | "descargo") => void;
-}) {
-  const plazo = material.plazo ? PLAZO_CONFIG[material.plazo] : null;
-  const ultimoCambio =
-    material.cambiosDeFecha.length > 0
-      ? material.cambiosDeFecha[material.cambiosDeFecha.length - 1]
-      : null;
-
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
-      <div className="min-w-0 space-y-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-sm font-medium">{material.titulo}</p>
-          {material.esExtra && <StatusBadge tone="brand">Extra</StatusBadge>}
-          {plazo && <StatusBadge tone={plazo.tone}>{plazo.label}</StatusBadge>}
-          {puedeAdministrar && !material.visible && (
-            <StatusBadge tone="neutral">Oculto</StatusBadge>
-          )}
-          {material.solicitudAbierta && (
-            <StatusBadge tone="warning">Solicitud pendiente</StatusBadge>
-          )}
-          {!material.solicitudAbierta && ultimoCambio?.estado === "aprobada" && (
-            <StatusBadge tone="success">Cambio de fecha aprobado</StatusBadge>
-          )}
-          {!material.solicitudAbierta && ultimoCambio?.estado === "rechazada" && (
-            <StatusBadge tone="danger">Cambio de fecha rechazado</StatusBadge>
-          )}
-        </div>
-        {material.descripcion && (
-          <p className="text-muted-foreground text-xs">{material.descripcion}</p>
-        )}
-        <p className="text-muted-foreground text-xs">
-          {material.fechaProgramada && `Programado: ${formatDate(material.fechaProgramada)}`}
-          {material.publicadoEn && ` · Publicado: ${formatDate(material.publicadoEn)}`}
-          {material.sesionClase?.fecha && ` · Clase: ${formatDate(material.sesionClase.fecha)}`}
-        </p>
-        {puedeAdministrar && ultimoCambio && (
-          <p className="text-muted-foreground text-[11px]">
-            Historial de fecha: {formatDate(ultimoCambio.fechaAnterior)} →{" "}
-            {formatDate(ultimoCambio.fechaSolicitada)} ({ultimoCambio.estado})
-            {ultimoCambio.respuesta ? ` · Respuesta: ${ultimoCambio.respuesta}` : ""}
-          </p>
-        )}
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        {material.url && (
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="min-h-9"
-            onClick={() =>
-              onRegistrarVisualizacion?.(
-                material,
-                material.tipo === "enlace" ? "visualizo" : "descargo",
-              )
-            }
-          >
-            <Link href={urlDeArchivo(material.url)} target="_blank" rel="noreferrer">
-              {material.tipo === "enlace" ? "Abrir enlace" : "Ver"}
-            </Link>
-          </Button>
-        )}
-        {puedeAdministrar && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="min-h-9 gap-1.5"
-            onClick={() => onVerActividad?.(material)}
-          >
-            <HugeiconsIcon icon={Activity01Icon} size={16} />
-            Actividad
-          </Button>
-        )}
-        {puedeAdministrar && onEditar && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="min-h-9 gap-1.5"
-            onClick={() => onEditar(material)}
-          >
-            <HugeiconsIcon icon={FileEditIcon} size={16} />
-            Editar
-          </Button>
-        )}
-        {puedeAdministrar && !material.publicadoEn && (
-          <Button
-            type="button"
-            size="sm"
-            className="min-h-9 gap-1.5"
-            onClick={() => onPublicar(material)}
-          >
-            <HugeiconsIcon icon={CloudUploadIcon} size={16} />
-            Publicar
-          </Button>
-        )}
-        {puedeAdministrar && material.publicadoEn && material.vigente && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="min-h-9 gap-1.5"
-            onClick={() => onPublicar(material)}
-          >
-            <HugeiconsIcon icon={CloudUploadIcon} size={16} />
-            Reemplazar
-          </Button>
-        )}
-        {puedeAdministrar &&
-          material.esPlanificado &&
-          material.fechaCongelada &&
-          !material.solicitudAbierta && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="min-h-9 gap-1.5"
-              onClick={() => onSolicitarCambio(material)}
-            >
-              <HugeiconsIcon icon={FileEditIcon} size={16} />
-              Cambiar fecha
-            </Button>
-          )}
-        {puedeAdministrar && material.publicadoEn && material.vigente && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-destructive min-h-9 gap-1.5"
-            onClick={() => onRetirar(material)}
-          >
-            <HugeiconsIcon icon={Delete02Icon} size={16} />
-            Retirar
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-}
 
 export function AulaVirtualPage({
   cursoSeccionId,
@@ -241,6 +69,7 @@ export function AulaVirtualPage({
 
   const { data: aula, isLoading, isError, error, refetch } = useAula(cursoId);
 
+  // Estados de modales de acción
   const [unidadModal, setUnidadModal] = React.useState<{
     abierto: boolean;
     unidad?: Unidad | null;
@@ -295,7 +124,7 @@ export function AulaVirtualPage({
   );
   const periodoActualLabel = opcionesPeriodo.find((p) => p.value === periodoId)?.label;
 
-  // 1. Si no hay curso seleccionado: Renderizar la cuadrícula de tarjetas tipo Google Classroom
+  // 1. Si no hay curso seleccionado: Renderizar catálogo de materias tipo Google Classroom con filtros
   if (!cursoId) {
     return (
       <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
@@ -319,110 +148,35 @@ export function AulaVirtualPage({
     );
   }
 
-  // 2. Si hay curso seleccionado: Renderizar la vista interior del curso con Banner estilo Classroom
+  // 2. Si hay curso seleccionado: Renderizar la vista interior del curso modularizada
   return (
     <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
       {/* Barra superior de navegación interna */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="hover:bg-muted gap-2 self-start rounded-xl text-xs font-semibold"
-        >
-          <Link href="/admin/aula-virtual" onClick={handleVolverCursos}>
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-            <span>Volver a todas las materias</span>
-          </Link>
-        </Button>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Selector rápido para saltar de materia sin salir */}
-          <div className="w-56">
-            <SelectOption
-              options={cursos.map((c) => ({
-                value: c.cursoSeccionId,
-                label: `${c.cursoNombre} · ${c.seccionNombre}`,
-              }))}
-              value={cursoId}
-              onSelect={handleSeleccionarCurso}
-              placeholder="Cambiar de materia"
-              searchPlaceholder="Buscar materia..."
-            />
-          </div>
-
-          {opcionesPeriodo.length > 1 && (
-            <div className="w-44">
-              <SelectOption
-                options={opcionesPeriodo}
-                value={periodoId}
-                onSelect={setPeriodoId}
-                placeholder="Periodo"
-              />
-            </div>
-          )}
-
-          {esApoderado && aula?.hijosEnCurso && aula.hijosEnCurso.length > 0 && (
-            <div className="w-56">
-              <SelectOption
-                options={aula.hijosEnCurso.map((h) => ({
-                  value: h.estudianteId,
-                  label: `Estudiante: ${h.nombreCompleto}`,
-                }))}
-                value={estudianteActivoId ?? ""}
-                onSelect={setEstudianteIdSeleccionado}
-                placeholder="Estudiante"
-              />
-            </div>
-          )}
-
-          {aula?.puedeAdministrar && (
-            <Button
-              type="button"
-              size="sm"
-              className="gap-1.5 rounded-xl text-xs font-semibold"
-              onClick={() => setUnidadModal({ abierto: true, unidad: null })}
-            >
-              <HugeiconsIcon icon={PlusSignIcon} size={16} />
-              <span>Nueva unidad</span>
-            </Button>
-          )}
-        </div>
-      </div>
+      <AulaNavHeader
+        cursos={cursos}
+        cursoId={cursoId}
+        onSelectCurso={handleSeleccionarCurso}
+        onVolverCursos={handleVolverCursos}
+        opcionesPeriodo={opcionesPeriodo}
+        periodoId={periodoId}
+        onSelectPeriodo={setPeriodoId}
+        esApoderado={esApoderado}
+        hijosEnCurso={aula?.hijosEnCurso}
+        estudianteActivoId={estudianteActivoId}
+        onSelectEstudiante={setEstudianteIdSeleccionado}
+        puedeAdministrar={Boolean(aula?.puedeAdministrar)}
+        onNuevaUnidad={() => setUnidadModal({ abierto: true, unidad: null })}
+      />
 
       {/* Hero Banner estilo Google Classroom */}
-      <div
-        className={`relative overflow-hidden rounded-2xl bg-linear-to-r p-6 md:p-8 ${estiloCurso.gradient} border border-white/10 text-white shadow-md`}
-      >
-        <div className="pointer-events-none absolute right-4 -bottom-6 opacity-15">
-          <HugeiconsIcon icon={BookOpen01Icon} size={150} />
-        </div>
-        <div className="relative z-10 flex flex-col justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-bold tracking-wide text-white! shadow-xs backdrop-blur-md">
-              {cursoInfo?.seccionNombre || aula?.seccionNombre}
-            </span>
-            <span className="text-xs font-medium text-white/90!">
-              {cursoInfo?.gradoNombre || "Secundaria"}
-            </span>
-            {periodoActualLabel && periodoId !== "" && (
-              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white/95! shadow-xs backdrop-blur-sm">
-                {periodoActualLabel}
-              </span>
-            )}
-          </div>
-
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-white! drop-shadow-md md:text-3xl">
-              {cursoInfo?.cursoNombre || aula?.cursoNombre}
-            </h1>
-            <p className="mt-1 flex items-center gap-2 text-sm font-medium text-white/90!">
-              <HugeiconsIcon icon={TeacherIcon} size={16} />
-              <span>Docente: {cursoInfo?.docenteNombre || "Docente asignado"}</span>
-            </p>
-          </div>
-        </div>
-      </div>
+      <CursoHeroBanner
+        seccionNombre={cursoInfo?.seccionNombre || aula?.seccionNombre}
+        gradoNombre={cursoInfo?.gradoNombre}
+        periodoActualLabel={periodoId !== "" ? periodoActualLabel : undefined}
+        cursoNombre={cursoInfo?.cursoNombre || aula?.cursoNombre}
+        docenteNombre={cursoInfo?.docenteNombre}
+        gradient={estiloCurso.gradient}
+      />
 
       <PageState
         isLoading={isLoading}
@@ -494,96 +248,32 @@ export function AulaVirtualPage({
               </TabsList>
             </div>
 
+            {/* Pestaña: Materiales de Reforzamiento */}
             <TabsContent value="materiales" className="space-y-4">
-              {unidadesFiltradas.length === 0 ? (
-                <EmptyState
-                  title="Aún no hay unidades"
-                  description="Crea la primera unidad para empezar a planificar materiales."
-                  icon={BookOpen01Icon}
-                />
-              ) : (
-                unidadesFiltradas.map((unidad) => (
-                  <div key={unidad.id} className="rounded-xl border p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <p className="font-semibold">{unidad.titulo}</p>
-                        {unidad.descripcion && (
-                          <p className="text-muted-foreground text-sm">{unidad.descripcion}</p>
-                        )}
-                        <p className="text-muted-foreground text-xs">
-                          {unidad.fechaInicio && formatDate(unidad.fechaInicio)} –{" "}
-                          {unidad.fechaFin && formatDate(unidad.fechaFin)}
-                          {!unidad.publicada && " · Oculta"}
-                        </p>
-                      </div>
-                      {aula.puedeAdministrar && (
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="min-h-9 gap-1.5"
-                            onClick={() => setUnidadParaMaterial(unidad.id)}
-                          >
-                            <HugeiconsIcon icon={Calendar03Icon} size={16} />
-                            Planificar
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="min-h-9 gap-1.5"
-                            onClick={() => setUnidadParaExtra(unidad.id)}
-                          >
-                            <HugeiconsIcon icon={FileAddIcon} size={16} />
-                            Material extra
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="min-h-9"
-                            onClick={() => setUnidadModal({ abierto: true, unidad })}
-                          >
-                            Editar
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      {unidad.materiales.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">Sin materiales todavía.</p>
-                      ) : (
-                        unidad.materiales.map((material) => (
-                          <MaterialFila
-                            key={material.id}
-                            material={material}
-                            puedeAdministrar={aula.puedeAdministrar}
-                            onPublicar={setMaterialPublicar}
-                            onEditar={(mat) =>
-                              setMaterialEditar({ unidadId: unidad.id, material: mat })
-                            }
-                            onSolicitarCambio={setMaterialCambio}
-                            onRetirar={setMaterialRetirar}
-                            onVerActividad={(mat) =>
-                              setRecursoActividad({
-                                tipo: "material",
-                                id: mat.id,
-                                titulo: mat.titulo,
-                              })
-                            }
-                            onRegistrarVisualizacion={(mat, accion) => {
-                              registrarActividad.mutate({ materialId: mat.id, accion });
-                            }}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
+              <MaterialesTab
+                unidades={unidadesFiltradas}
+                puedeAdministrar={aula.puedeAdministrar}
+                onPlanificarMaterial={setUnidadParaMaterial}
+                onMaterialExtra={setUnidadParaExtra}
+                onEditarUnidad={(unidad) => setUnidadModal({ abierto: true, unidad })}
+                onPublicarMaterial={setMaterialPublicar}
+                onEditarMaterial={(unidadId, mat) => setMaterialEditar({ unidadId, material: mat })}
+                onSolicitarCambio={setMaterialCambio}
+                onRetirarMaterial={setMaterialRetirar}
+                onVerActividad={(mat) =>
+                  setRecursoActividad({
+                    tipo: "material",
+                    id: mat.id,
+                    titulo: mat.titulo,
+                  })
+                }
+                onRegistrarVisualizacion={(mat, accion) => {
+                  registrarActividad.mutate({ materialId: mat.id, accion });
+                }}
+              />
             </TabsContent>
 
+            {/* Pestaña: Tareas y Evaluaciones */}
             <TabsContent value="tareas">
               <TareasTab
                 cursoSeccionId={aula.cursoSeccionId}
@@ -596,6 +286,7 @@ export function AulaVirtualPage({
               />
             </TabsContent>
 
+            {/* Pestaña: Muro de publicaciones */}
             {!esApoderado && (
               <TabsContent value="muro">
                 <MuroTab
@@ -607,6 +298,7 @@ export function AulaVirtualPage({
               </TabsContent>
             )}
 
+            {/* Pestañas condicionales según rol */}
             {aula.puedeAdministrar || esDirectivo ? (
               <>
                 <TabsContent value="libro-notas">
@@ -633,6 +325,7 @@ export function AulaVirtualPage({
         )}
       </PageState>
 
+      {/* Modales de Gestión de Unidades y Materiales */}
       {aula && (
         <UnidadModal
           open={unidadModal.abierto}
@@ -695,6 +388,7 @@ export function AulaVirtualPage({
         recurso={recursoActividad}
       />
 
+      {/* Chat Flotante en vivo */}
       {aula && !esApoderado && (
         <ChatFlotante
           cursoSeccionId={aula.cursoSeccionId}
