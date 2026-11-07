@@ -24,9 +24,11 @@ function normalizeHeaderKey(header: string): string {
 
   if (clean.includes("siagie") && clean.includes("estudiante")) return "codigoSiagieEstudiante";
   if (clean.includes("siagie")) return "codigoSiagie";
-  if (clean.includes("codigo") && clean.includes("docente")) return "codigoDocente";
-  if (clean === "codigo" || clean === "codigo estudiante" || clean.startsWith("cod"))
-    return "codigoSiagie";
+  if (clean.includes("docente") && (clean.includes("codigo") || clean.includes("cod")))
+    return "codigoDocente";
+  if (clean.includes("estudiante") && (clean.includes("codigo") || clean.includes("cod")))
+    return "codigoSiagieEstudiante";
+  if (clean === "codigo" || clean === "cod" || clean === "cod.") return "codigo";
   if (clean.includes("tipo") && (clean.includes("documento") || clean.includes("doc")))
     return "tipoDocumento";
   if (
