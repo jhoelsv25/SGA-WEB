@@ -8,6 +8,7 @@ import {
   descargarConstanciaPdf,
   getMatriculas,
   getMatriculaById,
+  matricularLote,
   matricularMasivo,
   retirarMatricula,
   trasladarMatricula,
@@ -20,6 +21,7 @@ import type {
   MatriculaItem,
   MatriculaMasivaPayload,
   MatriculaMasivaResponse,
+  MatricularLotePayload,
   MatriculaQueryParams,
   PaginatedMatriculasResponse,
   RetirarMatriculaPayload,
@@ -76,6 +78,24 @@ export function useMatriculaMasivaMutation(onSuccess?: (res: MatriculaMasivaResp
     },
     onError: (error) => {
       toast.error(error.message || "Error en la matrícula masiva.");
+    },
+  });
+}
+
+export function useMatricularLoteMutation(onSuccess?: (res: MatriculaMasivaResponse) => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation<MatriculaMasivaResponse, ApiClientError, MatricularLotePayload>({
+    mutationFn: (payload) => matricularLote(payload),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: MATRICULAS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["secciones"] });
+      queryClient.invalidateQueries({ queryKey: ["estudiantes"] });
+      toast.success(data.mensaje);
+      onSuccess?.(data);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Error al matricular estudiantes en lote.");
     },
   });
 }
