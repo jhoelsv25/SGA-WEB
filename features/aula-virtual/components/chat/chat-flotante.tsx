@@ -2,7 +2,13 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { BubbleChatIcon, Cancel01Icon, LockIcon, MinusSignIcon } from "@hugeicons/core-free-icons";
+import {
+  BubbleChatIcon,
+  Cancel01Icon,
+  LockIcon,
+  MinusSignIcon,
+  ViewIcon,
+} from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageState } from "@/components/common/page-state";
@@ -249,8 +255,8 @@ export function ChatFlotante({
             </PageState>
           </div>
 
-          {/* Formulario de entrada de mensajes */}
-          {!anioCerrado && !soloLectura && (
+          {/* Formulario de entrada de mensajes o aviso de modo supervisión */}
+          {!anioCerrado && !soloLectura ? (
             <ChatInputBar
               texto={texto}
               onTextoChange={setTexto}
@@ -259,7 +265,15 @@ export function ChatFlotante({
               onEnviar={handleEnviar}
               isPending={enviarMensaje.isPending}
             />
-          )}
+          ) : soloLectura ? (
+            <div className="border-border/60 bg-muted/30 text-muted-foreground flex items-center justify-center gap-2 border-t px-4 py-3 text-center text-xs">
+              <HugeiconsIcon icon={ViewIcon} size={15} className="text-primary shrink-0" />
+              <span>
+                <strong>Modo supervisión:</strong> Solo el docente a cargo y los estudiantes del
+                aula pueden enviar mensajes.
+              </span>
+            </div>
+          ) : null}
 
           {/* Modal de moderación */}
           <OcultarContenidoModal
