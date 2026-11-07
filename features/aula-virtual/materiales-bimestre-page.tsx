@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { ChartBarLineIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { MaterialesBimestreTable } from "./views/materiales-bimestre-table";
