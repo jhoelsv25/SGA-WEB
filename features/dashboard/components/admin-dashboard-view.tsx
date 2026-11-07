@@ -526,7 +526,7 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
                       <div className="min-w-0">
                         <p className="text-foreground truncate font-medium">{eq.nombre}</p>
                         <p className="text-muted-foreground truncate text-[10px]">
-                          {eq.tipo} {eq.ip ? `· ${eq.ip}` : ""}
+                          {eq.tipo}
                         </p>
                       </div>
                     </div>
