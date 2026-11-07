@@ -290,8 +290,9 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                   Plantilla oficial recomendada
                 </h4>
                 <p className="text-muted-foreground mt-0.5 text-xs">
-                  Descargue la plantilla formateada con los encabezados exactos y una fila de
-                  ejemplo para evitar inconsistencias.
+                  Incluye listas desplegables, las columnas obligatorias marcadas con * y una hoja
+                  de instrucciones. Escriba los datos en la hoja «Datos» sin cambiar los
+                  encabezados.
                 </p>
               </div>
               <Button

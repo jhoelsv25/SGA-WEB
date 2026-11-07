@@ -1,4 +1,4 @@
-import { read, utils, writeFile } from "xlsx";
+import { read, SSF, utils, writeFile } from "xlsx";
 import type { CredencialEmitida, TipoImportacion } from "../types/importacion.types";
 
 /**
@@ -6,10 +6,20 @@ import type { CredencialEmitida, TipoImportacion } from "../types/importacion.ty
  */
 function normalizeHeaderKey(header: string): string {
   const clean = header
+    .replace(/\*/g, "") // marca de obligatorio de la plantilla estándar
     .trim()
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, ""); // Quitar tildes
+
+  // Datos de ficha de la plantilla estándar (RF-007 V4)
+  if (clean.includes("detalle") && clean.includes("discapacidad")) return "detalleDiscapacidad";
+  if (clean.includes("discapacidad")) return "tieneDiscapacidad";
+  if (clean.includes("lengua")) return "lenguaMaterna";
+  if (clean.includes("religion")) return "religion";
+  if (clean.includes("titulo")) return "tituloProfesional";
+  if (clean.includes("direccion")) return "direccion";
+  if (clean.includes("distrito")) return "distrito";
 
   if (clean.includes("siagie") && clean.includes("estudiante")) return "codigoSiagieEstudiante";
   if (clean.includes("siagie")) return "codigoSiagie";
@@ -33,6 +43,31 @@ function normalizeHeaderKey(header: string): string {
   return header.trim();
 }
 
+const CAMPOS_FECHA = new Set(["fechaNacimiento", "fechaIngreso"]);
+
+const dos = (n: number) => String(n).padStart(2, "0");
+
+/**
+ * Convierte el valor de una celda de fecha a YYYY-MM-DD: acepta el número de serie de Excel
+ * (celdas con formato de fecha), objetos Date, «día/mes/año» y el formato ISO.
+ */
+function aFechaIso(valor: unknown): unknown {
+  if (typeof valor === "number") {
+    const f = SSF.parse_date_code(valor);
+    return f ? `${f.y}-${dos(f.m)}-${dos(f.d)}` : valor;
+  }
+  if (valor instanceof Date) {
+    return `${valor.getFullYear()}-${dos(valor.getMonth() + 1)}-${dos(valor.getDate())}`;
+  }
+  if (typeof valor === "string") {
+    const texto = valor.trim();
+    const dmy = /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/.exec(texto);
+    if (dmy) return `${dmy[3]}-${dos(Number(dmy[2]))}-${dos(Number(dmy[1]))}`;
+    return texto;
+  }
+  return valor;
+}
+
 /**
  * Parsea un archivo Excel subido por el usuario en el navegador y retorna un arreglo de filas.
  */
@@ -40,7 +75,9 @@ export async function parseExcelFile(file: File): Promise<Record<string, unknown
   const buffer = await file.arrayBuffer();
   const workbook = read(buffer, { type: "array" });
 
-  const firstSheetName = workbook.SheetNames[0];
+  // La plantilla estándar trae «Datos», «Instrucciones» y «Listas»: se lee «Datos» (o la primera hoja)
+  const firstSheetName =
+    workbook.SheetNames.find((n) => n.trim().toLowerCase() === "datos") ?? workbook.SheetNames[0];
   if (!firstSheetName) {
     throw new Error("El archivo Excel no contiene hojas de datos.");
   }
@@ -63,7 +100,7 @@ export async function parseExcelFile(file: File): Promise<Record<string, unknown
     const normalizedRow: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(row)) {
       const normalizedKey = normalizeHeaderKey(key);
-      normalizedRow[normalizedKey] = value;
+      normalizedRow[normalizedKey] = CAMPOS_FECHA.has(normalizedKey) ? aFechaIso(value) : value;
     }
     return normalizedRow;
   });
