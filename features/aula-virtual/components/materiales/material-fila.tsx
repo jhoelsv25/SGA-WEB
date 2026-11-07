@@ -12,9 +12,9 @@ import {
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/formatters/date";
-import { urlDeArchivo } from "../api";
-import { PLAZO_CONFIG } from "../consts";
-import type { Material } from "../types";
+import { urlDeArchivo } from "../../api";
+import { PLAZO_CONFIG } from "../../consts";
+import type { Material } from "../../types";
 
 export interface MaterialFilaProps {
   material: Material;

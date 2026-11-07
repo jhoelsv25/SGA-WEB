@@ -6,7 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { SelectOption } from "@/components/common/select";
-import type { CursoAula } from "../types";
+import type { CursoAula } from "../../types";
 
 export interface AulaNavHeaderProps {
   cursos: CursoAula[];
@@ -53,42 +53,49 @@ export function AulaNavHeader({
         </Link>
       </Button>
 
+      {/* Selectores rápidos superiores */}
       <div className="flex flex-wrap items-center gap-2">
-        {/* Selector rápido para saltar de materia sin salir */}
-        <div className="w-56">
-          <SelectOption
-            options={cursos.map((c) => ({
-              value: c.cursoSeccionId,
-              label: `${c.cursoNombre} · ${c.seccionNombre}`,
-            }))}
-            value={cursoId}
-            onSelect={onSelectCurso}
-            placeholder="Cambiar de materia"
-            searchPlaceholder="Buscar materia..."
-          />
-        </div>
+        {cursos.length > 1 && (
+          <div className="w-56">
+            <SelectOption
+              options={cursos.map((c) => ({
+                value: c.cursoSeccionId,
+                label: `${c.cursoNombre} · ${c.seccionNombre}`,
+              }))}
+              value={cursoId}
+              onSelect={onSelectCurso}
+              placeholder="Cambiar de curso"
+              searchPlaceholder="Buscar curso..."
+              className="h-8.5 text-xs"
+            />
+          </div>
+        )}
 
-        {opcionesPeriodo.length > 1 && (
-          <div className="w-44">
+        {opcionesPeriodo.length > 0 && (
+          <div className="w-40">
             <SelectOption
               options={opcionesPeriodo}
               value={periodoId}
               onSelect={onSelectPeriodo}
               placeholder="Periodo"
+              searchPlaceholder="Buscar periodo..."
+              className="h-8.5 text-xs"
             />
           </div>
         )}
 
-        {esApoderado && hijosEnCurso && hijosEnCurso.length > 0 && (
-          <div className="w-56">
+        {esApoderado && (hijosEnCurso?.length ?? 0) > 1 && (
+          <div className="w-48">
             <SelectOption
-              options={hijosEnCurso.map((h) => ({
+              options={(hijosEnCurso ?? []).map((h) => ({
                 value: h.estudianteId,
-                label: `Estudiante: ${h.nombreCompleto}`,
+                label: h.nombreCompleto,
               }))}
               value={estudianteActivoId ?? ""}
               onSelect={onSelectEstudiante}
-              placeholder="Estudiante"
+              placeholder="Seleccionar estudiante"
+              searchPlaceholder="Buscar estudiante..."
+              className="h-8.5 text-xs"
             />
           </div>
         )}
@@ -97,10 +104,10 @@ export function AulaNavHeader({
           <Button
             type="button"
             size="sm"
-            className="gap-1.5 rounded-xl text-xs font-semibold"
             onClick={onNuevaUnidad}
+            className="h-8.5 gap-1.5 rounded-xl text-xs font-semibold shadow-xs"
           >
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
+            <HugeiconsIcon icon={PlusSignIcon} size={15} />
             <span>Nueva unidad</span>
           </Button>
         )}

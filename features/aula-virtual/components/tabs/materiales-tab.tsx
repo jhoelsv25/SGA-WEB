@@ -6,7 +6,7 @@ import { BookOpen01Icon, Calendar03Icon, FileAddIcon } from "@hugeicons/core-fre
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/empty-state";
 import { formatDate } from "@/lib/formatters/date";
-import { MaterialFila } from "../material-fila";
+import { MaterialFila } from "../materiales/material-fila";
 import type { Material, Unidad } from "../../types";
 
 export interface MaterialesTabProps {
