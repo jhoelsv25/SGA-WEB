@@ -7,14 +7,13 @@ import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
 import { useListFilters } from "@/hooks/use-list-filters";
-import { useExportExcel } from "@/hooks/use-export-excel";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { personaFilterDefs } from "./config/filters";
-import { personaExportColumns } from "./config/export";
 import { usePersonasQuery } from "./hooks/use-personas";
 import { PersonasTable } from "./views/personas-table";
 import { CreatePersonaModal } from "./components/modals/create-persona-modal";
 import { ImportarButton } from "@/features/importacion";
-import type { Persona, TipoDocumento } from "./types/personas.types";
+import type { TipoDocumento } from "./types/personas.types";
 
 export function PersonasPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -75,11 +74,7 @@ export function PersonasPage() {
   };
 
   // Exportación a Excel estandarizada
-  const { exportToExcel, isExporting } = useExportExcel<Persona>({
-    columns: personaExportColumns,
-    filenamePrefix: "padron-personas-sga",
-    sheetName: "Personas",
-  });
+  const { exportar, isExporting } = useExportarReporte("personas");
 
   return (
     <div className="animate-in fade-in-50 space-y-6 duration-300">
@@ -107,7 +102,9 @@ export function PersonasPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => exportToExcel(personas)}
+                onClick={() =>
+                  void exportar({ search: search?.trim(), tipoDocumento, esProvisional })
+                }
                 disabled={isExporting || personas.length === 0}
                 className="gap-2"
               >

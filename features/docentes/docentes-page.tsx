@@ -9,19 +9,13 @@ import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
 import { useListFilters } from "@/hooks/use-list-filters";
-import { useExportExcel } from "@/hooks/use-export-excel";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { docenteFilterDefs } from "./config/filters";
-import { docenteExportColumns } from "./config/export";
 import { useDocentesQuery } from "./hooks/use-docentes";
 import { DocentesTable } from "./views/docentes-table";
 import { CreateDocenteModal } from "./components/modals/create-docente-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
-import type {
-  CreateDocenteResponse,
-  Docente,
-  EstadoDocente,
-  TipoContrato,
-} from "./types/docentes.types";
+import type { CreateDocenteResponse, EstadoDocente, TipoContrato } from "./types/docentes.types";
 
 export function DocentesPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -90,11 +84,7 @@ export function DocentesPage() {
   };
 
   // Exportar Excel
-  const { exportToExcel, isExporting } = useExportExcel<Docente>({
-    columns: docenteExportColumns,
-    filenamePrefix: "plana-docente-sga",
-    sheetName: "Docentes",
-  });
+  const { exportar, isExporting } = useExportarReporte("docentes");
 
   const handleCreatedSuccess = (res: CreateDocenteResponse) => {
     setCreatedData(res);
@@ -125,7 +115,7 @@ export function DocentesPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => exportToExcel(docentes)}
+                onClick={() => void exportar({ search: search?.trim(), tipoContrato, estado })}
                 disabled={isExporting || docentes.length === 0}
                 className="gap-2"
               >
