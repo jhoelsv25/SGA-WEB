@@ -435,7 +435,7 @@ export function AulaVirtualPage({
           <Tabs value={tabActiva} onValueChange={setTabActiva} className="w-full space-y-6">
             {/* Navegación por pestañas moderna estilo Google Classroom */}
             <div className="w-full scrollbar-none overflow-x-auto pt-1 pb-2">
-              <TabsList className="border-border/80 bg-card inline-flex !h-12 w-max items-center justify-start gap-1 rounded-2xl border p-1.5 shadow-xs backdrop-blur-md">
+              <TabsList className="border-border/80 bg-card inline-flex h-12! w-max items-center justify-start gap-1 rounded-2xl border p-1.5 shadow-xs backdrop-blur-md">
                 <TabsTrigger
                   value="materiales"
                   className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
