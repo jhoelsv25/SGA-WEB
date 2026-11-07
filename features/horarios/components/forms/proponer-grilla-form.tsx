@@ -39,15 +39,15 @@ export function ProponerGrillaForm({
         onSubmit(hora && hora.length > 0 ? hora : undefined);
       })}
     >
-      <div className="border-border/60 bg-muted/30 text-muted-foreground rounded-lg border p-3 text-xs">
-        El sistema calculará las franjas escolares estándar de lunes a viernes según la jornada
-        configurada para el turno y las mostrará en la grilla listas para asignarles cursos. Esta
-        acción no sobreescribe ni guarda automáticamente en la base de datos.
+      <div className="border-border/60 bg-muted/30 text-muted-foreground rounded-xl border p-3.5 text-xs leading-relaxed">
+        El sistema armará la plantilla semanal de <strong>horas pedagógicas (45 min)</strong> y{" "}
+        <strong>recreos</strong> de lunes a viernes según la jornada del colegio, dejándola lista
+        para que solo tengas que asignar cada asignatura a su hora correspondiente.
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="horaEntrada" className="text-sm font-medium">
-          Hora de entrada de estudiantes (Opcional)
+          Hora de entrada al colegio (Opcional)
         </Label>
         <Input
           id="horaEntrada"
@@ -58,8 +58,8 @@ export function ProponerGrillaForm({
           {...form.register("horaEntrada")}
         />
         <p className="text-muted-foreground text-xs">
-          Formato HH:mm (24 horas). Si se deja vacío, la API aplicará el horario de entrada
-          institucional del turno.
+          Formato HH:mm (ej. 07:45 o 08:00). Si se deja en blanco, se aplicará la hora de inicio
+          oficial de la institución.
         </p>
         {errors.horaEntrada && (
           <p className="text-destructive text-xs font-medium">{errors.horaEntrada.message}</p>
@@ -87,7 +87,7 @@ export function ProponerGrillaForm({
           ) : (
             <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3.5" />
           )}
-          <span>Generar propuesta</span>
+          <span>Generar horario base</span>
         </Button>
       </div>
     </form>

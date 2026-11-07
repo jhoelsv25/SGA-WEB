@@ -26,8 +26,8 @@ export function ProponerGrillaModal({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Proponer grilla escolar del día"
-      description="Calcula las franjas horarias y recreos de lunes a viernes según la jornada del turno."
+      title="Generar Horas de Clase y Recreos"
+      description="Calcula automáticamente los bloques de clase (horas pedagógicas) y recreos de lunes a viernes según el turno escolar."
       icon={Clock01Icon}
       size="md"
     >

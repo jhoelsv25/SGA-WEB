@@ -1,5 +1,6 @@
 import { Clock01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { cn } from "@/lib/utils";
 import type { BloqueHorario, BloquePropuesta, CargaItemHorario } from "../../types";
 import { DIAS_SEMANA, convertirHoraAMinutos } from "../../utils";
 import { CeldaBloque } from "./celda-bloque";
@@ -88,113 +89,166 @@ export function GrillaSemanal({
           </tr>
         </thead>
         <tbody className="divide-border/50 divide-y text-xs">
-          {franjas.map((franja, indexFranja) => (
-            <tr key={`${franja.inicio}-${franja.fin}`} className="hover:bg-muted/10">
-              {/* Encabezado de fila con hora */}
-              <th
-                scope="row"
-                className="border-border/60 bg-muted/10 text-foreground sticky left-0 z-10 border-r p-2 text-center font-mono shadow-xs"
+          {franjas.map((franja, indexFranja) => {
+            const esHoraEnPunto = franja.inicio.endsWith(":00");
+
+            return (
+              <tr
+                key={`${franja.inicio}-${franja.fin}`}
+                className={cn(
+                  "hover:bg-muted/10 h-[34px] transition-colors",
+                  esHoraEnPunto && "border-t-border/70 border-t-2",
+                )}
               >
-                <div className="text-foreground text-xs font-bold tracking-tight">
-                  {franja.inicio}
-                </div>
-                <div className="text-muted-foreground text-[10px] font-medium">{franja.fin}</div>
-              </th>
+                {/* Encabezado de fila con hora */}
+                <th
+                  scope="row"
+                  className={cn(
+                    "border-border/60 bg-muted/10 text-foreground sticky left-0 z-10 border-r px-2 py-0.5 text-center font-mono shadow-xs select-none",
+                    esHoraEnPunto && "bg-muted/25 font-bold",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "text-xs tracking-tight",
+                      esHoraEnPunto
+                        ? "text-foreground font-bold"
+                        : "text-muted-foreground font-normal",
+                    )}
+                  >
+                    {franja.inicio}
+                  </div>
+                  <div className="text-muted-foreground/70 text-[10px] leading-none">
+                    {franja.fin}
+                  </div>
+                </th>
 
-              {/* Celdas por día escolar (lunes a viernes) */}
-              {DIAS_SEMANA.map((dia) => {
-                const cubiertoHasta = cubiertoHastaMinuto.get(dia.dia) ?? 0;
-                if (cubiertoHasta > franja.minInicio) {
-                  return null;
-                }
-
-                // 1. Bloque registrado existente
-                const bloqueExistente = bloques.find(
-                  (b) => b.diaSemana === dia.dia && b.horaInicio === franja.inicio,
-                );
-
-                if (bloqueExistente) {
-                  const minFinBloque = convertirHoraAMinutos(bloqueExistente.horaFin);
-                  let span = 0;
-                  for (let k = indexFranja; k < franjas.length; k++) {
-                    if (franjas[k]!.minFin <= minFinBloque) {
-                      span++;
-                    } else {
-                      break;
-                    }
+                {/* Celdas por día escolar (lunes a viernes) */}
+                {DIAS_SEMANA.map((dia) => {
+                  const cubiertoHasta = cubiertoHastaMinuto.get(dia.dia) ?? 0;
+                  if (cubiertoHasta > franja.minInicio) {
+                    return null;
                   }
-                  if (span < 1) span = 1;
-                  cubiertoHastaMinuto.set(dia.dia, minFinBloque);
 
-                  return (
-                    <td
-                      key={`${dia.dia}-${franja.inicio}`}
-                      rowSpan={span}
-                      className="border-border/60 border-r p-1.5 align-top last:border-r-0"
-                    >
-                      <CeldaBloque
-                        bloque={bloqueExistente}
-                        duracionBaseClase={duracionBaseClase}
-                        puedeGestionar={puedeGestionar}
-                        onEditar={onEditarBloque}
-                        onEliminar={onEliminarBloque}
-                      />
-                    </td>
+                  // 1. Bloque registrado existente
+                  const bloqueExistente = bloques.find(
+                    (b) => b.diaSemana === dia.dia && b.horaInicio === franja.inicio,
                   );
-                }
 
-                // 2. Franja propuesta por la API
-                const propuestaExistente = bloquesPropuestos.find(
-                  (p) => p.diaSemana === dia.dia && p.horaInicio === franja.inicio,
-                );
-
-                if (propuestaExistente) {
-                  const minFinProp = convertirHoraAMinutos(propuestaExistente.horaFin);
-                  let span = 0;
-                  for (let k = indexFranja; k < franjas.length; k++) {
-                    if (franjas[k]!.minFin <= minFinProp) {
-                      span++;
-                    } else {
-                      break;
+                  if (bloqueExistente) {
+                    const minFinBloque = convertirHoraAMinutos(bloqueExistente.horaFin);
+                    let span = 0;
+                    for (let k = indexFranja; k < franjas.length; k++) {
+                      if (franjas[k]!.minFin <= minFinBloque) {
+                        span++;
+                      } else {
+                        break;
+                      }
                     }
-                  }
-                  if (span < 1) span = 1;
-                  cubiertoHastaMinuto.set(dia.dia, minFinProp);
+                    if (span < 1) span = 1;
+                    cubiertoHastaMinuto.set(dia.dia, minFinBloque);
 
+                    return (
+                      <td
+                        key={`${dia.dia}-${franja.inicio}`}
+                        rowSpan={span}
+                        className={cn(
+                          "border-border/60 h-full border-r p-1 align-top last:border-r-0",
+                          esHoraEnPunto && "border-t-border/70 border-t-2",
+                        )}
+                      >
+                        <CeldaBloque
+                          bloque={bloqueExistente}
+                          duracionBaseClase={duracionBaseClase}
+                          span={span}
+                          puedeGestionar={puedeGestionar}
+                          onEditar={onEditarBloque}
+                          onEliminar={onEliminarBloque}
+                        />
+                      </td>
+                    );
+                  }
+
+                  // 2. Franja propuesta por la API
+                  const propuestaExistente = bloquesPropuestos.find(
+                    (p) => p.diaSemana === dia.dia && p.horaInicio === franja.inicio,
+                  );
+
+                  if (propuestaExistente) {
+                    const minFinProp = convertirHoraAMinutos(propuestaExistente.horaFin);
+                    let span = 0;
+                    for (let k = indexFranja; k < franjas.length; k++) {
+                      if (franjas[k]!.minFin <= minFinProp) {
+                        span++;
+                      } else {
+                        break;
+                      }
+                    }
+                    if (span < 1) span = 1;
+                    cubiertoHastaMinuto.set(dia.dia, minFinProp);
+
+                    return (
+                      <td
+                        key={`${dia.dia}-${franja.inicio}`}
+                        rowSpan={span}
+                        className={cn(
+                          "border-border/60 h-full border-r p-1 align-top last:border-r-0",
+                          esHoraEnPunto && "border-t-border/70 border-t-2",
+                        )}
+                        onDragOver={(e) => {
+                          if (!puedeGestionar || propuestaExistente.tipoBloque === "receso") return;
+                          e.preventDefault();
+                          e.dataTransfer.dropEffect = "copy";
+                        }}
+                        onDrop={(e) => {
+                          if (!puedeGestionar || propuestaExistente.tipoBloque === "receso") return;
+                          e.preventDefault();
+                          try {
+                            const data = JSON.parse(e.dataTransfer.getData("application/json")) as {
+                              cursoSeccionId: string;
+                            };
+                            if (data.cursoSeccionId) {
+                              onAsignarCursoASlot(
+                                dia.dia,
+                                propuestaExistente.horaInicio,
+                                propuestaExistente.horaFin,
+                                "clase",
+                                data.cursoSeccionId,
+                              );
+                            }
+                          } catch {
+                            // Drop no válido
+                          }
+                        }}
+                      >
+                        <CeldaPropuesta
+                          propuesta={propuestaExistente}
+                          diaNombre={dia.nombre}
+                          span={span}
+                          puedeGestionar={puedeGestionar}
+                          cursoSeleccionado={cursoSeleccionado}
+                          onAsignarCursoASlot={onAsignarCursoASlot}
+                          onAbrirNuevoBloque={onAbrirNuevoBloque}
+                        />
+                      </td>
+                    );
+                  }
+
+                  // 3. Franja vacía sin bloque ni propuesta
                   return (
                     <td
                       key={`${dia.dia}-${franja.inicio}`}
-                      rowSpan={span}
-                      className="border-border/60 border-r p-1.5 align-top last:border-r-0"
-                      onDragOver={(e) => {
-                        if (!puedeGestionar || propuestaExistente.tipoBloque === "receso") return;
-                        e.preventDefault();
-                        e.dataTransfer.dropEffect = "copy";
-                      }}
-                      onDrop={(e) => {
-                        if (!puedeGestionar || propuestaExistente.tipoBloque === "receso") return;
-                        e.preventDefault();
-                        try {
-                          const data = JSON.parse(e.dataTransfer.getData("application/json")) as {
-                            cursoSeccionId: string;
-                          };
-                          if (data.cursoSeccionId) {
-                            onAsignarCursoASlot(
-                              dia.dia,
-                              propuestaExistente.horaInicio,
-                              propuestaExistente.horaFin,
-                              "clase",
-                              data.cursoSeccionId,
-                            );
-                          }
-                        } catch {
-                          // Drop no válido
-                        }
-                      }}
+                      className={cn(
+                        "border-border/60 border-r p-0.5 align-middle last:border-r-0",
+                        esHoraEnPunto && "border-t-border/70 border-t-2",
+                      )}
                     >
-                      <CeldaPropuesta
-                        propuesta={propuestaExistente}
+                      <CeldaVacia
+                        diaSemana={dia.dia}
                         diaNombre={dia.nombre}
+                        inicio={franja.inicio}
+                        fin={franja.fin}
+                        duracionSugeridaMinutos={duracionBaseClase ?? 45}
                         puedeGestionar={puedeGestionar}
                         cursoSeleccionado={cursoSeleccionado}
                         onAsignarCursoASlot={onAsignarCursoASlot}
@@ -202,29 +256,10 @@ export function GrillaSemanal({
                       />
                     </td>
                   );
-                }
-
-                // 3. Franja vacía sin bloque ni propuesta
-                return (
-                  <td
-                    key={`${dia.dia}-${franja.inicio}`}
-                    className="border-border/60 border-r p-1.5 align-middle last:border-r-0"
-                  >
-                    <CeldaVacia
-                      diaSemana={dia.dia}
-                      diaNombre={dia.nombre}
-                      inicio={franja.inicio}
-                      fin={franja.fin}
-                      puedeGestionar={puedeGestionar}
-                      cursoSeleccionado={cursoSeleccionado}
-                      onAsignarCursoASlot={onAsignarCursoASlot}
-                      onAbrirNuevoBloque={onAbrirNuevoBloque}
-                    />
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

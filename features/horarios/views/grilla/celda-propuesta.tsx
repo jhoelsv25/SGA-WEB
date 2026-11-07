@@ -11,6 +11,7 @@ interface CeldaPropuestaProps {
   propuesta: BloquePropuesta;
   diaNombre: string;
   puedeGestionar: boolean;
+  span?: number;
   cursoSeleccionado: CargaItemHorario | null;
   onAsignarCursoASlot: (
     diaSemana: number,
@@ -27,22 +28,32 @@ interface CeldaPropuestaProps {
   ) => void;
 }
 
+// Altura base en píxeles por slot de 15 minutos
+const ALTURA_SLOT_PX = 34;
+
 export function CeldaPropuesta({
   propuesta,
   diaNombre,
   puedeGestionar,
+  span,
   cursoSeleccionado,
   onAsignarCursoASlot,
   onAbrirNuevoBloque,
 }: CeldaPropuestaProps) {
   const esReceso = propuesta.tipoBloque === "receso";
+  const alturaCalculada = span && span > 1 ? span * ALTURA_SLOT_PX - 8 : undefined;
 
   if (esReceso) {
     return (
-      <div className="group flex h-full min-h-14 flex-col justify-between rounded-xl border border-dashed border-amber-500/30 bg-amber-500/5 p-2 text-xs transition-colors hover:bg-amber-500/10">
+      <div
+        className="group flex h-full min-h-7 flex-col justify-between rounded-lg border border-dashed border-amber-500/30 bg-amber-500/5 p-1.5 text-xs transition-colors hover:bg-amber-500/10"
+        style={{
+          minHeight: alturaCalculada ? `${alturaCalculada}px` : undefined,
+        }}
+      >
         <div className="flex items-center justify-between gap-1">
-          <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
-            <HugeiconsIcon icon={Clock01Icon} className="size-3.5" />
+          <span className="flex items-center gap-1 truncate text-[11px] font-semibold text-amber-700 dark:text-amber-400">
+            <HugeiconsIcon icon={Clock01Icon} className="size-3 shrink-0" />
             Receso propuesto
           </span>
           <span className="font-mono text-[10px] text-amber-700/80 dark:text-amber-400/80">
@@ -64,7 +75,7 @@ export function CeldaPropuesta({
                   null,
                 )
               }
-              className="h-7 border-amber-500/40 bg-amber-500/10 px-2.5 text-[11px] font-medium text-amber-800 hover:bg-amber-500/20 dark:text-amber-300"
+              className="h-6 border-amber-500/40 bg-amber-500/10 px-2 text-[10px] font-medium text-amber-800 hover:bg-amber-500/20 dark:text-amber-300"
               aria-label={`Fijar receso escolar el ${diaNombre} de ${propuesta.horaInicio} a ${propuesta.horaFin}`}
             >
               Fijar receso
@@ -93,11 +104,14 @@ export function CeldaPropuesta({
   return (
     <div
       className={cn(
-        "group flex h-full min-h-15 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed p-2 transition-all",
+        "group flex h-full min-h-12 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed p-2 transition-all",
         cursoSeleccionado
           ? "border-primary/60 bg-primary/10 hover:border-primary hover:bg-primary/20 ring-primary/30 ring-1"
           : "border-border/40 bg-muted/5 hover:border-primary/40 hover:bg-muted/20",
       )}
+      style={{
+        minHeight: alturaCalculada ? `${alturaCalculada}px` : undefined,
+      }}
       role={puedeGestionar ? "button" : undefined}
       tabIndex={puedeGestionar ? 0 : -1}
       onClick={handleAccion}

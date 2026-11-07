@@ -1,15 +1,15 @@
 "use client";
 
-import { PlusSignIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { CargaItemHorario } from "../../types";
+import { convertirHoraAMinutos, minutosAHora } from "../../utils";
 
 interface CeldaVaciaProps {
   diaSemana: number;
   diaNombre: string;
   inicio: string;
   fin: string;
+  duracionSugeridaMinutos?: number;
   puedeGestionar: boolean;
   cursoSeleccionado: CargaItemHorario | null;
   onAsignarCursoASlot: (
@@ -32,36 +32,49 @@ export function CeldaVacia({
   diaNombre,
   inicio,
   fin,
+  duracionSugeridaMinutos = 45,
   puedeGestionar,
   cursoSeleccionado,
   onAsignarCursoASlot,
   onAbrirNuevoBloque,
 }: CeldaVaciaProps) {
   const handleClick = () => {
+    // Si la celda es un slot atómico de 15 min, sugerir la duración de una clase ordinaria (ej. 45 min)
+    const minIni = convertirHoraAMinutos(inicio);
+    const finSugerido = duracionSugeridaMinutos
+      ? minutosAHora(minIni + duracionSugeridaMinutos)
+      : fin;
+
     if (cursoSeleccionado) {
-      onAsignarCursoASlot(diaSemana, inicio, fin, "clase", cursoSeleccionado.id);
+      onAsignarCursoASlot(diaSemana, inicio, finSugerido, "clase", cursoSeleccionado.id);
     } else {
-      onAbrirNuevoBloque(diaSemana, inicio, fin, "clase");
+      onAbrirNuevoBloque(diaSemana, inicio, finSugerido, "clase");
     }
   };
 
   return (
     <div
-      className={`flex h-full min-h-[50px] items-center justify-center rounded-lg border border-transparent transition-colors ${
-        puedeGestionar ? "hover:border-border/80 hover:bg-muted/20 hover:border-dashed" : ""
-      }`}
+      onClick={puedeGestionar ? handleClick : undefined}
+      role={puedeGestionar ? "button" : undefined}
+      tabIndex={puedeGestionar ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (puedeGestionar && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      className={cn(
+        "group flex h-full min-h-[30px] items-center justify-center rounded-md border border-transparent transition-all",
+        puedeGestionar &&
+          "hover:border-border/60 hover:bg-muted/25 focus-visible:ring-primary cursor-pointer focus-visible:ring-1 focus-visible:outline-none",
+        cursoSeleccionado && "hover:border-primary/50 hover:bg-primary/10",
+      )}
+      aria-label={`Asignar clase el ${diaNombre} a las ${inicio}`}
     >
       {puedeGestionar && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={handleClick}
-          className="text-muted-foreground hover:bg-muted hover:text-foreground size-11 min-h-11 min-w-11 rounded-full"
-          aria-label={`Registrar bloque el ${diaNombre} a las ${inicio}`}
-        >
-          <HugeiconsIcon icon={PlusSignIcon} className="size-4" />
-        </Button>
+        <span className="text-muted-foreground/30 group-hover:text-muted-foreground text-xs font-semibold transition-all select-none group-hover:scale-125">
+          +
+        </span>
       )}
     </div>
   );
