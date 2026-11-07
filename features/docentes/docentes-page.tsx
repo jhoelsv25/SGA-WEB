@@ -7,7 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { UserGroupIcon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
-import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useExportExcel } from "@/hooks/use-export-excel";
 import { docenteFilterDefs } from "./config/filters";
@@ -118,25 +118,25 @@ export function DocentesPage() {
         <ListToolbar
           filterDefs={docenteFilterDefs}
           listFilters={listFilters}
-          onRefresh={() => refetch()}
-          isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => exportToExcel(docentes)}
-                disabled={isExporting || docentes.length === 0}
-                className="gap-2"
-              >
-                <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
-                Exportar Excel
-              </Button>
               <RegistroPersonaAcciones
                 destino="docente"
                 tipoImportacion="docentes"
                 onVincular={(persona) => abrirRegistro(persona)}
                 onRegistrar={() => abrirRegistro(null)}
+                onImportSuccess={() => void refetch()}
+                onRefresh={() => void refetch()}
+                isRefreshing={isFetching}
+                extraMenuItems={
+                  <DropdownMenuItem
+                    disabled={isExporting || docentes.length === 0}
+                    onSelect={() => exportToExcel(docentes)}
+                  >
+                    <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
+                    Exportar Excel
+                  </DropdownMenuItem>
+                }
               />
             </div>
           }

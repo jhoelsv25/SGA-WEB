@@ -4,6 +4,7 @@ import * as React from "react";
 import { DataTable } from "@/components/common/data-table";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/common/user-avatar";
 import { StatusBadge } from "@/components/common/status-badge";
@@ -279,32 +280,29 @@ export function UsersTable() {
         onRefresh={() => refetch()}
         isRefreshing={isFetching}
         actions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportAll}
-              disabled={isExportingAll || isExporting || (users.length === 0 && !response?.hasMore)}
-              className="gap-2"
-            >
-              {isExportingAll || isExporting ? (
-                <Spinner className="size-4" />
-              ) : (
-                <HugeiconsIcon icon={FileExportIcon} className="size-4" />
-              )}
-              <span>
-                {isExportingAll
-                  ? exportLoadedCount !== null && exportLoadedCount > 0
-                    ? `Exportando (${exportLoadedCount})...`
-                    : "Exportando..."
-                  : "Exportar Excel"}
-              </span>
-            </Button>
-            <Button size="sm" onClick={() => setCreateModalOpen(true)} className="gap-2">
-              <HugeiconsIcon icon={UserAdd01Icon} className="size-4" />
-              Crear cuenta
-            </Button>
-          </div>
+          <Button size="sm" onClick={() => setCreateModalOpen(true)} className="h-10 gap-2">
+            <HugeiconsIcon icon={UserAdd01Icon} className="size-4" />
+            Crear cuenta
+          </Button>
+        }
+        secondaryActions={
+          <DropdownMenuItem
+            onSelect={handleExportAll}
+            disabled={isExportingAll || isExporting || (users.length === 0 && !response?.hasMore)}
+          >
+            {isExportingAll || isExporting ? (
+              <Spinner className="size-4" />
+            ) : (
+              <HugeiconsIcon icon={FileExportIcon} className="size-4" />
+            )}
+            <span>
+              {isExportingAll
+                ? exportLoadedCount !== null && exportLoadedCount > 0
+                  ? `Exportando (${exportLoadedCount})...`
+                  : "Exportando..."
+                : "Exportar Excel"}
+            </span>
+          </DropdownMenuItem>
         }
       />
 

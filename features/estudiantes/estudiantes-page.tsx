@@ -7,7 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { StudentIcon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
-import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useCursorPagination } from "@/hooks/use-cursor-pagination";
 import { useExportExcel } from "@/hooks/use-export-excel";
@@ -83,25 +83,25 @@ export function EstudiantesPage() {
         <ListToolbar
           filterDefs={estudianteFilterDefs}
           listFilters={listFilters}
-          onRefresh={refetch}
-          isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={isExporting || estudiantes.length === 0}
-                className="h-8 gap-1.5 text-xs"
-              >
-                <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
-                {isExporting ? "Exportando..." : "Exportar"}
-              </Button>
               <RegistroPersonaAcciones
                 destino="estudiante"
                 tipoImportacion="estudiantes"
                 onVincular={(persona) => abrirRegistro(persona)}
                 onRegistrar={() => abrirRegistro(null)}
+                onImportSuccess={() => void refetch()}
+                onRefresh={() => void refetch()}
+                isRefreshing={isFetching}
+                extraMenuItems={
+                  <DropdownMenuItem
+                    disabled={isExporting || estudiantes.length === 0}
+                    onSelect={() => void handleExport()}
+                  >
+                    <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
+                    Exportar Excel
+                  </DropdownMenuItem>
+                }
               />
             </div>
           }

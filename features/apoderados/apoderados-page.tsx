@@ -7,7 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { UserGroupIcon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
-import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useExportExcel } from "@/hooks/use-export-excel";
 import { apoderadoFilterDefs } from "./config/filters";
@@ -15,7 +15,6 @@ import { apoderadoExportColumns } from "./config/export";
 import { useApoderadosQuery } from "./hooks/use-apoderados";
 import { ApoderadosTable } from "./views/apoderados-table";
 import { CreateApoderadoModal } from "./components/modals/create-apoderado-modal";
-import { ImportarButton } from "@/features/importacion";
 import type { Apoderado } from "./types/apoderados.types";
 
 export function ApoderadosPage() {
@@ -94,26 +93,25 @@ export function ApoderadosPage() {
         <ListToolbar
           filterDefs={apoderadoFilterDefs}
           listFilters={listFilters}
-          onRefresh={refetch}
-          isRefreshing={isFetching}
           actions={
             <div className="flex items-center gap-2">
-              <ImportarButton tipo="apoderados" onSuccess={() => void refetch()} />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={isExporting || apoderados.length === 0}
-                className="h-8 gap-1.5 text-xs"
-              >
-                <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
-                {isExporting ? "Exportando..." : "Exportar"}
-              </Button>
               <RegistroPersonaAcciones
                 destino="apoderado"
                 tipoImportacion="apoderados"
                 onVincular={(persona) => abrirRegistro(persona)}
                 onRegistrar={() => abrirRegistro(null)}
+                onImportSuccess={() => void refetch()}
+                onRefresh={() => void refetch()}
+                isRefreshing={isFetching}
+                extraMenuItems={
+                  <DropdownMenuItem
+                    disabled={isExporting || apoderados.length === 0}
+                    onSelect={() => void handleExport()}
+                  >
+                    <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
+                    Exportar Excel
+                  </DropdownMenuItem>
+                }
               />
             </div>
           }

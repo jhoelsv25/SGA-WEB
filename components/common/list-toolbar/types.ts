@@ -38,5 +38,10 @@ export interface ListToolbarProps {
   /** Acciones antes del reload (p. ej. toggle tabla/lista) */
   leadingActions?: ReactNode;
   actions?: ReactNode;
+  /**
+   * Acciones ocasionales (importar, exportar…) como `DropdownMenuItem`s dentro del menú "⋯".
+   * Si se pasan, "Actualizar" también se mueve a ese menú.
+   */
+  secondaryActions?: ReactNode;
   className?: string;
 }
