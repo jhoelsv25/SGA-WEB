@@ -199,7 +199,7 @@ export function CursosClassroomGrid({
         {/* Controles de Filtro Dinámicos por Rol */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Buscador de texto en vivo */}
-          <div className="relative min-w-[240px] flex-1">
+          <div className="relative min-w-60 flex-1">
             <HugeiconsIcon
               icon={Search01Icon}
               size={17}
@@ -353,7 +353,7 @@ export function CursosClassroomGrid({
               >
                 {/* Banner de Cabecera tipo Classroom con degradado vibrante */}
                 <div
-                  className={`relative flex h-36 flex-col justify-between bg-gradient-to-br p-4 ${estilo.gradient} text-white`}
+                  className={`relative flex h-36 flex-col justify-between bg-linear-to-br p-4 ${estilo.gradient} text-white`}
                 >
                   {/* Patrón decorativo sutil en la esquina */}
                   <div className="pointer-events-none absolute right-2 -bottom-2 opacity-15">
