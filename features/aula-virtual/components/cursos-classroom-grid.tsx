@@ -1,15 +1,16 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { BookOpen01Icon, Search01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import type { CursoAula } from "../types";
 
 interface CursosClassroomGridProps {
   cursos: CursoAula[];
-  onSelectCurso: (cursoSeccionId: string) => void;
+  onSelectCurso?: (cursoSeccionId: string) => void;
+  basePath?: string;
 }
 
 // Paletas inspiradas en Google Classroom según área curricular o nombre
@@ -82,7 +83,11 @@ export function obtenerEstiloCurso(curso: {
   };
 }
 
-export function CursosClassroomGrid({ cursos, onSelectCurso }: CursosClassroomGridProps) {
+export function CursosClassroomGrid({
+  cursos,
+  onSelectCurso,
+  basePath = "/admin/aula-virtual",
+}: CursosClassroomGridProps) {
   const [busqueda, setBusqueda] = React.useState("");
   const [seccionFiltro, setSeccionFiltro] = React.useState<string>("todas");
 
@@ -181,11 +186,14 @@ export function CursosClassroomGrid({ cursos, onSelectCurso }: CursosClassroomGr
               ? curso.docenteNombre.charAt(0).toUpperCase()
               : "D";
 
+            const rutaCurso = `${basePath ?? "/admin/aula-virtual"}/${curso.cursoSeccionId}`;
+
             return (
-              <div
+              <Link
                 key={curso.cursoSeccionId}
-                onClick={() => onSelectCurso(curso.cursoSeccionId)}
-                className="group border-border/70 bg-card hover:border-border relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                href={rutaCurso}
+                onClick={() => onSelectCurso?.(curso.cursoSeccionId)}
+                className="group border-border/70 bg-card hover:border-border focus-visible:ring-primary relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:ring-2 focus-visible:outline-none"
               >
                 {/* Banner de Cabecera tipo Classroom con degradado vibrante */}
                 <div
@@ -231,26 +239,17 @@ export function CursosClassroomGrid({ cursos, onSelectCurso }: CursosClassroomGr
 
                   {/* Botón de acción tipo Classroom */}
                   <div className="border-border/50 border-t pt-2">
-                    <Button
-                      type="button"
-                      variant="default"
-                      size="sm"
-                      className="group-hover:bg-primary w-full gap-2 rounded-xl font-medium transition-all group-hover:shadow-md"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectCurso(curso.cursoSeccionId);
-                      }}
-                    >
+                    <div className="group-hover:bg-primary bg-primary/90 text-primary-foreground flex h-9 w-full items-center justify-center gap-2 rounded-xl text-xs font-medium transition-all group-hover:shadow-md">
                       <span>Entrar al aula</span>
                       <HugeiconsIcon
                         icon={ArrowRight01Icon}
                         size={15}
                         className="transition-transform group-hover:translate-x-0.5"
                       />
-                    </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

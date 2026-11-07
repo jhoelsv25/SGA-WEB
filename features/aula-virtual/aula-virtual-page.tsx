@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Activity01Icon,
@@ -220,9 +221,10 @@ export function AulaVirtualPage({
   initialTab?: string;
   initialTareaId?: string;
 }) {
+  const router = useRouter();
   const { data: cursos = [] } = useMisCursos();
   const { anio } = useAnioLectivo();
-  const [cursoId, setCursoId] = React.useState(cursoSeccionId ?? "");
+  const cursoId = cursoSeccionId ?? "";
   const [periodoId, setPeriodoId] = React.useState<string>("");
   const [tabActiva, setTabActiva] = React.useState<string>(
     initialTareaId ? "tareas" : initialTab || "materiales",
@@ -230,17 +232,11 @@ export function AulaVirtualPage({
   const [estudianteIdSeleccionado, setEstudianteIdSeleccionado] = React.useState<string>("");
 
   const handleSeleccionarCurso = (id: string) => {
-    setCursoId(id);
-    if (typeof window !== "undefined") {
-      window.history.pushState(null, "", `/admin/aula-virtual/${id}`);
-    }
+    router.push(`/admin/aula-virtual/${id}`);
   };
 
   const handleVolverCursos = () => {
-    setCursoId("");
-    if (typeof window !== "undefined") {
-      window.history.pushState(null, "", "/admin/aula-virtual");
-    }
+    router.push("/admin/aula-virtual");
   };
 
   const { data: aula, isLoading, isError, error, refetch } = useAula(cursoId);
@@ -329,14 +325,15 @@ export function AulaVirtualPage({
       {/* Barra superior de navegación interna */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button
-          type="button"
+          asChild
           variant="outline"
           size="sm"
           className="hover:bg-muted gap-2 self-start rounded-xl text-xs font-semibold"
-          onClick={handleVolverCursos}
         >
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          <span>Volver a todas las materias</span>
+          <Link href="/admin/aula-virtual" onClick={handleVolverCursos}>
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
+            <span>Volver a todas las materias</span>
+          </Link>
         </Button>
 
         <div className="flex flex-wrap items-center gap-2">
