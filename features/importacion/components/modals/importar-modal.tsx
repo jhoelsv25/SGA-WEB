@@ -297,7 +297,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
             <span
               className={`text-xs sm:text-sm ${pasoEfectivo === "processing" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
             >
-              Segundo plano
+              Procesamiento seguro
             </span>
           </div>
 
@@ -314,7 +314,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
             <span
               className={`text-xs sm:text-sm ${pasoEfectivo === "result" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
             >
-              Credenciales
+              Credenciales emitidas
             </span>
           </div>
         </div>
@@ -589,7 +589,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
           </div>
         )}
 
-        {/* PASO 3: PROCESAMIENTO EN SEGUNDO PLANO (BULLMQ) */}
+        {/* PASO 3: PROCESAMIENTO SEGURO EN LOTE */}
         {pasoEfectivo === "processing" && (
           <div className="space-y-6 py-4">
             <div className="flex flex-col items-center justify-center space-y-3 text-center">
@@ -601,19 +601,19 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
               </div>
               <div>
                 <h3 className="text-foreground text-base font-semibold">
-                  Procesando lote en segundo plano (BullMQ & Redis)
+                  Procesando e inscribiendo en el sistema institucional
                 </h3>
                 <p className="text-muted-foreground mx-auto mt-1 max-w-md text-xs">
-                  El lote de {vistaPrevia?.validasCount ?? 0} registros está siendo procesado por el
-                  worker en segundo plano con validación transaccional y generación segura de
-                  credenciales.
+                  El lote de {vistaPrevia?.validasCount ?? 0} registros está siendo validado y
+                  registrado en la base de datos oficial, emitiendo legajos escolares y credenciales
+                  seguras de acceso.
                 </p>
               </div>
 
               {activeJobId && (
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="font-mono text-xs">
-                    Job ID: {activeJobId}
+                    Lote de Operación: #{activeJobId}
                   </Badge>
                   <Badge
                     variant="outline"
@@ -621,8 +621,8 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                   >
                     <Spinner size="xs" />
                     {estadoJobQuery.data?.estado === "procesando"
-                      ? "Procesando registros..."
-                      : "En cola de espera..."}
+                      ? "Inscribiendo registros..."
+                      : "En espera de turno..."}
                   </Badge>
                 </div>
               )}
@@ -631,7 +631,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
             {/* Barra de Progreso */}
             <div className="mx-auto w-full max-w-lg space-y-2">
               <div className="text-muted-foreground flex items-center justify-between text-xs">
-                <span>Progreso de importación</span>
+                <span>Progreso de inscripción</span>
                 <span className="text-foreground font-mono font-medium">{progresoJob}%</span>
               </div>
               <div className="bg-muted h-3 w-full overflow-hidden rounded-full">
@@ -641,21 +641,22 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                 />
               </div>
               <p className="text-muted-foreground pt-1 text-center text-[11px]">
-                {estadoJobQuery.data?.mensaje || "Preparando ejecución de registros..."}
+                {estadoJobQuery.data?.mensaje || "Preparando procesamiento de registros..."}
               </p>
             </div>
 
             <div className="bg-muted/40 text-muted-foreground mx-auto max-w-lg rounded-lg border p-4 text-xs">
               <p>
-                💡 <strong>Información:</strong> Las credenciales temporales y PINs de marcación se
-                almacenarán temporalmente en Redis y estarán disponibles aquí una vez que finalice
-                el proceso.
+                💡 <strong>Aviso institucional:</strong> Al culminar el procesamiento, podrá
+                descargar el acta y reporte oficial en Excel con las cuentas de acceso, contraseñas
+                temporales y PINs de marcación escolar para su entrega personal y resguardo
+                confidencial.
               </p>
             </div>
 
             <div className="flex justify-center pt-2">
               <Button variant="outline" size="sm" onClick={() => handleOpenChange(false)}>
-                Cerrar y continuar en segundo plano
+                Cerrar ventana (el proceso continuará en segundo plano)
               </Button>
             </div>
           </div>
@@ -667,7 +668,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
             <div className="rounded-lg border border-emerald-500/20 bg-emerald-50/50 p-4 dark:bg-emerald-950/20">
               <div className="flex items-center gap-2.5 font-semibold text-emerald-700 dark:text-emerald-300">
                 <HugeiconsIcon icon={CheckmarkCircle01Icon} className="h-5 w-5 text-emerald-600" />
-                <span>Importación completada con éxito</span>
+                <span>Inscripción completada exitosamente</span>
               </div>
               <p className="text-muted-foreground mt-1 text-xs">{resultadoEfectivo.mensaje}</p>
             </div>
@@ -683,12 +684,12 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                     </h4>
                     <p className="text-xs font-medium text-rose-600 dark:text-rose-400">
                       Atención: Las contraseñas temporales y PINs de marcación se muestran por única
-                      vez. Descargue el reporte para su resguardo.
+                      vez. Descargue el reporte oficial para su resguardo institucional.
                     </p>
                   </div>
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="default"
                     onClick={() => {
                       if (activeJobId) {
                         descargarReporteMutation.mutate({ jobId: activeJobId, tipo });
@@ -697,14 +698,14 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                       }
                     }}
                     disabled={descargarReporteMutation.isPending}
-                    className="shrink-0 gap-1.5 text-xs"
+                    className="shrink-0 gap-1.5 text-xs font-semibold shadow-sm"
                   >
                     {descargarReporteMutation.isPending ? (
                       <Spinner size="xs" />
                     ) : (
                       <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
                     )}
-                    Descargar Credenciales (.xlsx)
+                    Descargar Reporte Oficial (.xlsx)
                   </Button>
                 </div>
 
