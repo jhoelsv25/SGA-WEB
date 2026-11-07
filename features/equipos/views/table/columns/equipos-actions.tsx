@@ -33,8 +33,7 @@ export function EquiposActions({
       }}
       items={[
         {
-          label:
-            equipo.tipo === "biometrico" ? "Clave de la app puente" : "Autorizar este dispositivo",
+          label: "Autorizar este dispositivo",
           icon: ShieldCheckIcon,
           onClick: () => onAutorizar(equipo),
         },

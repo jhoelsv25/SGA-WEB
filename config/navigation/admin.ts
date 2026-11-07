@@ -19,7 +19,6 @@ import {
   FileEditIcon,
   AlertCircleIcon,
   Task01Icon,
-  FingerPrintIcon,
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
 
@@ -168,14 +167,6 @@ export const adminNavigation: NavSection[] = [
         icon: Clock01Icon,
         roles: ["admin"],
         description: "Registro de marcaciones a mano con hora real y motivo",
-      },
-      {
-        id: "admin-marcaciones-pendientes",
-        label: "Marcaciones pendientes",
-        link: "/admin/marcaciones-pendientes",
-        icon: FingerPrintIcon,
-        roles: ["admin"],
-        description: "Marcaciones del reloj biométrico que no se pudieron asignar",
       },
       {
         id: "admin-asistencia",

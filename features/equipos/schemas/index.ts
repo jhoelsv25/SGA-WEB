@@ -12,7 +12,7 @@ export const equipoSchema = z
       .trim()
       .min(3, "La ubicación debe tener al menos 3 caracteres.")
       .max(150, "La ubicación no puede exceder 150 caracteres."),
-    tipo: z.enum(["kiosko", "biometrico"], {
+    tipo: z.enum(["kiosko"], {
       message: "Seleccione un tipo de equipo válido.",
     }),
     proposito: z.enum(["marcacion", "sesiones"], {

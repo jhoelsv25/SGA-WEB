@@ -5,7 +5,6 @@ import {
   ComputerIcon,
   SecurityLockIcon,
   Notification01Icon,
-  FingerPrintIcon,
 } from "@hugeicons/core-free-icons";
 import type { ItemMenuConfig } from "./types";
 
@@ -36,13 +35,6 @@ export const MENU_ITEMS: ItemMenuConfig[] = [
     label: "Equipos en Red",
     descripcion: "Kioskos y terminales autorizados",
     icono: ComputerIcon,
-    grupo: "general",
-  },
-  {
-    id: "biometrico",
-    label: "Reloj Biométrico",
-    descripcion: "Conexión del reloj y app puente",
-    icono: FingerPrintIcon,
     grupo: "general",
   },
   {

@@ -7,7 +7,6 @@ import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { Button } from "@/components/ui/button";
-import { AlertasRelojes } from "@/features/biometrico";
 import { ListaFaltan, JustificarMarcacionModal, TablaMarcaron } from "./components";
 import { usePanelMarcacionesHoy, usePuedeJustificarMarcaciones } from "./hooks";
 import type { GrupoPanel, MarcacionApi } from "./types";
@@ -123,7 +122,6 @@ export function MarcacionesHoyPage() {
       >
         {data && (
           <div className="space-y-5">
-            <AlertasRelojes />
             {!data.diaConClases && (
               <p
                 role="status"
