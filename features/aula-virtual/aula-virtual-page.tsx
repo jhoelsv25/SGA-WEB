@@ -438,7 +438,7 @@ export function AulaVirtualPage({
               <TabsList className="border-border/80 bg-card inline-flex !h-12 w-max items-center justify-start gap-1 rounded-2xl border p-1.5 shadow-xs backdrop-blur-md">
                 <TabsTrigger
                   value="materiales"
-                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
                 >
                   <HugeiconsIcon icon={BookOpen01Icon} size={18} />
                   <span>Materiales de Reforzamiento</span>
@@ -446,7 +446,7 @@ export function AulaVirtualPage({
 
                 <TabsTrigger
                   value="tareas"
-                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
                 >
                   <HugeiconsIcon icon={Task01Icon} size={18} />
                   <span>Tareas y Evaluaciones</span>
@@ -455,7 +455,7 @@ export function AulaVirtualPage({
                 {!esApoderado && (
                   <TabsTrigger
                     value="muro"
-                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
                   >
                     <HugeiconsIcon icon={Comment01Icon} size={18} />
                     <span>Muro</span>
@@ -466,7 +466,7 @@ export function AulaVirtualPage({
                   <>
                     <TabsTrigger
                       value="libro-notas"
-                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
                     >
                       <HugeiconsIcon icon={ChartBarLineIcon} size={18} />
                       <span>Libro de Calificaciones</span>
@@ -475,7 +475,7 @@ export function AulaVirtualPage({
                     {(aula.puedeAdministrar || aula.puedeVerModeracion) && (
                       <TabsTrigger
                         value="moderacion"
-                        className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                        className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
                       >
                         <HugeiconsIcon icon={ShieldAlertIcon} size={18} />
                         <span>Moderación</span>
@@ -485,7 +485,7 @@ export function AulaVirtualPage({
                 ) : (
                   <TabsTrigger
                     value="mis-notas"
-                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
                   >
                     <HugeiconsIcon icon={Award01Icon} size={18} />
                     <span>{esApoderado ? "Calificaciones" : "Mis Calificaciones"}</span>
