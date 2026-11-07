@@ -8,7 +8,6 @@ import {
   ArrowLeft01Icon,
   Award01Icon,
   BookOpen01Icon,
-  BubbleChatIcon,
   Calendar03Icon,
   ChartBarLineIcon,
   CloudUploadIcon,
@@ -34,7 +33,7 @@ import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { urlDeArchivo } from "./api";
 import {
   ActividadRecursoModal,
-  ChatTab,
+  ChatFlotante,
   CursosClassroomGrid,
   LibroNotasTab,
   MisNotasTab,
@@ -50,13 +49,7 @@ import {
   type RecursoActividadTarget,
 } from "./components";
 import { PLAZO_CONFIG } from "./consts";
-import {
-  useAula,
-  useChatNoLeidos,
-  useMisCursos,
-  useRegistrarActividad,
-  useRetirarMaterial,
-} from "./hooks";
+import { useAula, useMisCursos, useRegistrarActividad, useRetirarMaterial } from "./hooks";
 import type { Material, Unidad } from "./types";
 
 function MaterialFila({
@@ -275,9 +268,6 @@ export function AulaVirtualPage({
   const registrarActividad = useRegistrarActividad();
   const esApoderado = aula?.rolEnAula === "apoderado";
   const esDirectivo = aula?.rolEnAula === "directivo";
-  const { data: chatNoLeidos } = useChatNoLeidos(
-    !esApoderado && aula?.cursoSeccionId ? aula.cursoSeccionId : "",
-  );
   const anioCerrado = anio?.estado === "cerrado";
 
   const estudianteActivoId = React.useMemo(() => {
@@ -466,28 +456,13 @@ export function AulaVirtualPage({
                 </TabsTrigger>
 
                 {!esApoderado && (
-                  <>
-                    <TabsTrigger
-                      value="muro"
-                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
-                    >
-                      <HugeiconsIcon icon={Comment01Icon} size={18} />
-                      <span>Muro</span>
-                    </TabsTrigger>
-
-                    <TabsTrigger
-                      value="chat"
-                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
-                    >
-                      <HugeiconsIcon icon={BubbleChatIcon} size={18} />
-                      <span>Chat en vivo</span>
-                      {Boolean(chatNoLeidos?.noLeidos && chatNoLeidos.noLeidos > 0) && (
-                        <span className="bg-destructive text-destructive-foreground rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold shadow-xs">
-                          {chatNoLeidos?.noLeidos}
-                        </span>
-                      )}
-                    </TabsTrigger>
-                  </>
+                  <TabsTrigger
+                    value="muro"
+                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground !h-9 shrink-0 gap-2 rounded-xl px-4 text-xs font-medium transition-all data-[state=active]:font-semibold data-[state=active]:shadow-xs sm:text-sm"
+                  >
+                    <HugeiconsIcon icon={Comment01Icon} size={18} />
+                    <span>Muro</span>
+                  </TabsTrigger>
                 )}
 
                 {aula.puedeAdministrar || esDirectivo ? (
@@ -625,25 +600,14 @@ export function AulaVirtualPage({
             </TabsContent>
 
             {!esApoderado && (
-              <>
-                <TabsContent value="muro">
-                  <MuroTab
-                    cursoSeccionId={aula.cursoSeccionId}
-                    puedeAdministrar={aula.puedeAdministrar}
-                    anioCerrado={anioCerrado}
-                    soloLectura={esDirectivo}
-                  />
-                </TabsContent>
-
-                <TabsContent value="chat">
-                  <ChatTab
-                    cursoSeccionId={aula.cursoSeccionId}
-                    puedeAdministrar={aula.puedeAdministrar}
-                    anioCerrado={anioCerrado}
-                    soloLectura={esDirectivo}
-                  />
-                </TabsContent>
-              </>
+              <TabsContent value="muro">
+                <MuroTab
+                  cursoSeccionId={aula.cursoSeccionId}
+                  puedeAdministrar={aula.puedeAdministrar}
+                  anioCerrado={anioCerrado}
+                  soloLectura={esDirectivo}
+                />
+              </TabsContent>
             )}
 
             {aula.puedeAdministrar || esDirectivo ? (
@@ -733,6 +697,17 @@ export function AulaVirtualPage({
         onOpenChange={(abierto) => !abierto && setRecursoActividad(null)}
         recurso={recursoActividad}
       />
+
+      {aula && !esApoderado && (
+        <ChatFlotante
+          cursoSeccionId={aula.cursoSeccionId}
+          cursoNombre={cursoInfo?.cursoNombre || aula.cursoNombre}
+          seccionNombre={cursoInfo?.seccionNombre || aula.seccionNombre}
+          puedeAdministrar={aula.puedeAdministrar}
+          anioCerrado={anioCerrado}
+          soloLectura={esDirectivo}
+        />
+      )}
     </div>
   );
 }
