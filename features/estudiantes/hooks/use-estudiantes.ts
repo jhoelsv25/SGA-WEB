@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ApiClientError } from "@/lib/api-client";
 import { estudiantesApi } from "../api/estudiantes.api";
+import type { DarBajaFichaActualInput } from "../../personas/types/personas.types";
 import type {
   CreateEstudianteInput,
   CreateEstudianteResponse,
@@ -78,6 +79,46 @@ export function useDeleteEstudianteMutation() {
     },
     onError: (error: ApiClientError) => {
       toast.error(error.message || "No se pudo eliminar la ficha del estudiante.");
+    },
+  });
+}
+
+export function useDarDeBajaEstudianteMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { estudiante: Estudiante; message: string },
+    ApiClientError,
+    { id: string; input: DarBajaFichaActualInput }
+  >({
+    mutationFn: ({ id, input }) => estudiantesApi.darDeBajaEstudiante(id, input),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ESTUDIANTES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["personas"] });
+      toast.success(data.message, {
+        description: `${data.estudiante.persona.nombreCompleto} (${data.estudiante.codigo})`,
+      });
+    },
+    onError: (error: ApiClientError) => {
+      toast.error(error.message || "No se pudo dar de baja la ficha del estudiante.");
+    },
+  });
+}
+
+export function useReactivarEstudianteMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ estudiante: Estudiante; message: string }, ApiClientError, { id: string }>({
+    mutationFn: ({ id }) => estudiantesApi.reactivarEstudiante(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ESTUDIANTES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["personas"] });
+      toast.success(data.message, {
+        description: `${data.estudiante.persona.nombreCompleto} (${data.estudiante.codigo})`,
+      });
+    },
+    onError: (error: ApiClientError) => {
+      toast.error(error.message || "No se pudo reactivar al estudiante.");
     },
   });
 }

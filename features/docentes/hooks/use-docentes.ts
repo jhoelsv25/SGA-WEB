@@ -78,12 +78,31 @@ export function useCesarDocenteMutation() {
     mutationFn: ({ id, input }) => docentesApi.cesarDocente(id, input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: DOCENTES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["personas"] });
       toast.success(data.message, {
         description: `${data.docente.persona.nombreCompleto} (${data.docente.codigo})`,
       });
     },
     onError: (error: ApiClientError) => {
       toast.error(error.message || "No se pudo registrar el cese del docente.");
+    },
+  });
+}
+
+export function useReactivarDocenteMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ docente: Docente; message: string }, ApiClientError, { id: string }>({
+    mutationFn: ({ id }) => docentesApi.reactivarDocente(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: DOCENTES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["personas"] });
+      toast.success(data.message, {
+        description: `${data.docente.persona.nombreCompleto} (${data.docente.codigo})`,
+      });
+    },
+    onError: (error: ApiClientError) => {
+      toast.error(error.message || "No se pudo reactivar al docente.");
     },
   });
 }

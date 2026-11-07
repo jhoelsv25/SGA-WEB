@@ -12,6 +12,11 @@ import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { PersonaVinculadaCard } from "../../../personas/components/persona-vinculada-card";
+import {
+  BajaFichaActualField,
+  MOTIVO_BAJA_MIN,
+} from "../../../personas/components/baja-ficha-actual-field";
+import { fichaVigenteAlRegistrar } from "../../../personas/utils/ficha-academica";
 import { createDocenteSchema, type CreateDocenteFormValues } from "../../schemas/docentes.schema";
 import { parseIsoDate, formatToIsoDate } from "../../utils/dates";
 import type { CreateDocenteInput, JornadaHoras, TipoContrato } from "../../types/docentes.types";
@@ -58,6 +63,11 @@ export function CreateDocenteForm({
 }: CreateDocenteFormProps) {
   const personaVinculada = persona;
   const modo = personaVinculada ? "buscar" : "registrar";
+  const requiereBaja = personaVinculada
+    ? fichaVigenteAlRegistrar(personaVinculada, "docente") !== null
+    : false;
+  const [motivoBaja, setMotivoBaja] = React.useState("");
+  const [errorMotivoBaja, setErrorMotivoBaja] = React.useState<string | null>(null);
 
   const {
     register,
@@ -91,9 +101,16 @@ export function CreateDocenteForm({
   });
 
   const handleFormSubmit = async (values: CreateDocenteFormValues) => {
+    if (requiereBaja && motivoBaja.trim().length < MOTIVO_BAJA_MIN) {
+      setErrorMotivoBaja(`Indique el motivo de la baja (mínimo ${MOTIVO_BAJA_MIN} caracteres).`);
+      return;
+    }
+    setErrorMotivoBaja(null);
+
     if (personaVinculada) {
       await onSubmit({
         personaId: personaVinculada.id,
+        darBajaFichaActual: requiereBaja ? { motivo: motivoBaja.trim() } : undefined,
         codigo: values.codigo.trim(),
         especialidad: values.especialidad?.trim() || undefined,
         tituloProfesional: values.tituloProfesional?.trim() || undefined,
@@ -129,6 +146,14 @@ export function CreateDocenteForm({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4" noValidate>
       {personaVinculada && <PersonaVinculadaCard persona={personaVinculada} />}
+      <BajaFichaActualField
+        persona={personaVinculada}
+        destino="docente"
+        motivo={motivoBaja}
+        onMotivoChange={setMotivoBaja}
+        error={errorMotivoBaja}
+        disabled={isLoading}
+      />
 
       {/* 2. Datos personales (Solo si se registra una nueva persona) */}
       {modo === "registrar" && (

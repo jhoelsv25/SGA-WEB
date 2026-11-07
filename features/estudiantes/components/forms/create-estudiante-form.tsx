@@ -13,6 +13,11 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { PersonaVinculadaCard } from "../../../personas/components/persona-vinculada-card";
 import {
+  BajaFichaActualField,
+  MOTIVO_BAJA_MIN,
+} from "../../../personas/components/baja-ficha-actual-field";
+import { fichaVigenteAlRegistrar } from "../../../personas/utils/ficha-academica";
+import {
   createEstudianteSchema,
   type CreateEstudianteFormValues,
 } from "../../schemas/estudiantes.schema";
@@ -53,6 +58,11 @@ export function CreateEstudianteForm({
 }: CreateEstudianteFormProps) {
   const personaVinculada = persona;
   const modo = personaVinculada ? "buscar" : "registrar";
+  const requiereBaja = personaVinculada
+    ? fichaVigenteAlRegistrar(personaVinculada, "estudiante") !== null
+    : false;
+  const [motivoBaja, setMotivoBaja] = React.useState("");
+  const [errorMotivoBaja, setErrorMotivoBaja] = React.useState<string | null>(null);
 
   const {
     register,
@@ -92,9 +102,16 @@ export function CreateEstudianteForm({
   const tieneDiscapacidadValor = useWatch({ control, name: "tieneDiscapacidad" });
 
   const handleFormSubmit = async (values: CreateEstudianteFormValues) => {
+    if (requiereBaja && motivoBaja.trim().length < MOTIVO_BAJA_MIN) {
+      setErrorMotivoBaja(`Indique el motivo de la baja (mínimo ${MOTIVO_BAJA_MIN} caracteres).`);
+      return;
+    }
+    setErrorMotivoBaja(null);
+
     if (personaVinculada) {
       await onSubmit({
         personaId: personaVinculada.id,
+        darBajaFichaActual: requiereBaja ? { motivo: motivoBaja.trim() } : undefined,
         codigo: values.codigo.trim(),
         fechaIngreso: values.fechaIngreso,
         lenguaMaterna: values.lenguaMaterna?.trim() || undefined,
@@ -140,6 +157,14 @@ export function CreateEstudianteForm({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4" noValidate>
       {personaVinculada && <PersonaVinculadaCard persona={personaVinculada} />}
+      <BajaFichaActualField
+        persona={personaVinculada}
+        destino="estudiante"
+        motivo={motivoBaja}
+        onMotivoChange={setMotivoBaja}
+        error={errorMotivoBaja}
+        disabled={isLoading}
+      />
 
       {/* 2. Datos personales (Si es nueva persona) */}
       {modo === "registrar" && (

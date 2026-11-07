@@ -1,4 +1,8 @@
-import type { CreatePersonaInput, Persona } from "../../personas/types/personas.types";
+import type {
+  CreatePersonaInput,
+  DarBajaFichaActualInput,
+  Persona,
+} from "../../personas/types/personas.types";
 
 export type EstadoEstudiante = "activo" | "retirado" | "trasladado" | "egresado";
 
@@ -53,6 +57,8 @@ export interface EstudianteQueryParams {
 export interface CreateEstudianteInput {
   personaId?: string;
   nuevaPersona?: CreatePersonaInput;
+  /** RF-007 V4: baja de la otra ficha académica vigente (cambio de condición). */
+  darBajaFichaActual?: DarBajaFichaActualInput;
   codigo: string;
   fechaIngreso: string;
   lenguaMaterna?: string;

@@ -1,4 +1,8 @@
-import type { CreatePersonaInput, Persona } from "../../personas/types/personas.types";
+import type {
+  CreatePersonaInput,
+  DarBajaFichaActualInput,
+  Persona,
+} from "../../personas/types/personas.types";
 
 export type TipoContrato = "nombrado" | "contratado" | "practicante";
 export type JornadaHoras = 20 | 24 | 30 | 40;
@@ -54,6 +58,8 @@ export interface DocenteQueryParams {
 export interface CreateDocenteInput {
   personaId?: string;
   nuevaPersona?: CreatePersonaInput;
+  /** RF-007 V4: baja de la otra ficha académica vigente (cambio de condición). */
+  darBajaFichaActual?: DarBajaFichaActualInput;
   codigo: string;
   especialidad?: string;
   tituloProfesional?: string;

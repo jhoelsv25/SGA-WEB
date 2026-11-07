@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { usePersonasQuery } from "../hooks/use-personas";
 import type { Persona } from "../types/personas.types";
+import { esFichaVigente, estadoFicha } from "../utils/ficha-academica";
 
 const POR_PAGINA = 5;
 
@@ -33,8 +34,14 @@ function motivoBloqueo(persona: Persona, destino: DestinoFichaUnica): string | n
   if (destino === "cualquiera") return null;
   if (destino === "apoderado") return persona.fichas.esApoderado ? "Ya es apoderado" : null;
   if (destino === "cuenta") return persona.fichas.tieneUsuario ? "Ya tiene cuenta" : null;
-  if (persona.fichas.esDocente) return "Ya es docente";
-  if (persona.fichas.esEstudiante) return "Ya es estudiante";
+  // docente / estudiante: solo bloquea si ya tiene esa misma ficha (viva o de baja → reactivar).
+  // Si tiene la OTRA ficha vigente se permite elegirla: el formulario pedirá dar de baja esa ficha.
+  const estadoDestino = estadoFicha(persona, destino);
+  if (estadoDestino) {
+    return esFichaVigente(destino, estadoDestino)
+      ? `Ya es ${destino}`
+      : `${destino === "docente" ? "Docente" : "Estudiante"} de baja: reactívelo`;
+  }
   return null;
 }
 

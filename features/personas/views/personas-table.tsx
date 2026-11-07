@@ -7,7 +7,9 @@ import { EditPersonaModal } from "../components/modals/edit-persona-modal";
 import { DeletePersonaModal } from "../components/modals/delete-persona-modal";
 import { HistorialCriticoModal } from "../components/modals/historial-critico-modal";
 import { ChangeCargoModal } from "../components/modals/change-cargo-modal";
+import { FichaBajaModal, type AccionFicha } from "../components/modals/ficha-baja-modal";
 import type { Persona } from "../types/personas.types";
+import type { TipoFichaAcademica } from "../utils/ficha-academica";
 
 interface PersonasTableProps {
   personas: Persona[];
@@ -28,6 +30,20 @@ export function PersonasTable({ personas, isLoading, cursorPagination }: Persona
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [historialModalOpen, setHistorialModalOpen] = React.useState(false);
   const [changeCargoModalOpen, setChangeCargoModalOpen] = React.useState(false);
+
+  const [fichaModal, setFichaModal] = React.useState<{
+    tipo: TipoFichaAcademica;
+    accion: AccionFicha;
+    open: boolean;
+  }>({ tipo: "docente", accion: "baja", open: false });
+
+  const handleFichaAccion = React.useCallback(
+    (persona: Persona, tipo: TipoFichaAcademica, accion: AccionFicha) => {
+      setSelectedPersona(persona);
+      setFichaModal({ tipo, accion, open: true });
+    },
+    [],
+  );
 
   const handleEdit = React.useCallback((persona: Persona) => {
     setSelectedPersona(persona);
@@ -56,8 +72,9 @@ export function PersonasTable({ personas, isLoading, cursorPagination }: Persona
         onDelete: handleDelete,
         onVerHistorial: handleVerHistorial,
         onChangeCargo: handleChangeCargo,
+        onFichaAccion: handleFichaAccion,
       }),
-    [handleEdit, handleDelete, handleVerHistorial, handleChangeCargo],
+    [handleEdit, handleDelete, handleVerHistorial, handleChangeCargo, handleFichaAccion],
   );
 
   return (
@@ -96,6 +113,15 @@ export function PersonasTable({ personas, isLoading, cursorPagination }: Persona
         persona={selectedPersona}
         open={changeCargoModalOpen}
         onOpenChange={setChangeCargoModalOpen}
+      />
+
+      {/* Baja o reactivación de la ficha de docente/estudiante (RF-007 V4) */}
+      <FichaBajaModal
+        persona={selectedPersona}
+        tipo={fichaModal.tipo}
+        accion={fichaModal.accion}
+        open={fichaModal.open}
+        onOpenChange={(open) => setFichaModal((prev) => ({ ...prev, open }))}
       />
     </>
   );

@@ -60,4 +60,15 @@ export const docentesApi = {
       handleApiError(error, "Error al registrar el cese del docente.");
     }
   },
+
+  async reactivarDocente(id: string): Promise<{ docente: Docente; message: string }> {
+    try {
+      const { data } = await apiClient.post<{ docente: Docente; message: string }>(
+        `/docentes/${id}/reactivar`,
+      );
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al reactivar al docente.");
+    }
+  },
 };
