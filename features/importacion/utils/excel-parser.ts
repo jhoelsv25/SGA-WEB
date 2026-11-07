@@ -14,19 +14,28 @@ function normalizeHeaderKey(header: string): string {
   if (clean.includes("siagie") && clean.includes("estudiante")) return "codigoSiagieEstudiante";
   if (clean.includes("siagie")) return "codigoSiagie";
   if (clean.includes("codigo") && clean.includes("docente")) return "codigoDocente";
+  if (clean === "codigo" || clean === "codigo estudiante" || clean.startsWith("cod"))
+    return "codigoSiagie";
   if (clean.includes("tipo") && clean.includes("documento")) return "tipoDocumento";
-  if (clean.includes("numero") && clean.includes("documento")) return "numeroDocumento";
+  if (
+    (clean.includes("numero") && clean.includes("documento")) ||
+    clean.includes("n°") ||
+    clean.includes("nro") ||
+    clean.includes("dni") ||
+    clean === "documento"
+  )
+    return "numeroDocumento";
   if (clean.includes("paterno")) return "apellidoPaterno";
   if (clean.includes("materno")) return "apellidoMaterno";
   if (clean.includes("nombres") || clean === "nombre") return "nombres";
-  if (clean.includes("sexo")) return "sexo";
-  if (clean.includes("nacimiento")) return "fechaNacimiento";
-  if (clean.includes("celular") || clean.includes("telefono")) return "celular";
+  if (clean.includes("sexo") || clean === "genero") return "sexo";
+  if (clean.includes("nacimiento") || clean === "fec_nac") return "fechaNacimiento";
+  if (clean.includes("celular") || clean.includes("telefono") || clean === "cel") return "celular";
   if (clean.includes("correo") || clean.includes("email")) return "correo";
-  if (clean.includes("ingreso")) return "fechaIngreso";
+  if (clean.includes("ingreso") || clean === "fec_ingreso") return "fechaIngreso";
   if (clean.includes("especialidad")) return "especialidad";
   if (clean.includes("contrato")) return "tipoContrato";
-  if (clean.includes("jornada")) return "jornada";
+  if (clean.includes("jornada") || clean.includes("horas")) return "jornada";
   if (clean.includes("parentesco")) return "parentesco";
   if (clean.includes("principal")) return "esPrincipal";
 

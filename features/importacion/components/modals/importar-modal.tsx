@@ -57,6 +57,37 @@ const TITULOS_TIPO: Record<TipoImportacion, string> = {
   apoderados: "Padrón de Apoderados",
 };
 
+/**
+ * Extrae valores de las filas de importación de forma resiliente
+ * soportando camelCase, snake_case o encabezados originales en español.
+ */
+function getDato(datos: Record<string, unknown> | undefined, ...keys: string[]): string {
+  if (!datos) return "";
+  for (const k of keys) {
+    const v = datos[k];
+    if (v !== undefined && v !== null && String(v).trim() !== "") {
+      return String(v).trim();
+    }
+  }
+  const normalizar = (s: string) =>
+    s
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, "");
+
+  const targets = keys.map(normalizar);
+  for (const [k, v] of Object.entries(datos)) {
+    if (v !== undefined && v !== null && String(v).trim() !== "") {
+      const normK = normalizar(k);
+      if (targets.some((t) => normK === t || normK.includes(t) || t.includes(normK))) {
+        return String(v).trim();
+      }
+    }
+  }
+  return "";
+}
+
 export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarModalProps) {
   const [paso, setPaso] = React.useState<Paso>("upload");
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
@@ -445,21 +476,40 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                             {fila.numeroFila}
                           </TableCell>
                           <TableCell className="text-xs font-medium">
-                            {String(fila.datos.tipoDocumento ?? "DNI").toUpperCase()}:{" "}
-                            {String(fila.datos.numeroDocumento ?? "—")}
+                            {(
+                              getDato(fila.datos, "tipoDocumento", "tipo_documento", "tipo") ||
+                              "DNI"
+                            ).toUpperCase()}
+                            :{" "}
+                            {getDato(
+                              fila.datos,
+                              "numeroDocumento",
+                              "numero_documento",
+                              "documento",
+                              "dni",
+                              "num_doc",
+                            ) || "—"}
                           </TableCell>
-                          <TableCell className="text-xs">
-                            {String(fila.datos.nombres ?? "")}{" "}
-                            {String(fila.datos.apellidoPaterno ?? "")}{" "}
-                            {String(fila.datos.apellidoMaterno ?? "")}
+                          <TableCell className="text-xs font-medium">
+                            {[
+                              getDato(fila.datos, "nombres", "nombre"),
+                              getDato(fila.datos, "apellidoPaterno", "apellido_paterno", "paterno"),
+                              getDato(fila.datos, "apellidoMaterno", "apellido_materno", "materno"),
+                            ]
+                              .filter(Boolean)
+                              .join(" ") || "—"}
                           </TableCell>
                           <TableCell className="text-muted-foreground font-mono text-xs">
-                            {String(
-                              fila.datos.codigoSiagie ??
-                                fila.datos.codigoDocente ??
-                                fila.datos.codigoSiagieEstudiante ??
-                                "—",
-                            )}
+                            {getDato(
+                              fila.datos,
+                              "codigoSiagie",
+                              "codigo_siagie",
+                              "codigoDocente",
+                              "codigo_docente",
+                              "codigoSiagieEstudiante",
+                              "codigo",
+                              "siagie",
+                            ) || "—"}
                           </TableCell>
                           <TableCell className="text-center">
                             {fila.estado === "valida" && (
