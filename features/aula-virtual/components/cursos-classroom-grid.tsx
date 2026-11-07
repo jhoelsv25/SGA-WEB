@@ -196,10 +196,10 @@ export function CursosClassroomGrid({
           )}
         </div>
 
-        {/* Controles de Filtro en Línea */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
+        {/* Controles de Filtro Dinámicos por Rol */}
+        <div className="flex flex-wrap items-center gap-3">
           {/* Buscador de texto en vivo */}
-          <div className="relative sm:col-span-2 lg:col-span-4">
+          <div className="relative min-w-[240px] flex-1">
             <HugeiconsIcon
               icon={Search01Icon}
               size={17}
@@ -213,9 +213,9 @@ export function CursosClassroomGrid({
             />
           </div>
 
-          {/* Filtro por Grado */}
+          {/* Filtro por Grado / Año (solo si el usuario tiene cursos en > 1 grado) */}
           {gradosDisponibles.length > 1 && (
-            <div className="sm:col-span-1 lg:col-span-2">
+            <div className="w-full sm:w-44 md:w-48">
               <SelectOption
                 options={opcionesGrados}
                 value={gradoFiltro}
@@ -230,9 +230,9 @@ export function CursosClassroomGrid({
             </div>
           )}
 
-          {/* Filtro por Sección */}
+          {/* Filtro por Sección (solo si el usuario tiene cursos en > 1 sección) */}
           {seccionesDisponibles.length > 1 && (
-            <div className="sm:col-span-1 lg:col-span-2">
+            <div className="w-full sm:w-40 md:w-44">
               <SelectOption
                 options={opcionesSecciones}
                 value={seccionFiltro}
@@ -244,9 +244,9 @@ export function CursosClassroomGrid({
             </div>
           )}
 
-          {/* Filtro por Materia / Área */}
+          {/* Filtro por Materia / Área Curricular (si hay > 1 materia) */}
           {materiasDisponibles.length > 1 && (
-            <div className="sm:col-span-1 lg:col-span-2">
+            <div className="w-full sm:w-44 md:w-48">
               <SelectOption
                 options={opcionesMaterias}
                 value={materiaFiltro}
@@ -258,9 +258,9 @@ export function CursosClassroomGrid({
             </div>
           )}
 
-          {/* Filtro por Docente (visible para Directivos / Admin) */}
-          {(esDirectivoOAdmin || docentesDisponibles.length > 1) && (
-            <div className="sm:col-span-1 lg:col-span-2">
+          {/* Filtro por Docente (exclusivo de supervisión para Admin/Directivos, oculto para Docente y Estudiante) */}
+          {!esDocente && !esEstudiante && (esDirectivoOAdmin || docentesDisponibles.length > 1) && (
+            <div className="w-full sm:w-48 md:w-52">
               <SelectOption
                 options={opcionesDocentes}
                 value={docenteFiltro}
