@@ -392,31 +392,31 @@ export function AulaVirtualPage({
 
       {/* Hero Banner estilo Google Classroom */}
       <div
-        className={`relative overflow-hidden rounded-2xl bg-gradient-to-r p-6 md:p-8 ${estiloCurso.gradient} border border-white/10 text-white shadow-md`}
+        className={`relative overflow-hidden rounded-2xl bg-linear-to-r p-6 md:p-8 ${estiloCurso.gradient} border border-white/10 text-white shadow-md`}
       >
         <div className="pointer-events-none absolute right-4 -bottom-6 opacity-15">
           <HugeiconsIcon icon={BookOpen01Icon} size={150} />
         </div>
         <div className="relative z-10 flex flex-col justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-bold tracking-wide !text-white shadow-xs backdrop-blur-md">
+            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-bold tracking-wide text-white! shadow-xs backdrop-blur-md">
               {cursoInfo?.seccionNombre || aula?.seccionNombre}
             </span>
-            <span className="text-xs font-medium !text-white/90">
+            <span className="text-xs font-medium text-white/90!">
               {cursoInfo?.gradoNombre || "Secundaria"}
             </span>
             {periodoActualLabel && periodoId !== "" && (
-              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium !text-white/95 shadow-xs backdrop-blur-sm">
+              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white/95! shadow-xs backdrop-blur-sm">
                 {periodoActualLabel}
               </span>
             )}
           </div>
 
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight !text-white drop-shadow-md md:text-3xl">
+            <h1 className="text-2xl font-extrabold tracking-tight text-white! drop-shadow-md md:text-3xl">
               {cursoInfo?.cursoNombre || aula?.cursoNombre}
             </h1>
-            <p className="mt-1 flex items-center gap-2 text-sm font-medium !text-white/90">
+            <p className="mt-1 flex items-center gap-2 text-sm font-medium text-white/90!">
               <HugeiconsIcon icon={TeacherIcon} size={16} />
               <span>Docente: {cursoInfo?.docenteNombre || "Docente asignado"}</span>
             </p>
