@@ -5,3 +5,4 @@ export { TabTurnos } from "./tabs/tab-turnos";
 export { TabEquipos } from "./tabs/tab-equipos";
 export { TabSeguridad } from "./tabs/tab-seguridad";
 export { TabNotificaciones } from "./tabs/tab-notificaciones";
+export { TabBiometrico } from "./tabs/tab-biometrico";
