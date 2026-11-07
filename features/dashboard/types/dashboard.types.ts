@@ -217,7 +217,6 @@ export interface AdminEquipoReciente {
   id: string;
   nombre: string;
   tipo: string;
-  ip?: string;
   ultimoAcceso?: string;
   autorizado: boolean;
   activo: boolean;
