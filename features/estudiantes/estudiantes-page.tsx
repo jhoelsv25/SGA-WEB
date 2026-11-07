@@ -10,18 +10,13 @@ import { ListToolbar } from "@/components/common/list-toolbar";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useCursorPagination } from "@/hooks/use-cursor-pagination";
-import { useExportExcel } from "@/hooks/use-export-excel";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { estudianteFilterDefs } from "./config/filters";
-import { estudianteExportColumns } from "./config/export";
 import { useEstudiantesQuery } from "./hooks/use-estudiantes";
 import { EstudiantesTable } from "./views/estudiantes-table";
 import { CreateEstudianteModal } from "./components/modals/create-estudiante-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
-import type {
-  CreateEstudianteResponse,
-  Estudiante,
-  EstadoEstudiante,
-} from "./types/estudiantes.types";
+import type { CreateEstudianteResponse, EstadoEstudiante } from "./types/estudiantes.types";
 
 export function EstudiantesPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -56,14 +51,10 @@ export function EstudiantesPage() {
 
   const estudiantes = data?.data ?? [];
 
-  const { exportToExcel, isExporting } = useExportExcel<Estudiante>({
-    columns: estudianteExportColumns,
-    filenamePrefix: "Padron_Estudiantes",
-    sheetName: "Estudiantes",
-  });
+  const { exportar, isExporting } = useExportarReporte("estudiantes");
 
   const handleExport = async () => {
-    await exportToExcel(estudiantes);
+    await exportar({ search: search?.trim(), estado });
   };
 
   const handleCreatedSuccess = (res: CreateEstudianteResponse) => {

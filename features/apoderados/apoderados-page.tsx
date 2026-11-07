@@ -9,13 +9,11 @@ import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useListFilters } from "@/hooks/use-list-filters";
-import { useExportExcel } from "@/hooks/use-export-excel";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { apoderadoFilterDefs } from "./config/filters";
-import { apoderadoExportColumns } from "./config/export";
 import { useApoderadosQuery } from "./hooks/use-apoderados";
 import { ApoderadosTable } from "./views/apoderados-table";
 import { CreateApoderadoModal } from "./components/modals/create-apoderado-modal";
-import type { Apoderado } from "./types/apoderados.types";
 
 export function ApoderadosPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -71,14 +69,10 @@ export function ApoderadosPage() {
     }
   };
 
-  const { exportToExcel, isExporting } = useExportExcel<Apoderado>({
-    columns: apoderadoExportColumns,
-    filenamePrefix: "padron-apoderados-sga",
-    sheetName: "Apoderados",
-  });
+  const { exportar, isExporting } = useExportarReporte("apoderados");
 
   const handleExport = () => {
-    exportToExcel(apoderados);
+    void exportar({ search, gradoInstruccion });
   };
 
   return (

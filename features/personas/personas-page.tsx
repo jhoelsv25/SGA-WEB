@@ -12,15 +12,14 @@ import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
 import { useListFilters } from "@/hooks/use-list-filters";
-import { useExportExcel } from "@/hooks/use-export-excel";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { personaFilterDefs } from "./config/filters";
-import { personaExportColumns } from "./config/export";
 import { usePersonasQuery } from "./hooks/use-personas";
 import { PersonasTable } from "./views/personas-table";
 import { CreatePersonaModal } from "./components/modals/create-persona-modal";
 import { ImportarModal } from "@/features/importacion";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import type { Persona, TipoDocumento } from "./types/personas.types";
+import type { TipoDocumento } from "./types/personas.types";
 
 export function PersonasPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -82,11 +81,7 @@ export function PersonasPage() {
   };
 
   // Exportación a Excel estandarizada
-  const { exportToExcel, isExporting } = useExportExcel<Persona>({
-    columns: personaExportColumns,
-    filenamePrefix: "padron-personas-sga",
-    sheetName: "Personas",
-  });
+  const { exportar, isExporting } = useExportarReporte("personas");
 
   return (
     <div className="animate-in fade-in-50 space-y-6 duration-300">
@@ -122,7 +117,9 @@ export function PersonasPage() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={isExporting || personas.length === 0}
-                onSelect={() => exportToExcel(personas)}
+                onSelect={() =>
+                  void exportar({ search: search?.trim(), tipoDocumento, esProvisional })
+                }
               >
                 <HugeiconsIcon icon={FileExportIcon} className="h-4 w-4" />
                 Exportar Excel

@@ -12,17 +12,14 @@ import { Spinner } from "@/components/common/spinner";
 import { UserAdd01Icon, FileExportIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useListFilters } from "@/hooks/use-list-filters";
-import { useExportExcel } from "@/hooks/use-export-excel";
-import { toast } from "@/lib/toast";
+import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { formatDate } from "@/lib/formatters/date";
 import { cn } from "@/lib/utils";
 import { getUserColumns } from "./columns/user-columns";
 import { UserActions } from "./columns/user-actions";
 import { userFilterDefs } from "../../config/filters";
-import { userExportColumns } from "../../config/export";
 import { USER_STATUS_CONFIG } from "../../consts/users.consts";
 import { useUsersQuery } from "../../hooks/use-users-query";
-import { usersApi } from "../../api/users.api";
 import { useSession } from "../../../auth/hooks/use-auth";
 import { CreateUserModal } from "../../components/modals/create-user-modal";
 import { ManageRolesModal } from "../../components/modals/manage-roles-modal";
@@ -85,72 +82,9 @@ export function UsersTable() {
 
   const users = response?.data ?? [];
 
-  // Exportación a Excel de todas las páginas filtradas recorriendo el cursor
-  const { exportSpreadsheet, isExporting } = useExportExcel<UserItem>();
-  const [isExportingAll, setIsExportingAll] = React.useState(false);
-  const [exportLoadedCount, setExportLoadedCount] = React.useState<number | null>(null);
-
-  const handleExportAll = async () => {
-    if (isExportingAll || isExporting) return;
-    setIsExportingAll(true);
-    setExportLoadedCount(0);
-
-    try {
-      const allUsers: UserItem[] = [];
-      let cursorToFetch: string | null = null;
-      let hasMore = true;
-      const fetchLimit = 50;
-      const seenCursors = new Set<string>();
-
-      while (hasMore) {
-        const pageResult = await usersApi.getUsers({
-          cursor: cursorToFetch,
-          limit: fetchLimit,
-          estado,
-          search: search ? search.trim() : undefined,
-        });
-
-        if (!pageResult || !pageResult.data || pageResult.data.length === 0) {
-          break;
-        }
-
-        allUsers.push(...pageResult.data);
-        setExportLoadedCount(allUsers.length);
-
-        if (
-          pageResult.hasMore &&
-          pageResult.nextCursor &&
-          !seenCursors.has(pageResult.nextCursor)
-        ) {
-          seenCursors.add(pageResult.nextCursor);
-          cursorToFetch = pageResult.nextCursor;
-        } else {
-          hasMore = false;
-        }
-      }
-
-      if (allUsers.length === 0) {
-        toast.info("No hay usuarios para exportar con los filtros seleccionados.");
-        return;
-      }
-
-      const todayStr = new Date().toISOString().split("T")[0];
-      await exportSpreadsheet({
-        data: allUsers,
-        columns: userExportColumns,
-        filename: `cuentas-usuarios-${todayStr}`,
-        sheetName: "Usuarios",
-        format: "xlsx",
-      });
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : "Error al recopilar usuarios para la exportación.";
-      toast.error("Error al exportar", { description: message });
-    } finally {
-      setIsExportingAll(false);
-      setExportLoadedCount(null);
-    }
-  };
+  // Exportación a Excel (todas las filas filtradas, generadas por el servidor)
+  const { exportar, isExporting } = useExportarReporte("usuarios");
+  const handleExportAll = () => exportar({ estado, search: search ? search.trim() : undefined });
 
   // Estados de modales
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -287,21 +221,15 @@ export function UsersTable() {
         }
         secondaryActions={
           <DropdownMenuItem
-            onSelect={handleExportAll}
-            disabled={isExportingAll || isExporting || (users.length === 0 && !response?.hasMore)}
+            onSelect={() => void handleExportAll()}
+            disabled={isExporting || users.length === 0}
           >
-            {isExportingAll || isExporting ? (
+            {isExporting ? (
               <Spinner className="size-4" />
             ) : (
               <HugeiconsIcon icon={FileExportIcon} className="size-4" />
             )}
-            <span>
-              {isExportingAll
-                ? exportLoadedCount !== null && exportLoadedCount > 0
-                  ? `Exportando (${exportLoadedCount})...`
-                  : "Exportando..."
-                : "Exportar Excel"}
-            </span>
+            <span>{isExporting ? "Exportando..." : "Exportar Excel"}</span>
           </DropdownMenuItem>
         }
       />
