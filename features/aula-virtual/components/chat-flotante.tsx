@@ -178,7 +178,7 @@ export function ChatFlotante({
       {abierto && !minimizado && (
         <aside
           aria-label="Ventana flotante de chat del aula"
-          className="border-border/80 bg-card/95 animate-in slide-in-from-bottom-5 fixed right-6 bottom-6 z-50 flex h-[580px] max-h-[85vh] w-[94vw] flex-col overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl duration-200 sm:w-[410px]"
+          className="border-border/80 bg-card/95 animate-in slide-in-from-bottom-5 fixed right-6 bottom-6 z-50 flex h-145 max-h-[85vh] w-[94vw] flex-col overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl duration-200 sm:w-102"
         >
           {/* Cabecera del Chat Flotante */}
           <div className="border-border/60 bg-muted/40 flex items-center justify-between border-b px-4 py-3 select-none">
