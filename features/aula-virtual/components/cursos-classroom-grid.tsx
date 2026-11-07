@@ -15,96 +15,14 @@ import { Button } from "@/components/ui/button";
 import { SelectOption, type SelectOptionItem } from "@/components/common/select";
 import { useSession } from "@/features/auth";
 import type { CursoAula } from "../types";
+import { obtenerEstiloCurso } from "../utils";
+
+export { obtenerEstiloCurso };
 
 interface CursosClassroomGridProps {
   cursos: CursoAula[];
   onSelectCurso?: (cursoSeccionId: string) => void;
   basePath?: string;
-}
-
-// Paletas inspiradas en Google Classroom según área curricular o nombre
-const PALETAS_AREA: Record<string, { gradient: string; accent: string }> = {
-  matematica: {
-    gradient: "from-blue-600 via-indigo-700 to-slate-900",
-    accent: "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
-  },
-  comunicacion: {
-    gradient: "from-rose-600 via-red-700 to-neutral-900",
-    accent: "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300",
-  },
-  ingles: {
-    gradient: "from-purple-600 via-violet-800 to-slate-900",
-    accent: "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",
-  },
-  arte_cultura: {
-    gradient: "from-fuchsia-600 via-purple-700 to-indigo-950",
-    accent: "bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
-  },
-  ciencias_sociales: {
-    gradient: "from-amber-600 via-orange-700 to-stone-900",
-    accent: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
-  },
-  ciencia_tecnologia: {
-    gradient: "from-emerald-600 via-teal-700 to-slate-900",
-    accent: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
-  },
-  educacion_fisica: {
-    gradient: "from-cyan-600 via-teal-700 to-slate-900",
-    accent: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300",
-  },
-  educacion_religiosa: {
-    gradient: "from-sky-600 via-blue-800 to-slate-900",
-    accent: "bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300",
-  },
-  educacion_trabajo: {
-    gradient: "from-yellow-600 via-amber-700 to-neutral-900",
-    accent: "bg-yellow-50 text-yellow-800 dark:bg-yellow-950/60 dark:text-yellow-300",
-  },
-  desarrollo_personal: {
-    gradient: "from-teal-600 via-emerald-700 to-slate-900",
-    accent: "bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300",
-  },
-  tutoría: {
-    gradient: "from-indigo-600 via-purple-700 to-slate-900",
-    accent: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
-  },
-};
-
-export function obtenerEstiloCurso(curso: {
-  cursoNombre: string;
-  colorHex?: string | null;
-  areaCurricular?: string | null;
-}) {
-  const nombre = (curso.areaCurricular || curso.cursoNombre || "").toLowerCase();
-
-  for (const [clave, estilo] of Object.entries(PALETAS_AREA)) {
-    if (nombre.includes(clave.replace("_", " ")) || nombre.includes(clave)) {
-      return estilo;
-    }
-  }
-
-  if (nombre.includes("mat")) return PALETAS_AREA.matematica;
-  if (nombre.includes("comunic")) return PALETAS_AREA.comunicacion;
-  if (nombre.includes("ingl")) return PALETAS_AREA.ingles;
-  if (nombre.includes("arte") || nombre.includes("cultura")) return PALETAS_AREA.arte_cultura;
-  if (nombre.includes("social") || nombre.includes("historia") || nombre.includes("geografia")) {
-    return PALETAS_AREA.ciencias_sociales;
-  }
-  if (nombre.includes("ciencia") || nombre.includes("tecnolog") || nombre.includes("quimica")) {
-    return PALETAS_AREA.ciencia_tecnologia;
-  }
-  if (nombre.includes("fisica") || nombre.includes("deporte")) return PALETAS_AREA.educacion_fisica;
-  if (nombre.includes("religion") || nombre.includes("religios"))
-    return PALETAS_AREA.educacion_religiosa;
-  if (nombre.includes("trabajo") || nombre.includes("computacion") || nombre.includes("ept")) {
-    return PALETAS_AREA.educacion_trabajo;
-  }
-  if (nombre.includes("tutor")) return PALETAS_AREA.tutoría;
-
-  return {
-    gradient: "from-slate-700 via-slate-800 to-zinc-900",
-    accent: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200",
-  };
 }
 
 export function CursosClassroomGrid({
