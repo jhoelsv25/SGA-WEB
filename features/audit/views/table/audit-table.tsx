@@ -12,12 +12,17 @@ import { getAuditActionMeta } from "../../consts";
 import type { AuditLogItem } from "../../types/audit.types";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { BuscarPersonaModal } from "@/features/personas/components/modals/buscar-persona-modal";
+import type { Persona } from "@/features/personas/types/personas.types";
+import { usersApi } from "@/features/users/api/users.api";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AlertCircleIcon,
   EyeIcon,
   Layers01Icon,
   Robot01Icon,
+  Search01Icon,
   ShieldCheckIcon,
 } from "@hugeicons/core-free-icons";
 import { formatDateTime } from "@/lib/formatters/date";
@@ -244,6 +249,27 @@ export function AuditTable() {
   };
 
   // Modal de Detalle
+  const [buscarPersonaOpen, setBuscarPersonaOpen] = React.useState(false);
+
+  /** Filtra la bitácora por la cuenta de la persona elegida en el buscador. */
+  const filtrarPorPersona = async (persona: Persona) => {
+    if (!persona.fichas.tieneUsuario) {
+      toast.error(`${persona.nombreCompleto} no tiene cuenta de usuario.`);
+      return;
+    }
+    try {
+      const res = await usersApi.getUsers({ search: persona.numeroDocumento, limit: 10 });
+      const cuenta = res.data.find((u) => u.persona.id === persona.id);
+      if (!cuenta) {
+        toast.error("No se encontró la cuenta de esa persona.");
+        return;
+      }
+      listFilters.setFilter("usuario", cuenta.nombreUsuario);
+    } catch {
+      toast.error("No se pudo buscar la cuenta de la persona.");
+    }
+  };
+
   const [selectedAuditId, setSelectedAuditId] = React.useState<number | null>(null);
   const [detailModalOpen, setDetailModalOpen] = React.useState<boolean>(false);
 
@@ -267,7 +293,22 @@ export function AuditTable() {
         isRefreshing={isFetching}
         hasActiveFilters={listFilters.hasActive}
         onClearFilters={listFilters.clearFilters}
+        actions={
+          <Button size="sm" onClick={() => setBuscarPersonaOpen(true)} className="h-10 gap-2">
+            <HugeiconsIcon icon={Search01Icon} className="size-4" />
+            Buscar persona
+          </Button>
+        }
       />
+
+      {buscarPersonaOpen && (
+        <BuscarPersonaModal
+          open
+          onOpenChange={setBuscarPersonaOpen}
+          destino="cualquiera"
+          onSeleccionar={(persona) => void filtrarPorPersona(persona)}
+        />
+      )}
 
       {/* Alerta de validación en caso de manipulación de fechas en URL */}
       {validationError && (

@@ -5,15 +5,22 @@ import { UserAdd01Icon } from "@hugeicons/core-free-icons";
 import { CreateUserForm } from "../forms/create-user-form";
 import { useCreateUserMutation } from "../../hooks/use-users-mutations";
 import type { CreateUserFormValues } from "../../schemas/users.schema";
+import type { Persona } from "@/features/personas/types/personas.types";
 import type { CreateUserResponse } from "../../types/users.types";
 
 interface CreateUserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUserCreated: (res: CreateUserResponse) => void;
+  personaInicial?: Persona | null;
 }
 
-export function CreateUserModal({ open, onOpenChange, onUserCreated }: CreateUserModalProps) {
+export function CreateUserModal({
+  open,
+  onOpenChange,
+  onUserCreated,
+  personaInicial,
+}: CreateUserModalProps) {
   const createMutation = useCreateUserMutation((data) => {
     onOpenChange(false);
     onUserCreated(data);
@@ -52,6 +59,7 @@ export function CreateUserModal({ open, onOpenChange, onUserCreated }: CreateUse
     >
       <CreateUserForm
         onSubmit={handleSubmit}
+        personaInicial={personaInicial}
         isLoading={createMutation.isPending}
         onCancel={() => onOpenChange(false)}
       />

@@ -22,6 +22,8 @@ interface Props {
   onSubmit: (values: CreateUserFormValues) => Promise<void> | void;
   isLoading?: boolean;
   onCancel?: () => void;
+  /** Persona ya elegida en el buscador: el formulario arranca vinculado a ella. */
+  personaInicial?: Persona | null;
 }
 
 const TIPO_DOCUMENTO_OPTIONS = [
@@ -31,8 +33,13 @@ const TIPO_DOCUMENTO_OPTIONS = [
   { value: "partida_nacimiento", label: "Partida de nacimiento" },
 ];
 
-export function CreateUserForm({ onSubmit, isLoading = false, onCancel }: Props) {
-  const [personaElegida, setPersonaElegida] = React.useState<Persona | null>(null);
+export function CreateUserForm({
+  onSubmit,
+  isLoading = false,
+  onCancel,
+  personaInicial = null,
+}: Props) {
+  const [personaElegida, setPersonaElegida] = React.useState<Persona | null>(personaInicial);
   const { data: roles = [] } = useRolesQuery(true);
   const { data: cargos = [], isLoading: isLoadingCargos } = useCargosQuery(true);
 
@@ -45,11 +52,11 @@ export function CreateUserForm({ onSubmit, isLoading = false, onCancel }: Props)
   } = useForm<CreateUserFormValues>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      tipoPersona: "existente",
-      personaId: "",
+      tipoPersona: personaInicial ? "existente" : "nueva",
+      personaId: personaInicial?.id ?? "",
       cargoId: "",
       rolIds: [],
-      nombreUsuario: "",
+      nombreUsuario: personaInicial?.numeroDocumento ?? "",
     },
   });
 

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/common/user-avatar";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Spinner } from "@/components/common/spinner";
-import { UserAdd01Icon, FileExportIcon } from "@hugeicons/core-free-icons";
+import { UserAdd01Icon, FileExportIcon, Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useExportarReporte } from "@/hooks/use-exportar-reporte";
@@ -21,6 +21,8 @@ import { userFilterDefs } from "../../config/filters";
 import { USER_STATUS_CONFIG } from "../../consts/users.consts";
 import { useUsersQuery } from "../../hooks/use-users-query";
 import { useSession } from "../../../auth/hooks/use-auth";
+import { BuscarPersonaModal } from "@/features/personas/components/modals/buscar-persona-modal";
+import type { Persona } from "@/features/personas/types/personas.types";
 import { CreateUserModal } from "../../components/modals/create-user-modal";
 import { ManageRolesModal } from "../../components/modals/manage-roles-modal";
 import { UpdateUsernameModal } from "../../components/modals/update-username-modal";
@@ -88,6 +90,8 @@ export function UsersTable() {
 
   // Estados de modales
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
+  const [buscarPersonaOpen, setBuscarPersonaOpen] = React.useState(false);
+  const [personaElegida, setPersonaElegida] = React.useState<Persona | null>(null);
 
   const [roleModalOpen, setRoleModalOpen] = React.useState(false);
   const [userForRole, setUserForRole] = React.useState<UserItem | null>(null);
@@ -214,10 +218,24 @@ export function UsersTable() {
         onRefresh={() => refetch()}
         isRefreshing={isFetching}
         actions={
-          <Button size="sm" onClick={() => setCreateModalOpen(true)} className="h-10 gap-2">
-            <HugeiconsIcon icon={UserAdd01Icon} className="size-4" />
-            Crear cuenta
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setPersonaElegida(null);
+                setCreateModalOpen(true);
+              }}
+              className="h-10 gap-2"
+            >
+              <HugeiconsIcon icon={UserAdd01Icon} className="size-4" />
+              Crear cuenta
+            </Button>
+            <Button size="sm" onClick={() => setBuscarPersonaOpen(true)} className="h-10 gap-2">
+              <HugeiconsIcon icon={Search01Icon} className="size-4" />
+              Buscar persona
+            </Button>
+          </div>
         }
         secondaryActions={
           <DropdownMenuItem
@@ -254,7 +272,21 @@ export function UsersTable() {
       />
 
       {/* Modales */}
+      {buscarPersonaOpen && (
+        <BuscarPersonaModal
+          open
+          onOpenChange={setBuscarPersonaOpen}
+          destino="cuenta"
+          onSeleccionar={(persona) => {
+            setPersonaElegida(persona);
+            setCreateModalOpen(true);
+          }}
+        />
+      )}
+
       <CreateUserModal
+        key={personaElegida?.id ?? "persona-nueva"}
+        personaInicial={personaElegida}
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
         onUserCreated={handleUserCreated}
