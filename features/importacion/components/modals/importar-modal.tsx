@@ -80,7 +80,14 @@ function getDato(datos: Record<string, unknown> | undefined, ...keys: string[]):
   for (const [k, v] of Object.entries(datos)) {
     if (v !== undefined && v !== null && String(v).trim() !== "") {
       const normK = normalizar(k);
-      if (targets.some((t) => normK === t || normK.includes(t) || t.includes(normK))) {
+      // Evitar falsos positivos con claves muy cortas como 'n' o '#'
+      if (
+        targets.some(
+          (t) =>
+            normK === t ||
+            (normK.length >= 3 && t.length >= 3 && (normK.includes(t) || t.includes(normK))),
+        )
+      ) {
         return String(v).trim();
       }
     }

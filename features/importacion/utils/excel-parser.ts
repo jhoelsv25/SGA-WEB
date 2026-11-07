@@ -11,18 +11,30 @@ function normalizeHeaderKey(header: string): string {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, ""); // Quitar tildes
 
+  if (
+    clean === "n°" ||
+    clean === "nro" ||
+    clean === "n" ||
+    clean === "item" ||
+    clean === "orden" ||
+    clean === "#"
+  ) {
+    return "numeroOrden";
+  }
+
   if (clean.includes("siagie") && clean.includes("estudiante")) return "codigoSiagieEstudiante";
   if (clean.includes("siagie")) return "codigoSiagie";
   if (clean.includes("codigo") && clean.includes("docente")) return "codigoDocente";
   if (clean === "codigo" || clean === "codigo estudiante" || clean.startsWith("cod"))
     return "codigoSiagie";
-  if (clean.includes("tipo") && clean.includes("documento")) return "tipoDocumento";
+  if (clean.includes("tipo") && (clean.includes("documento") || clean.includes("doc")))
+    return "tipoDocumento";
   if (
-    (clean.includes("numero") && clean.includes("documento")) ||
-    clean.includes("n°") ||
-    clean.includes("nro") ||
+    clean.includes("documento") ||
     clean.includes("dni") ||
-    clean === "documento"
+    clean.includes("num_doc") ||
+    clean.includes("nro_doc") ||
+    clean === "doc"
   )
     return "numeroDocumento";
   if (clean.includes("paterno")) return "apellidoPaterno";
