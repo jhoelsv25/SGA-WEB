@@ -9,6 +9,7 @@ import {
   TabVariables,
   TabTurnos,
   TabEquipos,
+  TabBiometrico,
   TabSeguridad,
   TabNotificaciones,
 } from "./components";
@@ -37,6 +38,7 @@ export function ConfiguracionPage() {
           {tabActiva === "variables" && <TabVariables />}
           {tabActiva === "turnos" && <TabTurnos />}
           {tabActiva === "equipos" && <TabEquipos />}
+          {tabActiva === "biometrico" && <TabBiometrico />}
           {tabActiva === "seguridad" && <TabSeguridad />}
           {tabActiva === "notificaciones" && <TabNotificaciones />}
         </div>
