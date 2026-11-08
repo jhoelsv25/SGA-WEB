@@ -5,12 +5,15 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Activity01Icon,
   Add01Icon,
+  Award01Icon,
   Calendar03Icon,
   CheckmarkCircle02Icon,
   Clock01Icon,
   Delete02Icon,
   FileEditIcon,
+  Folder01Icon,
   LockIcon,
+  Search01Icon,
   Task01Icon,
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
@@ -131,62 +134,83 @@ export function TareasTab({
     });
   }, [tareas, tipoFiltro, estadoFiltro, busqueda]);
 
-  const obtenerTipoTone = (tipo: TipoTarea): "brand" | "info" | "danger" | "neutral" => {
+  const obtenerConfigTipo = (tipo: TipoTarea) => {
     switch (tipo) {
       case "trabajo":
-        return "brand";
+        return {
+          icon: Task01Icon,
+          color: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+          label: "Trabajo",
+          tone: "brand" as const,
+        };
       case "proyecto":
-        return "info";
+        return {
+          icon: Folder01Icon,
+          color: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+          label: "Proyecto",
+          tone: "info" as const,
+        };
       case "cuestionario":
-        return "brand";
+        return {
+          icon: Task01Icon,
+          color: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+          label: "Cuestionario",
+          tone: "brand" as const,
+        };
       case "examen":
-        return "danger";
+        return {
+          icon: Award01Icon,
+          color: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+          label: "Examen",
+          tone: "danger" as const,
+        };
       default:
-        return "neutral";
-    }
-  };
-
-  const formatearTipo = (tipo: TipoTarea) => {
-    switch (tipo) {
-      case "trabajo":
-        return "Trabajo";
-      case "proyecto":
-        return "Proyecto";
-      case "cuestionario":
-        return "Cuestionario";
-      case "examen":
-        return "Examen";
-      default:
-        return tipo;
+        return {
+          icon: Task01Icon,
+          color: "bg-primary/10 text-primary border-primary/20",
+          label: tipo,
+          tone: "neutral" as const,
+        };
     }
   };
 
   return (
-    <div className="space-y-4">
-      {/* Barra de acciones y filtros */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-64 flex-1 flex-wrap items-center gap-2">
-          <Input
-            placeholder="Buscar por título o instrucción..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            className="h-9 max-w-xs"
-          />
-          <div className="w-44">
+    <div className="space-y-5">
+      {/* Barra de acciones y filtros moderna */}
+      <div className="border-border/80 bg-card flex flex-col justify-between gap-3.5 rounded-2xl border p-4 shadow-xs sm:flex-row sm:items-center">
+        <div className="flex flex-1 flex-wrap items-center gap-2.5">
+          <div className="relative min-w-56 flex-1 sm:max-w-xs">
+            <HugeiconsIcon
+              icon={Search01Icon}
+              size={16}
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2"
+            />
+            <Input
+              placeholder="Buscar por título o instrucción..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="h-9 rounded-xl pr-3 pl-9 text-xs"
+            />
+          </div>
+
+          <div className="w-40">
             <SelectOption
               options={TIPOS_FILTRO}
               value={tipoFiltro}
               onSelect={setTipoFiltro}
               placeholder="Tipo"
+              className="h-9 text-xs"
             />
           </div>
+
           {puedeAdministrar && (
-            <div className="w-44">
+            <div className="w-40">
               <SelectOption
                 options={ESTADOS_FILTRO}
                 value={estadoFiltro}
                 onSelect={setEstadoFiltro}
                 placeholder="Estado"
+                className="h-9 text-xs"
               />
             </div>
           )}
@@ -195,11 +219,11 @@ export function TareasTab({
         {puedeAdministrar && (
           <Button
             type="button"
-            className="min-h-9 gap-1.5"
+            className="h-9 gap-1.5 rounded-xl text-xs font-semibold shadow-xs"
             onClick={() => setModalTarea({ abierto: true, tarea: null })}
           >
-            <HugeiconsIcon icon={Add01Icon} size={16} />
-            Nueva tarea o evaluación
+            <HugeiconsIcon icon={Add01Icon} size={15} />
+            <span>Nueva evaluación</span>
           </Button>
         )}
       </div>
@@ -240,119 +264,135 @@ export function TareasTab({
             }
           />
         ) : (
-          <div className="grid gap-3">
+          <div className="space-y-3">
             {tareasFiltradas.map((tarea) => {
               const esVencida = new Date(tarea.fechaLimite).getTime() < ahoraMs;
               const miEntrega = tarea.miEntrega;
+              const config = obtenerConfigTipo(tarea.tipo);
 
               return (
                 <div
                   key={tarea.id}
-                  className="group bg-card hover:border-foreground/20 relative flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4 transition-all hover:shadow-2xs"
+                  className="group border-border/80 bg-card hover:border-border flex flex-col justify-between gap-4 rounded-2xl border p-4 transition-all hover:shadow-2xs sm:flex-row sm:items-center"
                 >
-                  {/* Información principal */}
-                  <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-base font-semibold tracking-tight">{tarea.titulo}</span>
-                      <StatusBadge tone={obtenerTipoTone(tarea.tipo)}>
-                        {formatearTipo(tarea.tipo)}
-                      </StatusBadge>
-
-                      {puedeAdministrar ? (
-                        <StatusBadge
-                          tone={
-                            tarea.estado === "publicada"
-                              ? "success"
-                              : tarea.estado === "borrador"
-                                ? "neutral"
-                                : "danger"
-                          }
-                        >
-                          {tarea.estado.toUpperCase()}
-                        </StatusBadge>
-                      ) : // Para estudiante: estado de su entrega
-                      miEntrega ? (
-                        <StatusBadge
-                          tone={
-                            miEntrega.estado === "calificada"
-                              ? "success"
-                              : miEntrega.estado === "devuelta"
-                                ? "warning"
-                                : "brand"
-                          }
-                        >
-                          {miEntrega.estado === "calificada"
-                            ? `Calificada (${miEntrega.nota ?? 0}/20)`
-                            : miEntrega.estado === "devuelta"
-                              ? "Devuelta para corrección"
-                              : "Entregada"}
-                        </StatusBadge>
-                      ) : esVencida ? (
-                        <StatusBadge tone="danger">Vencida</StatusBadge>
-                      ) : (
-                        <StatusBadge tone="warning">Pendiente</StatusBadge>
-                      )}
-
-                      {tarea.permiteEntregaTardia && (
-                        <span className="text-muted-foreground bg-muted rounded-md px-2 py-0.5 text-[11px]">
-                          Permite entrega tardía
-                        </span>
-                      )}
+                  {/* Información principal con icono de tipo */}
+                  <div className="flex min-w-0 items-start gap-3.5">
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${config.color}`}
+                    >
+                      <HugeiconsIcon icon={config.icon} size={20} />
                     </div>
 
-                    {tarea.instrucciones && (
-                      <p className="text-muted-foreground line-clamp-2 text-sm">
-                        {tarea.instrucciones}
-                      </p>
-                    )}
-
-                    <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-                      <span className="flex items-center gap-1">
-                        <HugeiconsIcon icon={Calendar03Icon} size={14} />
-                        Límite: {formatDate(tarea.fechaLimite)}
-                      </span>
-
-                      {tarea.limiteTiempoMinutos && (
-                        <span className="flex items-center gap-1">
-                          <HugeiconsIcon icon={Clock01Icon} size={14} />
-                          {tarea.limiteTiempoMinutos} min
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-foreground text-sm font-bold tracking-tight">
+                          {tarea.titulo}
                         </span>
+                        <StatusBadge tone={config.tone}>{config.label}</StatusBadge>
+
+                        {puedeAdministrar ? (
+                          <StatusBadge
+                            tone={
+                              tarea.estado === "publicada"
+                                ? "success"
+                                : tarea.estado === "borrador"
+                                  ? "neutral"
+                                  : "danger"
+                            }
+                          >
+                            {tarea.estado.toUpperCase()}
+                          </StatusBadge>
+                        ) : miEntrega ? (
+                          <StatusBadge
+                            tone={
+                              miEntrega.estado === "calificada"
+                                ? "success"
+                                : miEntrega.estado === "devuelta"
+                                  ? "warning"
+                                  : "brand"
+                            }
+                          >
+                            {miEntrega.estado === "calificada"
+                              ? `Calificada (${miEntrega.nota ?? 0}/20)`
+                              : miEntrega.estado === "devuelta"
+                                ? "Devuelta para corrección"
+                                : "Entregada"}
+                          </StatusBadge>
+                        ) : esVencida ? (
+                          <StatusBadge tone="danger">Vencida</StatusBadge>
+                        ) : (
+                          <StatusBadge tone="warning">Pendiente</StatusBadge>
+                        )}
+
+                        {tarea.permiteEntregaTardia && (
+                          <span className="bg-muted text-muted-foreground rounded-md px-1.5 py-0.5 text-[10px] font-medium">
+                            Entrega tardía permitida
+                          </span>
+                        )}
+                      </div>
+
+                      {tarea.instrucciones && (
+                        <p className="text-muted-foreground line-clamp-2 text-xs">
+                          {tarea.instrucciones}
+                        </p>
                       )}
 
-                      <span>Puntaje: {tarea.puntajeMaximo} pts</span>
-
-                      {tarea.tipo === "cuestionario" || tarea.tipo === "examen" ? (
-                        <span>
-                          Intentos máx: {tarea.intentosMaximos}
-                          {typeof tarea.intentosRestantes === "number" &&
-                            ` (${tarea.intentosRestantes} restantes)`}
+                      <div className="text-muted-foreground flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[11px]">
+                        <span className="flex items-center gap-1 font-medium">
+                          <HugeiconsIcon
+                            icon={Calendar03Icon}
+                            size={12}
+                            className="text-muted-foreground/70"
+                          />
+                          <span>Límite: {formatDate(tarea.fechaLimite)}</span>
                         </span>
-                      ) : (
-                        <span>1 intento (editable)</span>
-                      )}
+
+                        {tarea.limiteTiempoMinutos && (
+                          <span className="flex items-center gap-1">
+                            <HugeiconsIcon
+                              icon={Clock01Icon}
+                              size={12}
+                              className="text-muted-foreground/70"
+                            />
+                            <span>{tarea.limiteTiempoMinutos} min</span>
+                          </span>
+                        )}
+
+                        <span>· Puntaje: {tarea.puntajeMaximo} pts</span>
+
+                        {tarea.tipo === "cuestionario" || tarea.tipo === "examen" ? (
+                          <span>
+                            · Intentos máx: {tarea.intentosMaximos}
+                            {typeof tarea.intentosRestantes === "number" &&
+                              ` (${tarea.intentosRestantes} restantes)`}
+                          </span>
+                        ) : (
+                          <span>· 1 intento</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   {/* Acciones */}
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 self-end sm:self-center">
                     {puedeAdministrar ? (
                       <>
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="min-h-9 gap-1.5"
+                          className="h-8.5 gap-1.5 rounded-xl text-xs font-medium"
                           onClick={() => setModalEntregas({ abierto: true, tarea })}
                         >
-                          <HugeiconsIcon icon={UserGroupIcon} size={16} />
-                          Entregas
+                          <HugeiconsIcon icon={UserGroupIcon} size={14} />
+                          <span>Entregas</span>
                         </Button>
 
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="min-h-9 gap-1.5"
+                          className="h-8.5 gap-1.5 rounded-xl text-xs font-medium"
                           onClick={() =>
                             setRecursoActividad({
                               tipo: "tarea",
@@ -361,20 +401,20 @@ export function TareasTab({
                             })
                           }
                         >
-                          <HugeiconsIcon icon={Activity01Icon} size={16} />
-                          Actividad
+                          <HugeiconsIcon icon={Activity01Icon} size={14} />
+                          <span className="hidden md:inline">Actividad</span>
                         </Button>
 
                         {tarea.estado === "borrador" && (
                           <Button
                             type="button"
                             size="sm"
-                            className="min-h-9 gap-1.5"
+                            className="h-8.5 gap-1.5 rounded-xl text-xs font-semibold"
                             onClick={() => publicar.mutate(tarea.id)}
                             disabled={publicar.isPending}
                           >
-                            <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} />
-                            Publicar
+                            <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} />
+                            <span>Publicar</span>
                           </Button>
                         )}
 
@@ -383,7 +423,7 @@ export function TareasTab({
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="min-h-9 gap-1.5 text-amber-600 hover:text-amber-700"
+                            className="h-8.5 gap-1.5 rounded-xl text-xs font-medium text-amber-600 hover:text-amber-700"
                             onClick={() =>
                               setTareaACerrar({
                                 tarea,
@@ -392,8 +432,8 @@ export function TareasTab({
                             }
                             disabled={cerrar.isPending}
                           >
-                            <HugeiconsIcon icon={LockIcon} size={16} />
-                            Cerrar
+                            <HugeiconsIcon icon={LockIcon} size={14} />
+                            <span>Cerrar</span>
                           </Button>
                         )}
 
@@ -401,21 +441,21 @@ export function TareasTab({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="min-h-9 gap-1.5"
+                          className="h-8.5 gap-1.5 rounded-xl text-xs font-medium"
                           onClick={() => setModalTarea({ abierto: true, tarea })}
                         >
-                          <HugeiconsIcon icon={FileEditIcon} size={16} />
-                          Editar
+                          <HugeiconsIcon icon={FileEditIcon} size={14} />
+                          <span>Editar</span>
                         </Button>
 
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="text-destructive hover:text-destructive min-h-9 gap-1.5"
+                          className="text-destructive hover:bg-destructive/10 h-8.5 rounded-xl text-xs"
                           onClick={() => setTareaAEliminar(tarea)}
                         >
-                          <HugeiconsIcon icon={Delete02Icon} size={16} />
+                          <HugeiconsIcon icon={Delete02Icon} size={14} />
                         </Button>
                       </>
                     ) : (

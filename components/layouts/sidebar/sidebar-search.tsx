@@ -16,6 +16,25 @@ import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
+function RenderSearchIcon({
+  icon,
+  className = "size-4 shrink-0",
+}: {
+  icon: NavItem["icon"];
+  className?: string;
+}) {
+  if (typeof icon === "function") {
+    const Component = icon;
+    return <Component className={className} />;
+  }
+
+  if (Array.isArray(icon)) {
+    return <HugeiconsIcon icon={icon} className={className} />;
+  }
+
+  return <HugeiconsIcon icon={Search01Icon} className={className} />;
+}
+
 export interface SidebarSearchProps {
   sections: NavSection[];
 }
@@ -25,6 +44,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
   const { state, setOpenMobile, isMobile } = useSidebar();
   const [openDialog, setOpenDialog] = React.useState(false);
   const [query, setQuery] = React.useState("");
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
   const allItems = React.useMemo(() => {
     const list: Array<NavItem & { sectionTitle?: string }> = [];
@@ -58,7 +78,12 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
     );
   }, [allItems, query]);
 
-  // Atajo de teclado (Ctrl + K o Cmd + K)
+  const handleQueryChange = (val: string) => {
+    setQuery(val);
+    setSelectedIndex(0);
+  };
+
+  // Atajo de teclado global (Ctrl + K o Cmd + K)
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -73,10 +98,30 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
 
   const handleSelect = (link: string) => {
     setOpenDialog(false);
+    setQuery("");
     if (isMobile) {
       setOpenMobile(false);
     }
     router.push(link);
+  };
+
+  // Navegación por teclado dentro del cuadro de diálogo
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (filteredItems.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % filteredItems.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + filteredItems.length) % filteredItems.length);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const targetItem = filteredItems[selectedIndex];
+      if (targetItem) {
+        handleSelect(targetItem.link);
+      }
+    }
   };
 
   const isCollapsed = state === "collapsed";
@@ -132,7 +177,8 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
             </div>
             <Input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => handleQueryChange(e.target.value)}
+              onKeyDown={handleInputKeyDown}
               placeholder="Buscar asignaturas, asistencias, roles, usuarios..."
               className="placeholder:text-muted-foreground/60 h-9 border-none bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
               autoFocus
@@ -140,7 +186,7 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
             {query && (
               <button
                 type="button"
-                onClick={() => setQuery("")}
+                onClick={() => handleQueryChange("")}
                 className="text-muted-foreground hover:text-foreground rounded-full p-1 transition-colors"
                 title="Limpiar"
                 aria-label="Limpiar búsqueda"
@@ -157,43 +203,81 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
                 No se encontraron módulos con &ldquo;{query}&rdquo;
               </div>
             ) : (
-              filteredItems.map((item) => (
-                <button
-                  key={`${item.id}-${item.link}`}
-                  type="button"
-                  onClick={() => handleSelect(item.link)}
-                  className="group hover:bg-accent/80 hover:text-accent-foreground flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition-all duration-150"
-                >
-                  <div className="flex items-center gap-3 truncate">
-                    <div className="bg-primary/10 text-primary border-primary/15 group-hover:bg-primary group-hover:text-primary-foreground flex size-7 shrink-0 items-center justify-center rounded-lg border transition-colors">
-                      <HugeiconsIcon icon={Search01Icon} className="size-3.5" />
-                    </div>
-                    <div className="truncate">
-                      <div className="text-foreground group-hover:text-primary truncate font-semibold transition-colors">
-                        {item.label}
-                      </div>
-                      {item.sectionTitle && (
-                        <div className="text-muted-foreground/80 truncate text-xs">
-                          {item.sectionTitle}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+              filteredItems.map((item, index) => {
+                const isSelected = index === selectedIndex;
 
-                  <HugeiconsIcon
-                    icon={ArrowRight01Icon}
-                    className="text-muted-foreground/60 size-3.5 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
-                  />
-                </button>
-              ))
+                return (
+                  <button
+                    key={`${item.id}-${item.link}`}
+                    type="button"
+                    onClick={() => handleSelect(item.link)}
+                    onMouseEnter={() => setSelectedIndex(index)}
+                    className={cn(
+                      "group flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition-all duration-150 select-none",
+                      isSelected
+                        ? "bg-primary/10 text-primary-foreground border-primary/20 border shadow-2xs"
+                        : "hover:bg-accent/80 hover:text-accent-foreground border border-transparent",
+                    )}
+                  >
+                    <div className="flex items-center gap-3 truncate">
+                      <div
+                        className={cn(
+                          "flex size-7.5 shrink-0 items-center justify-center rounded-lg border transition-colors",
+                          isSelected
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-muted/70 text-foreground/80 border-border/60 group-hover:bg-primary group-hover:text-primary-foreground",
+                        )}
+                      >
+                        <RenderSearchIcon icon={item.icon} className="size-4" />
+                      </div>
+                      <div className="truncate">
+                        <div
+                          className={cn(
+                            "truncate font-semibold transition-colors",
+                            isSelected
+                              ? "text-primary dark:text-primary-foreground"
+                              : "text-foreground group-hover:text-primary",
+                          )}
+                        >
+                          {item.label}
+                        </div>
+                        {item.sectionTitle && (
+                          <div className="text-muted-foreground/80 truncate text-[11px]">
+                            {item.sectionTitle}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <HugeiconsIcon
+                      icon={ArrowRight01Icon}
+                      className={cn(
+                        "size-3.5 transition-all",
+                        isSelected
+                          ? "text-primary dark:text-primary-foreground translate-x-0.5 opacity-100"
+                          : "text-muted-foreground/60 opacity-0 group-hover:translate-x-0.5 group-hover:opacity-100",
+                      )}
+                    />
+                  </button>
+                );
+              })
             )}
           </div>
 
           {/* Footer de navegación rápida */}
-          <div className="border-border/60 bg-muted/40 text-muted-foreground flex items-center justify-between border-t px-4 py-2.5 text-xs">
-            <span className="font-medium">
-              Navegación Institucional · I.E. Nuestra Señora del Carmen
-            </span>
+          <div className="border-border/60 bg-muted/40 text-muted-foreground flex flex-wrap items-center justify-between gap-2 border-t px-4 py-2.5 text-xs">
+            <div className="flex items-center gap-2 font-medium">
+              <span className="hidden sm:inline">Navegación Institucional</span>
+              <span className="text-muted-foreground/50 hidden sm:inline">·</span>
+              <span className="flex items-center gap-1 font-mono text-[11px]">
+                <kbd className="border-border bg-background rounded border px-1">↑</kbd>
+                <kbd className="border-border bg-background rounded border px-1">↓</kbd> navegar
+              </span>
+              <span className="text-muted-foreground/50">·</span>
+              <span className="flex items-center gap-1 font-mono text-[11px]">
+                <kbd className="border-border bg-background rounded border px-1">↵</kbd> entrar
+              </span>
+            </div>
             <span className="font-mono text-xs">ESC para salir</span>
           </div>
         </DialogContent>

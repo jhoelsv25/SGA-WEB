@@ -168,6 +168,7 @@ export function AulaVirtualPage({
         periodoActualLabel={periodoId !== "" ? periodoActualLabel : undefined}
         cursoNombre={cursoInfo?.cursoNombre || aula?.cursoNombre}
         docenteNombre={cursoInfo?.docenteNombre}
+        totalEstudiantes={cursoInfo?.totalEstudiantes}
         gradient={estiloCurso.gradient}
       />
 

@@ -2,7 +2,13 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { BookOpen01Icon, Calendar03Icon, FileAddIcon } from "@hugeicons/core-free-icons";
+import {
+  BookOpen01Icon,
+  Calendar03Icon,
+  FileAddIcon,
+  FileEditIcon,
+  Folder01Icon,
+} from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/empty-state";
 import { formatDate } from "@/lib/formatters/date";
@@ -40,65 +46,119 @@ export function MaterialesTab({
     return (
       <EmptyState
         title="Aún no hay unidades"
-        description="Crea la primera unidad para empezar a planificar materiales."
+        description="Crea la primera unidad para empezar a planificar materiales de reforzamiento."
         icon={BookOpen01Icon}
       />
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {unidades.map((unidad) => (
-        <div key={unidad.id} className="bg-card/60 rounded-xl border p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-foreground font-semibold">{unidad.titulo}</p>
-              {unidad.descripcion && (
-                <p className="text-muted-foreground text-sm">{unidad.descripcion}</p>
-              )}
-              <p className="text-muted-foreground text-xs">
-                {unidad.fechaInicio && formatDate(unidad.fechaInicio)} –{" "}
-                {unidad.fechaFin && formatDate(unidad.fechaFin)}
-                {!unidad.publicada && " · Oculta"}
-              </p>
+        <div
+          key={unidad.id}
+          className="border-border/80 bg-card overflow-hidden rounded-2xl border shadow-xs"
+        >
+          {/* Cabecera de la Unidad temática */}
+          <div className="bg-muted/30 border-border/60 flex flex-col justify-between gap-3 border-b p-4 sm:flex-row sm:items-center">
+            <div className="flex items-start gap-3">
+              <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl font-bold">
+                <HugeiconsIcon icon={Folder01Icon} size={18} />
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-foreground text-base font-bold">{unidad.titulo}</h3>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                      unidad.publicada
+                        ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                        : "bg-muted text-muted-foreground border"
+                    }`}
+                  >
+                    {unidad.publicada ? "Publicada" : "Oculta para alumnos"}
+                  </span>
+                  <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium">
+                    {unidad.materiales.length}{" "}
+                    {unidad.materiales.length === 1 ? "recurso" : "recursos"}
+                  </span>
+                </div>
+
+                {unidad.descripcion && (
+                  <p className="text-muted-foreground text-xs">{unidad.descripcion}</p>
+                )}
+
+                {(unidad.fechaInicio || unidad.fechaFin) && (
+                  <p className="text-muted-foreground flex items-center gap-1.5 pt-0.5 text-[11px] font-medium">
+                    <HugeiconsIcon
+                      icon={Calendar03Icon}
+                      size={12}
+                      className="text-muted-foreground/70"
+                    />
+                    <span>
+                      Vigencia: {unidad.fechaInicio && formatDate(unidad.fechaInicio)} –{" "}
+                      {unidad.fechaFin && formatDate(unidad.fechaFin)}
+                    </span>
+                  </p>
+                )}
+              </div>
             </div>
+
+            {/* Acciones del docente sobre la unidad */}
             {puedeAdministrar && (
-              <div className="flex gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-center">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="min-h-9 gap-1.5"
+                  className="h-8 gap-1.5 rounded-xl text-xs font-medium"
                   onClick={() => onPlanificarMaterial(unidad.id)}
                 >
-                  <HugeiconsIcon icon={Calendar03Icon} size={16} />
-                  Planificar
+                  <HugeiconsIcon icon={Calendar03Icon} size={14} />
+                  <span>Planificar</span>
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="min-h-9 gap-1.5"
+                  className="h-8 gap-1.5 rounded-xl text-xs font-medium"
                   onClick={() => onMaterialExtra(unidad.id)}
                 >
-                  <HugeiconsIcon icon={FileAddIcon} size={16} />
-                  Material extra
+                  <HugeiconsIcon icon={FileAddIcon} size={14} />
+                  <span>Material extra</span>
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="min-h-9"
+                  className="h-8 gap-1.5 rounded-xl text-xs font-medium"
                   onClick={() => onEditarUnidad(unidad)}
                 >
-                  Editar
+                  <HugeiconsIcon icon={FileEditIcon} size={14} />
+                  <span>Editar unidad</span>
                 </Button>
               </div>
             )}
           </div>
-          <div className="mt-3 space-y-2">
+
+          {/* Listado de Materiales dentro de la Unidad */}
+          <div className="space-y-2.5 p-4">
             {unidad.materiales.length === 0 ? (
-              <p className="text-muted-foreground text-sm">Sin materiales todavía.</p>
+              <div className="border-border/60 bg-muted/20 rounded-xl border border-dashed py-6 text-center">
+                <p className="text-muted-foreground text-xs font-medium">
+                  Esta unidad aún no tiene materiales planificados o publicados.
+                </p>
+                {puedeAdministrar && (
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    className="text-primary mt-1 h-auto text-xs"
+                    onClick={() => onPlanificarMaterial(unidad.id)}
+                  >
+                    + Planificar primer material
+                  </Button>
+                )}
+              </div>
             ) : (
               unidad.materiales.map((material) => (
                 <MaterialFila
