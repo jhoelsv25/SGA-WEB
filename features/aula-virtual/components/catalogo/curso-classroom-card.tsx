@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, BookOpen01Icon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, BookOpen01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import type { CursoAula } from "../../types";
 import { obtenerEstiloCurso } from "../../utils";
 
@@ -26,7 +26,7 @@ export function CursoClassroomCard({
     <Link
       href={rutaCurso}
       onClick={() => onSelect?.(curso.cursoSeccionId)}
-      className="group border-border/70 bg-card hover:border-border focus-visible:ring-primary relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:ring-2 focus-visible:outline-none"
+      className="group border-border/70 bg-card hover:border-border focus-visible:ring-primary relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-xs transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:ring-2 focus-visible:outline-none"
     >
       {/* Banner de Cabecera tipo Classroom con degradado vibrante */}
       <div
@@ -47,25 +47,52 @@ export function CursoClassroomCard({
         </div>
 
         <div>
-          <h3 className="line-clamp-2 text-lg leading-snug font-bold text-white drop-shadow-sm">
+          <h3 className="line-clamp-2 text-lg leading-snug font-bold text-white drop-shadow-xs">
             {curso.cursoNombre}
           </h3>
         </div>
       </div>
 
       {/* Cuerpo de la tarjeta */}
-      <div className="bg-card flex flex-1 flex-col justify-between gap-4 p-4">
-        {/* Información del Docente */}
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold">
-            {inicialDocente}
+      <div className="bg-card flex flex-1 flex-col justify-between gap-3.5 p-4">
+        {/* Información del Docente y Matrícula */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold">
+              {inicialDocente}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-muted-foreground text-[11px] font-medium">Docente a cargo</p>
+              <p className="text-foreground truncate text-xs font-semibold">
+                {curso.docenteNombre || "Por asignar"}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-muted-foreground text-[11px] font-medium">Docente a cargo</p>
-            <p className="text-foreground truncate text-xs font-semibold">
-              {curso.docenteNombre || "Por asignar"}
-            </p>
-          </div>
+
+          {/* Estado de matrícula de estudiantes */}
+          {typeof curso.totalEstudiantes === "number" && (
+            <div className="bg-muted/40 border-border/40 flex items-center justify-between rounded-xl border px-2.5 py-1.5 text-[11px]">
+              <span className="text-muted-foreground flex items-center gap-1.5 font-medium">
+                <HugeiconsIcon
+                  icon={UserGroupIcon}
+                  size={13}
+                  className="text-muted-foreground/70"
+                />
+                <span>Matriculados:</span>
+              </span>
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                  curso.totalEstudiantes > 0
+                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                    : "bg-muted text-muted-foreground/70"
+                }`}
+              >
+                {curso.totalEstudiantes > 0
+                  ? `${curso.totalEstudiantes} ${curso.totalEstudiantes === 1 ? "alumno" : "alumnos"}`
+                  : "0 alumnos"}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Botón de acción tipo Classroom */}

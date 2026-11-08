@@ -12,6 +12,7 @@ export interface CursoAula {
   colorHex?: string | null;
   areaCurricular?: string | null;
   gradoNombre?: string | null;
+  totalEstudiantes?: number;
 }
 
 export interface CambioFecha {
