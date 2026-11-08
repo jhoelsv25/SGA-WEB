@@ -45,34 +45,34 @@ export function AulaNavHeader({
         asChild
         variant="outline"
         size="sm"
-        className="hover:bg-muted gap-2 self-start rounded-xl text-xs font-semibold"
+        className="hover:bg-muted border-border/80 gap-2 self-start rounded-xl text-xs font-semibold shadow-2xs"
       >
         <Link href="/admin/aula-virtual" onClick={onVolverCursos}>
-          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          <span>Volver a todas las materias</span>
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={15} />
+          <span>Volver al catálogo</span>
         </Link>
       </Button>
 
       {/* Selectores rápidos superiores */}
       <div className="flex flex-wrap items-center gap-2">
         {cursos.length > 1 && (
-          <div className="w-56">
+          <div className="max-w-72 min-w-56">
             <SelectOption
               options={cursos.map((c) => ({
                 value: c.cursoSeccionId,
-                label: `${c.cursoNombre} · ${c.seccionNombre}`,
+                label: `${c.cursoNombre} (${c.seccionNombre})`,
               }))}
               value={cursoId}
               onSelect={onSelectCurso}
               placeholder="Cambiar de curso"
-              searchPlaceholder="Buscar curso..."
+              searchPlaceholder="Buscar materia..."
               className="h-8.5 text-xs"
             />
           </div>
         )}
 
         {opcionesPeriodo.length > 0 && (
-          <div className="w-40">
+          <div className="w-44">
             <SelectOption
               options={opcionesPeriodo}
               value={periodoId}
@@ -85,7 +85,7 @@ export function AulaNavHeader({
         )}
 
         {esApoderado && (hijosEnCurso?.length ?? 0) > 1 && (
-          <div className="w-48">
+          <div className="w-52">
             <SelectOption
               options={(hijosEnCurso ?? []).map((h) => ({
                 value: h.estudianteId,
