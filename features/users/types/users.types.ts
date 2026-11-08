@@ -73,6 +73,10 @@ export interface TempPasswordResetResponse {
   tempPassword: string;
 }
 
+export interface ResetPasswordInput {
+  nuevaContrasena?: string;
+}
+
 export interface UpdateUsernameInput {
   nombreUsuario: string;
 }

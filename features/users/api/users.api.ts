@@ -5,6 +5,7 @@ import type {
   CreateUserResponse,
   EligiblePersona,
   PaginatedUsersResponse,
+  ResetPasswordInput,
   TempPasswordResetResponse,
   UpdateUsernameInput,
   UserItem,
@@ -88,10 +89,11 @@ export const usersApi = {
     }
   },
 
-  async resetPassword(id: string): Promise<TempPasswordResetResponse> {
+  async resetPassword(id: string, input?: ResetPasswordInput): Promise<TempPasswordResetResponse> {
     try {
       const { data } = await apiClient.post<TempPasswordResetResponse>(
         `/users/${id}/reset-password`,
+        input ?? {},
       );
       return data;
     } catch (error) {

@@ -12,17 +12,16 @@ import {
 import {
   useDeactivateUserMutation,
   useReactivateUserMutation,
-  useResetPasswordMutation,
   useUnlockUserMutation,
 } from "../../../hooks/use-users-mutations";
-import type { TempPasswordResetResponse, UserItem } from "../../../types/users.types";
+import type { UserItem } from "../../../types/users.types";
 
 interface UserActionsProps {
   user: UserItem;
   currentUserId?: string;
   onChangeRole: (user: UserItem) => void;
   onUpdateUsername: (user: UserItem) => void;
-  onPasswordReset: (data: TempPasswordResetResponse, username: string) => void;
+  onPasswordReset: (user: UserItem) => void;
 }
 
 export function UserActions({
@@ -35,9 +34,6 @@ export function UserActions({
   const unlockMutation = useUnlockUserMutation();
   const deactivateMutation = useDeactivateUserMutation();
   const reactivateMutation = useReactivateUserMutation();
-  const resetPasswordMutation = useResetPasswordMutation((data) => {
-    onPasswordReset(data, user.nombreUsuario);
-  });
 
   const isSelf = currentUserId === user.id;
   const isBlocked = user.estado === "bloqueado";
@@ -67,7 +63,7 @@ export function UserActions({
     actionItems.push({
       label: "Restablecer contraseña",
       icon: Key01Icon,
-      onClick: () => resetPasswordMutation.mutate(user.id),
+      onClick: () => onPasswordReset(user),
     });
   }
 
