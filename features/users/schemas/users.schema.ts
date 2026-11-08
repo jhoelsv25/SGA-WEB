@@ -64,5 +64,34 @@ export const updateUsernameSchema = z.object({
     .trim(),
 });
 
+/** Restablecer contraseña: generada por el sistema o escrita por el administrador. */
+export const resetPasswordSchema = z
+  .object({
+    modo: z.enum(["generar", "manual"]),
+    contrasena: z.string().optional(),
+    confirmarContrasena: z.string().optional(),
+    debeCambiarContrasena: z.boolean(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.modo !== "manual") return;
+    const clave = data.contrasena ?? "";
+    // La longitud mínima real es configurable y la valida el servidor; aquí el piso por defecto.
+    if (clave.length < 8 || !/^(?=.*[A-Za-z])(?=.*\d).+$/.test(clave)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["contrasena"],
+        message: "Mínimo 8 caracteres, con letras y números",
+      });
+    }
+    if (clave !== (data.confirmarContrasena ?? "")) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirmarContrasena"],
+        message: "Las contraseñas no coinciden",
+      });
+    }
+  });
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 export type CreateUserFormValues = z.infer<typeof createUserSchema>;
 export type UpdateUsernameFormValues = z.infer<typeof updateUsernameSchema>;

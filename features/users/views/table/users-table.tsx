@@ -27,6 +27,7 @@ import { CreateUserModal } from "../../components/modals/create-user-modal";
 import { ManageRolesModal } from "../../components/modals/manage-roles-modal";
 import { UpdateUsernameModal } from "../../components/modals/update-username-modal";
 import { TempPasswordModal } from "../../components/modals/temp-password-modal";
+import { ResetPasswordModal } from "../../components/modals/reset-password-modal";
 import type {
   CreateUserResponse,
   TempPasswordResetResponse,
@@ -99,6 +100,9 @@ export function UsersTable() {
   const [usernameModalOpen, setUsernameModalOpen] = React.useState(false);
   const [userForUsername, setUserForUsername] = React.useState<UserItem | null>(null);
 
+  const [resetModalOpen, setResetModalOpen] = React.useState(false);
+  const [userForReset, setUserForReset] = React.useState<UserItem | null>(null);
+
   const [tempPasswordModalOpen, setTempPasswordModalOpen] = React.useState(false);
   const [tempPasswordData, setTempPasswordData] = React.useState<{
     username: string;
@@ -130,6 +134,11 @@ export function UsersTable() {
     setTempPasswordModalOpen(true);
   };
 
+  const handleResetPassword = (user: UserItem) => {
+    setUserForReset(user);
+    setResetModalOpen(true);
+  };
+
   const handleChangeRole = (user: UserItem) => {
     setUserForRole(user);
     setRoleModalOpen(true);
@@ -146,7 +155,7 @@ export function UsersTable() {
         currentUserId,
         onChangeRole: handleChangeRole,
         onUpdateUsername: handleUpdateUsername,
-        onPasswordReset: handlePasswordReset,
+        onResetPassword: handleResetPassword,
       }),
     [currentUserId],
   );
@@ -175,7 +184,7 @@ export function UsersTable() {
               currentUserId={currentUserId}
               onChangeRole={handleChangeRole}
               onUpdateUsername={handleUpdateUsername}
-              onPasswordReset={handlePasswordReset}
+              onResetPassword={handleResetPassword}
             />
           </div>
 
@@ -298,6 +307,14 @@ export function UsersTable() {
         open={usernameModalOpen}
         onOpenChange={setUsernameModalOpen}
         user={userForUsername}
+      />
+
+      <ResetPasswordModal
+        open={resetModalOpen}
+        onOpenChange={setResetModalOpen}
+        user={userForReset}
+        currentUserId={currentUserId}
+        onGenerated={handlePasswordReset}
       />
 
       {tempPasswordData && (

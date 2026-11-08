@@ -9,20 +9,20 @@ import { formatDate } from "@/lib/formatters/date";
 import { cn } from "@/lib/utils";
 import { UserActions } from "./user-actions";
 import { USER_STATUS_CONFIG } from "../../../consts/users.consts";
-import type { TempPasswordResetResponse, UserItem } from "../../../types/users.types";
+import type { UserItem } from "../../../types/users.types";
 
 interface GetUserColumnsOptions {
   currentUserId?: string;
   onChangeRole: (user: UserItem) => void;
   onUpdateUsername: (user: UserItem) => void;
-  onPasswordReset: (data: TempPasswordResetResponse, username: string) => void;
+  onResetPassword: (user: UserItem) => void;
 }
 
 export function getUserColumns({
   currentUserId,
   onChangeRole,
   onUpdateUsername,
-  onPasswordReset,
+  onResetPassword,
 }: GetUserColumnsOptions): ColumnDef<UserItem>[] {
   return [
     {
@@ -113,7 +113,7 @@ export function getUserColumns({
           currentUserId={currentUserId}
           onChangeRole={onChangeRole}
           onUpdateUsername={onUpdateUsername}
-          onPasswordReset={onPasswordReset}
+          onResetPassword={onResetPassword}
         />
       ),
     },

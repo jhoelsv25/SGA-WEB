@@ -5,6 +5,7 @@ import type {
   AddUserRoleInput,
   CreateUserInput,
   CreateUserResponse,
+  ResetPasswordInput,
   TempPasswordResetResponse,
   UpdateUsernameInput,
 } from "../types/users.types";
@@ -153,7 +154,8 @@ export function useResetPasswordMutation(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => usersApi.resetPassword(id),
+    mutationFn: ({ id, input }: { id: string; input?: ResetPasswordInput }) =>
+      usersApi.resetPassword(id, input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
       toast.success("Contraseña restablecida exitosamente.");
