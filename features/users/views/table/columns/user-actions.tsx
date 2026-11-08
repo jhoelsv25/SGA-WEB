@@ -21,7 +21,7 @@ interface UserActionsProps {
   currentUserId?: string;
   onChangeRole: (user: UserItem) => void;
   onUpdateUsername: (user: UserItem) => void;
-  onPasswordReset: (user: UserItem) => void;
+  onResetPassword: (user: UserItem) => void;
 }
 
 export function UserActions({
@@ -29,7 +29,7 @@ export function UserActions({
   currentUserId,
   onChangeRole,
   onUpdateUsername,
-  onPasswordReset,
+  onResetPassword,
 }: UserActionsProps) {
   const unlockMutation = useUnlockUserMutation();
   const deactivateMutation = useDeactivateUserMutation();
@@ -58,12 +58,12 @@ export function UserActions({
     onClick: () => onUpdateUsername(user),
   });
 
-  // Restablecer contraseña (solo disponible para otras cuentas; la propia se gestiona desde el menú de perfil)
+  // Restablecer contraseña (solo para otras cuentas; la propia se cambia desde el menú de perfil)
   if (!isSelf) {
     actionItems.push({
       label: "Restablecer contraseña",
       icon: Key01Icon,
-      onClick: () => onPasswordReset(user),
+      onClick: () => onResetPassword(user),
     });
   }
 

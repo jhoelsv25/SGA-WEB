@@ -15,14 +15,14 @@ interface GetUserColumnsOptions {
   currentUserId?: string;
   onChangeRole: (user: UserItem) => void;
   onUpdateUsername: (user: UserItem) => void;
-  onPasswordReset: (user: UserItem) => void;
+  onResetPassword: (user: UserItem) => void;
 }
 
 export function getUserColumns({
   currentUserId,
   onChangeRole,
   onUpdateUsername,
-  onPasswordReset,
+  onResetPassword,
 }: GetUserColumnsOptions): ColumnDef<UserItem>[] {
   return [
     {
@@ -113,7 +113,7 @@ export function getUserColumns({
           currentUserId={currentUserId}
           onChangeRole={onChangeRole}
           onUpdateUsername={onUpdateUsername}
-          onPasswordReset={onPasswordReset}
+          onResetPassword={onResetPassword}
         />
       ),
     },

@@ -27,9 +27,13 @@ import { CreateUserModal } from "../../components/modals/create-user-modal";
 import { ManageRolesModal } from "../../components/modals/manage-roles-modal";
 import { UpdateUsernameModal } from "../../components/modals/update-username-modal";
 import { TempPasswordModal } from "../../components/modals/temp-password-modal";
-import { ConfirmResetPasswordModal } from "../../components/modals/confirm-reset-password-modal";
-import { useResetPasswordMutation } from "../../hooks/use-users-mutations";
-import type { CreateUserResponse, UserItem, UserStatus } from "../../types/users.types";
+import { ResetPasswordModal } from "../../components/modals/reset-password-modal";
+import type {
+  CreateUserResponse,
+  TempPasswordResetResponse,
+  UserItem,
+  UserStatus,
+} from "../../types/users.types";
 
 export function UsersTable() {
   const { data: sessionData } = useSession();
@@ -96,7 +100,7 @@ export function UsersTable() {
   const [usernameModalOpen, setUsernameModalOpen] = React.useState(false);
   const [userForUsername, setUserForUsername] = React.useState<UserItem | null>(null);
 
-  const [confirmResetModalOpen, setConfirmResetModalOpen] = React.useState(false);
+  const [resetModalOpen, setResetModalOpen] = React.useState(false);
   const [userForReset, setUserForReset] = React.useState<UserItem | null>(null);
 
   const [tempPasswordModalOpen, setTempPasswordModalOpen] = React.useState(false);
@@ -105,16 +109,6 @@ export function UsersTable() {
     password: string;
     title: string;
   } | null>(null);
-
-  const resetPasswordMutation = useResetPasswordMutation((data) => {
-    setConfirmResetModalOpen(false);
-    setTempPasswordData({
-      username: userForReset?.nombreUsuario ?? "",
-      password: data.tempPassword,
-      title: "Contraseña restablecida",
-    });
-    setTempPasswordModalOpen(true);
-  });
 
   const handleUserCreated = (res: CreateUserResponse) => {
     if (!res.tempPassword) {
@@ -131,9 +125,18 @@ export function UsersTable() {
     setTempPasswordModalOpen(true);
   };
 
-  const handlePasswordReset = (user: UserItem) => {
+  const handlePasswordReset = (data: TempPasswordResetResponse, username: string) => {
+    setTempPasswordData({
+      username,
+      password: data.tempPassword,
+      title: "Contraseña restablecida",
+    });
+    setTempPasswordModalOpen(true);
+  };
+
+  const handleResetPassword = (user: UserItem) => {
     setUserForReset(user);
-    setConfirmResetModalOpen(true);
+    setResetModalOpen(true);
   };
 
   const handleChangeRole = (user: UserItem) => {
@@ -152,7 +155,7 @@ export function UsersTable() {
         currentUserId,
         onChangeRole: handleChangeRole,
         onUpdateUsername: handleUpdateUsername,
-        onPasswordReset: handlePasswordReset,
+        onResetPassword: handleResetPassword,
       }),
     [currentUserId],
   );
@@ -181,7 +184,7 @@ export function UsersTable() {
               currentUserId={currentUserId}
               onChangeRole={handleChangeRole}
               onUpdateUsername={handleUpdateUsername}
-              onPasswordReset={handlePasswordReset}
+              onResetPassword={handleResetPassword}
             />
           </div>
 
@@ -306,19 +309,12 @@ export function UsersTable() {
         user={userForUsername}
       />
 
-      <ConfirmResetPasswordModal
-        open={confirmResetModalOpen}
-        onOpenChange={setConfirmResetModalOpen}
+      <ResetPasswordModal
+        open={resetModalOpen}
+        onOpenChange={setResetModalOpen}
         user={userForReset}
-        isLoading={resetPasswordMutation.isPending}
-        onConfirm={async (nuevaContrasena) => {
-          if (userForReset) {
-            await resetPasswordMutation.mutateAsync({
-              id: userForReset.id,
-              input: nuevaContrasena ? { nuevaContrasena } : undefined,
-            });
-          }
-        }}
+        currentUserId={currentUserId}
+        onGenerated={handlePasswordReset}
       />
 
       {tempPasswordData && (

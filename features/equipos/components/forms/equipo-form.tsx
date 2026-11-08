@@ -63,7 +63,6 @@ export function EquipoForm({
   });
 
   const watchProposito = useWatch({ control, name: "proposito" });
-  const watchTipo = useWatch({ control, name: "tipo" });
   const watchUsuarios = useWatch({ control, name: "usuariosPermitidos" }) || [];
 
   // Regla Gherkin: Si el propósito es 'sesiones', debe ser 'kiosko' y exclusivo de 'docentes'
@@ -168,27 +167,6 @@ export function EquipoForm({
             {errors.tipo && <p className="text-destructive text-xs">{errors.tipo.message}</p>}
           </div>
         </div>
-
-        {/* Número de Serie (si es biométrico) */}
-        {watchTipo === "biometrico" && (
-          <div className="border-warning/20 bg-warning/10 space-y-1.5 rounded-xl border p-3">
-            <Label htmlFor="numeroSerie" className="text-foreground text-xs font-semibold">
-              Número de serie del reloj biométrico (Opcional)
-            </Label>
-            <Input
-              id="numeroSerie"
-              placeholder="Ej. ZK-TECO-MB360-99482"
-              {...register("numeroSerie")}
-              disabled={isSubmitting}
-            />
-            <p className="text-muted-foreground text-xs">
-              Identificador de hardware para sincronización de huellas en versiones futuras.
-            </p>
-            {errors.numeroSerie && (
-              <p className="text-destructive text-xs">{errors.numeroSerie.message}</p>
-            )}
-          </div>
-        )}
 
         {/* Quién puede usar este equipo */}
         <div className="bg-muted/20 space-y-2 rounded-xl border p-3.5">

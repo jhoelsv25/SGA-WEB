@@ -1,48 +1,3 @@
-export type EstadoPendienteApi = "pendiente" | "asignada" | "descartada";
-export type MotivoPendienteApi = "codigo_desconocido" | "no_docente" | "sin_turno";
-export type EstadoRelojApi =
-  "nunca_conectado" | "ok" | "app_sin_conexion" | "reloj_no_responde" | "fuera_de_horario";
-
-export interface PendienteApi {
-  id: string;
-  equipoId: string;
-  equipoNombre: string | null;
-  codigoBiometrico: string;
-  fechaHora: string;
-  motivo: MotivoPendienteApi;
-  estado: EstadoPendienteApi;
-  personaId: string | null;
-  motivoDescarte: string | null;
-  resueltaEn: string | null;
-}
-
-export interface ResolverPendienteResponse {
-  mensaje: string;
-  pendiente: PendienteApi;
-}
-
-export interface AsignarPendientePayload {
-  personaId: string;
-  vincularCodigo?: boolean;
-}
-
-export interface DescartarPendientePayload {
-  motivo: string;
-}
-
-export interface EstadoRelojApiDto {
-  equipoId: string;
-  nombre: string;
-  ubicacion: string;
-  activo: boolean;
-  ultimoLatidoEn: string | null;
-  relojRespondioEn: string | null;
-  desfaseMinutos: number | null;
-  config: ConfigRelojApi;
-  estado: EstadoRelojApi;
-  alertas: string[];
-}
-
 export interface CodigoBiometricoApi {
   personaId: string;
   nombreCompleto: string;
@@ -50,34 +5,23 @@ export interface CodigoBiometricoApi {
   mensaje: string;
 }
 
-export interface ConfigRelojApi {
-  relojIp: string | null;
-  relojPuerto: number;
-  relojClaveComunicacion: number;
-  intervaloSegundos: number;
+export interface HoraProgramada {
+  /** HH:mm, 24 horas */
+  hora: string;
+  /** 1 = lunes … 7 = domingo, separados por coma */
+  dias: string;
+  activa: boolean;
 }
 
-export interface GuardarConfigRelojPayload {
-  relojIp: string;
-  relojPuerto: number;
-  relojClaveComunicacion: number;
-  intervaloSegundos: number;
-}
-
-export interface GuardarConfigRelojResponse {
+export interface ProgramacionBiometrico {
+  horarios: HoraProgramada[];
+  actualizadoEn: string | null;
   mensaje: string;
-  config: ConfigRelojApi;
 }
 
-export type TipoOrdenApi = "probar_reloj" | "leer_reloj" | "sincronizar";
-export type EstadoOrdenApi = "pendiente" | "completada" | "error";
-
-export interface OrdenApi {
-  id: string;
-  tipo: TipoOrdenApi;
-  estado: EstadoOrdenApi;
-  mensaje: string | null;
-  datos: { recientes?: { codigo: string; fechaHora: string }[]; total?: number } | null;
-  creadoEn: string;
-  resueltaEn: string | null;
+export interface SincronizacionReloj {
+  relojSerie: string;
+  ultimaMarca: string;
+  ultimaSincronizacion: string;
+  equipo: string | null;
 }

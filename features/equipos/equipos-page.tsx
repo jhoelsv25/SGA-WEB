@@ -5,14 +5,13 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ComputerIcon, ShieldCheckIcon, Key01Icon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { EquiposTable } from "./views/table/equipos-table";
-import { EquiposAccesoTable } from "@/features/equipos-acceso";
 
 export function EquiposPage() {
   return (
     <div className="animate-in fade-in-50 space-y-6 duration-300">
       <PageHeader
         title="Equipos autorizados"
-        description="Gestiona las estaciones de marcación de asistencia (kioskos y biométricos) y firma de sesiones docentes dentro del colegio."
+        description="Gestiona las estaciones de marcación de asistencia (kioskos) y firma de sesiones docentes dentro del colegio."
         icon={ComputerIcon}
         breadcrumbs={[
           { label: "Inicio", href: "/admin/dashboard" },
@@ -50,18 +49,6 @@ export function EquiposPage() {
 
       {/* Tabla de Equipos */}
       <EquiposTable />
-
-      {/* Equipos desde los que los usuarios inician sesión en SGA-NET: se aprueban aquí */}
-      <section className="space-y-3">
-        <div className="space-y-1">
-          <h2 className="text-foreground text-base font-semibold">Accesos de usuarios (SGA-NET)</h2>
-          <p className="text-muted-foreground text-xs leading-relaxed">
-            Cuando un usuario inicia sesión en SGA-NET desde un equipo nuevo, su solicitud queda{" "}
-            <strong>pendiente</strong> hasta que un administrador la autorice.
-          </p>
-        </div>
-        <EquiposAccesoTable />
-      </section>
     </div>
   );
 }

@@ -89,11 +89,14 @@ export const usersApi = {
     }
   },
 
-  async resetPassword(id: string, input?: ResetPasswordInput): Promise<TempPasswordResetResponse> {
+  async resetPassword(
+    id: string,
+    input: ResetPasswordInput = {},
+  ): Promise<TempPasswordResetResponse> {
     try {
       const { data } = await apiClient.post<TempPasswordResetResponse>(
         `/users/${id}/reset-password`,
-        input ?? {},
+        input,
       );
       return data;
     } catch (error) {

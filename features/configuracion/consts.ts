@@ -3,9 +3,9 @@ import {
   SlidersHorizontalIcon,
   Clock01Icon,
   ComputerIcon,
+  FingerPrintScanIcon,
   SecurityLockIcon,
   Notification01Icon,
-  FingerPrintIcon,
 } from "@hugeicons/core-free-icons";
 import type { ItemMenuConfig } from "./types";
 
@@ -40,9 +40,9 @@ export const MENU_ITEMS: ItemMenuConfig[] = [
   },
   {
     id: "biometrico",
-    label: "Reloj Biométrico",
-    descripcion: "Conexión del reloj y app puente",
-    icono: FingerPrintIcon,
+    label: "Biométrico",
+    descripcion: "Horas de sincronización del reloj",
+    icono: FingerPrintScanIcon,
     grupo: "general",
   },
   {

@@ -1,51 +1,10 @@
 import { apiClient } from "@/lib/api-client";
 import type {
-  AsignarPendientePayload,
   CodigoBiometricoApi,
-  DescartarPendientePayload,
-  EstadoPendienteApi,
-  EstadoRelojApiDto,
-  GuardarConfigRelojPayload,
-  GuardarConfigRelojResponse,
-  OrdenApi,
-  TipoOrdenApi,
-  PendienteApi,
-  ResolverPendienteResponse,
+  HoraProgramada,
+  ProgramacionBiometrico,
+  SincronizacionReloj,
 } from "../types";
-
-export async function getEstadoRelojes(): Promise<EstadoRelojApiDto[]> {
-  const { data } = await apiClient.get<EstadoRelojApiDto[]>("/biometrico/estado");
-  return data;
-}
-
-export async function getPendientes(estado: EstadoPendienteApi): Promise<PendienteApi[]> {
-  const { data } = await apiClient.get<PendienteApi[]>("/biometrico/pendientes", {
-    params: { estado },
-  });
-  return data;
-}
-
-export async function asignarPendiente(
-  id: string,
-  payload: AsignarPendientePayload,
-): Promise<ResolverPendienteResponse> {
-  const { data } = await apiClient.post<ResolverPendienteResponse>(
-    `/biometrico/pendientes/${id}/asignar`,
-    payload,
-  );
-  return data;
-}
-
-export async function descartarPendiente(
-  id: string,
-  payload: DescartarPendientePayload,
-): Promise<ResolverPendienteResponse> {
-  const { data } = await apiClient.post<ResolverPendienteResponse>(
-    `/biometrico/pendientes/${id}/descartar`,
-    payload,
-  );
-  return data;
-}
 
 export async function getCodigoBiometrico(personaId: string): Promise<CodigoBiometricoApi> {
   const { data } = await apiClient.get<CodigoBiometricoApi>(
@@ -72,25 +31,21 @@ export async function quitarCodigoBiometrico(personaId: string): Promise<CodigoB
   return data;
 }
 
-export async function guardarConfigReloj(
-  equipoId: string,
-  payload: GuardarConfigRelojPayload,
-): Promise<GuardarConfigRelojResponse> {
-  const { data } = await apiClient.put<GuardarConfigRelojResponse>(
-    `/biometrico/relojes/${equipoId}/config`,
-    payload,
-  );
+export async function getProgramacionBiometrico(): Promise<ProgramacionBiometrico> {
+  const { data } = await apiClient.get<ProgramacionBiometrico>("/biometrico/programacion");
   return data;
 }
 
-export async function crearOrdenReloj(equipoId: string, tipo: TipoOrdenApi): Promise<OrdenApi> {
-  const { data } = await apiClient.post<OrdenApi>(`/biometrico/relojes/${equipoId}/ordenes`, {
-    tipo,
+export async function guardarProgramacionBiometrico(
+  horarios: HoraProgramada[],
+): Promise<ProgramacionBiometrico> {
+  const { data } = await apiClient.put<ProgramacionBiometrico>("/biometrico/programacion", {
+    horarios,
   });
   return data;
 }
 
-export async function getOrdenesReloj(equipoId: string): Promise<OrdenApi[]> {
-  const { data } = await apiClient.get<OrdenApi[]>(`/biometrico/relojes/${equipoId}/ordenes`);
+export async function getSincronizacionesReloj(): Promise<SincronizacionReloj[]> {
+  const { data } = await apiClient.get<SincronizacionReloj[]>("/biometrico/sincronizaciones");
   return data;
 }

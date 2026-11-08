@@ -68,13 +68,15 @@ export interface CreateUserResponse {
   cuentaExistente: boolean;
 }
 
+/** Sin `contrasena` el backend genera una clave temporal. */
+export interface ResetPasswordInput {
+  contrasena?: string;
+  debeCambiarContrasena?: boolean;
+}
+
 export interface TempPasswordResetResponse {
   message: string;
   tempPassword: string;
-}
-
-export interface ResetPasswordInput {
-  nuevaContrasena?: string;
 }
 
 export interface UpdateUsernameInput {

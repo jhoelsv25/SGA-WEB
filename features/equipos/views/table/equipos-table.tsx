@@ -11,7 +11,6 @@ import { EquiposActions } from "./columns/equipos-actions";
 import { getEquiposColumns } from "./columns";
 import { EquipoFormModal } from "../../components/modals/equipo-form-modal";
 import { AutorizarModal } from "../../components/modals/autorizar-modal";
-import { AlertasRelojes, ClaveAppPuenteModal } from "@/features/biometrico";
 import {
   useEquiposQuery,
   useCreateEquipoMutation,
@@ -46,14 +45,7 @@ export function EquiposTable() {
     setFormModalOpen(true);
   }, []);
 
-  const [equipoClavePuente, setEquipoClavePuente] = React.useState<Equipo | null>(null);
-
   const handleAutorizar = React.useCallback((equipo: Equipo) => {
-    // Un reloj biométrico no se autoriza desde este navegador: se genera la clave de su app puente.
-    if (equipo.tipo === "biometrico") {
-      setEquipoClavePuente(equipo);
-      return;
-    }
     setEquipoToAutorizar(equipo);
     setAutorizarModalOpen(true);
   }, []);
@@ -142,8 +134,6 @@ export function EquiposTable() {
 
   return (
     <>
-      <AlertasRelojes />
-
       <DataTable
         columns={columns}
         data={equipos}
@@ -178,17 +168,6 @@ export function EquiposTable() {
         equipo={equipoToAutorizar}
         onConfirmAutorizar={handleConfirmAutorizar}
         isAuthorizing={autorizarMutation.isPending}
-      />
-
-      {/* Clave de la app puente del reloj biométrico (RF-022) */}
-      <ClaveAppPuenteModal
-        equipo={equipoClavePuente}
-        onOpenChange={(abierto) => {
-          if (!abierto) {
-            setEquipoClavePuente(null);
-            void refetch();
-          }
-        }}
       />
     </>
   );

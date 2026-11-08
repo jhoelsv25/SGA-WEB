@@ -1,4 +1,4 @@
-export type TipoEquipo = "kiosko" | "biometrico";
+export type TipoEquipo = "kiosko";
 export type PropositoEquipo = "marcacion" | "sesiones";
 export type UsuarioPermitido = "estudiantes" | "docentes" | "administrativos";
 

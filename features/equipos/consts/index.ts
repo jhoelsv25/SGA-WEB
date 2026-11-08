@@ -5,7 +5,6 @@ export const KIOSK_TOKEN_STORAGE_KEY = "sga_kiosk_token";
 
 export const TIPO_EQUIPO_OPTIONS = [
   { value: "kiosko", label: "Kiosko (computadora o tableta con pantalla del sistema)" },
-  { value: "biometrico", label: "Reloj biométrico (huella digital o facial)" },
 ];
 
 export const PROPOSITO_EQUIPO_OPTIONS = [
@@ -26,10 +25,6 @@ export const TIPO_EQUIPO_META: Record<TipoEquipo, { label: string; tone: StatusB
   kiosko: {
     label: "Kiosko web",
     tone: "info",
-  },
-  biometrico: {
-    label: "Reloj biométrico",
-    tone: "warning",
   },
 };
 
