@@ -62,12 +62,14 @@ export function UserActions({
     onClick: () => onUpdateUsername(user),
   });
 
-  // Restablecer contraseña
-  actionItems.push({
-    label: "Restablecer contraseña",
-    icon: Key01Icon,
-    onClick: () => resetPasswordMutation.mutate(user.id),
-  });
+  // Restablecer contraseña (solo disponible para otras cuentas; la propia se gestiona desde el menú de perfil)
+  if (!isSelf) {
+    actionItems.push({
+      label: "Restablecer contraseña",
+      icon: Key01Icon,
+      onClick: () => resetPasswordMutation.mutate(user.id),
+    });
+  }
 
   // Desbloquear si está bloqueado
   if (isBlocked) {

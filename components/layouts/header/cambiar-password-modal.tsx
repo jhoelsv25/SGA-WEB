@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -24,7 +25,7 @@ import {
   type ChangePasswordFormValues,
 } from "@/features/auth/schemas/change-password.schema";
 import { toast } from "@/lib/toast";
-import type { ApiClientError } from "@/lib/api-client";
+import { setAccessToken, type ApiClientError } from "@/lib/api-client";
 
 interface CambiarPasswordModalProps {
   open: boolean;
@@ -32,6 +33,7 @@ interface CambiarPasswordModalProps {
 }
 
 export function CambiarPasswordModal({ open, onOpenChange }: CambiarPasswordModalProps) {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const {
@@ -77,10 +79,22 @@ export function CambiarPasswordModal({ open, onOpenChange }: CambiarPasswordModa
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       }),
-    onSuccess: (data) => {
-      toast.success(data?.message || "Contraseña actualizada exitosamente.");
-      queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
+    onSuccess: async (data) => {
       onOpenChange(false);
+      toast.success(
+        data?.message
+          ? `${data.message} Inicia sesión con tu nueva contraseña.`
+          : "Contraseña actualizada exitosamente. Inicia sesión con tu nueva contraseña.",
+      );
+      try {
+        await authApi.logout();
+      } catch {
+        // En caso de que el backend ya haya revocado la sesión
+      }
+      setAccessToken(null);
+      queryClient.clear();
+      router.replace("/login?passwordChanged=true");
+      router.refresh();
     },
     onError: (err) => {
       toast.error(err?.message || "No se pudo actualizar la contraseña.");
