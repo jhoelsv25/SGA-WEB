@@ -25,19 +25,19 @@ export const PLATAFORMA_EQUIPO_ACCESO_LABEL: Record<number, string> = {
 export const ACCION_EQUIPO_ACCESO_TEXTOS = {
   autorizar: {
     titulo: "Autorizar equipo",
-    descripcion: "El usuario podrá iniciar sesión en SGA-NET desde este equipo.",
+    descripcion: "El programa del reloj podrá enviar marcas desde este equipo.",
     confirmar: "Sí, autorizar",
     exito: "Equipo autorizado.",
   },
   rechazar: {
     titulo: "Rechazar equipo",
-    descripcion: "El usuario no podrá iniciar sesión desde este equipo.",
+    descripcion: "El programa del reloj no podrá enviar marcas desde este equipo.",
     confirmar: "Sí, rechazar",
     exito: "Solicitud rechazada.",
   },
   revocar: {
     titulo: "Revocar equipo",
-    descripcion: "El equipo dejará de poder iniciar sesión de inmediato.",
+    descripcion: "El equipo dejará de poder enviar marcas de inmediato.",
     confirmar: "Sí, revocar",
     exito: "Equipo revocado.",
   },

@@ -2,7 +2,7 @@ import type { ESTADO_EQUIPO_ACCESO } from "../consts";
 
 export type EstadoEquipoAcceso = (typeof ESTADO_EQUIPO_ACCESO)[keyof typeof ESTADO_EQUIPO_ACCESO];
 
-/** Equipo desde el que un usuario inicia sesión en SGA-NET (tabla `equipos_acceso`). */
+/** Computadora desde la que el programa del reloj pide autorización (tabla `equipos_acceso`). */
 export interface EquipoAcceso {
   id: string;
   usuarioId: string;

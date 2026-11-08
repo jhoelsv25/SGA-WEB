@@ -53,13 +53,13 @@ export function EquiposAccesoTable() {
         isLoading={isLoading}
         isError={isError}
         onRetry={() => refetch()}
-        caption="Equipos desde los que los usuarios inician sesión en SGA-NET"
+        caption="Computadoras desde las que el programa del reloj pide autorización"
         searchKey="nombreUsuario"
         searchPlaceholder="Buscar por usuario..."
         emptyState={{
           title: "Aún no hay solicitudes",
           description:
-            "Cuando un usuario inicie sesión en SGA-NET desde un equipo nuevo, aparecerá aquí como pendiente.",
+            "Cuando el programa del reloj se conecte desde una computadora nueva, aparecerá aquí como pendiente.",
         }}
         mobileCard={(equipo: EquipoAcceso) => {
           const meta = ESTADO_EQUIPO_ACCESO_META[equipo.estado];

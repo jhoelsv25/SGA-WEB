@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/features/auth";
+import { EquiposAccesoTable } from "@/features/equipos-acceso";
 import {
   DIAS_LABORABLES,
   DIAS_SEMANA,
@@ -38,6 +39,10 @@ export function TabBiometrico() {
   const roles = sesion?.user?.roles ?? [];
   const puedeEditar =
     sesion?.user?.activeRoleName === "Administrador" || roles.includes("Administrador");
+  // Mismos roles que exige la API en /equipos-acceso
+  const puedeAprobarEquipos = ["Administrador", "Soporte TI"].some(
+    (rol) => sesion?.user?.activeRoleName === rol || roles.includes(rol),
+  );
 
   const programacion = useProgramacionBiometrico();
   const sincronizaciones = useSincronizacionesReloj();
@@ -253,6 +258,22 @@ export function TabBiometrico() {
           )}
         </CardContent>
       </Card>
+
+      {puedeAprobarEquipos && (
+        <Card className="border-border/60 bg-card rounded-2xl shadow-xs">
+          <CardHeader className="border-border/40 border-b pb-4">
+            <CardTitle className="text-base font-bold">Equipos del programa del reloj</CardTitle>
+            <CardDescription className="text-xs">
+              Cuando el programa del reloj se conecta por primera vez desde una computadora, la
+              solicitud queda <strong>pendiente</strong> y no envía marcas hasta que un
+              administrador la autorice aquí.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <EquiposAccesoTable />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
