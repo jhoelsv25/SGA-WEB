@@ -148,22 +148,54 @@ export function AsistenciaSeccionPage() {
       />
 
       {/* Selectores de Sección y Bimestre */}
-      <div className="border-border/80 bg-card flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 shadow-xs">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="w-full sm:w-64">
-            <label className="text-muted-foreground mb-1 block text-xs font-medium">
+      <div className="border-border/80 bg-card flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-4 shadow-xs">
+        <div className="flex flex-wrap items-center gap-4">
+          <div>
+            <label className="text-muted-foreground mb-1.5 block text-xs font-semibold">
               Sección escolar
             </label>
-            <SelectOption
-              options={secciones.map((s) => ({ value: s.id, label: s.nombre }))}
-              value={seccionActual}
-              onSelect={setSeccionId}
-              placeholder="Seleccionar sección"
-              searchPlaceholder="Buscar sección"
-            />
+            {secciones.length <= 5 ? (
+              <div
+                role="tablist"
+                aria-label="Seleccionar sección escolar"
+                className="bg-muted/70 border-border/60 inline-flex flex-wrap items-center gap-1 rounded-xl border p-1 shadow-inner"
+              >
+                {secciones.map((s) => {
+                  const activo = s.id === seccionActual;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={activo}
+                      onClick={() => setSeccionId(s.id)}
+                      className={cn(
+                        "rounded-lg px-3 py-1.5 text-xs font-semibold transition-all select-none",
+                        activo
+                          ? "bg-card text-foreground font-bold shadow-xs"
+                          : "text-muted-foreground hover:bg-card/40 hover:text-foreground",
+                      )}
+                    >
+                      {s.nombre}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="w-full sm:w-56">
+                <SelectOption
+                  options={secciones.map((s) => ({ value: s.id, label: s.nombre }))}
+                  value={seccionActual}
+                  onSelect={setSeccionId}
+                  placeholder="Seleccionar sección"
+                  searchPlaceholder="Buscar sección..."
+                />
+              </div>
+            )}
           </div>
+
           <div>
-            <label className="text-muted-foreground mb-1 block text-xs font-medium">
+            <label className="text-muted-foreground mb-1.5 block text-xs font-semibold">
               Periodo / Bimestre
             </label>
             <SelectorBimestre bimestres={bimestres} valor={bimestreId} onCambiar={setElegido} />
@@ -171,10 +203,12 @@ export function AsistenciaSeccionPage() {
         </div>
 
         {data && (
-          <div className="text-muted-foreground flex items-center gap-2 text-xs">
+          <div className="bg-muted/50 border-border/60 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs">
             <HugeiconsIcon icon={Calendar03Icon} className="text-primary size-4" />
             <span className="text-foreground font-semibold">{data.seccionNombre}:</span>
-            <span>{data.diasConClases} días con clases en el periodo</span>
+            <span className="text-muted-foreground">
+              {data.diasConClases} días con clases en el periodo
+            </span>
           </div>
         )}
       </div>
@@ -387,6 +421,12 @@ export function AsistenciaSeccionPage() {
                     ) : (
                       estudiantesFiltrados.map((e) => {
                         const totalFaltasCursos = e.clases.faltas + e.clases.faltasJustificadas;
+                        const esPerfecta =
+                          e.faltasColegio === 0 &&
+                          e.tardanzasColegio === 0 &&
+                          totalFaltasCursos === 0 &&
+                          e.clases.tardanzas === 0;
+
                         return (
                           <TableRow
                             key={e.estudianteId}
@@ -398,9 +438,21 @@ export function AsistenciaSeccionPage() {
                                   name={e.nombreCompleto}
                                   className="size-7.5 text-xs font-bold"
                                 />
-                                <span className="text-foreground text-xs font-semibold">
-                                  {e.nombreCompleto}
-                                </span>
+                                <div className="flex flex-col">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-foreground text-xs font-semibold">
+                                      {e.nombreCompleto}
+                                    </span>
+                                    {esPerfecta && (
+                                      <Badge
+                                        variant="outline"
+                                        className="border-emerald-500/30 bg-emerald-500/10 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400"
+                                      >
+                                        100%
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                             </TableCell>
 
@@ -413,8 +465,8 @@ export function AsistenciaSeccionPage() {
                                   {e.faltasColegio}
                                 </Badge>
                               ) : (
-                                <span className="text-muted-foreground/60 font-mono text-xs">
-                                  0
+                                <span className="text-muted-foreground/40 font-mono text-xs">
+                                  —
                                 </span>
                               )}
                             </TableCell>
@@ -428,8 +480,8 @@ export function AsistenciaSeccionPage() {
                                   {e.tardanzasColegio}
                                 </Badge>
                               ) : (
-                                <span className="text-muted-foreground/60 font-mono text-xs">
-                                  0
+                                <span className="text-muted-foreground/40 font-mono text-xs">
+                                  —
                                 </span>
                               )}
                             </TableCell>
@@ -443,8 +495,8 @@ export function AsistenciaSeccionPage() {
                                   {totalFaltasCursos}
                                 </Badge>
                               ) : (
-                                <span className="text-muted-foreground/60 font-mono text-xs">
-                                  0
+                                <span className="text-muted-foreground/40 font-mono text-xs">
+                                  —
                                 </span>
                               )}
                             </TableCell>
@@ -458,8 +510,8 @@ export function AsistenciaSeccionPage() {
                                   {e.clases.tardanzas}
                                 </Badge>
                               ) : (
-                                <span className="text-muted-foreground/60 font-mono text-xs">
-                                  0
+                                <span className="text-muted-foreground/40 font-mono text-xs">
+                                  —
                                 </span>
                               )}
                             </TableCell>
