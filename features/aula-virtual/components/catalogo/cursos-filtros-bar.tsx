@@ -2,7 +2,12 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { FilterIcon, RotateLeft01Icon, Search01Icon } from "@hugeicons/core-free-icons";
+import {
+  FilterIcon,
+  RotateLeft01Icon,
+  Search01Icon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SelectOption, type SelectOptionItem } from "@/components/common/select";
@@ -31,6 +36,9 @@ export interface CursosFiltrosBarProps {
   opcionesDocentes: SelectOptionItem<string>[];
   docenteFiltro: string;
   onDocenteChange: (val: string) => void;
+  soloConAlumnos?: boolean;
+  onSoloConAlumnosChange?: (val: boolean) => void;
+  totalConAlumnos?: number;
 }
 
 export function CursosFiltrosBar({
@@ -42,7 +50,7 @@ export function CursosFiltrosBar({
   busqueda,
   onBusquedaChange,
   gradosDisponibles,
-  opcionesGrados,
+  opcionesGrados: _opcionesGrados,
   gradoFiltro,
   onGradoChange,
   seccionesDisponibles,
@@ -57,11 +65,16 @@ export function CursosFiltrosBar({
   opcionesDocentes,
   docenteFiltro,
   onDocenteChange,
+  soloConAlumnos = false,
+  onSoloConAlumnosChange,
+  totalConAlumnos,
 }: CursosFiltrosBarProps) {
   const esDirectivoOAdmin = ["Administrador", "Director", "Subdirector"].includes(rolNombre);
   const esDocente = rolNombre === "Docente";
   const esEstudiante = rolNombre === "Estudiante";
   const esApoderado = rolNombre === "Apoderado";
+
+  const tieneCursosVacios = typeof totalConAlumnos === "number" && totalConAlumnos < totalCursos;
 
   return (
     <div className="border-border/80 bg-card space-y-4 rounded-2xl border p-4 shadow-xs sm:p-5">
@@ -92,19 +105,90 @@ export function CursosFiltrosBar({
           </span>
         </div>
 
-        {hayFiltrosActivos && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onLimpiarFiltros}
-            className="text-muted-foreground hover:text-foreground hover:bg-muted/60 h-8 gap-1.5 self-start rounded-lg text-xs font-medium sm:self-auto"
-          >
-            <HugeiconsIcon icon={RotateLeft01Icon} size={14} />
-            <span>Limpiar filtros</span>
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Toggle rápido para filtrar solo cursos con alumnos matriculados */}
+          {tieneCursosVacios && onSoloConAlumnosChange && (
+            <div className="bg-muted/60 inline-flex items-center rounded-xl p-0.5">
+              <button
+                type="button"
+                onClick={() => onSoloConAlumnosChange(false)}
+                className={`cursor-pointer rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
+                  !soloConAlumnos
+                    ? "bg-card text-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Todas ({totalCursos})
+              </button>
+              <button
+                type="button"
+                onClick={() => onSoloConAlumnosChange(true)}
+                className={`flex cursor-pointer items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
+                  soloConAlumnos
+                    ? "bg-card text-primary font-semibold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <HugeiconsIcon icon={UserGroupIcon} size={13} />
+                <span>Con matriculados ({totalConAlumnos})</span>
+              </button>
+            </div>
+          )}
+
+          {hayFiltrosActivos && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onLimpiarFiltros}
+              className="text-muted-foreground hover:text-foreground hover:bg-muted/60 h-8 gap-1.5 rounded-lg text-xs font-medium"
+            >
+              <HugeiconsIcon icon={RotateLeft01Icon} size={14} />
+              <span>Limpiar filtros</span>
+            </Button>
+          )}
+        </div>
       </div>
+
+      {/* Pestañas de Grado tipo Segmented Bar (para navegación ágil e intuitiva) */}
+      {gradosDisponibles.length > 1 && (
+        <div className="border-border/60 flex flex-wrap items-center gap-1.5 border-t pt-3">
+          <span className="text-muted-foreground mr-1 text-[11px] font-semibold tracking-wide uppercase">
+            Grados:
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              onGradoChange("");
+              onSeccionChange("");
+            }}
+            className={`cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium transition-all ${
+              gradoFiltro === ""
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            Todos los grados
+          </button>
+          {gradosDisponibles.map((g) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => {
+                onGradoChange(gradoFiltro === g ? "" : g);
+                onSeccionChange("");
+              }}
+              className={`cursor-pointer rounded-xl px-3 py-1.5 text-xs font-medium transition-all ${
+                gradoFiltro === g
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Controles de Filtro Dinámicos por Rol */}
       <div className="flex flex-wrap items-center gap-3">
@@ -122,20 +206,6 @@ export function CursosFiltrosBar({
             className="h-9.5 rounded-xl pr-4 pl-9 text-xs sm:text-sm"
           />
         </div>
-
-        {/* Filtro por Grado / Año (solo si el usuario tiene cursos en > 1 grado) */}
-        {gradosDisponibles.length > 1 && (
-          <div className="w-full sm:w-44 md:w-48">
-            <SelectOption
-              options={opcionesGrados}
-              value={gradoFiltro}
-              onSelect={onGradoChange}
-              placeholder="Grado / Año"
-              searchPlaceholder="Buscar grado..."
-              className="h-9.5 text-xs"
-            />
-          </div>
-        )}
 
         {/* Filtro por Sección (solo si el usuario tiene cursos en > 1 sección) */}
         {seccionesDisponibles.length > 1 && (
@@ -180,8 +250,8 @@ export function CursosFiltrosBar({
         )}
       </div>
 
-      {/* Chips de sección rápidos (si hay pocas secciones para alternar con 1 clic) */}
-      {seccionesDisponibles.length > 1 && seccionesDisponibles.length <= 6 && (
+      {/* Chips de sección rápidos (si hay secciones dentro del grado seleccionado) */}
+      {seccionesDisponibles.length > 1 && seccionesDisponibles.length <= 8 && (
         <div className="border-border/60 flex flex-wrap items-center gap-1.5 border-t pt-3">
           <span className="text-muted-foreground mr-1 text-[11px] font-medium">
             Sección rápida:
@@ -195,7 +265,7 @@ export function CursosFiltrosBar({
                 : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
-            Todas ({totalCursos})
+            Todas
           </button>
           {seccionesDisponibles.map((sec) => (
             <button

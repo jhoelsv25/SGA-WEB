@@ -17,7 +17,7 @@ import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons"
 import { Spinner } from "@/components/common/spinner";
 import { bloqueSchema, type BloqueFormValues } from "../../schemas";
 import type { BloqueHorario, CargaItemHorario } from "../../types";
-import { DIAS_SEMANA } from "../../utils";
+import { DIAS_SEMANA, convertirHoraAMinutos, minutosAHora } from "../../utils";
 
 interface BloqueFormProps {
   bloque?: BloqueHorario | null;
@@ -61,7 +61,22 @@ export function BloqueForm({
     name: "tipoBloque",
     defaultValue: bloque?.tipoBloque ?? tipoBloqueInicial,
   });
+  const horaInicioVal = useWatch({
+    control: form.control,
+    name: "horaInicio",
+  });
   const errors = form.formState.errors;
+
+  const aplicarDuracion = (minutos: number) => {
+    if (!horaInicioVal || !horaInicioVal.includes(":")) return;
+    try {
+      const minIni = convertirHoraAMinutos(horaInicioVal);
+      const minFin = minIni + minutos;
+      form.setValue("horaFin", minutosAHora(minFin), { shouldValidate: true });
+    } catch {
+      // Ignorar si el formato es inválido
+    }
+  };
 
   return (
     <form className="space-y-4" noValidate onSubmit={form.handleSubmit(onSubmit)}>
@@ -197,14 +212,84 @@ export function BloqueForm({
           <Input
             id="horaFin"
             type="text"
-            placeholder="Ej. 08:30 o 10:00"
+            placeholder="Ej. 08:45 o 09:30"
             disabled={isSubmitting}
             aria-invalid={Boolean(errors.horaFin)}
             {...form.register("horaFin")}
           />
-          <p className="text-muted-foreground text-xs">Bloque doble permitido</p>
+          <p className="text-muted-foreground text-[11px]">
+            1 hora pedagógica = 45 min · Bloque doble = 90 min · 2 horas = 120 min
+          </p>
           {errors.horaFin && (
             <p className="text-destructive text-xs font-medium">{errors.horaFin.message}</p>
+          )}
+
+          {tipoBloque === "clase" ? (
+            <div className="flex flex-wrap items-center gap-1 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => aplicarDuracion(45)}
+                disabled={!horaInicioVal || isSubmitting}
+                className="h-6 rounded-md px-2 text-[10px] font-medium"
+              >
+                +45m (1 h)
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => aplicarDuracion(90)}
+                disabled={!horaInicioVal || isSubmitting}
+                className="text-primary hover:bg-primary/10 h-6 rounded-md px-2 text-[10px] font-medium"
+              >
+                +90m (Doble)
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => aplicarDuracion(120)}
+                disabled={!horaInicioVal || isSubmitting}
+                className="h-6 rounded-md px-2 text-[10px] font-medium"
+              >
+                +120m (2 h)
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => aplicarDuracion(135)}
+                disabled={!horaInicioVal || isSubmitting}
+                className="h-6 rounded-md px-2 text-[10px] font-medium"
+              >
+                +135m (Triple)
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-1 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => aplicarDuracion(15)}
+                disabled={!horaInicioVal || isSubmitting}
+                className="h-6 rounded-md px-2 text-[10px] font-medium text-amber-700 hover:bg-amber-500/10 dark:text-amber-300"
+              >
+                +15m (Receso corto)
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => aplicarDuracion(30)}
+                disabled={!horaInicioVal || isSubmitting}
+                className="h-6 rounded-md px-2 text-[10px] font-medium text-amber-700 hover:bg-amber-500/10 dark:text-amber-300"
+              >
+                +30m (Recreo principal)
+              </Button>
+            </div>
           )}
         </div>
       </div>

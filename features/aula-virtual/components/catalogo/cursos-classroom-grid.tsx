@@ -2,7 +2,12 @@
 
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { BookOpen01Icon, RotateLeft01Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  BookOpen01Icon,
+  RotateLeft01Icon,
+} from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import type { SelectOptionItem } from "@/components/common/select";
 import { useSession } from "@/features/auth";
@@ -29,6 +34,16 @@ export function CursosClassroomGrid({
   const [seccionFiltro, setSeccionFiltro] = React.useState<string>("");
   const [materiaFiltro, setMateriaFiltro] = React.useState<string>("");
   const [docenteFiltro, setDocenteFiltro] = React.useState<string>("");
+  const [soloConAlumnos, setSoloConAlumnos] = React.useState<boolean>(false);
+
+  // Paginación
+  const [paginaActual, setPaginaActual] = React.useState(1);
+  const [porPagina, setPorPagina] = React.useState<number>(12);
+
+  // Conteo de cursos que tienen matriculados
+  const totalConAlumnos = React.useMemo(() => {
+    return cursos.filter((c) => (c.totalEstudiantes ?? 0) > 0).length;
+  }, [cursos]);
 
   // Grados disponibles
   const gradosDisponibles = React.useMemo(() => {
@@ -104,6 +119,38 @@ export function CursosClassroomGrid({
     [docentesDisponibles],
   );
 
+  // Reset de página al cambiar cualquier filtro
+  const handleBusquedaChange = (val: string) => {
+    setBusqueda(val);
+    setPaginaActual(1);
+  };
+
+  const handleGradoChange = (val: string) => {
+    setGradoFiltro(val);
+    setSeccionFiltro("");
+    setPaginaActual(1);
+  };
+
+  const handleSeccionChange = (val: string) => {
+    setSeccionFiltro(val);
+    setPaginaActual(1);
+  };
+
+  const handleMateriaChange = (val: string) => {
+    setMateriaFiltro(val);
+    setPaginaActual(1);
+  };
+
+  const handleDocenteChange = (val: string) => {
+    setDocenteFiltro(val);
+    setPaginaActual(1);
+  };
+
+  const handleSoloConAlumnosChange = (val: boolean) => {
+    setSoloConAlumnos(val);
+    setPaginaActual(1);
+  };
+
   // Filtrado reactivo multidimensional
   const cursosFiltrados = React.useMemo(() => {
     return cursos.filter((c) => {
@@ -122,12 +169,30 @@ export function CursosClassroomGrid({
           ? !c.docenteNombre || c.docenteNombre.trim() === ""
           : c.docenteNombre === docenteFiltro);
 
-      return matchBusqueda && matchGrado && matchSeccion && matchMateria && matchDocente;
+      const matchAlumnos = !soloConAlumnos || (c.totalEstudiantes ?? 0) > 0;
+
+      return (
+        matchBusqueda && matchGrado && matchSeccion && matchMateria && matchDocente && matchAlumnos
+      );
     });
-  }, [cursos, busqueda, gradoFiltro, seccionFiltro, materiaFiltro, docenteFiltro]);
+  }, [cursos, busqueda, gradoFiltro, seccionFiltro, materiaFiltro, docenteFiltro, soloConAlumnos]);
+
+  // Cálculos de paginación
+  const limiteEfectivo = porPagina > 0 ? porPagina : cursosFiltrados.length;
+  const totalPaginas = Math.max(1, Math.ceil(cursosFiltrados.length / limiteEfectivo));
+  const paginaValida = Math.min(paginaActual, totalPaginas);
+
+  const cursosPaginados = React.useMemo(() => {
+    if (porPagina <= 0) return cursosFiltrados;
+    const inicio = (paginaValida - 1) * porPagina;
+    return cursosFiltrados.slice(inicio, inicio + porPagina);
+  }, [cursosFiltrados, paginaValida, porPagina]);
+
+  const indiceInicio = cursosFiltrados.length === 0 ? 0 : (paginaValida - 1) * limiteEfectivo + 1;
+  const indiceFin = Math.min(paginaValida * limiteEfectivo, cursosFiltrados.length);
 
   const hayFiltrosActivos = Boolean(
-    busqueda || gradoFiltro || seccionFiltro || materiaFiltro || docenteFiltro,
+    busqueda || gradoFiltro || seccionFiltro || materiaFiltro || docenteFiltro || soloConAlumnos,
   );
 
   const limpiarFiltros = () => {
@@ -136,6 +201,8 @@ export function CursosClassroomGrid({
     setSeccionFiltro("");
     setMateriaFiltro("");
     setDocenteFiltro("");
+    setSoloConAlumnos(false);
+    setPaginaActual(1);
   };
 
   return (
@@ -148,26 +215,26 @@ export function CursosClassroomGrid({
         hayFiltrosActivos={hayFiltrosActivos}
         onLimpiarFiltros={limpiarFiltros}
         busqueda={busqueda}
-        onBusquedaChange={setBusqueda}
+        onBusquedaChange={handleBusquedaChange}
         gradosDisponibles={gradosDisponibles}
         opcionesGrados={opcionesGrados}
         gradoFiltro={gradoFiltro}
-        onGradoChange={(val) => {
-          setGradoFiltro(val);
-          setSeccionFiltro("");
-        }}
+        onGradoChange={handleGradoChange}
         seccionesDisponibles={seccionesDisponibles}
         opcionesSecciones={opcionesSecciones}
         seccionFiltro={seccionFiltro}
-        onSeccionChange={setSeccionFiltro}
+        onSeccionChange={handleSeccionChange}
         materiasDisponibles={materiasDisponibles}
         opcionesMaterias={opcionesMaterias}
         materiaFiltro={materiaFiltro}
-        onMateriaChange={setMateriaFiltro}
+        onMateriaChange={handleMateriaChange}
         docentesDisponibles={docentesDisponibles}
         opcionesDocentes={opcionesDocentes}
         docenteFiltro={docenteFiltro}
-        onDocenteChange={setDocenteFiltro}
+        onDocenteChange={handleDocenteChange}
+        soloConAlumnos={soloConAlumnos}
+        onSoloConAlumnosChange={handleSoloConAlumnosChange}
+        totalConAlumnos={totalConAlumnos}
       />
 
       {/* Grid de Materias tipo Google Classroom */}
@@ -198,15 +265,124 @@ export function CursosClassroomGrid({
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {cursosFiltrados.map((curso) => (
-            <CursoClassroomCard
-              key={curso.cursoSeccionId}
-              curso={curso}
-              basePath={basePath}
-              onSelect={onSelectCurso}
-            />
-          ))}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {cursosPaginados.map((curso) => (
+              <CursoClassroomCard
+                key={curso.cursoSeccionId}
+                curso={curso}
+                basePath={basePath}
+                onSelect={onSelectCurso}
+              />
+            ))}
+          </div>
+
+          {/* Barra de Paginación */}
+          {cursosFiltrados.length > 0 && (
+            <div className="border-border/70 bg-card flex flex-col items-center justify-between gap-4 rounded-2xl border p-4 shadow-xs sm:flex-row">
+              {/* Información de elementos */}
+              <div className="text-muted-foreground text-xs font-medium">
+                Mostrando <span className="text-foreground font-semibold">{indiceInicio}</span> a{" "}
+                <span className="text-foreground font-semibold">{indiceFin}</span> de{" "}
+                <span className="text-foreground font-semibold">{cursosFiltrados.length}</span>{" "}
+                materias
+                {totalPaginas > 1 && (
+                  <span className="text-muted-foreground/80 ml-1.5">
+                    · Página {paginaValida} de {totalPaginas}
+                  </span>
+                )}
+              </div>
+
+              {/* Controles de página y selector de límite */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Selector de límite por página */}
+                <div className="bg-muted/60 mr-2 flex items-center rounded-xl p-0.5 text-xs">
+                  <span className="text-muted-foreground px-2 text-[11px] font-medium">Ver:</span>
+                  {[12, 24, 0].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => {
+                        setPorPagina(num);
+                        setPaginaActual(1);
+                      }}
+                      className={`cursor-pointer rounded-lg px-2 py-1 text-[11px] font-medium transition-all ${
+                        porPagina === num
+                          ? "bg-card text-foreground font-semibold shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {num === 0 ? "Todos" : num}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Botones de navegación cuando hay más de 1 página */}
+                {totalPaginas > 1 && (
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPaginaActual((prev) => Math.max(1, prev - 1))}
+                      disabled={paginaValida <= 1}
+                      className="h-8 gap-1 rounded-xl px-2.5 text-xs"
+                    >
+                      <HugeiconsIcon icon={ArrowLeft01Icon} size={14} />
+                      <span className="hidden sm:inline">Anterior</span>
+                    </Button>
+
+                    {/* Botones numéricos de página */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => {
+                        // Limitar la cantidad de botones mostrados si hay muchas páginas
+                        if (
+                          num === 1 ||
+                          num === totalPaginas ||
+                          (num >= paginaValida - 1 && num <= paginaValida + 1)
+                        ) {
+                          return (
+                            <button
+                              key={num}
+                              type="button"
+                              onClick={() => setPaginaActual(num)}
+                              className={`h-8 w-8 cursor-pointer rounded-xl text-xs font-semibold transition-all ${
+                                paginaValida === num
+                                  ? "bg-primary text-primary-foreground shadow-xs"
+                                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                              }`}
+                            >
+                              {num}
+                            </button>
+                          );
+                        }
+                        if (num === paginaValida - 2 || num === paginaValida + 2) {
+                          return (
+                            <span key={num} className="text-muted-foreground px-1 text-xs">
+                              …
+                            </span>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPaginaActual((prev) => Math.min(totalPaginas, prev + 1))}
+                      disabled={paginaValida >= totalPaginas}
+                      className="h-8 gap-1 rounded-xl px-2.5 text-xs"
+                    >
+                      <span className="hidden sm:inline">Siguiente</span>
+                      <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

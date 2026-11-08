@@ -1,17 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Calendar03Icon, School01Icon } from "@hugeicons/core-free-icons";
+import { Calendar03Icon, Clock01Icon, School01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
+import { StatusBadge } from "@/components/common/status-badge";
 import { useGradosQuery } from "@/features/grados";
 import {
   AvisoSeccionCerrada,
   AvisosYAdvertencias,
   HorariosDialogsContainer,
   HorariosHeaderActions,
-  ListaCursosCarga,
-  ResumenHorasPanel,
+  ModalResumenHoras,
   SelectorGradoSeccion,
 } from "./components";
 import {
@@ -24,7 +26,6 @@ import {
   useHorariosSeleccion,
   usePuedeGestionarHorarios,
 } from "./hooks";
-import type { CargaItemHorario } from "./types";
 import { GrillaSemanal } from "./views";
 
 export function HorariosPage() {
@@ -75,11 +76,13 @@ export function HorariosPage() {
   );
 
   const [mensajeVigencia, setMensajeVigencia] = useState<string | null>(null);
-  const [cursoSeleccionado, setCursoSeleccionado] = useState<CargaItemHorario | null>(null);
 
   const dialogs = useHorariosDialogs();
   const crearBloqueMutation = useCreateBloqueMutation();
   const deleteBloqueMutation = useDeleteBloqueMutation();
+
+  const [modalHorasOpen, setModalHorasOpen] = useState(false);
+  const [docenteFiltroId, setDocenteFiltroId] = useState<string | null>(null);
 
   const cargaItems = useMemo(() => cargaData?.items ?? [], [cargaData]);
   const bloquesHorario = useMemo(() => horarioData?.bloques ?? [], [horarioData]);
@@ -89,6 +92,31 @@ export function HorariosPage() {
     () => (grillaPropuestaActiva ? (grillaPropuestaData?.bloques ?? []) : []),
     [grillaPropuestaActiva, grillaPropuestaData],
   );
+
+  const docentesDeLaSeccion = useMemo(() => {
+    const map = new Map<string, string>();
+    cargaItems.forEach((item) => {
+      if (item.docente) {
+        map.set(item.docente.id, item.docente.nombreCompleto);
+      }
+    });
+    return Array.from(map.entries())
+      .map(([id, nombre]) => ({ id, nombre }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }, [cargaItems]);
+
+  const totalesHoras = useMemo(() => {
+    return resumenHoras.reduce(
+      (acc, item) => {
+        acc.horario += item.horasHorario;
+        acc.plan += item.horasPlan;
+        return acc;
+      },
+      { horario: 0, plan: 0 },
+    );
+  }, [resumenHoras]);
+
+  const estaCuadrado = totalesHoras.horario === totalesHoras.plan && totalesHoras.plan > 0;
 
   const handleAsignarCursoASlot = async (
     diaSemana: number,
@@ -110,7 +138,6 @@ export function HorariosPage() {
         },
       });
       if (res.mensaje) setMensajeVigencia(res.mensaje);
-      setCursoSeleccionado(null);
     } catch {
       // Notificado en toast
     }
@@ -142,11 +169,11 @@ export function HorariosPage() {
             seccionId={seccionId}
             seccionesMismoGradoCount={seccionesMismoGrado.length}
             isLoadingPropuesta={isLoadingPropuesta}
+            grillaPropuestaActiva={grillaPropuestaActiva}
             onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
+            onDescartarPropuesta={() => setGrillaPropuestaActiva(false)}
             onCopiarHorario={() => dialogs.setCopiarModalOpen(true)}
-            onNuevoBloque={() =>
-              dialogs.abrirNuevoBloque(1, "", "", "clase", cursoSeleccionado?.id)
-            }
+            onNuevoBloque={() => dialogs.abrirNuevoBloque(1, "", "", "clase", null)}
           />
         }
       />
@@ -159,6 +186,7 @@ export function HorariosPage() {
             seleccionarGrado(gId);
             setGrillaPropuestaActiva(false);
             setMensajeVigencia(null);
+            setDocenteFiltroId(null);
           }}
           secciones={seccionesDelGrado}
           seccionSeleccionadaId={seccionId}
@@ -166,8 +194,12 @@ export function HorariosPage() {
             seleccionarSeccion(sId);
             setGrillaPropuestaActiva(false);
             setMensajeVigencia(null);
+            setDocenteFiltroId(null);
           }}
           isLoadingSecciones={isLoadingSeccionesGrado}
+          docentes={docentesDeLaSeccion}
+          docenteSeleccionadoId={docenteFiltroId}
+          onSelectDocente={(dId) => setDocenteFiltroId(dId)}
         />
       </div>
 
@@ -189,42 +221,75 @@ export function HorariosPage() {
         }}
       >
         {seccionId && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {seccionCerrada && <AvisoSeccionCerrada />}
-            <AvisosYAdvertencias
-              mensajeVigencia={mensajeVigencia}
+
+            {/* Mensaje de vigencia oficial sólo si existe */}
+            {mensajeVigencia && (
+              <AvisosYAdvertencias
+                mensajeVigencia={mensajeVigencia}
+                onDismissMensaje={() => setMensajeVigencia(null)}
+              />
+            )}
+
+            {/* Barra compacta y limpia de Horas vs Plan */}
+            {resumenHoras.length > 0 && (
+              <div className="border-border/70 bg-card flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-2.5 shadow-2xs">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <HugeiconsIcon icon={Clock01Icon} className="text-primary size-4" />
+                    <span className="text-foreground text-xs font-semibold">Horas vs. Plan:</span>
+                    <span className="text-muted-foreground text-xs font-medium">
+                      {totalesHoras.horario} de {totalesHoras.plan} h planificadas
+                    </span>
+                  </div>
+                  <StatusBadge tone={estaCuadrado ? "success" : "warning"} size="sm">
+                    {estaCuadrado
+                      ? "Cuadrado 100%"
+                      : `${totalesHoras.plan - totalesHoras.horario} h pendientes`}
+                  </StatusBadge>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setModalHorasOpen(true)}
+                  className="h-8 gap-1.5 rounded-lg px-3 text-xs font-semibold"
+                >
+                  <HugeiconsIcon icon={Clock01Icon} className="size-3.5" />
+                  <span>Ver Horas vs. Plan ({resumenHoras.length} asignaturas)</span>
+                </Button>
+              </div>
+            )}
+
+            {/* Modal de Detalle de Horas vs Plan de Estudios */}
+            <ModalResumenHoras
+              open={modalHorasOpen}
+              onOpenChange={setModalHorasOpen}
+              resumenHoras={resumenHoras}
               advertencias={advertenciasPlan}
-              onDismissMensaje={() => setMensajeVigencia(null)}
+              mensajeVigencia={mensajeVigencia}
             />
 
-            <ResumenHorasPanel resumenHoras={resumenHoras} />
-
-            <div className="grid gap-6 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr]">
-              <aside className="space-y-4">
-                <ListaCursosCarga
-                  cargaItems={cargaItems}
-                  cursoSeleccionado={cursoSeleccionado}
-                  onSelectCurso={(c) => setCursoSeleccionado(c)}
-                  puedeGestionar={puedeGestionar}
-                />
-              </aside>
-
-              <section className="min-w-0">
-                <GrillaSemanal
-                  bloques={bloquesHorario}
-                  bloquesPropuestos={bloquesPropuestos}
-                  puedeGestionar={puedeGestionar}
-                  cursoSeleccionado={cursoSeleccionado}
-                  onAsignarCursoASlot={handleAsignarCursoASlot}
-                  onAbrirNuevoBloque={(d, ini, fin, tipo) =>
-                    dialogs.abrirNuevoBloque(d, ini, fin, tipo, cursoSeleccionado?.id)
-                  }
-                  onEditarBloque={(b) => dialogs.abrirEditarBloque(b)}
-                  onEliminarBloque={(b) => dialogs.abrirEliminarBloque(b)}
-                  onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
-                />
-              </section>
-            </div>
+            {/* Grilla semanal de clases ocupando el 100% del ancho */}
+            <section className="w-full min-w-0">
+              <GrillaSemanal
+                bloques={bloquesHorario}
+                bloquesPropuestos={bloquesPropuestos}
+                puedeGestionar={puedeGestionar}
+                docenteFiltroNombre={
+                  docentesDeLaSeccion.find((d) => d.id === docenteFiltroId)?.nombre
+                }
+                onAsignarCursoASlot={handleAsignarCursoASlot}
+                onAbrirNuevoBloque={(d, ini, fin, tipo) =>
+                  dialogs.abrirNuevoBloque(d, ini, fin, tipo, null)
+                }
+                onEditarBloque={(b) => dialogs.abrirEditarBloque(b)}
+                onEliminarBloque={(b) => dialogs.abrirEliminarBloque(b)}
+                onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
+              />
+            </section>
           </div>
         )}
       </PageState>

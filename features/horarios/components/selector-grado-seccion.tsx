@@ -14,6 +14,9 @@ interface SelectorGradoSeccionProps {
   seccionSeleccionadaId: string | null;
   onSelectSeccion: (seccionId: string) => void;
   isLoadingSecciones?: boolean;
+  docentes?: { id: string; nombre: string }[];
+  docenteSeleccionadoId?: string | null;
+  onSelectDocente?: (docenteId: string | null) => void;
 }
 
 export function SelectorGradoSeccion({
@@ -24,6 +27,9 @@ export function SelectorGradoSeccion({
   seccionSeleccionadaId,
   onSelectSeccion,
   isLoadingSecciones = false,
+  docentes = [],
+  docenteSeleccionadoId = null,
+  onSelectDocente,
 }: SelectorGradoSeccionProps) {
   const gradoOptions = useMemo<SelectOptionItem[]>(() => {
     return grados.map((g) => ({
@@ -38,6 +44,20 @@ export function SelectorGradoSeccion({
       label: `Sección ${sec.nombre}`,
     }));
   }, [secciones]);
+
+  const docenteOptions = useMemo<SelectOptionItem[]>(() => {
+    return [
+      {
+        value: "",
+        label: "Todos los docentes",
+        description: "Mostrar todos los cursos y profesores",
+      },
+      ...docentes.map((d) => ({
+        value: d.id,
+        label: d.nombre,
+      })),
+    ];
+  }, [docentes]);
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
@@ -77,6 +97,29 @@ export function SelectorGradoSeccion({
             }
             searchPlaceholder="Buscar sección..."
             emptyMessage="No se encontraron secciones"
+            className="min-h-11 w-full"
+          />
+        </div>
+      </div>
+
+      {/* Selector de docente (Filtro por profesor) */}
+      <div className="w-full sm:w-64">
+        <Label className="text-muted-foreground text-xs font-medium">Docente (Filtro)</Label>
+        <div className="mt-1">
+          <SelectOption
+            options={docenteOptions}
+            value={docenteSeleccionadoId ?? ""}
+            onSelect={(val) => onSelectDocente?.(val || null)}
+            disabled={!seccionSeleccionadaId || docentes.length === 0}
+            placeholder={
+              !seccionSeleccionadaId
+                ? "Primero elige sección"
+                : docentes.length === 0
+                  ? "Sin docentes asignados"
+                  : "Todos los docentes"
+            }
+            searchPlaceholder="Buscar profesor..."
+            emptyMessage="No se encontraron profesores"
             className="min-h-11 w-full"
           />
         </div>

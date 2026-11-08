@@ -15,7 +15,7 @@ export function GrillaEmptyState({ puedeGestionar, onProponerGrilla }: GrillaEmp
     <div className="border-border/80 bg-card rounded-xl border border-dashed p-6 shadow-sm">
       <EmptyState
         title="Sin bloques de horario registrados"
-        description="Esta sección escolar no tiene clases planificadas ni franjas propuestas. Haz clic en 'Proponer grilla' para generar automáticamente las franjas horarias y recreos de la semana, o utiliza 'Nuevo bloque' para agregar una clase manualmente."
+        description="Esta sección escolar no tiene horas de clase planificadas todavía. Haz clic en 'Generar horario base' para crear automáticamente los bloques de clase y recreos de la semana, o utiliza 'Nuevo bloque' para agregar una hora manualmente."
         icon={Clock01Icon}
         action={
           puedeGestionar && onProponerGrilla ? (
@@ -25,7 +25,7 @@ export function GrillaEmptyState({ puedeGestionar, onProponerGrilla }: GrillaEmp
               className="h-11 min-h-11 min-w-11 gap-2 rounded-full px-5 text-xs font-semibold shadow-md"
             >
               <HugeiconsIcon icon={Clock01Icon} className="size-4" />
-              <span>Proponer grilla semanal</span>
+              <span>Generar horario base semanal</span>
             </Button>
           ) : undefined
         }

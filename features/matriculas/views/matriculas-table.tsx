@@ -12,8 +12,8 @@ import {
   CheckmarkCircle02Icon,
   UserRemove01Icon,
   ArrowRight01Icon,
-  Search01Icon,
   UserGroupIcon,
+  UserAdd01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { getMatriculaColumns } from "./columns";
@@ -201,8 +201,8 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         actions={
           puedeGestionar ? (
             <Button size="sm" className="h-10 gap-2" onClick={() => setBuscarOpen(true)}>
-              <HugeiconsIcon icon={Search01Icon} className="size-4" />
-              Buscar estudiante
+              <HugeiconsIcon icon={UserAdd01Icon} className="size-4" />
+              Matricular estudiante
             </Button>
           ) : undefined
         }

@@ -3,14 +3,14 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { siteConfig } from "@/config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormValues } from "../../schemas/login.schema";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLogin, useLogout, useSelectRole, useSession } from "../../hooks/use-auth";
 import type { AuthResponse } from "../../types/auth.types";
-import { getInitialLoginValues, saveRememberedUsername } from "../../utils/auth-storage.utils";
+import { getRememberedUsername, saveRememberedUsername } from "../../utils/auth-storage.utils";
 import { getAccessToken } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -175,6 +175,19 @@ function LoginFormInner() {
   // RF-001 V3: tras validar las credenciales, sigue el paso de selección de rol
   const [autenticado, setAutenticado] = React.useState<AuthResponse | null>(null);
 
+  // Sincronización segura de montaje SSR/Cliente sin provocar re-renders en cascada
+  const isMounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+  const savedUsername = React.useSyncExternalStore(
+    () => () => {},
+    () => getRememberedUsername(),
+    () => "",
+  );
+
   // Si ya existe sesión institucional activa y no está expirada, redirigir automáticamente
   React.useEffect(() => {
     if (!autenticado && !isExpired && session?.user) {
@@ -186,18 +199,30 @@ function LoginFormInner() {
     }
   }, [autenticado, session, isExpired, redirectTo, router]);
 
-  const initialValues = React.useMemo(() => getInitialLoginValues(), []);
-  const [rememberUser, setRememberUser] = React.useState(initialValues.rememberUser);
-
   const {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: initialValues,
+    defaultValues: {
+      username: "",
+      password: "",
+      rememberUser: false,
+    },
   });
+
+  const rememberUser = useWatch({ control, name: "rememberUser", defaultValue: false });
+
+  // Rellenar usuario recordado una vez disponible en cliente
+  React.useEffect(() => {
+    if (savedUsername) {
+      setValue("username", savedUsername);
+      setValue("rememberUser", true);
+    }
+  }, [savedUsername, setValue]);
 
   const {
     mutate: login,
@@ -239,7 +264,8 @@ function LoginFormInner() {
     );
   }
 
-  if (!isExpired && isCheckingSession && !!getAccessToken()) {
+  // Solo mostrar el spinner de validación de token si el componente ya montó en cliente
+  if (isMounted && !isExpired && isCheckingSession && !!getAccessToken()) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-8">
         <Spinner size="md" className="text-primary" />
@@ -329,9 +355,7 @@ function LoginFormInner() {
             id="rememberUser"
             checked={rememberUser}
             onCheckedChange={(checked) => {
-              const val = !!checked;
-              setValue("rememberUser", val);
-              setRememberUser(val);
+              setValue("rememberUser", checked === true);
             }}
           />
           <Label

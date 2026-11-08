@@ -6,6 +6,7 @@ import type {
   MatriculaItem,
   MatriculaMasivaPayload,
   MatriculaMasivaResponse,
+  MatricularLotePayload,
   MatriculaQueryParams,
   PaginatedMatriculasResponse,
   RetirarMatriculaPayload,
@@ -47,6 +48,13 @@ export async function matricularMasivo(
   payload: MatriculaMasivaPayload,
 ): Promise<MatriculaMasivaResponse> {
   const response = await apiClient.post<MatriculaMasivaResponse>("/matriculas/masiva", payload);
+  return response.data;
+}
+
+export async function matricularLote(
+  payload: MatricularLotePayload,
+): Promise<MatriculaMasivaResponse> {
+  const response = await apiClient.post<MatriculaMasivaResponse>("/matriculas/lote", payload);
   return response.data;
 }
 

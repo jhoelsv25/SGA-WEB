@@ -76,6 +76,13 @@ export interface MatriculaMasivaPayload {
   fechaMatricula?: string;
 }
 
+export interface MatricularLotePayload {
+  seccionId: string;
+  estudianteIds: string[];
+  tipo: TipoMatricula;
+  fechaMatricula?: string;
+}
+
 export interface MatriculaNoProcesadaItem {
   estudianteId: string;
   estudianteNombre: string;
