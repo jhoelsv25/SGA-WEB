@@ -15,6 +15,7 @@ import { PersonaBuscadorField } from "@/features/personas/components/persona-bus
 import type { Persona } from "@/features/personas/types/personas.types";
 import { useRolesQuery } from "../../../roles/hooks/use-roles-query";
 import { useCargosQuery } from "../../../cargos/hooks/use-cargos-query";
+import { CARGOS_CON_FICHA, ROLES_CON_FICHA } from "../../consts/users.consts";
 import { createUserSchema, type CreateUserFormValues } from "../../schemas/users.schema";
 import { cn } from "@/lib/utils";
 
@@ -89,7 +90,9 @@ export function CreateUserForm({
   }, [selectedCargoId]);
 
   const cargoOptions = React.useMemo(() => {
-    return cargos.map((c) => ({ value: c.id, label: c.nombre }));
+    return cargos
+      .filter((c) => !CARGOS_CON_FICHA.includes(c.nombre))
+      .map((c) => ({ value: c.id, label: c.nombre }));
   }, [cargos]);
 
   const activeRoles = React.useMemo(() => roles.filter((r) => r.activo), [roles]);
@@ -296,6 +299,9 @@ export function CreateUserForm({
                   disabled={isLoading}
                 />
                 <span className="font-medium">{rol.nombre}</span>
+                {ROLES_CON_FICHA.includes(rol.nombre) && (
+                  <span className="text-muted-foreground">Requiere ficha</span>
+                )}
               </label>
             );
           })}

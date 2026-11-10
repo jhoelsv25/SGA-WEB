@@ -11,6 +11,7 @@ import { SelectOption } from "@/components/common/select";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { useRolesQuery } from "../../../roles/hooks/use-roles-query";
 import { useUserRolesQuery } from "../../hooks/use-users-query";
+import { ROLES_CON_FICHA } from "../../consts/users.consts";
 import {
   useAddRoleMutation,
   useRetireRoleMutation,
@@ -42,7 +43,10 @@ export function ManageRolesModal({ open, onOpenChange, user }: ManageRolesModalP
   const assignedRoleIds = new Set(assignments.map((a) => a.rolId));
   const roleOptions = roles
     .filter((r) => r.activo && !assignedRoleIds.has(r.id))
-    .map((r) => ({ value: r.id, label: r.nombre }));
+    .map((r) => ({
+      value: r.id,
+      label: ROLES_CON_FICHA.includes(r.nombre) ? `${r.nombre} (requiere ficha)` : r.nombre,
+    }));
 
   const handleAddRole = async () => {
     if (!newRoleId) return;
