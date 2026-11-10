@@ -4,15 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import {
   listarPretests,
+  obtenerApoyo,
   obtenerComparacion,
   obtenerHistorialMediciones,
   obtenerMedicionPeriodo,
+  obtenerMisApoyo,
   obtenerMisIndicadores,
   obtenerPanel,
   obtenerPretestVigente,
   obtenerTablero,
 } from "../api";
-import type { FiltroIndicadoresQueryDto, Indicador } from "../types";
+import type { FiltroApoyoQueryDto, FiltroIndicadoresQueryDto, Indicador } from "../types";
 import { indicadoresKeys } from "./indicadores-keys";
 
 /**
@@ -39,6 +41,37 @@ export function useMisIndicadoresQuery(periodoId?: string, habilitado = true) {
   return useQuery({
     queryKey: indicadoresKeys.misIndicadores(anio?.id, periodoId),
     queryFn: () => obtenerMisIndicadores(periodoId),
+    enabled: habilitado,
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+  });
+}
+
+/**
+ * Indicadores de apoyo con ranking y evolución (Director, Subdirector, Administrador).
+ * Se calculan en vivo; no se congelan.
+ */
+export function useApoyoQuery(query?: FiltroApoyoQueryDto, habilitado = true) {
+  const { anio } = useAnioLectivo();
+
+  return useQuery({
+    queryKey: indicadoresKeys.apoyo(anio?.id, query),
+    queryFn: () => obtenerApoyo(query),
+    enabled: habilitado,
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+  });
+}
+
+/**
+ * Indicadores de apoyo propios del docente autenticado (sin ranking ni datos de otros).
+ */
+export function useMisApoyoQuery(query?: FiltroApoyoQueryDto, habilitado = true) {
+  const { anio } = useAnioLectivo();
+
+  return useQuery({
+    queryKey: indicadoresKeys.misApoyo(anio?.id, query),
+    queryFn: () => obtenerMisApoyo(query),
     enabled: habilitado,
     staleTime: 30_000,
     gcTime: 5 * 60_000,

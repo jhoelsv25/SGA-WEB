@@ -12,6 +12,7 @@ import {
   Clock01Icon,
   DashboardSquare01Icon,
   RefreshIcon,
+  UserSearch01Icon,
 } from "@hugeicons/core-free-icons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ import { TableroSkeleton } from "./tablero-skeleton";
 import { TarjetasIndicadoresGrid } from "./tarjetas-indicadores-grid";
 import { GestionMedicionPanel } from "../medicion/gestion-medicion-panel";
 import { PanelGeneralVista } from "../panel/panel-general-vista";
+import { SeccionApoyo } from "../apoyo/seccion-apoyo";
 
 /**
  * Componente principal interactivo del Tablero de Indicadores de la Tesis (RF-020).
@@ -268,6 +270,10 @@ function TableroIndicadoresContenido() {
             <HugeiconsIcon icon={CheckmarkCircle02Icon} size={15} />
             <span>Evolución Bimestral</span>
           </TabsTrigger>
+          <TabsTrigger value="apoyo" className="gap-2">
+            <HugeiconsIcon icon={UserSearch01Icon} size={15} />
+            <span>Indicadores de apoyo</span>
+          </TabsTrigger>
           <TabsTrigger value="panel-general" className="gap-2">
             <HugeiconsIcon icon={DashboardSquare01Icon} size={15} />
             <span>Panel Operativo</span>
@@ -333,6 +339,14 @@ function TableroIndicadoresContenido() {
               Sin datos de evolución para los períodos del año académico.
             </Card>
           )}
+        </TabsContent>
+
+        {/* ================================================================= */}
+        {/* PESTAÑA APARTE: Indicadores de apoyo del seguimiento docente      */}
+        {/* (RF-020 V2). Separados de la tesis: no se congelan ni se comparan */}
+        {/* ================================================================= */}
+        <TabsContent value="apoyo" className="space-y-6 focus-visible:outline-none">
+          <SeccionApoyo modo="directivo" />
         </TabsContent>
 
         {/* ================================================================= */}

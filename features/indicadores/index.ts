@@ -12,3 +12,4 @@ export * from "./components/tablero";
 export * from "./components/medicion";
 export * from "./components/mis-indicadores";
 export * from "./components/panel";
+export * from "./components/apoyo";

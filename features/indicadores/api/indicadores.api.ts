@@ -3,7 +3,9 @@ import type {
   CerrarMedicionDto,
   ComparacionBimestreResponseDto,
   ExportarIndicadoresQueryDto,
+  FiltroApoyoQueryDto,
   FiltroIndicadoresQueryDto,
+  IndicadoresApoyoResponseDto,
   HistorialMedicionResponseDto,
   Indicador,
   MedicionBimestreResponseDto,
@@ -45,6 +47,47 @@ export async function obtenerMisIndicadores(
     },
   );
   return data;
+}
+
+// ============================================================================
+// 2b. Indicadores de apoyo del seguimiento docente (RF-020 V2)
+// ============================================================================
+
+export async function obtenerApoyo(
+  query?: FiltroApoyoQueryDto,
+): Promise<IndicadoresApoyoResponseDto> {
+  const { data } = await apiClient.get<IndicadoresApoyoResponseDto>(`${RUTA_BASE}/apoyo`, {
+    params: query,
+  });
+  return data;
+}
+
+export async function obtenerMisApoyo(
+  query?: FiltroApoyoQueryDto,
+): Promise<IndicadoresApoyoResponseDto> {
+  const { data } = await apiClient.get<IndicadoresApoyoResponseDto>(
+    `${RUTA_BASE}/apoyo/mis-indicadores`,
+    { params: query },
+  );
+  return data;
+}
+
+export async function descargarExcelApoyo(
+  query?: FiltroApoyoQueryDto,
+  nombreArchivo = "indicadores-de-apoyo.xlsx",
+): Promise<void> {
+  const { data } = await apiClient.get<Blob>(`${RUTA_BASE}/apoyo/exportar/excel`, {
+    params: query,
+    responseType: "blob",
+  });
+  const url = window.URL.createObjectURL(data);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = nombreArchivo;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
 }
 
 // ============================================================================

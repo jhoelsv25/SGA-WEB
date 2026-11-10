@@ -1,4 +1,4 @@
-import type { FiltroIndicadoresQueryDto, Indicador } from "../types";
+import type { FiltroApoyoQueryDto, FiltroIndicadoresQueryDto, Indicador } from "../types";
 
 /**
  * Fábrica estructurada de claves de caché para TanStack Query.
@@ -20,6 +20,13 @@ export const indicadoresKeys = {
     [...indicadoresKeys.misIndicadoresRoot(), anioId ?? "vigente"] as const,
   misIndicadores: (anioId?: string, periodoId?: string) =>
     [...indicadoresKeys.misIndicadoresAnio(anioId), periodoId ?? "todos"] as const,
+
+  // Indicadores de apoyo del seguimiento docente (RF-020 V2)
+  apoyoRoot: () => [...indicadoresKeys.all, "apoyo"] as const,
+  apoyo: (anioId?: string, query?: FiltroApoyoQueryDto) =>
+    [...indicadoresKeys.apoyoRoot(), "directivo", anioId ?? "vigente", query ?? {}] as const,
+  misApoyo: (anioId?: string, query?: FiltroApoyoQueryDto) =>
+    [...indicadoresKeys.apoyoRoot(), "propio", anioId ?? "vigente", query ?? {}] as const,
 
   // Pretests
   pretests: () => [...indicadoresKeys.all, "pretest"] as const,

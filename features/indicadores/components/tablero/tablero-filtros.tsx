@@ -27,6 +27,10 @@ interface TableroFiltrosProps {
   onLimpiar: () => void;
   bimestres?: Bimestre[];
   cargando?: boolean;
+  /** «apoyo» quita las referencias a CSP, ISA e IGM de las etiquetas (RF-020 V2). */
+  modo?: "tesis" | "apoyo";
+  /** El docente solo ve lo suyo: no se ofrece el filtro por docente. */
+  ocultarDocente?: boolean;
 }
 
 /**
@@ -39,7 +43,10 @@ export function TableroFiltros({
   onLimpiar,
   bimestres = [],
   cargando = false,
+  modo = "tesis",
+  ocultarDocente = false,
 }: TableroFiltrosProps) {
+  const esTesis = modo === "tesis";
   const [mostrarAvanzados, setMostrarAvanzados] = React.useState(false);
 
   // Consultas de catálogos para los selectores
@@ -239,28 +246,34 @@ export function TableroFiltros({
 
         {/* Fila Secundaria: Filtros Avanzados Desplegables */}
         {mostrarAvanzados && (
-          <div className="border-border/60 grid grid-cols-1 gap-3 border-t pt-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div
+            className={`border-border/60 grid grid-cols-1 gap-3 border-t pt-4 sm:grid-cols-2 ${
+              ocultarDocente ? "lg:grid-cols-3" : "lg:grid-cols-4"
+            }`}
+          >
             {/* Filtro por Docente */}
-            <div className="space-y-1.5">
-              <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
-                <HugeiconsIcon icon={User02Icon} size={14} />
-                Docente (CSP / IGM)
-              </span>
-              <SelectOption
-                options={opcionesDocentes}
-                value={filtros.docenteId ?? "all"}
-                onSelect={manejarCambioDocente}
-                placeholder="Todos los docentes"
-                searchPlaceholder="Buscar docente..."
-                disabled={cargando}
-              />
-            </div>
+            {!ocultarDocente && (
+              <div className="space-y-1.5">
+                <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
+                  <HugeiconsIcon icon={User02Icon} size={14} />
+                  {esTesis ? "Docente (CSP / IGM)" : "Docente"}
+                </span>
+                <SelectOption
+                  options={opcionesDocentes}
+                  value={filtros.docenteId ?? "all"}
+                  onSelect={manejarCambioDocente}
+                  placeholder="Todos los docentes"
+                  searchPlaceholder="Buscar docente..."
+                  disabled={cargando}
+                />
+              </div>
+            )}
 
             {/* Filtro por Curso */}
             <div className="space-y-1.5">
               <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
                 <HugeiconsIcon icon={Book02Icon} size={14} />
-                Curso (CSP / IGM)
+                {esTesis ? "Curso (CSP / IGM)" : "Curso"}
               </span>
               <SelectOption
                 options={opcionesCursos}
@@ -276,7 +289,7 @@ export function TableroFiltros({
             <div className="space-y-1.5">
               <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
                 <HugeiconsIcon icon={HierarchySquare02Icon} size={14} />
-                Sección (ISA)
+                {esTesis ? "Sección (ISA)" : "Sección"}
               </span>
               <SelectOption
                 options={opcionesSecciones}

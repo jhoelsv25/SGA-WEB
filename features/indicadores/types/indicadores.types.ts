@@ -26,6 +26,20 @@ export interface FiltroIndicadoresQueryDto {
   seccionId?: string;
 }
 
+/** Columnas del ranking de indicadores de apoyo (RF-020 V2). */
+export type IndicadorApoyo =
+  | "jornadasEfectivas"
+  | "minutosPerdidos"
+  | "promedioMinutosPerdidos"
+  | "puntualidad"
+  | "minutosFueraAula"
+  | "tiempoResolucion";
+
+export interface FiltroApoyoQueryDto extends FiltroIndicadoresQueryDto {
+  ordenarPor?: IndicadorApoyo;
+  orden?: "asc" | "desc";
+}
+
 export interface RegistrarPretestDto {
   indicador: Indicador;
   periodoDescrito: string;
@@ -282,4 +296,81 @@ export interface MensajeIndicadoresResponseDto {
   mensaje: string;
   id?: string;
   version?: number;
+}
+
+// ============================================================================
+// DTOs de Respuesta: Indicadores de apoyo del seguimiento docente (RF-020 V2)
+// Informativos: sin meta, semáforo ni calificación; no se congelan.
+// ============================================================================
+
+export interface JornadasEfectivasApoyoDto {
+  sinDatos: boolean;
+  valor: number | null;
+  minutosProgramados: number;
+  minutosEfectivos: number;
+}
+
+export interface MinutosPerdidosApoyoDto {
+  sinDatos: boolean;
+  total: number | null;
+  promedioPorSesion: number | null;
+  sesionesEjecutadas: number;
+}
+
+export interface PuntualidadApoyoDto {
+  sinDatos: boolean;
+  valor: number | null;
+  puntuales: number;
+  sesionesConIngreso: number;
+}
+
+export interface MinutosFueraAulaApoyoDto {
+  sinDatos: boolean;
+  minutos: number | null;
+  supervisiones: number;
+}
+
+export interface TiempoResolucionApoyoDto {
+  sinDatos: boolean;
+  promedioDias: number | null;
+  resueltas: number;
+  vencidas: number;
+}
+
+export interface ResumenApoyoDto {
+  jornadasEfectivas: JornadasEfectivasApoyoDto;
+  minutosPerdidos: MinutosPerdidosApoyoDto;
+  puntualidad: PuntualidadApoyoDto;
+  minutosFueraAula: MinutosFueraAulaApoyoDto;
+  tiempoResolucion: TiempoResolucionApoyoDto;
+}
+
+export interface FilaRankingApoyoDto {
+  docenteId: string;
+  docenteNombre: string;
+  resumen: ResumenApoyoDto;
+}
+
+export interface EvolucionApoyoDto {
+  periodoId: string;
+  periodoNombre: string;
+  enCurso: boolean;
+  mensajeEnCurso: string | null;
+  resumen: ResumenApoyoDto;
+}
+
+export interface IndicadoresApoyoResponseDto {
+  titulo: string;
+  mensaje: string;
+  etiquetaSinDatos: string;
+  periodoId: string | null;
+  periodoNombre: string | null;
+  desde: string;
+  hasta: string;
+  enCurso: boolean;
+  mensajeEnCurso: string | null;
+  resumen: ResumenApoyoDto;
+  /** Solo Director y Subdirector; el docente no recibe ranking. */
+  ranking: FilaRankingApoyoDto[] | null;
+  evolucion: EvolucionApoyoDto[];
 }

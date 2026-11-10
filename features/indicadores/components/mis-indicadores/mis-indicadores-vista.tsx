@@ -16,6 +16,7 @@ import { GraficoBarrasMisIndicadores } from "./grafico-barras-mis-indicadores";
 import { MisIndicadoresCursosTabla } from "./mis-indicadores-cursos-tabla";
 import { MisIndicadoresFiltro } from "./mis-indicadores-filtro";
 import { TarjetaIndicadorDocente } from "./tarjeta-indicador-docente";
+import { SeccionApoyo } from "../apoyo/seccion-apoyo";
 
 export interface MisIndicadoresVistaProps {
   className?: string;
@@ -131,6 +132,9 @@ export function MisIndicadoresVista({ className = "" }: MisIndicadoresVistaProps
           )}
         </>
       )}
+
+      {/* Indicadores de apoyo propios (RF-020 V2): aparte de la tesis, sin ranking ni datos de otros */}
+      <SeccionApoyo modo="docente" />
     </div>
   );
 }
