@@ -51,3 +51,44 @@ export const resolverSolicitudSchema = z
   );
 
 export type ResolverSolicitudFormValues = z.infer<typeof resolverSolicitudSchema>;
+
+const FECHA_ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+export const registrarCompromisoSchema = z.object({
+  descripcion: z
+    .string()
+    .trim()
+    .min(1, "Indique la descripción del compromiso.")
+    .max(500, "Máximo 500 caracteres"),
+  fechaRevision: z.string().regex(FECHA_ISO, "Elija la fecha de revisión."),
+});
+
+export type RegistrarCompromisoFormValues = z.infer<typeof registrarCompromisoSchema>;
+
+export const cerrarCompromisoSchema = z.object({
+  resultado: z.enum(["cumplido", "no_cumplido"]),
+  observacion: z
+    .string()
+    .trim()
+    .min(1, "Indique la observación de cierre.")
+    .max(500, "Máximo 500 caracteres"),
+});
+
+export type CerrarCompromisoFormValues = z.infer<typeof cerrarCompromisoSchema>;
+
+export const reprogramarCompromisoSchema = z.object({
+  fechaRevision: z.string().regex(FECHA_ISO, "Elija la fecha de revisión."),
+  descripcion: z.string().trim().max(500, "Máximo 500 caracteres").optional(),
+});
+
+export type ReprogramarCompromisoFormValues = z.infer<typeof reprogramarCompromisoSchema>;
+
+export const anularCompromisoSchema = z.object({
+  motivo: z
+    .string()
+    .trim()
+    .min(1, "Indique el motivo de la anulación.")
+    .max(500, "Máximo 500 caracteres"),
+});
+
+export type AnularCompromisoFormValues = z.infer<typeof anularCompromisoSchema>;

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/common/data-table/data-table-column-header";
 import { DECISIONES_CONSOLIDADO_CONFIG, ESTADOS_CONSOLIDADO_CONFIG } from "../../consts";
 import type { ConsolidadoResumenItem } from "../../types";
+import { formatearHoras } from "../../utils";
 import { ConsolidadoActions } from "./consolidado-actions";
 
 export interface GetConsolidadoColumnsOptions {
@@ -96,6 +97,23 @@ export function getConsolidadoColumns(
                 <span className="font-medium text-blue-500">Justif: {c.sesionesJustificadas}</span>
               )}
             </div>
+          </div>
+        );
+      },
+    },
+    {
+      id: "horas",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Horas pedagógicas" />,
+      cell: ({ row }) => {
+        const c = row.original;
+        return (
+          <div className="flex flex-col">
+            <span className="text-foreground font-mono text-xs font-semibold">
+              {formatearHoras(c.horasDictadas)} / {formatearHoras(c.horasProgramadas)}
+            </span>
+            <span className="text-muted-foreground text-[11px]">
+              {formatearHoras(c.horasPerdidas)} perdidas
+            </span>
           </div>
         );
       },

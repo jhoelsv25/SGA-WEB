@@ -24,7 +24,17 @@ export interface ConsolidadoResumenItem {
   minutosFueraAula: number;
   minutosTotalFuera: number;
   tiempoTotalFueraTexto: string;
+  /** Horas pedagógicas y minutos equivalentes (RF-013 V2); nulos en consolidados anteriores. */
+  horasProgramadas: number | null;
+  horasDictadas: number | null;
+  horasPerdidas: number | null;
+  minutosProgramados: number | null;
+  minutosDictados: number | null;
+  minutosNoDictados: number | null;
+  minutosHoraPedagogica: number | null;
   decision: DecisionConsolidado;
+  /** Fecha y hora en que el Director registró su decisión; nula si aún no decide. */
+  decisionRegistradaEn: string | null;
   observacion: string | null;
   motivoCambio?: string | null;
   generadoEn: string;

@@ -1,3 +1,4 @@
+export * from "./compromisos";
 import type { DecisionConsolidado, EstadoConsolidado, EstadoSolicitudRevision } from "../types";
 
 export const ESTADOS_CONSOLIDADO_CONFIG: Record<

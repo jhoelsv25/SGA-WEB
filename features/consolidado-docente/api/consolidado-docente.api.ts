@@ -202,13 +202,10 @@ export async function descargarFichaPdf(consolidadoId: string): Promise<Blob> {
 
 export async function exportarExcel(periodoId: string): Promise<Blob> {
   try {
-    const { data } = await apiClient.get<Blob>(
-      CONSOLIDADO_DOCENTE_ENDPOINTS.EXPORTAR_EXCEL,
-      {
-        params: { periodoId },
-        responseType: "blob",
-      },
-    );
+    const { data } = await apiClient.get<Blob>(CONSOLIDADO_DOCENTE_ENDPOINTS.EXPORTAR_EXCEL, {
+      params: { periodoId },
+      responseType: "blob",
+    });
     descargarBlobEnNavegador(data, "consolidados-docentes.xlsx");
     return data;
   } catch (error) {

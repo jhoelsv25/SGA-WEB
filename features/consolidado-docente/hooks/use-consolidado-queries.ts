@@ -2,12 +2,15 @@
 
 import { useQuery } from "@tanstack/react-query";
 import {
+  listarCompromisos,
   listarConsolidadosPeriodo,
+  obtenerCompromiso,
+  obtenerPendientes,
   obtenerDetalleConsolidado,
   obtenerHistorialVersiones,
   obtenerMiSeguimiento,
 } from "../api";
-import type { ConsolidadoQueryDto } from "../types";
+import type { ConsolidadoQueryDto, PendientesQueryDto } from "../types";
 import { consolidadoKeys } from "./consolidado-keys";
 
 export function useConsolidadosQuery(query: ConsolidadoQueryDto, enabled = true) {
@@ -43,5 +46,32 @@ export function useHistorialVersionesQuery(consolidadoId: string, enabled = true
     queryFn: () => obtenerHistorialVersiones(consolidadoId),
     enabled: Boolean(consolidadoId) && enabled,
     staleTime: 60_000,
+  });
+}
+
+export function useCompromisosQuery(consolidadoId: string, enabled = true) {
+  return useQuery({
+    queryKey: consolidadoKeys.compromisos(consolidadoId),
+    queryFn: () => listarCompromisos(consolidadoId),
+    enabled: Boolean(consolidadoId) && enabled,
+    staleTime: 15_000,
+  });
+}
+
+export function useCompromisoQuery(compromisoId: string, enabled = true) {
+  return useQuery({
+    queryKey: consolidadoKeys.compromiso(compromisoId),
+    queryFn: () => obtenerCompromiso(compromisoId),
+    enabled: Boolean(compromisoId) && enabled,
+    staleTime: 15_000,
+  });
+}
+
+export function usePendientesSeguimientoQuery(query: PendientesQueryDto, enabled = true) {
+  return useQuery({
+    queryKey: consolidadoKeys.pendientes(query),
+    queryFn: () => obtenerPendientes(query),
+    enabled,
+    staleTime: 15_000,
   });
 }

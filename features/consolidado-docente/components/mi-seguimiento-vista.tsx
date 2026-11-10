@@ -27,6 +27,7 @@ import {
 } from "../consts";
 import { useMiSeguimientoQuery } from "../hooks";
 import { getDetalleSesionesColumns } from "../views/columns";
+import { HorasPedagogicasCards } from "./metricas/horas-pedagogicas-cards";
 import { ModalSolicitarRevision } from "./modals";
 
 export function MiSeguimientoVista() {
@@ -242,6 +243,8 @@ export function MiSeguimientoVista() {
               </p>
             </div>
           </div>
+
+          <HorasPedagogicasCards consolidado={consolidado} variante="docente" />
 
           {/* Tabla de sesiones del docente */}
           <div className="space-y-3">

@@ -13,6 +13,7 @@ import { descargarFichaPdf } from "../../api";
 import { DECISIONES_CONSOLIDADO_CONFIG, ESTADOS_CONSOLIDADO_CONFIG } from "../../consts";
 import { useDetalleConsolidadoQuery } from "../../hooks";
 import type { ConsolidadoResumenItem } from "../../types";
+import { HorasPedagogicasCards } from "../metricas/horas-pedagogicas-cards";
 import {
   getDetalleAusenciasColumns,
   getDetalleSesionesColumns,
@@ -219,6 +220,8 @@ export function ModalDetalleConsolidado({
               </div>
             </div>
           </div>
+
+          <HorasPedagogicasCards consolidado={consolidado} />
 
           {/* Observaciones del Director */}
           {consolidado.observacion && (
