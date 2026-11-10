@@ -44,8 +44,13 @@ export function BimestresForm({ anio, onSubmit, isSubmitting = false }: Bimestre
       })}
     >
       {NOMBRES_BIMESTRE.map((nombre, indice) => (
-        <div key={nombre} className="grid items-end gap-3 sm:grid-cols-[3rem_1fr_1fr]">
-          <p className="pb-2 text-sm font-semibold">{nombre}</p>
+        <div
+          key={nombre}
+          className="bg-card grid items-end gap-3 rounded-xl border p-4 sm:grid-cols-[2.5rem_1fr_1fr]"
+        >
+          <span className="bg-muted text-muted-foreground flex size-9 items-center justify-center rounded-full text-xs font-bold sm:mb-0.5">
+            {nombre}
+          </span>
           <CampoFecha
             control={form.control}
             name={`bimestres.${indice}.fechaInicio`}

@@ -20,3 +20,13 @@ export const USER_STATUS_CONFIG: Record<UserStatus, UserStatusConfig> = {
     tone: "neutral",
   },
 };
+
+/** RF-002 V4: roles que solo puede tener quien tiene la ficha vigente de ese tipo. */
+export const ROLES_CON_FICHA: readonly string[] = ["Docente", "Estudiante", "Apoderado"];
+
+/** RF-002: cargos que requieren ficha y por eso no se ofrecen en "Usuarios". */
+export const CARGOS_CON_FICHA: readonly string[] = [
+  "Estudiante",
+  "Docente de aula",
+  "Apoderado(a)",
+];
