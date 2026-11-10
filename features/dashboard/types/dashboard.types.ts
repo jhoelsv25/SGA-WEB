@@ -274,7 +274,14 @@ export interface SecretariaDashboardData {
 }
 
 export interface DashboardResponse {
-  rolCategoria: "directivo" | "docente" | "estudiante" | "apoderado" | "admin" | "secretaria";
+  rolCategoria:
+    | "directivo"
+    | "docente"
+    | "estudiante"
+    | "apoderado"
+    | "admin"
+    | "secretaria"
+    | "adicional";
   rolNombre: string;
   periodoActual: PeriodoActualInfo;
   directivo?: DirectivoDashboardData;
