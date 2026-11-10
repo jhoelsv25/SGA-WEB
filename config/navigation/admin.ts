@@ -286,7 +286,7 @@ export const adminNavigation: NavSection[] = [
         icon: ChartBarLineIcon,
         roles: ["admin"],
         description:
-          "Indicadores cuantitativos de la tesis (CSP, ISA, IGM) y panel directivo (RF-020)",
+          "Indicadores de la tesis (CSP, ISA, IGM), indicadores de apoyo del seguimiento docente y panel directivo (RF-020)",
       },
       {
         id: "admin-mis-indicadores",
@@ -296,7 +296,7 @@ export const adminNavigation: NavSection[] = [
         roles: ["admin"],
         ocultarAlAdministrador: true,
         description:
-          "Cumplimiento de sesiones planificadas y materiales propios del docente (RF-020)",
+          "Cumplimiento de sesiones planificadas y materiales propios del docente, e indicadores de apoyo propios (RF-020)",
       },
     ],
   },
