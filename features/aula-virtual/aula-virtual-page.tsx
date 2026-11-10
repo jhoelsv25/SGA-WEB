@@ -195,6 +195,7 @@ export function AulaVirtualPage({
               <MaterialesTab
                 unidades={unidadesFiltradas}
                 puedeAdministrar={aula.puedeAdministrar}
+                onNuevaUnidad={() => setUnidadModal({ abierto: true, unidad: null })}
                 onPlanificarMaterial={setUnidadParaMaterial}
                 onMaterialExtra={setUnidadParaExtra}
                 onEditarUnidad={(unidad) => setUnidadModal({ abierto: true, unidad })}

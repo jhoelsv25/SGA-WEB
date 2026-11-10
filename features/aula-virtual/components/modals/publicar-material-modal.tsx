@@ -26,7 +26,7 @@ export function PublicarMaterialModal({
       title={material?.publicadoEn ? "Reemplazar material" : "Publicar material"}
       description={material?.titulo}
       icon={CloudUploadIcon}
-      size="md"
+      size="lg"
     >
       {material && (
         <PublicarMaterialForm

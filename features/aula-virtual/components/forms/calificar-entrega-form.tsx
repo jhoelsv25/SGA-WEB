@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowTurnBackwardIcon,
+  Cancel01Icon,
   CheckmarkCircle02Icon,
   File01Icon,
   Link01Icon,
@@ -260,8 +261,9 @@ export function CalificarEntregaForm({
         </Button>
 
         <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
+          <Button type="button" variant="outline" className="gap-2" onClick={onCancel}>
+            <HugeiconsIcon icon={Cancel01Icon} size={16} />
+            <span>Cancelar</span>
           </Button>
           <Button
             type="button"

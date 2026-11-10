@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, SentIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -70,12 +72,17 @@ export function SolicitarCambioFechaForm({
       </div>
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">
-        <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
-          Cancelar
+        <Button type="button" variant="outline" className="min-h-10 gap-2" onClick={onCancel}>
+          <HugeiconsIcon icon={Cancel01Icon} size={16} />
+          <span>Cancelar</span>
         </Button>
         <Button type="submit" disabled={solicitar.isPending} className="min-h-10 gap-2">
-          {solicitar.isPending && <Spinner className="size-4" />}
-          Enviar solicitud
+          {solicitar.isPending ? (
+            <Spinner className="size-4" />
+          ) : (
+            <HugeiconsIcon icon={SentIcon} size={16} />
+          )}
+          <span>Enviar solicitud</span>
         </Button>
       </div>
     </form>

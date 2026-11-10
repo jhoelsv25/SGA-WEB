@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -84,12 +86,23 @@ export function OcultarContenidoForm({
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={ocultar.isPending}>
-          Cancelar
+        <Button
+          type="button"
+          variant="outline"
+          className="gap-2"
+          onClick={onCancel}
+          disabled={ocultar.isPending}
+        >
+          <HugeiconsIcon icon={Cancel01Icon} size={16} />
+          <span>Cancelar</span>
         </Button>
         <Button type="submit" variant="destructive" disabled={ocultar.isPending} className="gap-2">
-          {ocultar.isPending && <Spinner className="size-4" />}
-          Ocultar contenido
+          {ocultar.isPending ? (
+            <Spinner className="size-4" />
+          ) : (
+            <HugeiconsIcon icon={ViewOffSlashIcon} size={16} />
+          )}
+          <span>Ocultar contenido</span>
         </Button>
       </div>
     </form>

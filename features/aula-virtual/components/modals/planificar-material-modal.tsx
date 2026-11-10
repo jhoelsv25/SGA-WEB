@@ -32,7 +32,7 @@ export function PlanificarMaterialModal({
           : "Compromete un material de reforzamiento con su fecha. Cuenta en el IGM."
       }
       icon={Calendar03Icon}
-      size="md"
+      size="lg"
     >
       {open && (
         <PlanificarMaterialForm

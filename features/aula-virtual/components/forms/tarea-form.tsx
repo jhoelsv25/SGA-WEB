@@ -4,9 +4,12 @@ import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Add01Icon,
+  Cancel01Icon,
   CheckmarkCircle02Icon,
   Delete02Icon,
+  FloppyDiskIcon,
   InformationCircleIcon,
+  Upload01Icon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -557,25 +560,36 @@ export function TareaForm({
 
       {/* Acciones */}
       <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
-          Cancelar
+        <Button
+          type="button"
+          variant="outline"
+          className="gap-2"
+          onClick={onCancel}
+          disabled={isPending}
+        >
+          <HugeiconsIcon icon={Cancel01Icon} size={16} />
+          <span>Cancelar</span>
         </Button>
         <Button
           type="button"
           variant="secondary"
           id="btn-guardar-borrador-tarea"
+          className="gap-2"
           onClick={() => void guardar(false)}
           disabled={isPending}
         >
-          Guardar borrador
+          <HugeiconsIcon icon={FloppyDiskIcon} size={16} />
+          <span>Guardar borrador</span>
         </Button>
         <Button
           type="button"
           id="btn-publicar-tarea"
+          className="gap-2"
           onClick={() => void guardar(true)}
           disabled={isPending}
         >
-          {isPending ? "Guardando..." : "Publicar ahora"}
+          <HugeiconsIcon icon={Upload01Icon} size={16} />
+          <span>{isPending ? "Guardando..." : "Publicar ahora"}</span>
         </Button>
       </div>
     </form>

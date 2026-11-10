@@ -25,7 +25,7 @@ export function PublicarExtraModal({
       title="Publicar material extra"
       description="Se ve igual que los demás, pero no cuenta en el IGM."
       icon={FileAddIcon}
-      size="md"
+      size="lg"
     >
       {open && (
         <PublicarExtraForm
