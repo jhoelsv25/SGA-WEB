@@ -4,12 +4,17 @@ export const MENU_SESIONES_HOY = "/admin/sesiones-hoy";
 export const MENU_JUSTIFICACIONES_SESION = "/admin/justificaciones-sesion";
 export const MENU_MIS_SESIONES = "/admin/mis-sesiones";
 
+/** Código del motivo «Otro»: exige observación (RF-011 V3). */
+export const MOTIVO_OTRO = "otro";
+
 export const INTERVALO_PANEL_SESIONES_MS = 30_000;
 
 export const SESIONES_ENDPOINTS = {
   BASE: "/sesiones-clase",
   HOY: "/sesiones-clase/hoy",
   JUSTIFICACIONES: "/sesiones-clase/justificaciones",
+  MOTIVOS_JUSTIFICACION: "/sesiones-clase/justificaciones/motivos",
+  DETALLE_JUSTIFICACION: (id: string) => `/sesiones-clase/justificaciones/${id}`,
   MIS_SESIONES: "/sesiones-clase/mis-sesiones",
   REEMPLAZO: (id: string) => `/sesiones-clase/${id}/reemplazo`,
   APROBAR_JUSTIFICACION: (id: string) => `/sesiones-clase/${id}/justificacion/aprobar`,

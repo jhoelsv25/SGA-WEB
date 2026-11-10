@@ -8,6 +8,17 @@ export function createEditVariableSchema(variable: VariableSistema) {
       motivoCambio: z.string().trim().min(1, "El motivo del cambio es obligatorio."),
     })
     .superRefine((data, ctx) => {
+      if (variable.tipo === "lista") {
+        const items = data.valor.split(",").map((i) => i.trim());
+        if (items.some((i) => i === "")) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La lista no puede tener valores vacíos entre comas.",
+            path: ["valor"],
+          });
+        }
+        return;
+      }
       if (variable.tipo === "entero" || variable.tipo === "decimal") {
         const num = Number(data.valor);
         if (Number.isNaN(num)) {

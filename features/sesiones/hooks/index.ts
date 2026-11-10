@@ -9,20 +9,26 @@ import {
   aprobarJustificacion,
   asignarReemplazo,
   corregirTema,
+  getDetalleJustificacion,
   getJustificacionesSolicitadas,
   getMisSesiones,
+  getMotivosJustificacion,
   getPanelSesionesHoy,
   rechazarJustificacion,
   solicitarJustificacion,
 } from "../api";
 import { INTERVALO_PANEL_SESIONES_MS, MENU_JUSTIFICACIONES_SESION } from "../consts";
+import type { FiltrosBandejaJustificaciones, SolicitudJustificacionPayload } from "../types";
 import { extraerMensajeSesion } from "../utils";
 
 export const sesionesKeys = {
   all: ["sesiones-clase"] as const,
   panel: (anioId?: string) => [...sesionesKeys.all, anioId ?? "vigente", "panel-hoy"] as const,
-  justificaciones: (anioId?: string) =>
-    [...sesionesKeys.all, anioId ?? "vigente", "justificaciones"] as const,
+  justificaciones: (anioId?: string, filtros?: FiltrosBandejaJustificaciones) =>
+    [...sesionesKeys.all, anioId ?? "vigente", "justificaciones", filtros ?? {}] as const,
+  detalleJustificacion: (anioId: string | undefined, id: string) =>
+    [...sesionesKeys.all, anioId ?? "vigente", "justificacion", id] as const,
+  motivos: () => [...sesionesKeys.all, "motivos-justificacion"] as const,
   mias: (anioId: string | undefined, desde: string, hasta: string) =>
     [...sesionesKeys.all, anioId ?? "vigente", "mis-sesiones", desde, hasta] as const,
 };
@@ -38,13 +44,35 @@ export function usePanelSesionesHoy() {
   });
 }
 
-export function useJustificacionesSolicitadas() {
+export function useJustificacionesSolicitadas(filtros: FiltrosBandejaJustificaciones = {}) {
   const { anio } = useAnioLectivo();
   return useQuery({
-    queryKey: sesionesKeys.justificaciones(anio?.id),
-    queryFn: getJustificacionesSolicitadas,
+    queryKey: sesionesKeys.justificaciones(anio?.id, filtros),
+    queryFn: () => getJustificacionesSolicitadas(filtros),
     staleTime: 30_000,
     gcTime: 5 * 60_000,
+  });
+}
+
+/** Detalle de una solicitud con el contador de permisos personales del año. */
+export function useDetalleJustificacion(id?: string) {
+  const { anio } = useAnioLectivo();
+  return useQuery({
+    queryKey: sesionesKeys.detalleJustificacion(anio?.id, id ?? ""),
+    queryFn: () => getDetalleJustificacion(id!),
+    enabled: Boolean(id),
+    staleTime: 15_000,
+    gcTime: 5 * 60_000,
+  });
+}
+
+/** Catálogo de motivos con la regla del documento y el aviso de la norma (viene de la API). */
+export function useMotivosJustificacion() {
+  return useQuery({
+    queryKey: sesionesKeys.motivos(),
+    queryFn: getMotivosJustificacion,
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
   });
 }
 
@@ -81,11 +109,29 @@ export function useAsignarReemplazo() {
   );
 }
 
+/**
+ * Aprueba una solicitud. Si el docente superaría el tope de permisos personales, la API responde
+ * 409 con el mensaje a mostrar; la pantalla pide confirmar y vuelve a llamar con `confirmarTope`.
+ * Ese 409 no se muestra como error.
+ */
 export function useAprobarJustificacion() {
-  return useMutacionSesion(
-    (id: string) => aprobarJustificacion(id),
-    (r) => extraerMensajeSesion(r, "Sesión justificada."),
-  );
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, confirmarTope }: { id: string; confirmarTope?: boolean }) =>
+      aprobarJustificacion(id, confirmarTope),
+    onSuccess: (resultado) => {
+      void queryClient.invalidateQueries({ queryKey: sesionesKeys.all });
+      toast.success(extraerMensajeSesion(resultado, "Sesión justificada."));
+    },
+    onError: (error: ApiClientError) => {
+      if (!esConfirmacionDeTope(error)) toast.error(error.message);
+    },
+  });
+}
+
+/** El 409 de aprobar significa "supera el tope, ¿continuar?" (única causa de conflicto allí). */
+export function esConfirmacionDeTope(error: unknown): boolean {
+  return error instanceof ApiClientError && error.statusCode === 409;
 }
 
 export function useRechazarJustificacion() {
@@ -105,7 +151,7 @@ export function useCorregirTema() {
 
 export function useSolicitarJustificacion() {
   return useMutacionSesion(
-    ({ id, ...payload }: { id: string; motivo: string; documentoUrl?: string }) =>
+    ({ id, ...payload }: { id: string } & SolicitudJustificacionPayload) =>
       solicitarJustificacion(id, payload),
     (r) => extraerMensajeSesion(r, "Su justificación fue enviada al subdirector."),
   );

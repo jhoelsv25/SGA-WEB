@@ -18,9 +18,9 @@ import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { SelectorBimestre, useRangoBimestre } from "@/features/asistencia/components";
 import { cn } from "@/lib/utils";
-import { ModalTexto } from "./components";
+import { ModalJustificar, ModalTexto } from "./components";
 import { getMisSesionesColumns } from "./views";
-import { useCorregirTema, useMisSesiones, useSolicitarJustificacion } from "./hooks";
+import { useCorregirTema, useMisSesiones } from "./hooks";
 import type { Sesion } from "./types";
 
 type Accion = { tipo: "tema" | "justificar"; sesion: Sesion } | null;
@@ -34,7 +34,6 @@ export function MisSesionesPage() {
   const [filtro, setFiltro] = React.useState<FiltroEstado>("todas");
 
   const tema = useCorregirTema();
-  const justificar = useSolicitarJustificacion();
   const cerrar = () => setAccion(null);
 
   const handleCorregirTema = React.useCallback((sesion: Sesion) => {
@@ -274,26 +273,9 @@ export function MisSesionesPage() {
           accion && tema.mutate({ id: accion.sesion.id, tema: texto }, { onSuccess: cerrar })
         }
       />
-      <ModalTexto
-        abierto={accion?.tipo === "justificar"}
-        clave={`justificar-${accion?.sesion.id ?? ""}`}
+      <ModalJustificar
+        sesion={accion?.tipo === "justificar" ? accion.sesion : null}
         onOpenChange={(abierto) => !abierto && cerrar()}
-        titulo="Solicitar justificación"
-        descripcion="La revisa el subdirector."
-        icono={FileEditIcon}
-        etiqueta="Motivo"
-        placeholder="Ej. Descanso médico"
-        mensajeRequerido="Indique el motivo de la justificación."
-        conEnlace
-        textoBoton="Enviar justificación"
-        pendiente={justificar.isPending}
-        onEnviar={({ texto, enlace }) =>
-          accion &&
-          justificar.mutate(
-            { id: accion.sesion.id, motivo: texto, documentoUrl: enlace },
-            { onSuccess: cerrar },
-          )
-        }
       />
     </div>
   );

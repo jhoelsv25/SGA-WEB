@@ -44,6 +44,14 @@ export const MODULO_CONFIG: Record<string, ModuloInfo> = {
     label: "Organización y Jornada Escolar",
     icon: SlidersHorizontalIcon,
   },
+  consolidado: {
+    label: "Consolidado y Ficha de Seguimiento",
+    icon: Audit01Icon,
+  },
+  observacion: {
+    label: "Observación de Aula",
+    icon: TeacherIcon,
+  },
   convivencia: {
     label: "Convivencia y Conducta",
     icon: UserGroupIcon,

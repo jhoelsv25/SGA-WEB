@@ -81,6 +81,12 @@ export function EditVariableForm({
             Valores aceptados: true o false (o 1 / 0).
           </p>
         )}
+        {variable.tipo === "lista" && (
+          <p className="text-muted-foreground text-xs">
+            Escriba los valores separados por comas, sin espacios dentro de cada valor (por ejemplo:
+            descanso_medico,licencia).
+          </p>
+        )}
         {errors.valor && (
           <p className="text-destructive text-xs font-medium">{errors.valor.message}</p>
         )}

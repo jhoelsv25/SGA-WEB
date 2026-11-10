@@ -57,13 +57,14 @@ export function SesionesHoyPage() {
   const metricas = React.useMemo(() => {
     const sesiones = data?.sesiones ?? [];
     const total = sesiones.length;
-    const alertas = data?.totalAlertas ?? sesiones.filter((s) => s.alerta).length;
+    const alertasSesiones = sesiones.filter((s) => s.alerta || s.alertaSalida).length;
+    const alertas = data?.totalAlertas ?? alertasSesiones;
     const firmadas = sesiones.filter((s) =>
       ["cumplida", "parcial", "en_curso"].includes(s.estado),
     ).length;
     const pendientes = sesiones.filter((s) => s.estado === "pendiente" && !s.alerta).length;
 
-    return { total, alertas, firmadas, pendientes };
+    return { total, alertas, alertasSesiones, firmadas, pendientes };
   }, [data]);
 
   // Filtrado reactivo de sesiones
@@ -78,7 +79,7 @@ export function SesionesHoyPage() {
         (s.tema && s.tema.toLowerCase().includes(busqueda.toLowerCase()));
 
       let matchEstado = true;
-      if (filtroEstado === "alertas") matchEstado = Boolean(s.alerta);
+      if (filtroEstado === "alertas") matchEstado = Boolean(s.alerta || s.alertaSalida);
       else if (filtroEstado === "firmadas") {
         matchEstado = ["cumplida", "parcial", "en_curso"].includes(s.estado);
       } else if (filtroEstado === "pendientes") {
@@ -161,7 +162,7 @@ export function SesionesHoyPage() {
               >
                 <span className="flex items-center gap-1.5 text-xs font-medium">
                   <HugeiconsIcon icon={AlertCircleIcon} size={15} />
-                  <span>Alertas de tolerancia</span>
+                  <span>Alertas</span>
                 </span>
                 <p
                   className={`mt-2 text-2xl font-extrabold tracking-tight ${
@@ -171,7 +172,7 @@ export function SesionesHoyPage() {
                   {metricas.alertas}
                 </p>
                 <span className="text-[11px]">
-                  {metricas.alertas > 0 ? "Requieren reemplazo o descargo" : "Todo bajo control"}
+                  {metricas.alertas > 0 ? "Requieren seguimiento" : "Todo bajo control"}
                 </span>
               </div>
 
@@ -188,6 +189,22 @@ export function SesionesHoyPage() {
                 </span>
               </div>
             </div>
+
+            {data.alertasMinutos.length > 0 && (
+              <section
+                aria-label="Minutos perdidos"
+                className="border-warning/30 bg-warning/10 space-y-2 rounded-2xl border p-4"
+              >
+                <h2 className="text-sm font-semibold">Minutos perdidos sobre el umbral</h2>
+                <ul className="space-y-1">
+                  {data.alertasMinutos.map((a) => (
+                    <li key={`${a.docenteId}-${a.periodo}`} className="text-sm">
+                      {a.mensaje}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             {/* Barra de Búsqueda y Filtros Rápidos */}
             <div className="border-border/80 bg-card flex flex-col justify-between gap-3 rounded-2xl border p-4 shadow-xs sm:flex-row sm:items-center">
@@ -230,7 +247,7 @@ export function SesionesHoyPage() {
                   {metricas.alertas > 0 && (
                     <span className="bg-destructive size-1.5 rounded-full" />
                   )}
-                  <span>Alertas ({metricas.alertas})</span>
+                  <span>Alertas ({metricas.alertasSesiones})</span>
                 </button>
                 <button
                   type="button"

@@ -19,6 +19,8 @@ export const variableFilterDefs: readonly ListFilterDef[] = [
       { label: "Aula Virtual", value: "aula_virtual" },
       { label: "Libretas", value: "libretas" },
       { label: "Jornada", value: "organizacion" },
+      { label: "Consolidado", value: "consolidado" },
+      { label: "Observación", value: "observacion" },
       { label: "Auditoría", value: "auditoria" },
       { label: "Convivencia", value: "convivencia" },
     ],

@@ -72,7 +72,9 @@ export function VariablesGroupedList({
                   ? v.valor === "true" || v.valor === "1"
                     ? "Activado"
                     : "Desactivado"
-                  : v.valor;
+                  : v.tipo === "lista"
+                    ? v.valor.split(",").join(", ")
+                    : v.valor;
 
                 return (
                   <div

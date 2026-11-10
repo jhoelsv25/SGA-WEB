@@ -2,11 +2,16 @@ import { apiClient, handleApiError } from "@/lib/api-client";
 import { SESIONES_ENDPOINTS } from "../consts";
 import type {
   CredencialesKiosko,
+  DetalleSolicitudJustificacion,
+  FiltrosBandejaJustificaciones,
   MensajeSesion,
   MisSesiones,
+  MotivoJustificacion,
   PanelSesiones,
   Sesion,
   SesionesKiosko,
+  SolicitudJustificacion,
+  SolicitudJustificacionPayload,
 } from "../types";
 import { cabeceraKiosko } from "../utils";
 
@@ -19,12 +24,44 @@ export async function getPanelSesionesHoy(): Promise<PanelSesiones> {
   }
 }
 
-export async function getJustificacionesSolicitadas(): Promise<Sesion[]> {
+export async function getJustificacionesSolicitadas(
+  filtros: FiltrosBandejaJustificaciones = {},
+): Promise<SolicitudJustificacion[]> {
   try {
-    const { data } = await apiClient.get<Sesion[]>(SESIONES_ENDPOINTS.JUSTIFICACIONES);
+    const { data } = await apiClient.get<SolicitudJustificacion[]>(
+      SESIONES_ENDPOINTS.JUSTIFICACIONES,
+      {
+        params: {
+          ...(filtros.motivo ? { motivo: filtros.motivo } : {}),
+          ...(filtros.vencidas ? { vencidas: "true" } : {}),
+        },
+      },
+    );
     return data;
   } catch (error) {
     handleApiError(error, "Error al obtener las justificaciones solicitadas.");
+  }
+}
+
+export async function getMotivosJustificacion(): Promise<MotivoJustificacion[]> {
+  try {
+    const { data } = await apiClient.get<MotivoJustificacion[]>(
+      SESIONES_ENDPOINTS.MOTIVOS_JUSTIFICACION,
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al cargar los motivos de justificación.");
+  }
+}
+
+export async function getDetalleJustificacion(id: string): Promise<DetalleSolicitudJustificacion> {
+  try {
+    const { data } = await apiClient.get<DetalleSolicitudJustificacion>(
+      SESIONES_ENDPOINTS.DETALLE_JUSTIFICACION(id),
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al cargar el detalle de la solicitud.");
   }
 }
 
@@ -48,10 +85,14 @@ export async function asignarReemplazo(id: string, docenteId: string): Promise<S
   }
 }
 
-export async function aprobarJustificacion(id: string): Promise<MensajeSesion> {
+export async function aprobarJustificacion(
+  id: string,
+  confirmarTope = false,
+): Promise<MensajeSesion> {
   try {
     const { data } = await apiClient.patch<MensajeSesion>(
       SESIONES_ENDPOINTS.APROBAR_JUSTIFICACION(id),
+      confirmarTope ? { confirmarTope: true } : {},
     );
     return data;
   } catch (error) {
@@ -85,7 +126,7 @@ export async function corregirTema(id: string, tema: string): Promise<Sesion> {
 
 export async function solicitarJustificacion(
   id: string,
-  payload: { motivo: string; documentoUrl?: string },
+  payload: SolicitudJustificacionPayload,
 ): Promise<MensajeSesion> {
   try {
     const { data } = await apiClient.post<MensajeSesion>(

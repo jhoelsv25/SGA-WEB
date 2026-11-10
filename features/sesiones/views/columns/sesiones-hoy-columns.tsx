@@ -98,6 +98,11 @@ export function getSesionesHoyColumns({
                 Sin firma
               </StatusBadge>
             )}
+            {s.alertaSalida && (
+              <span role="alert" className="text-warning-text basis-full text-xs font-medium">
+                {s.alertaSalida}
+              </span>
+            )}
           </div>
         );
       },
