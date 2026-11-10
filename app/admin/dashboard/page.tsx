@@ -228,6 +228,13 @@ export default function DashboardPage() {
           {dashboardData?.docente && <DocenteDashboardView data={dashboardData.docente} />}
 
           {dashboardData?.estudiante && <EstudianteDashboardView data={dashboardData.estudiante} />}
+
+          {dashboardData?.rolCategoria === "adicional" && (
+            <EmptyState
+              title="Sin información para su rol."
+              description="Use los accesos rápidos para entrar a las opciones que tiene asignadas."
+            />
+          )}
         </>
       )}
 
