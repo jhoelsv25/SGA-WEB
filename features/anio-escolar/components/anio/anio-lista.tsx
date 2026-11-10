@@ -13,7 +13,7 @@ interface AnioListaProps {
 
 export function AnioLista({ anios, seleccionadoId, onSeleccionar }: AnioListaProps) {
   return (
-    <div className="flex flex-row gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
+    <div className="flex flex-row gap-2 overflow-x-auto pb-1">
       {anios.map((anio) => (
         <button
           key={anio.id}

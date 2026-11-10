@@ -102,12 +102,14 @@ export function AniosPage() {
           action: <Button onClick={() => setCrearAbierto(true)}>Crear el primer año</Button>,
         }}
       >
-        <div className="grid gap-4 lg:grid-cols-[16rem_1fr]">
-          <AnioLista
-            anios={anios}
-            seleccionadoId={seleccionado?.id ?? null}
-            onSeleccionar={setSeleccionadoId}
-          />
+        <div className="flex flex-col gap-4">
+          {anios.length > 1 ? (
+            <AnioLista
+              anios={anios}
+              seleccionadoId={seleccionado?.id ?? null}
+              onSeleccionar={setSeleccionadoId}
+            />
+          ) : null}
           {seleccionado ? (
             <AnioDetalle
               anio={seleccionado}
