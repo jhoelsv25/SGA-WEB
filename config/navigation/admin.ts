@@ -254,6 +254,22 @@ export const adminNavigation: NavSection[] = [
           "Fichas de seguimiento bimestral, cumplimiento de horas y decisiones del Director",
       },
       {
+        id: "admin-pendientes-seguimiento",
+        label: "Pendientes de seguimiento",
+        link: "/admin/pendientes-seguimiento",
+        icon: Task01Icon,
+        roles: ["admin"],
+        description: "Justificaciones, descargos, consolidados y compromisos por atender",
+      },
+      {
+        id: "admin-informe-horas-efectivas",
+        label: "Informe de horas efectivas",
+        link: "/admin/informe-horas-efectivas",
+        icon: Clock01Icon,
+        roles: ["admin"],
+        description: "Informe mensual de horas pedagógicas programadas, dictadas y perdidas",
+      },
+      {
         id: "admin-mi-seguimiento",
         label: "Mi seguimiento",
         link: "/admin/mi-seguimiento",

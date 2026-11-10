@@ -4,3 +4,5 @@ export * from "./metricas/consolidados-metricas";
 export * from "./forms";
 export * from "./modals";
 export * from "./compromisos";
+export * from "./pendientes";
+export * from "./informe";
