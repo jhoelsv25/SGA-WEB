@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import { Download01Icon, RefreshIcon, Clock01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PageHeader } from "@/components/common/page-header";
@@ -13,7 +14,12 @@ import { useListFilters } from "@/hooks/use-list-filters";
 import { toast } from "@/lib/toast";
 import { descargarFichaPdf, exportarExcel, obtenerSolicitudPendiente } from "../api";
 import { generarFiltroDefsConsolidados } from "../config";
-import { useConsolidadosQuery, useGenerarConsolidadosMutation } from "../hooks";
+import {
+  useCompromisoQuery,
+  useConsolidadosQuery,
+  useGenerarConsolidadosMutation,
+  useSolicitudPorEnlaceQuery,
+} from "../hooks";
 import type { ConsolidadoResumenItem, SolicitudRevisionItem } from "../types";
 import { ConsolidadosMetricas } from "./metricas/consolidados-metricas";
 import {
@@ -51,6 +57,14 @@ export function ConsolidadosVista() {
   const decisionFiltro = listFilters.getString("decision");
   const busquedaTexto = listFilters.getString("search");
 
+  // Enlaces de «Pendientes de seguimiento» (RF-013 V2, HU7): abren lo que se debe atender.
+  const searchParams = useSearchParams();
+  const consolidadoIdUrl = searchParams.get("consolidadoId") ?? "";
+  const compromisoIdUrl = searchParams.get("compromisoId") ?? "";
+  const solicitudIdUrl = searchParams.get("solicitudId") ?? "";
+  const docenteIdUrl = searchParams.get("docenteId") ?? "";
+  const [enlaceAtendido, setEnlaceAtendido] = React.useState(false);
+
   // Estado de exportación
   const [exportandoExcel, setExportandoExcel] = React.useState(false);
 
@@ -80,6 +94,28 @@ export function ConsolidadosVista() {
 
   const { mutateAsync: generarConsolidados, isPending: generando } =
     useGenerarConsolidadosMutation();
+
+  const { data: compromisoEnlace } = useCompromisoQuery(compromisoIdUrl, Boolean(compromisoIdUrl));
+  const { data: solicitudEnlace } = useSolicitudPorEnlaceQuery(
+    solicitudIdUrl,
+    consolidados,
+    Boolean(solicitudIdUrl) && !isLoading,
+  );
+
+  const detalleDesdeEnlace = consolidadoIdUrl || compromisoEnlace?.compromiso.consolidadoId || null;
+  const detalleAbiertoId = detalleId ?? (enlaceAtendido ? null : detalleDesdeEnlace);
+  const abiertoPorEnlace = detalleId === null && detalleAbiertoId !== null;
+  const solicitudAbierta = solicitudResolver ?? (enlaceAtendido ? null : (solicitudEnlace ?? null));
+
+  const docenteSinConsolidado =
+    Boolean(docenteIdUrl) &&
+    Boolean(periodoActivo) &&
+    !isLoading &&
+    !consolidados.some((c) => c.docenteId === docenteIdUrl);
+
+  const handleGenerarDelDocente = async () => {
+    await generarConsolidados({ periodoId: periodoActivo, docenteId: docenteIdUrl });
+  };
 
   const handleGenerar = async () => {
     if (!periodoActivo) {
@@ -215,6 +251,19 @@ export function ConsolidadosVista() {
         actions={headerActions}
       />
 
+      {docenteSinConsolidado && esDirectorOAdmin && (
+        <div className="border-border/60 bg-card flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 text-xs shadow-xs">
+          <p className="text-foreground">
+            El docente elegido en «Pendientes de seguimiento» aún no tiene consolidado en este
+            bimestre.
+          </p>
+          <Button size="sm" onClick={handleGenerarDelDocente} disabled={generando}>
+            {generando ? <Spinner className="size-3.5" /> : null}
+            <span>Generar consolidado de este docente</span>
+          </Button>
+        </div>
+      )}
+
       {/* Métricas consolidadas del bimestre */}
       <ConsolidadosMetricas
         totalDocentes={totalDocentes}
@@ -254,9 +303,16 @@ export function ConsolidadosVista() {
 
       {/* Modales desacoplados */}
       <ModalDetalleConsolidado
-        consolidadoId={detalleId}
-        abierto={Boolean(detalleId)}
-        onOpenChange={(abierto) => !abierto && setDetalleId(null)}
+        key={detalleAbiertoId ?? "cerrado"}
+        consolidadoId={detalleAbiertoId}
+        abierto={Boolean(detalleAbiertoId)}
+        onOpenChange={(abierto) => {
+          if (abierto) return;
+          setDetalleId(null);
+          setEnlaceAtendido(true);
+        }}
+        pestanaInicial={abiertoPorEnlace && compromisoIdUrl ? "compromisos" : "sesiones"}
+        compromisoIdInicial={abiertoPorEnlace ? compromisoIdUrl || null : null}
         onAbrirDecision={(c) => setConsolidadoDecision(c)}
         onAbrirReabrir={(c) => setConsolidadoReabrir(c)}
         onAbrirCerrar={(c) => setConsolidadoCerrar(c)}
@@ -288,9 +344,13 @@ export function ConsolidadosVista() {
       />
 
       <ModalResolverSolicitud
-        solicitud={solicitudResolver}
-        abierto={Boolean(solicitudResolver)}
-        onOpenChange={(abierto) => !abierto && setSolicitudResolver(null)}
+        solicitud={solicitudAbierta}
+        abierto={Boolean(solicitudAbierta)}
+        onOpenChange={(abierto) => {
+          if (abierto) return;
+          setSolicitudResolver(null);
+          setEnlaceAtendido(true);
+        }}
       />
     </div>
   );

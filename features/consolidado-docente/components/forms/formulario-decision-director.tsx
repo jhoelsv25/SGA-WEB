@@ -40,14 +40,19 @@ export function FormularioDecisionDirector({
   });
 
   const onSubmit = async (values: DecisionDirectorFormValues) => {
-    await registrarDecision({
-      id: consolidado.id,
-      dto: {
-        decision: values.decision,
-        observacion: values.observacion?.trim() || undefined,
-      },
-    });
-    onCerrar();
+    try {
+      await registrarDecision({
+        id: consolidado.id,
+        dto: {
+          decision: values.decision,
+          observacion: values.observacion?.trim() || undefined,
+        },
+      });
+      onCerrar();
+    } catch {
+      // Si la API la rechaza (por ejemplo, con compromisos pendientes), el mensaje ya se
+      // muestra en el aviso de error y el formulario queda abierto.
+    }
   };
 
   return (

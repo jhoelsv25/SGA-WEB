@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   listarCompromisos,
+  obtenerSolicitudPendiente,
   listarConsolidadosPeriodo,
   obtenerCompromiso,
   obtenerPendientes,
@@ -10,7 +11,12 @@ import {
   obtenerHistorialVersiones,
   obtenerMiSeguimiento,
 } from "../api";
-import type { ConsolidadoQueryDto, PendientesQueryDto } from "../types";
+import type {
+  ConsolidadoQueryDto,
+  ConsolidadoResumenItem,
+  PendientesQueryDto,
+  SolicitudRevisionItem,
+} from "../types";
 import { consolidadoKeys } from "./consolidado-keys";
 
 export function useConsolidadosQuery(query: ConsolidadoQueryDto, enabled = true) {
@@ -72,6 +78,32 @@ export function usePendientesSeguimientoQuery(query: PendientesQueryDto, enabled
     queryKey: consolidadoKeys.pendientes(query),
     queryFn: () => obtenerPendientes(query),
     enabled,
+    staleTime: 15_000,
+  });
+}
+
+/**
+ * El enlace de «Pendientes de seguimiento» trae solo el id de la solicitud. Entre los
+ * consolidados del bimestre con solicitudes pendientes se busca a cuál pertenece.
+ */
+export function useSolicitudPorEnlaceQuery(
+  solicitudId: string,
+  consolidados: readonly ConsolidadoResumenItem[],
+  enabled = true,
+) {
+  const candidatos = consolidados
+    .filter((c) => (c.solicitudesPendientesCount ?? 0) > 0)
+    .map((c) => c.id);
+  return useQuery<SolicitudRevisionItem | null>({
+    queryKey: [...consolidadoKeys.all, "solicitud-por-enlace", solicitudId, candidatos],
+    queryFn: async () => {
+      for (const consolidadoId of candidatos) {
+        const solicitud = await obtenerSolicitudPendiente(consolidadoId);
+        if (solicitud?.id === solicitudId) return solicitud;
+      }
+      return null;
+    },
+    enabled: Boolean(solicitudId) && candidatos.length > 0 && enabled,
     staleTime: 15_000,
   });
 }

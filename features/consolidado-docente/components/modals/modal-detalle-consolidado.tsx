@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
 import { descargarFichaPdf } from "../../api";
 import { DECISIONES_CONSOLIDADO_CONFIG, ESTADOS_CONSOLIDADO_CONFIG } from "../../consts";
-import { useDetalleConsolidadoQuery } from "../../hooks";
+import { useCompromisosQuery, useDetalleConsolidadoQuery } from "../../hooks";
 import type { ConsolidadoResumenItem } from "../../types";
+import { CompromisosPanel } from "../compromisos";
 import { HorasPedagogicasCards } from "../metricas/horas-pedagogicas-cards";
 import {
   getDetalleAusenciasColumns,
@@ -28,7 +29,13 @@ export interface ModalDetalleConsolidadoProps {
   onAbrirReabrir?: (consolidado: ConsolidadoResumenItem) => void;
   onAbrirCerrar?: (consolidado: ConsolidadoResumenItem) => void;
   esDirectorOAdmin?: boolean;
+  /** Pestaña con la que se abre; los enlaces de pendientes abren «compromisos». */
+  pestanaInicial?: PestanaDetalle;
+  /** Compromiso cuyo detalle se abre al llegar desde un enlace de pendientes. */
+  compromisoIdInicial?: string | null;
 }
+
+export type PestanaDetalle = "sesiones" | "ausencias" | "compromisos";
 
 export function ModalDetalleConsolidado({
   consolidadoId,
@@ -38,11 +45,18 @@ export function ModalDetalleConsolidado({
   onAbrirReabrir,
   onAbrirCerrar,
   esDirectorOAdmin = false,
+  pestanaInicial = "sesiones",
+  compromisoIdInicial = null,
 }: ModalDetalleConsolidadoProps) {
   const [descargandoPdf, setDescargandoPdf] = React.useState(false);
-  const [pestana, setPestana] = React.useState<"sesiones" | "ausencias">("sesiones");
+  const [pestana, setPestana] = React.useState<PestanaDetalle>(pestanaInicial);
 
   const { data, isLoading } = useDetalleConsolidadoQuery(
+    consolidadoId ?? "",
+    abierto && Boolean(consolidadoId),
+  );
+
+  const { data: compromisos = [] } = useCompromisosQuery(
     consolidadoId ?? "",
     abierto && Boolean(consolidadoId),
   );
@@ -251,6 +265,14 @@ export function ModalDetalleConsolidado({
             >
               Ausencias e Incidencias ({todasLasAusencias.length})
             </Button>
+            <Button
+              variant={pestana === "compromisos" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setPestana("compromisos")}
+              className="h-8 text-xs"
+            >
+              Compromisos ({compromisos.length})
+            </Button>
           </div>
 
           {pestana === "sesiones" ? (
@@ -260,6 +282,12 @@ export function ModalDetalleConsolidado({
               pagination={false}
               caption="Registro de sesiones de clase del bimestre"
               emptyMessage="No hay sesiones registradas en este periodo."
+            />
+          ) : pestana === "compromisos" ? (
+            <CompromisosPanel
+              consolidado={consolidado}
+              puedeGestionar={esDirectorOAdmin}
+              compromisoIdInicial={compromisoIdInicial}
             />
           ) : (
             <DataTable

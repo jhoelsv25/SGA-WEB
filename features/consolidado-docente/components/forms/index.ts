@@ -3,3 +3,7 @@ export * from "./formulario-reabrir-consolidado";
 export * from "./formulario-cerrar-consolidado";
 export * from "./formulario-solicitar-revision";
 export * from "./formulario-resolver-solicitud";
+export * from "./formulario-registrar-compromiso";
+export * from "./formulario-cerrar-compromiso";
+export * from "./formulario-reprogramar-compromiso";
+export * from "./formulario-anular-compromiso";

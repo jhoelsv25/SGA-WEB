@@ -5,3 +5,5 @@ export * from "./modal-solicitar-revision";
 export * from "./modal-resolver-solicitud";
 export * from "./modal-historial-versiones";
 export * from "./modal-detalle-consolidado";
+export * from "./modales-compromiso";
+export * from "./modal-detalle-compromiso";
