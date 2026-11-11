@@ -101,7 +101,7 @@ export function EntregasTareaModal({
                     <div className="flex items-center gap-3">
                       <div className="text-right">
                         <span className="text-sm font-bold">
-                          {ent.nota !== null ? `${ent.nota.toFixed(2)} pts` : "Sin calificar"}
+                          {ent.nota !== null ? `Nota: ${ent.nota.toFixed(1)}` : "Sin calificar"}
                         </span>
                       </div>
                       <Button

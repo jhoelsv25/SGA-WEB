@@ -152,6 +152,21 @@ export async function calificarEntrega(
   return data;
 }
 
+export async function calificarDirecto(
+  tareaId: string,
+  payload: {
+    matriculaId: string;
+    nota: number;
+    retroalimentacion?: string;
+  },
+): Promise<{ mensaje: string; entrega: Entrega }> {
+  const { data } = await apiClient.post<{ mensaje: string; entrega: Entrega }>(
+    `${BASE}/tareas/${tareaId}/calificar-directo`,
+    payload,
+  );
+  return data;
+}
+
 export async function getLibroNotas(
   cursoSeccionId: string,
   periodoId?: string,

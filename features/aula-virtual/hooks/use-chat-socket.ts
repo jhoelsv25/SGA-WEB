@@ -51,6 +51,11 @@ export function useChatSocket(cursoSeccionId: string) {
         }
         return [...anteriores, nuevoMensaje];
       });
+
+      // Actualizar conteo de no leídos en tiempo real vía socket (cero polling HTTP)
+      queryClient.setQueryData<number>(aulaKeys.chatNoLeidos(cursoSeccionId), (actual) =>
+        typeof actual === "number" ? actual + 1 : 1,
+      );
     });
 
     // Escuchar eventos de moderación (ocultado / restaurado)
