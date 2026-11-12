@@ -20,6 +20,7 @@ export function usePanelMarcacionesHoy() {
     queryKey: marcacionesKeys.panel(anio?.id),
     queryFn: getPanelMarcacionesHoy,
     refetchInterval: INTERVALO_PANEL_MS,
+    refetchIntervalInBackground: false,
     staleTime: 10_000,
     gcTime: 5 * 60_000,
   });

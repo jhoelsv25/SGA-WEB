@@ -33,6 +33,7 @@ export function usePanelSesionesHoy() {
     queryKey: sesionesKeys.panel(anio?.id),
     queryFn: getPanelSesionesHoy,
     refetchInterval: INTERVALO_PANEL_SESIONES_MS,
+    refetchIntervalInBackground: false,
     staleTime: 10_000,
     gcTime: 5 * 60_000,
   });

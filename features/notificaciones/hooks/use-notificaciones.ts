@@ -29,8 +29,8 @@ export function useNotificacionesConteoQuery() {
   return useQuery<{ unreadCount: number }, ApiClientError>({
     queryKey: NOTIFICACIONES_CONTEO_KEY,
     queryFn: getNotificacionesConteo,
-    staleTime: 1000 * 60 * 3, // 3 minutos de frescura
-    refetchOnWindowFocus: true, // Revalida solo si el usuario vuelve a enfocar la ventana
+    staleTime: 1000 * 60 * 5, // 5 minutos de frescura
+    refetchOnWindowFocus: false, // La invalidación se realiza en tiempo real mediante SSE
   });
 }
 
