@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+.github
+.agents
+.vscode
+*.log
+.env
+.env.*
+!.env.example
