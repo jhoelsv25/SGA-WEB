@@ -8,6 +8,7 @@ import { Modal } from "@/components/common/modal";
 import { Spinner } from "@/components/common/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ResumenObservacionConsolidado } from "@/features/observaciones-aula/components/resumen-consolidado";
 import { toast } from "@/lib/toast";
 import { descargarFichaPdf } from "../../api";
 import { DECISIONES_CONSOLIDADO_CONFIG, ESTADOS_CONSOLIDADO_CONFIG } from "../../consts";
@@ -236,6 +237,11 @@ export function ModalDetalleConsolidado({
           </div>
 
           <HorasPedagogicasCards consolidado={consolidado} />
+
+          <ResumenObservacionConsolidado
+            docenteId={consolidado.docenteId}
+            periodoId={consolidado.periodoId}
+          />
 
           {/* Observaciones del Director */}
           {consolidado.observacion && (
