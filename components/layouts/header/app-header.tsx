@@ -4,6 +4,7 @@ import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { HeaderNotificationBell } from "@/features/notificaciones";
+import { HeaderSesionDocente } from "@/features/sesiones";
 import { useOptionalDashboardRole } from "../dashboard-role-context";
 import type { UserProfileData } from "../sidebar/nav-user";
 import { HeaderAcademicYearSelect } from "./header-academic-year";
@@ -28,6 +29,7 @@ export function AppHeader({ user }: AppHeaderProps) {
         <HeaderLiveClock />
         <HeaderAcademicYearSelect />
 
+        <HeaderSesionDocente />
         <HeaderNotificationBell />
 
         <ThemeToggle />

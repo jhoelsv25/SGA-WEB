@@ -9,7 +9,6 @@ import { siteConfig } from "@/config";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   LogInIcon,
-  Time02Icon,
   Menu01Icon,
   Cancel01Icon,
   Home01Icon,
@@ -21,9 +20,9 @@ import {
 
 const NAV_LINKS = [
   { label: "Inicio", href: "/#inicio", icon: Home01Icon },
-  { label: "Módulos", href: "/#modulos", icon: GridIcon },
-  { label: "Características", href: "/#caracteristicas", icon: FlashIcon },
-  { label: "Normativa", href: siteConfig.routes.privacy, icon: FileTextIcon },
+  { label: "Comunidad", href: "/#modulos", icon: GridIcon },
+  { label: "Servicios", href: "/#caracteristicas", icon: FlashIcon },
+  { label: "Guía rápida", href: "/#faq", icon: FileTextIcon },
   { label: "Contacto", href: "/#contacto", icon: MailAtSign01Icon },
 ];
 
@@ -79,21 +78,6 @@ export function PortalNavbar() {
 
           {/* Divider */}
           <div className="bg-border mx-1 h-5 w-px" />
-
-          {/* Kiosko */}
-          <Button
-            asChild
-            variant="ghost"
-            size="sm"
-            className="hover:bg-muted/70 group h-9 gap-2 rounded-full px-4 font-medium"
-          >
-            <Link href={siteConfig.routes.kiosk}>
-              <HugeiconsIcon icon={Time02Icon} className="text-primary size-4" />
-              <span className="text-muted-foreground group-hover:text-foreground transition-colors">
-                Kiosko de marcación
-              </span>
-            </Link>
-          </Button>
 
           {/* Login CTA */}
           <Button
@@ -157,30 +141,16 @@ export function PortalNavbar() {
 
           {/* Divider */}
           <div className="border-border/50 border-t pt-4">
-            <div className="grid grid-cols-2 gap-2.5">
-              <Button
-                asChild
-                variant="outline"
-                className="h-10 w-full gap-2 rounded-xl font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Link href={siteConfig.routes.kiosk}>
-                  <HugeiconsIcon icon={Time02Icon} className="text-primary size-4" />
-                  Kiosko de marcación
-                </Link>
-              </Button>
-
-              <Button
-                asChild
-                className="h-10 w-full gap-2 rounded-xl font-semibold"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Link href={siteConfig.routes.login}>
-                  <HugeiconsIcon icon={LogInIcon} className="size-4" />
-                  Iniciar sesión
-                </Link>
-              </Button>
-            </div>
+            <Button
+              asChild
+              className="h-10 w-full gap-2 rounded-xl font-semibold"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Link href={siteConfig.routes.login}>
+                <HugeiconsIcon icon={LogInIcon} className="size-4" />
+                Iniciar sesión
+              </Link>
+            </Button>
           </div>
 
           {/* Footer info */}

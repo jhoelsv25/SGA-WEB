@@ -53,17 +53,17 @@ export function PortalFooter() {
                   href={siteConfig.routes.kiosk}
                   className="hover:text-primary transition-colors"
                 >
-                  Kiosko de marcación
+                  Registro de asistencia
                 </Link>
               </li>
               <li>
                 <Link href="/#modulos" className="hover:text-primary transition-colors">
-                  Módulos de Acceso
+                  Comunidad educativa
                 </Link>
               </li>
               <li>
                 <Link href="/#caracteristicas" className="hover:text-primary transition-colors">
-                  Capacidades del Sistema
+                  Servicios del colegio
                 </Link>
               </li>
             </ul>

@@ -3,6 +3,7 @@ import { SESIONES_ENDPOINTS } from "../consts";
 import type {
   CredencialesKiosko,
   MensajeSesion,
+  MiJornadaHoy,
   MisSesiones,
   PanelSesiones,
   Sesion,
@@ -36,6 +37,35 @@ export async function getMisSesiones(desde: string, hasta: string): Promise<MisS
     return data;
   } catch (error) {
     handleApiError(error, "Error al cargar sus sesiones de clase.");
+  }
+}
+
+export async function getMiJornadaHoy(): Promise<MiJornadaHoy> {
+  try {
+    const { data } = await apiClient.get<MiJornadaHoy>(SESIONES_ENDPOINTS.MI_JORNADA_HOY);
+    return data;
+  } catch (error) {
+    handleApiError(error, "Error al cargar las sesiones de hoy.");
+  }
+}
+
+export async function firmarIngresoWeb(id: string, tema: string): Promise<MensajeSesion> {
+  try {
+    const { data } = await apiClient.post<MensajeSesion>(SESIONES_ENDPOINTS.FIRMAR_INGRESO(id), {
+      tema,
+    });
+    return data;
+  } catch (error) {
+    handleApiError(error, "No se pudo firmar el ingreso de la sesión.");
+  }
+}
+
+export async function firmarSalidaWeb(id: string): Promise<MensajeSesion> {
+  try {
+    const { data } = await apiClient.post<MensajeSesion>(SESIONES_ENDPOINTS.FIRMAR_SALIDA(id));
+    return data;
+  } catch (error) {
+    handleApiError(error, "No se pudo firmar la salida de la sesión.");
   }
 }
 

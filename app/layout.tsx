@@ -73,20 +73,11 @@ export const metadata: Metadata = {
     siteName: `${siteConfig.acronym} · ${siteConfig.institution.shortName}`,
     title: `${siteConfig.name} | ${siteConfig.institution.shortName}`,
     description: siteConfig.description,
-    images: [
-      {
-        url: siteConfig.branding.logo,
-        width: 800,
-        height: 800,
-        alt: `Insignia Institucional - ${siteConfig.institution.badge}`,
-      },
-    ],
   },
   twitter: {
     card: siteConfig.seo.twitterCard,
     title: `${siteConfig.name} | ${siteConfig.institution.shortName}`,
     description: siteConfig.description,
-    images: [siteConfig.branding.logo],
   },
   robots: {
     index: true,
