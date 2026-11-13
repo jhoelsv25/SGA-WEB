@@ -8,7 +8,9 @@ import {
   Key01Icon,
   LockKeyIcon,
   CheckmarkCircle02Icon,
+  ViewIcon,
 } from "@hugeicons/core-free-icons";
+import { useImpersonate, useSession } from "@/features/auth";
 import {
   useDeactivateUserMutation,
   useReactivateUserMutation,
@@ -31,6 +33,8 @@ export function UserActions({
   onUpdateUsername,
   onResetPassword,
 }: UserActionsProps) {
+  const { data: session } = useSession();
+  const impersonateMutation = useImpersonate();
   const unlockMutation = useUnlockUserMutation();
   const deactivateMutation = useDeactivateUserMutation();
   const reactivateMutation = useReactivateUserMutation();
@@ -40,7 +44,22 @@ export function UserActions({
   const isInactive = user.estado === "inactivo";
   const isActive = user.estado === "activo";
 
+  const rolActivo = session?.user?.activeRoleName ?? session?.user?.roles?.[0] ?? "";
+  const puedeSimular =
+    ["Administrador", "Soporte TI"].includes(rolActivo) &&
+    !session?.user?.impersonatedBy &&
+    isActive &&
+    !isSelf;
+
   const actionItems = [];
+
+  if (puedeSimular) {
+    actionItems.push({
+      label: "Ver como este usuario",
+      icon: ViewIcon,
+      onClick: () => impersonateMutation.mutate({ userId: user.id }),
+    });
+  }
 
   // Gestionar roles (un usuario activo puede agregar o cambiar sus roles secundarios)
   if (!isInactive) {

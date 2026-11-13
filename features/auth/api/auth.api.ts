@@ -55,6 +55,29 @@ export const authApi = {
     }
   },
 
+  /** Inicia una vista simulada como otro usuario (solo Administrador / Soporte TI). */
+  async impersonate(userId: string, roleId?: string): Promise<AuthResponse> {
+    try {
+      const { data } = await apiClient.post<AuthResponse>("/auth/impersonate", {
+        userId,
+        roleId,
+      });
+      return data;
+    } catch (error) {
+      handleApiError(error, "No se pudo ingresar en vista simulada.");
+    }
+  },
+
+  /** Sale de la vista simulada y restaura la sesión de Administrador / Soporte TI. */
+  async stopImpersonate(): Promise<AuthResponse> {
+    try {
+      const { data } = await apiClient.post<AuthResponse>("/auth/stop-impersonate");
+      return data;
+    } catch (error) {
+      handleApiError(error, "No se pudo restaurar la sesión original.");
+    }
+  },
+
   async checkToken(): Promise<AuthResponse> {
     try {
       const { data } = await apiClient.get<AuthResponse>("/auth/check-token");

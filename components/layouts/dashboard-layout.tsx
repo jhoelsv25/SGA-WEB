@@ -8,6 +8,7 @@ import type { UserProfileData } from "./sidebar/nav-user";
 import { AnioLectivoProvider } from "@/features/anio-escolar/anio-lectivo-context";
 import { useOptionalDashboardRole } from "./dashboard-role-context";
 import { PushNotificationPromptToast } from "@/features/notificaciones/components";
+import { ImpersonationBanner } from "@/features/auth";
 
 export interface Props {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ export function DashboardLayout({ children, user: userProp, defaultOpen = true }
       <SidebarProvider defaultOpen={defaultOpen}>
         <AppSidebar />
         <SidebarInset className="bg-background flex h-dvh flex-col overflow-hidden">
+          <ImpersonationBanner />
           <AppHeader user={activeUser} />
           <div className="bg-background min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-6 lg:p-8">
             <div className="animate-in fade-in duration-300">{children}</div>
