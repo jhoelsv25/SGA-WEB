@@ -25,18 +25,22 @@ export function AppHeader({ user }: AppHeaderProps) {
         <SidebarTrigger className="text-muted-foreground hover:text-foreground -ml-1 size-11 shrink-0" />
       </div>
 
-      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
         <HeaderLiveClock />
         <HeaderAcademicYearSelect />
 
+        <Separator
+          orientation="vertical"
+          className="mx-1 hidden data-[orientation=vertical]:h-4 sm:block"
+        />
+
         <HeaderSesionDocente />
         <HeaderNotificationBell />
-
         <ThemeToggle />
 
         <Separator
           orientation="vertical"
-          className="mx-0.5 hidden data-[orientation=vertical]:h-4 sm:block"
+          className="mx-1 hidden data-[orientation=vertical]:h-4 sm:block"
         />
 
         <HeaderUserMenu user={activeUser} />

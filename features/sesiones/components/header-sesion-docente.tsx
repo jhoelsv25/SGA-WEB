@@ -80,16 +80,16 @@ export function HeaderSesionDocente() {
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground relative h-9 gap-1.5 rounded-full px-2.5"
-          aria-label="Mis clases de hoy y firma de sesión"
+          size="icon"
+          title="Mis sesiones de hoy"
+          className="text-muted-foreground hover:text-foreground relative size-9 rounded-full"
+          aria-label="Mis sesiones de hoy y firma"
         >
-          <HugeiconsIcon icon={BookOpen01Icon} size={17} strokeWidth={2} />
-          <span className="hidden text-xs font-medium lg:inline">Mi clase</span>
+          <HugeiconsIcon icon={BookOpen01Icon} className="size-5" />
           {(hayEnCurso || hayPorFirmarEnVentana) && (
             <span
               className={cn(
-                "size-2 rounded-full",
+                "ring-background absolute top-1 right-1 size-2 rounded-full ring-2",
                 hayEnCurso ? "bg-emerald-500" : "animate-pulse bg-amber-500",
               )}
             />
@@ -100,12 +100,12 @@ export function HeaderSesionDocente() {
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-85 max-w-[calc(100vw-1rem)] p-0 sm:w-93"
+        className="border-border/70 w-80 overflow-hidden rounded-2xl p-0 shadow-xl sm:w-96"
       >
-        <div className="border-border/60 flex items-center justify-between border-b px-4 py-3">
+        <div className="border-border/50 bg-muted/30 flex items-center justify-between border-b px-4 py-3">
           <div>
-            <p className="text-sm font-semibold">Sesiones de hoy</p>
-            <p className="text-muted-foreground flex items-center gap-1 text-xs">
+            <p className="text-foreground text-xs font-bold">Sesiones de hoy</p>
+            <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-[11px]">
               <HugeiconsIcon icon={Clock01Icon} size={12} strokeWidth={2} />
               <span>Hora actual: {reloj.hhmm}</span>
             </p>
@@ -113,7 +113,7 @@ export function HeaderSesionDocente() {
           <Link
             href={MENU_MIS_SESIONES}
             onClick={() => setOpen(false)}
-            className="text-primary text-xs font-medium hover:underline"
+            className="text-primary text-xs font-semibold hover:underline"
           >
             Ver historial
           </Link>
@@ -126,9 +126,26 @@ export function HeaderSesionDocente() {
               <span>Cargando sesiones de hoy...</span>
             </div>
           ) : sesiones.length === 0 ? (
-            <p className="text-muted-foreground py-4 text-center text-xs">
-              No tiene sesiones programadas para hoy.
-            </p>
+            <div className="flex flex-col items-center justify-center gap-2 py-5 text-center">
+              <span className="bg-muted text-muted-foreground flex size-10 items-center justify-center rounded-full">
+                <HugeiconsIcon icon={BookOpen01Icon} className="size-5" />
+              </span>
+              <p className="text-foreground text-xs font-semibold">
+                Sin sesiones programadas para hoy
+              </p>
+              <p className="text-muted-foreground text-[11px]">
+                Puedes revisar tu historial o justificaciones cuando lo necesites.
+              </p>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="mt-1 h-8 rounded-full px-4 text-xs"
+                onClick={() => setOpen(false)}
+              >
+                <Link href={MENU_MIS_SESIONES}>Ir a Mis sesiones</Link>
+              </Button>
+            </div>
           ) : (
             <>
               <ul className="max-h-44 space-y-1.5 overflow-y-auto pr-0.5">
