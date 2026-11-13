@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,14 +11,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/common/spinner";
 import { SelectOption } from "@/components/common/select";
 import { DatePicker } from "@/components/common/date-picker";
+import { formatDate } from "@/lib/formatters/date";
+import type { Bimestre } from "@/features/anio-escolar/types";
 import { useCrearUnidad, useActualizarUnidad } from "../../hooks";
 import { formatearBimestre } from "../../utils";
 import type { Unidad } from "../../types";
-
-interface Bimestre {
-  id: string;
-  nombre: string;
-}
 
 interface UnidadFormProps {
   cursoSeccionId: string;
@@ -46,15 +45,60 @@ export function UnidadForm({
   onCancel,
   onSuccess,
 }: UnidadFormProps) {
+  // 1. Preseleccionar automáticamente el bimestre activo ("en_curso")
+  const periodoPorDefecto = React.useMemo(() => {
+    if (unidad?.periodoId) return unidad.periodoId;
+    const enCurso = bimestres.find((b) => b.estado === "en_curso");
+    if (enCurso) return enCurso.id;
+    const planificado = bimestres.find((b) => b.estado === "planificado");
+    if (planificado) return planificado.id;
+    return bimestres[0]?.id ?? "";
+  }, [unidad?.periodoId, bimestres]);
+
+  const [periodoId, setPeriodoId] = React.useState(periodoPorDefecto);
+
+  const bimestreSeleccionado = React.useMemo(() => {
+    return bimestres.find((b) => b.id === periodoId);
+  }, [bimestres, periodoId]);
+
   const [titulo, setTitulo] = React.useState(unidad?.titulo ?? "");
   const [descripcion, setDescripcion] = React.useState(unidad?.descripcion ?? "");
-  const [periodoId, setPeriodoId] = React.useState(unidad?.periodoId ?? bimestres[0]?.id ?? "");
   const [fechaInicio, setFechaInicio] = React.useState<Date | undefined>(
-    aFecha(unidad?.fechaInicio),
+    aFecha(unidad?.fechaInicio) ?? (unidad ? undefined : aFecha(bimestreSeleccionado?.fechaInicio)),
   );
-  const [fechaFin, setFechaFin] = React.useState<Date | undefined>(aFecha(unidad?.fechaFin));
+  const [fechaFin, setFechaFin] = React.useState<Date | undefined>(
+    aFecha(unidad?.fechaFin) ?? (unidad ? undefined : aFecha(bimestreSeleccionado?.fechaFin)),
+  );
   const [publicada, setPublicada] = React.useState(unidad?.publicada ?? true);
   const [error, setError] = React.useState<string | null>(null);
+
+  const handleCambiarBimestre = (nuevoId: string) => {
+    setPeriodoId(nuevoId);
+    if (!unidad) {
+      const nuevoBimestre = bimestres.find((b) => b.id === nuevoId);
+      if (nuevoBimestre) {
+        setFechaInicio(aFecha(nuevoBimestre.fechaInicio));
+        setFechaFin(aFecha(nuevoBimestre.fechaFin));
+      }
+    }
+  };
+
+  const opcionesBimestre = React.useMemo(() => {
+    return bimestres.map((b) => {
+      const cerrado = b.estado === "cerrado";
+      const enCurso = b.estado === "en_curso";
+      let tag = "";
+      if (enCurso) tag = " • En curso";
+      else if (cerrado) tag = " (Cerrado)";
+
+      return {
+        value: b.id,
+        label: `${formatearBimestre(b.nombre)}${tag}`,
+        disabled: !unidad && cerrado,
+        description: cerrado ? "Periodo finalizado (no admite nuevas unidades)" : undefined,
+      };
+    });
+  }, [bimestres, unidad]);
 
   const crear = useCrearUnidad(cursoSeccionId);
   const actualizar = useActualizarUnidad();
@@ -64,6 +108,14 @@ export function UnidadForm({
     event.preventDefault();
     if (!titulo.trim()) {
       setError("Ingrese el título de la unidad.");
+      return;
+    }
+    if (!periodoId) {
+      setError("Seleccione un bimestre válido.");
+      return;
+    }
+    if (!unidad && bimestreSeleccionado?.estado === "cerrado") {
+      setError("El bimestre está cerrado. No se pueden crear unidades en periodos finalizados.");
       return;
     }
     if (!fechaInicio || !fechaFin) {
@@ -112,6 +164,7 @@ export function UnidadForm({
           id="unidad-descripcion"
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
+          placeholder="Describe los temas o competencias que se desarrollarán en esta unidad..."
           maxLength={1000}
           disabled={mutacion.isPending}
         />
@@ -119,12 +172,18 @@ export function UnidadForm({
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">Bimestre *</Label>
         <SelectOption
-          options={bimestres.map((b) => ({ value: b.id, label: formatearBimestre(b.nombre) }))}
+          options={opcionesBimestre}
           value={periodoId}
-          onSelect={setPeriodoId}
+          onSelect={handleCambiarBimestre}
           placeholder="Seleccionar bimestre..."
           disabled={mutacion.isPending}
         />
+        {bimestreSeleccionado && (
+          <p className="text-muted-foreground text-[11px]">
+            Vigencia del periodo: {formatDate(bimestreSeleccionado.fechaInicio)} al{" "}
+            {formatDate(bimestreSeleccionado.fechaFin)}
+          </p>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
@@ -147,12 +206,17 @@ export function UnidadForm({
       </div>
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">
-        <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
-          Cancelar
+        <Button type="button" variant="outline" className="min-h-10 gap-2" onClick={onCancel}>
+          <HugeiconsIcon icon={Cancel01Icon} size={16} />
+          <span>Cancelar</span>
         </Button>
         <Button type="submit" disabled={mutacion.isPending} className="min-h-10 gap-2">
-          {mutacion.isPending && <Spinner className="size-4" />}
-          Guardar
+          {mutacion.isPending ? (
+            <Spinner className="size-4" />
+          ) : (
+            <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} />
+          )}
+          <span>{unidad ? "Guardar cambios" : "Crear unidad"}</span>
         </Button>
       </div>
     </form>

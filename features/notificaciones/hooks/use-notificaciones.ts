@@ -29,7 +29,8 @@ export function useNotificacionesConteoQuery() {
   return useQuery<{ unreadCount: number }, ApiClientError>({
     queryKey: NOTIFICACIONES_CONTEO_KEY,
     queryFn: getNotificacionesConteo,
-    refetchInterval: 30000, // Revalidación pasiva cada 30 segundos
+    staleTime: 1000 * 60 * 5, // 5 minutos de frescura
+    refetchOnWindowFocus: false, // La invalidación se realiza en tiempo real mediante SSE
   });
 }
 

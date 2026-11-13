@@ -3,92 +3,118 @@ import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/config";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
-  Shield01Icon,
-  Time02Icon,
   Award01Icon,
   DatabaseIcon,
   LockIcon,
+  Shield01Icon,
   SmartPhone01Icon,
+  Time02Icon,
 } from "@hugeicons/core-free-icons";
 
-const CARACTERISTICAS: { icono: IconSvgElement; titulo: string; detalle: string }[] = [
+interface ServicioItem {
+  numero: string;
+  icono: IconSvgElement;
+  titulo: string;
+  detalle: string;
+}
+
+const SERVICIOS: ServicioItem[] = [
   {
-    icono: LockIcon,
-    titulo: "Acceso por rol",
-    detalle:
-      "Cada cuenta entra con un rol y ve solo el menú que el administrador le asignó. La cuenta se bloquea tras varios intentos fallidos.",
-  },
-  {
+    numero: "01",
     icono: Time02Icon,
     titulo: "Marcación en equipos autorizados",
     detalle:
-      "La asistencia solo se registra en equipos del colegio que Soporte TI autorizó, sin depender del GPS del celular.",
+      "La asistencia se registra en kioskos habilitados por Soporte TI dentro del colegio, con cálculo automático de tardanzas según turno y compatibilidad con lector biométrico.",
   },
   {
-    icono: DatabaseIcon,
-    titulo: "Bitácora de auditoría",
-    detalle:
-      "Los cambios importantes quedan registrados con el usuario, la fecha y el detalle de lo que cambió.",
-  },
-  {
+    numero: "02",
     icono: Award01Icon,
-    titulo: "Libretas del SIAGIE",
+    titulo: "Libretas oficiales del SIAGIE",
     detalle:
-      "La libreta oficial se descarga del SIAGIE en PDF y queda disponible para el estudiante y su apoderado.",
+      "Las boletas oficiales se publican en PDF para descarga directa de estudiantes y apoderados al cierre de cada bimestre.",
   },
   {
+    numero: "03",
+    icono: LockIcon,
+    titulo: "Acceso estricto por rol",
+    detalle:
+      "Cada cuenta ve únicamente las herramientas de su perfil y bloquea el acceso ante intentos fallidos repetidos.",
+  },
+  {
+    numero: "04",
+    icono: DatabaseIcon,
+    titulo: "Trazabilidad y auditoría",
+    detalle:
+      "Cada cambio relevante en notas, asistencias o matrículas queda registrado con usuario, fecha y detalle.",
+  },
+  {
+    numero: "05",
     icono: SmartPhone01Icon,
-    titulo: "Pensado para el celular",
+    titulo: "Listo para cualquier pantalla",
     detalle:
-      "Docentes y apoderados pueden consultar desde el navegador del celular, también con conexión limitada.",
+      "Docentes y familias acceden desde celular, tablet o computadora sin instalar aplicaciones adicionales.",
   },
   {
+    numero: "06",
     icono: Shield01Icon,
-    titulo: "Protección de datos",
+    titulo: "Protección de datos (Ley N.° 29733)",
     detalle:
-      "Los datos de estudiantes y familias se tratan conforme a la Ley N.° 29733 de Protección de Datos Personales.",
+      "Toda la información de estudiantes, docentes y apoderados se resguarda conforme a la normativa vigente.",
   },
 ];
 
 export function FeaturesSection() {
   return (
-    <section
-      id="caracteristicas"
-      className="border-border bg-muted/30 relative overflow-hidden border-y py-20 sm:py-24"
-    >
+    <section id="caracteristicas" className="border-border bg-muted/25 border-y py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <Badge variant="outline" className="border-primary/30 bg-primary/5 text-primary text-xs">
-            Características
-          </Badge>
-          <h2 className="text-foreground mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Cómo funciona el {siteConfig.acronym}
-          </h2>
-        </div>
-
-        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {CARACTERISTICAS.map((item) => (
-            <div key={item.titulo} className="bg-card border-border/80 rounded-2xl border p-6">
-              <div className="bg-primary/10 text-primary mb-4 flex size-11 items-center justify-center rounded-xl">
-                <HugeiconsIcon icon={item.icono} className="size-6" />
-              </div>
-              <h3 className="text-foreground text-lg font-bold">{item.titulo}</h3>
-              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{item.detalle}</p>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          {/* Columna editorial fija */}
+          <div className="lg:col-span-4">
+            <Badge
+              variant="outline"
+              className="border-primary/30 bg-primary/5 text-primary text-xs"
+            >
+              Servicios del colegio
+            </Badge>
+            <h2 className="text-foreground mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Pensado para la jornada escolar diaria
+            </h2>
+            <p className="text-muted-foreground mt-4 text-base leading-relaxed">
+              {siteConfig.acronym} conecta portería, aula, dirección y familias sin procesos
+              complicados ni pantallas recargadas.
+            </p>
+            <div className="border-primary/40 mt-8 border-l-2 pl-4">
+              <p className="text-foreground text-sm font-semibold">
+                {siteConfig.institution.shortName}
+              </p>
+              <p className="text-muted-foreground mt-1 text-xs">
+                {siteConfig.institution.administration.ugel} ·{" "}
+                {siteConfig.institution.administration.dre}
+              </p>
             </div>
-          ))}
-        </div>
+          </div>
 
-        <div className="bg-primary text-primary-foreground relative mt-16 overflow-hidden rounded-3xl p-8 sm:p-12">
-          <div className="relative z-10 space-y-2 text-center lg:text-left">
-            <span className="bg-primary-foreground/15 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold">
-              Lema institucional
-            </span>
-            <p className="text-2xl font-extrabold sm:text-3xl">
-              &ldquo;{siteConfig.institution.motto}&rdquo;
-            </p>
-            <p className="text-primary-foreground/85 text-sm">
-              {siteConfig.institution.name} · {siteConfig.institution.location.reference}
-            </p>
+          {/* Lista limpia sin cards ni bordes cerrados */}
+          <div className="divide-border/70 grid grid-cols-1 divide-y sm:grid-cols-2 sm:gap-x-10 sm:divide-y-0 lg:col-span-8">
+            {SERVICIOS.map((item) => (
+              <div
+                key={item.numero}
+                className="border-border/70 flex gap-4 py-6 sm:border-t sm:first:border-t-0 sm:nth-2:border-t-0"
+              >
+                <div className="flex flex-col items-center gap-2 pt-0.5">
+                  <span className="text-primary/60 font-mono text-xs font-bold">{item.numero}</span>
+                  <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-xl">
+                    <HugeiconsIcon icon={item.icono} className="size-4.5" />
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-foreground text-base font-bold">{item.titulo}</h3>
+                  <p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
+                    {item.detalle}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

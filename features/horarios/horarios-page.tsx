@@ -27,6 +27,9 @@ import {
   usePuedeGestionarHorarios,
 } from "./hooks";
 import { GrillaSemanal } from "./views";
+import { ajustarHoraFinAlHueco } from "./utils";
+import { descargarHorarioSeccionPdf } from "./api";
+import { toast } from "@/lib/toast";
 
 export function HorariosPage() {
   const permisoGestionar = usePuedeGestionarHorarios();
@@ -126,13 +129,14 @@ export function HorariosPage() {
     cursoSeccionId?: string | null,
   ) => {
     if (!seccionId) return;
+    const horaFinAjustada = ajustarHoraFinAlHueco(diaSemana, horaInicio, horaFin, bloquesHorario);
     try {
       const res = await crearBloqueMutation.mutateAsync({
         seccionId,
         payload: {
           diaSemana,
           horaInicio,
-          horaFin,
+          horaFin: horaFinAjustada,
           tipoBloque,
           cursoSeccionId: tipoBloque === "receso" ? null : (cursoSeccionId ?? null),
         },
@@ -140,6 +144,28 @@ export function HorariosPage() {
       if (res.mensaje) setMensajeVigencia(res.mensaje);
     } catch {
       // Notificado en toast
+    }
+  };
+
+  const [exportandoPdf, setExportandoPdf] = useState(false);
+
+  const handleExportarPdf = async () => {
+    if (!seccionId) return;
+    setExportandoPdf(true);
+    try {
+      const blob = await descargarHorarioSeccionPdf(seccionId, docenteFiltroId ?? undefined);
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = `horario-seccion.pdf`;
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("No se pudo generar el PDF del horario.");
+    } finally {
+      setExportandoPdf(false);
     }
   };
 
@@ -169,10 +195,12 @@ export function HorariosPage() {
             seccionId={seccionId}
             seccionesMismoGradoCount={seccionesMismoGrado.length}
             isLoadingPropuesta={isLoadingPropuesta}
+            isExportandoPdf={exportandoPdf}
             grillaPropuestaActiva={grillaPropuestaActiva}
             onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
             onDescartarPropuesta={() => setGrillaPropuestaActiva(false)}
             onCopiarHorario={() => dialogs.setCopiarModalOpen(true)}
+            onExportarPdf={() => void handleExportarPdf()}
             onNuevoBloque={() => dialogs.abrirNuevoBloque(1, "", "", "clase", null)}
           />
         }
@@ -282,9 +310,11 @@ export function HorariosPage() {
                   docentesDeLaSeccion.find((d) => d.id === docenteFiltroId)?.nombre
                 }
                 onAsignarCursoASlot={handleAsignarCursoASlot}
-                onAbrirNuevoBloque={(d, ini, fin, tipo) =>
-                  dialogs.abrirNuevoBloque(d, ini, fin, tipo, null)
-                }
+                onAbrirNuevoBloque={(d, ini, fin, tipo) => {
+                  const horaFinAjustada =
+                    ini && fin ? ajustarHoraFinAlHueco(d, ini, fin, bloquesHorario) : fin;
+                  dialogs.abrirNuevoBloque(d, ini, horaFinAjustada, tipo, null);
+                }}
                 onEditarBloque={(b) => dialogs.abrirEditarBloque(b)}
                 onEliminarBloque={(b) => dialogs.abrirEliminarBloque(b)}
                 onProponerGrilla={() => dialogs.setProponerModalOpen(true)}

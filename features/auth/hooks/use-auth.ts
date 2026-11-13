@@ -182,6 +182,58 @@ export function useSelectRole(options?: UseSelectRoleOptions) {
   });
 }
 
+/**
+ * Inicia una vista simulada como otro usuario (exclusivo Administrador / Soporte TI).
+ */
+export function useImpersonate() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  return useMutation<AuthResponse, ApiClientError, { userId: string; roleId?: string }>({
+    mutationKey: ["auth", "impersonate"],
+    mutationFn: ({ userId, roleId }) => authApi.impersonate(userId, roleId),
+    onSuccess: (data) => {
+      if (data.accessToken) {
+        setAccessToken(data.accessToken);
+      }
+      queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      queryClient.setQueryData(["auth", "session"], data);
+      toast.success(data.message ?? "Vista simulada iniciada.");
+      router.push(destinoTrasIngresar(data));
+      router.refresh();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+/**
+ * Sale de la vista simulada y restaura la sesión del Administrador o Soporte TI.
+ */
+export function useStopImpersonate() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  return useMutation<AuthResponse, ApiClientError, void>({
+    mutationKey: ["auth", "stop-impersonate"],
+    mutationFn: () => authApi.stopImpersonate(),
+    onSuccess: (data) => {
+      if (data.accessToken) {
+        setAccessToken(data.accessToken);
+      }
+      queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      queryClient.setQueryData(["auth", "session"], data);
+      toast.success(data.message ?? "Sesión restaurada.");
+      router.push("/admin/users");
+      router.refresh();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
 export interface UseLogoutOptions {
   onSuccess?: () => void;
   onError?: (error: ApiClientError) => void;

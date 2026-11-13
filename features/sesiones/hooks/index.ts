@@ -10,7 +10,10 @@ import {
   asignarReemplazo,
   corregirTema,
   getDetalleJustificacion,
+  firmarIngresoWeb,
+  firmarSalidaWeb,
   getJustificacionesSolicitadas,
+  getMiJornadaHoy,
   getMisSesiones,
   getMotivosJustificacion,
   getPanelSesionesHoy,
@@ -31,6 +34,8 @@ export const sesionesKeys = {
   motivos: () => [...sesionesKeys.all, "motivos-justificacion"] as const,
   mias: (anioId: string | undefined, desde: string, hasta: string) =>
     [...sesionesKeys.all, anioId ?? "vigente", "mis-sesiones", desde, hasta] as const,
+  jornadaHoy: (anioId?: string) =>
+    [...sesionesKeys.all, anioId ?? "vigente", "mi-jornada-hoy"] as const,
 };
 
 export function usePanelSesionesHoy() {
@@ -39,6 +44,7 @@ export function usePanelSesionesHoy() {
     queryKey: sesionesKeys.panel(anio?.id),
     queryFn: getPanelSesionesHoy,
     refetchInterval: INTERVALO_PANEL_SESIONES_MS,
+    refetchIntervalInBackground: false,
     staleTime: 10_000,
     gcTime: 5 * 60_000,
   });
@@ -83,6 +89,19 @@ export function useMisSesiones(rango?: { desde: string; hasta: string }) {
     queryFn: () => getMisSesiones(rango!.desde, rango!.hasta),
     enabled: Boolean(rango),
     staleTime: 60_000,
+    gcTime: 5 * 60_000,
+  });
+}
+
+export function useMiJornadaHoy(enabled: boolean) {
+  const { anio } = useAnioLectivo();
+  return useQuery({
+    queryKey: sesionesKeys.jornadaHoy(anio?.id),
+    queryFn: getMiJornadaHoy,
+    enabled,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
+    staleTime: 30_000,
     gcTime: 5 * 60_000,
   });
 }
@@ -154,6 +173,20 @@ export function useSolicitarJustificacion() {
     ({ id, ...payload }: { id: string } & SolicitudJustificacionPayload) =>
       solicitarJustificacion(id, payload),
     (r) => extraerMensajeSesion(r, "Su justificación fue enviada al subdirector."),
+  );
+}
+
+export function useFirmarIngresoWeb() {
+  return useMutacionSesion(
+    ({ id, tema }: { id: string; tema: string }) => firmarIngresoWeb(id, tema),
+    (r) => extraerMensajeSesion(r, "Ingreso de sesión firmado."),
+  );
+}
+
+export function useFirmarSalidaWeb() {
+  return useMutacionSesion(
+    (id: string) => firmarSalidaWeb(id),
+    (r) => extraerMensajeSesion(r, "Salida de sesión firmada."),
   );
 }
 

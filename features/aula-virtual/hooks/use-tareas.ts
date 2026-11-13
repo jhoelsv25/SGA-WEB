@@ -6,6 +6,7 @@ import { ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
 import {
   actualizarTarea,
+  calificarDirecto,
   calificarEntrega,
   cerrarTarea,
   crearTarea,
@@ -143,5 +144,19 @@ export function useCalificarEntrega() {
     }: {
       entregaId: string;
     } & CalificarEntregaPayload) => calificarEntrega(entregaId, payload),
+  );
+}
+
+export function useCalificarDirecto() {
+  return useMutacionAula(
+    ({
+      tareaId,
+      ...payload
+    }: {
+      tareaId: string;
+      matriculaId: string;
+      nota: number;
+      retroalimentacion?: string;
+    }) => calificarDirecto(tareaId, payload),
   );
 }

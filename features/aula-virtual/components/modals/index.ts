@@ -10,3 +10,4 @@ export * from "./calificar-entrega-modal";
 export * from "./entregas-tarea-modal";
 export * from "./ocultar-contenido-modal";
 export * from "./actividad-recurso-modal";
+export * from "./video-reproductor-modal";

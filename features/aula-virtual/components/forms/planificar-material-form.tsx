@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -145,6 +147,7 @@ export function PlanificarMaterialForm({
           id="material-descripcion"
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
+          placeholder="Describe brevemente de qué trata este material..."
           maxLength={1000}
           disabled={isPending}
         />
@@ -209,12 +212,17 @@ export function PlanificarMaterialForm({
       )}
       {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       <div className="flex justify-end gap-2.5 pt-3">
-        <Button type="button" variant="outline" className="min-h-10" onClick={onCancel}>
-          Cancelar
+        <Button type="button" variant="outline" className="min-h-10 gap-2" onClick={onCancel}>
+          <HugeiconsIcon icon={Cancel01Icon} size={16} />
+          <span>Cancelar</span>
         </Button>
         <Button type="submit" disabled={isPending} className="min-h-10 gap-2">
-          {isPending && <Spinner className="size-4" />}
-          {esEdicion ? "Guardar cambios" : "Planificar"}
+          {isPending ? (
+            <Spinner className="size-4" />
+          ) : (
+            <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} />
+          )}
+          <span>{esEdicion ? "Guardar cambios" : "Planificar material"}</span>
         </Button>
       </div>
     </form>

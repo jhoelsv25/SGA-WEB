@@ -4,6 +4,7 @@ import type { NextConfig } from "next";
 const apiUrl = new URL(process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api");
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {

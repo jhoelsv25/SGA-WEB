@@ -4,15 +4,19 @@ import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Add01Icon,
+  Cancel01Icon,
   CheckmarkCircle02Icon,
   Delete02Icon,
+  FloppyDiskIcon,
   InformationCircleIcon,
+  Upload01Icon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { SelectOption, type SelectOptionItem } from "@/components/common/select";
 import { toast } from "@/lib/toast";
 import { useActualizarTarea, useCrearTarea } from "../../hooks";
 import type {
@@ -45,6 +49,19 @@ const TIPOS_TAREA_OPCIONES: Array<{ value: TipoTarea; label: string; desc: strin
     label: "Examen",
     desc: "Evaluación formal con tiempo límite y control estricto",
   },
+];
+
+const OPCIONES_CALCULO_NOTA: SelectOptionItem<CalculoNotaIntentos>[] = [
+  { value: "mas_alta", label: "La más alta" },
+  { value: "ultima", label: "La última" },
+  { value: "promedio", label: "Promedio" },
+];
+
+const OPCIONES_REVELAR_RESPUESTAS: SelectOptionItem<RevelarRespuestas>[] = [
+  { value: "al_terminar_intentos", label: "Al agotar los intentos" },
+  { value: "despues_fecha_limite", label: "Tras la fecha límite" },
+  { value: "inmediato", label: "Inmediatamente" },
+  { value: "nunca", label: "Nunca" },
 ];
 
 export interface TareaFormProps {
@@ -105,6 +122,16 @@ export function TareaForm({
   const puntajeTotal = React.useMemo(() => {
     return preguntas.reduce((sum, p) => sum + (Number(p.puntaje) || 0), 0);
   }, [preguntas]);
+
+  const opcionesUnidades = React.useMemo<SelectOptionItem<string>[]>(() => {
+    return [
+      { value: "sin_asignar", label: "Sin unidad asignada" },
+      ...unidades.map((u) => ({
+        value: u.id,
+        label: u.titulo,
+      })),
+    ];
+  }, [unidades]);
 
   const agregarPregunta = (tipoPreg: TipoPregunta) => {
     const orden = preguntas.length + 1;
@@ -262,21 +289,16 @@ export function TareaForm({
         </div>
 
         {unidades.length > 0 && (
-          <div>
-            <Label htmlFor="select-unidad-tarea">Unidad de aprendizaje (opcional)</Label>
-            <select
-              id="select-unidad-tarea"
-              value={unidadId}
-              onChange={(e) => setUnidadId(e.target.value)}
-              className="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm"
-            >
-              <option value="">Sin unidad asignada</option>
-              {unidades.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.titulo}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Unidad de aprendizaje (opcional)</Label>
+            <SelectOption
+              value={unidadId || "sin_asignar"}
+              onSelect={(val) => setUnidadId(val === "sin_asignar" ? "" : val)}
+              options={opcionesUnidades}
+              placeholder="Seleccionar unidad..."
+              searchPlaceholder="Buscar unidad..."
+              emptyMessage="No se encontraron unidades."
+            />
           </div>
         )}
       </div>
@@ -357,33 +379,24 @@ export function TareaForm({
               />
             </div>
 
-            <div>
-              <Label htmlFor="select-calculo-nota">Cálculo de nota</Label>
-              <select
-                id="select-calculo-nota"
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Cálculo de nota</Label>
+              <SelectOption
                 value={calculoNotaIntentos}
-                onChange={(e) => setCalculoNotaIntentos(e.target.value as CalculoNotaIntentos)}
-                className="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm"
-              >
-                <option value="mas_alta">La más alta</option>
-                <option value="ultima">La última</option>
-                <option value="promedio">Promedio</option>
-              </select>
+                onSelect={(val) => setCalculoNotaIntentos(val as CalculoNotaIntentos)}
+                options={OPCIONES_CALCULO_NOTA}
+                placeholder="Seleccione método"
+              />
             </div>
 
-            <div>
-              <Label htmlFor="select-revelar-resp">Mostrar respuestas correctas</Label>
-              <select
-                id="select-revelar-resp"
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Mostrar respuestas correctas</Label>
+              <SelectOption
                 value={revelarRespuestas}
-                onChange={(e) => setRevelarRespuestas(e.target.value as RevelarRespuestas)}
-                className="border-input bg-background mt-1 h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm"
-              >
-                <option value="al_terminar_intentos">Al agotar los intentos</option>
-                <option value="despues_fecha_limite">Tras la fecha límite</option>
-                <option value="inmediato">Inmediatamente</option>
-                <option value="nunca">Nunca</option>
-              </select>
+                onSelect={(val) => setRevelarRespuestas(val as RevelarRespuestas)}
+                options={OPCIONES_REVELAR_RESPUESTAS}
+                placeholder="Seleccione visibilidad"
+              />
             </div>
 
             {tipo === "examen" && (
@@ -557,25 +570,36 @@ export function TareaForm({
 
       {/* Acciones */}
       <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
-          Cancelar
+        <Button
+          type="button"
+          variant="outline"
+          className="gap-2"
+          onClick={onCancel}
+          disabled={isPending}
+        >
+          <HugeiconsIcon icon={Cancel01Icon} size={16} />
+          <span>Cancelar</span>
         </Button>
         <Button
           type="button"
           variant="secondary"
           id="btn-guardar-borrador-tarea"
+          className="gap-2"
           onClick={() => void guardar(false)}
           disabled={isPending}
         >
-          Guardar borrador
+          <HugeiconsIcon icon={FloppyDiskIcon} size={16} />
+          <span>Guardar borrador</span>
         </Button>
         <Button
           type="button"
           id="btn-publicar-tarea"
+          className="gap-2"
           onClick={() => void guardar(true)}
           disabled={isPending}
         >
-          {isPending ? "Guardando..." : "Publicar ahora"}
+          <HugeiconsIcon icon={Upload01Icon} size={16} />
+          <span>{isPending ? "Guardando..." : "Publicar ahora"}</span>
         </Button>
       </div>
     </form>

@@ -108,7 +108,7 @@ export function MisNotasTab({
                         </StatusBadge>
                         <span className="min-w-16 text-right font-mono text-sm font-bold">
                           {t.nota !== null && t.nota !== undefined
-                            ? `${Number(t.nota).toFixed(2)} pts`
+                            ? `Nota: ${Number(t.nota).toFixed(1)}`
                             : "—"}
                         </span>
                       </div>

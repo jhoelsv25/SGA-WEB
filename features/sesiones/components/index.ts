@@ -1,4 +1,5 @@
 export * from "./estado-sesion";
+export * from "./header-sesion-docente";
 export * from "./modal-texto";
 export * from "./modal-justificar";
 export * from "./detalle-solicitud";

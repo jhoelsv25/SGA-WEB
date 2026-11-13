@@ -163,7 +163,7 @@ export function useChatNoLeidos(cursoSeccionId: string) {
     queryKey: aulaKeys.chatNoLeidos(cursoSeccionId),
     queryFn: () => getChatNoLeidos(cursoSeccionId),
     enabled: Boolean(cursoSeccionId),
-    refetchInterval: 12_000,
+    staleTime: 1000 * 60 * 5, // 5 minutos en caché (se actualiza reactivamente por WebSocket)
   });
 }
 

@@ -21,6 +21,12 @@ export interface AuthRole {
   isPrincipal: boolean;
 }
 
+export interface ImpersonatedBy {
+  userId: string;
+  username: string;
+  role: string;
+}
+
 export interface CurrentUser {
   id: string;
   username: string;
@@ -37,6 +43,7 @@ export interface CurrentUser {
   activeRoleName?: string;
   /** Rutas de menú del rol activo. Registrar en el calendario exige `/admin/calendario`. */
   menuRoutes?: string[];
+  impersonatedBy?: ImpersonatedBy;
 }
 
 export interface AuthModule {

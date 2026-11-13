@@ -8,6 +8,7 @@ import {
   FileAddIcon,
   FileEditIcon,
   Folder01Icon,
+  PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/empty-state";
@@ -18,6 +19,7 @@ import type { Material, Unidad } from "../../types";
 export interface MaterialesTabProps {
   unidades: Unidad[];
   puedeAdministrar: boolean;
+  onNuevaUnidad?: () => void;
   onPlanificarMaterial: (unidadId: string) => void;
   onMaterialExtra: (unidadId: string) => void;
   onEditarUnidad: (unidad: Unidad) => void;
@@ -32,6 +34,7 @@ export interface MaterialesTabProps {
 export function MaterialesTab({
   unidades,
   puedeAdministrar,
+  onNuevaUnidad,
   onPlanificarMaterial,
   onMaterialExtra,
   onEditarUnidad,
@@ -48,12 +51,43 @@ export function MaterialesTab({
         title="Aún no hay unidades"
         description="Crea la primera unidad para empezar a planificar materiales de reforzamiento."
         icon={BookOpen01Icon}
+        action={
+          puedeAdministrar && onNuevaUnidad ? (
+            <Button
+              type="button"
+              onClick={onNuevaUnidad}
+              className="gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-xs"
+            >
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              <span>Crear primera unidad</span>
+            </Button>
+          ) : undefined
+        }
       />
     );
   }
 
   return (
     <div className="space-y-6">
+      {puedeAdministrar && onNuevaUnidad && (
+        <div className="flex flex-col gap-2 pb-1 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-foreground text-sm font-semibold">Unidades temáticas</h3>
+            <p className="text-muted-foreground text-xs">
+              Organiza los contenidos y materiales de reforzamiento por unidades.
+            </p>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            onClick={onNuevaUnidad}
+            className="gap-1.5 self-start rounded-xl text-xs font-semibold shadow-xs sm:self-auto"
+          >
+            <HugeiconsIcon icon={PlusSignIcon} size={15} />
+            <span>Nueva unidad</span>
+          </Button>
+        </div>
+      )}
       {unidades.map((unidad) => (
         <div
           key={unidad.id}

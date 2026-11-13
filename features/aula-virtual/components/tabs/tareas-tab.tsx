@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Activity01Icon,
@@ -73,6 +74,7 @@ export function TareasTab({
   soloLectura?: boolean;
   estudianteId?: string;
 }) {
+  const router = useRouter();
   const {
     data: tareas = [],
     isLoading,
@@ -358,7 +360,7 @@ export function TareasTab({
                           </span>
                         )}
 
-                        <span>· Puntaje: {tarea.puntajeMaximo} pts</span>
+                        <span>· Escala: 0 a {tarea.puntajeMaximo}</span>
 
                         {tarea.tipo === "cuestionario" || tarea.tipo === "examen" ? (
                           <span>
@@ -382,7 +384,9 @@ export function TareasTab({
                           variant="outline"
                           size="sm"
                           className="h-8.5 gap-1.5 rounded-xl text-xs font-medium"
-                          onClick={() => setModalEntregas({ abierto: true, tarea })}
+                          onClick={() =>
+                            router.push(`/admin/aula-virtual/${cursoSeccionId}/tareas/${tarea.id}`)
+                          }
                         >
                           <HugeiconsIcon icon={UserGroupIcon} size={14} />
                           <span>Entregas</span>

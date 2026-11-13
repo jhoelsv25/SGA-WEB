@@ -1,4 +1,5 @@
 export * from "./aula-virtual-page";
+export * from "./tarea-entregas-page";
 export * from "./solicitudes-cambio-fecha-page";
 export * from "./materiales-bimestre-page";
 export * from "./components";

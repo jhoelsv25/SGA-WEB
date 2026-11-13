@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BookOpen01Icon } from "@hugeicons/core-free-icons";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/common/page-header";
@@ -43,17 +43,44 @@ export function AulaVirtualPage({
   initialTareaId?: string;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const { data: cursos = [] } = useMisCursos();
   const { anio } = useAnioLectivo();
   const cursoId = cursoSeccionId ?? "";
   const [periodoId, setPeriodoId] = React.useState<string>("");
-  const [tabActiva, setTabActiva] = React.useState<string>(
-    initialTareaId ? "tareas" : initialTab || "materiales",
+
+  const tabFromUrl = searchParams.get("tab");
+  const tareaIdFromUrl = searchParams.get("tareaId");
+
+  // Derivar la pestaña activa directamente de la URL (sin useState/useEffect innecesarios)
+  const tabActiva =
+    tareaIdFromUrl || initialTareaId ? "tareas" : tabFromUrl || initialTab || "materiales";
+
+  const handleTabChange = React.useCallback(
+    (nuevaTab: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (nuevaTab === "materiales") {
+        params.delete("tab");
+      } else {
+        params.set("tab", nuevaTab);
+      }
+      if (nuevaTab !== "tareas") {
+        params.delete("tareaId");
+      }
+      const qs = params.toString();
+      const targetUrl = qs ? `${pathname}?${qs}` : pathname;
+      router.replace(targetUrl, { scroll: false });
+    },
+    [pathname, router, searchParams],
   );
+
   const [estudianteIdSeleccionado, setEstudianteIdSeleccionado] = React.useState<string>("");
 
   const handleSeleccionarCurso = (id: string) => {
-    router.push(`/admin/aula-virtual/${id}`);
+    const query = tabActiva && tabActiva !== "materiales" ? `?tab=${tabActiva}` : "";
+    router.push(`/admin/aula-virtual/${id}${query}`);
   };
 
   const handleVolverCursos = () => {
@@ -180,7 +207,7 @@ export function AulaVirtualPage({
         errorTitle="No se pudo cargar el aula virtual"
       >
         {aula && (
-          <Tabs value={tabActiva} onValueChange={setTabActiva} className="w-full space-y-6">
+          <Tabs value={tabActiva} onValueChange={handleTabChange} className="w-full space-y-6">
             {/* Navegación por pestañas moderna estilo Google Classroom */}
             <AulaTabsNav
               unidadesCount={unidadesFiltradas.length}
@@ -195,6 +222,7 @@ export function AulaVirtualPage({
               <MaterialesTab
                 unidades={unidadesFiltradas}
                 puedeAdministrar={aula.puedeAdministrar}
+                onNuevaUnidad={() => setUnidadModal({ abierto: true, unidad: null })}
                 onPlanificarMaterial={setUnidadParaMaterial}
                 onMaterialExtra={setUnidadParaExtra}
                 onEditarUnidad={(unidad) => setUnidadModal({ abierto: true, unidad })}

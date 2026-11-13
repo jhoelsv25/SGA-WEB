@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AlertCircleIcon,
+  Cancel01Icon,
   CheckmarkCircle02Icon,
   Clock01Icon,
   CloudUploadIcon,
@@ -634,8 +635,9 @@ export function ResolverTareaForm({
 
       {/* Botones de acción */}
       <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cerrar
+        <Button type="button" variant="outline" className="gap-2" onClick={onCancel}>
+          <HugeiconsIcon icon={Cancel01Icon} size={16} />
+          <span>Cerrar</span>
         </Button>
 
         {!soloLectura && !esEvaluacion && !entregaCalificada && !noAceptaTardia && (

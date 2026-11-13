@@ -4,12 +4,8 @@ import * as React from "react";
 import { BookOpen01Icon } from "@hugeicons/core-free-icons";
 import { Modal } from "@/components/common/modal";
 import { UnidadForm } from "../forms/unidad-form";
+import type { Bimestre } from "@/features/anio-escolar/types";
 import type { Unidad } from "../../types";
-
-interface Bimestre {
-  id: string;
-  nombre: string;
-}
 
 interface UnidadModalProps {
   open: boolean;
@@ -33,7 +29,7 @@ export function UnidadModal({
       title={unidad ? "Editar unidad" : "Nueva unidad"}
       description="Organiza el aula virtual en unidades, como en tu plan de clase."
       icon={BookOpen01Icon}
-      size="md"
+      size="xl"
     >
       {open && (
         <UnidadForm

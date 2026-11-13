@@ -4,7 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  ArrowRight01Icon,
   ArrowTurnBackwardIcon,
+  Cancel01Icon,
   CheckmarkCircle02Icon,
   File01Icon,
   Link01Icon,
@@ -24,6 +26,7 @@ export interface CalificarEntregaFormProps {
   tarea: Tarea;
   onCancel: () => void;
   onSuccess?: () => void;
+  onSiguiente?: () => void;
 }
 
 export function CalificarEntregaForm({
@@ -31,6 +34,7 @@ export function CalificarEntregaForm({
   tarea,
   onCancel,
   onSuccess,
+  onSiguiente,
 }: CalificarEntregaFormProps) {
   const calificar = useCalificarEntrega();
 
@@ -259,9 +263,10 @@ export function CalificarEntregaForm({
           Devolver para corrección
         </Button>
 
-        <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" className="gap-2" onClick={onCancel}>
+            <HugeiconsIcon icon={Cancel01Icon} size={16} />
+            <span>Cancelar</span>
           </Button>
           <Button
             type="button"
@@ -273,6 +278,21 @@ export function CalificarEntregaForm({
             <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} />
             {calificar.isPending ? "Guardando..." : "Guardar calificación"}
           </Button>
+          {onSiguiente && (
+            <Button
+              type="button"
+              id="btn-guardar-siguiente"
+              onClick={async () => {
+                await handleGuardarCalificacion();
+                onSiguiente();
+              }}
+              disabled={calificar.isPending}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5"
+            >
+              <span>Guardar y siguiente</span>
+              <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -59,3 +59,27 @@ export function minutosAHora(minutos: number): string {
 export function formatearRangoHora(inicio: string, fin: string): string {
   return `${inicio} – ${fin}`;
 }
+
+/**
+ * Recorta la hora de fin sugerida para que no se cruce con el siguiente bloque
+ * ya registrado ese día en la sección (por ejemplo, un hueco libre de 11:00 a 11:30).
+ */
+export function ajustarHoraFinAlHueco(
+  diaSemana: number,
+  horaInicio: string,
+  horaFinSugerida: string,
+  bloques: readonly { diaSemana: number; horaInicio: string }[],
+): string {
+  if (!horaInicio || !horaFinSugerida) return horaFinSugerida;
+  const ini = convertirHoraAMinutos(horaInicio);
+  const fin = convertirHoraAMinutos(horaFinSugerida);
+
+  const siguientes = bloques
+    .filter((b) => b.diaSemana === diaSemana)
+    .map((b) => convertirHoraAMinutos(b.horaInicio))
+    .filter((bIni) => bIni > ini);
+
+  if (siguientes.length === 0) return horaFinSugerida;
+  const proximoInicio = Math.min(...siguientes);
+  return fin > proximoInicio ? minutosAHora(proximoInicio) : horaFinSugerida;
+}

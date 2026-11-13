@@ -132,3 +132,12 @@ export interface CredencialesKiosko {
   codigo: string;
   pin: string;
 }
+
+export interface MiJornadaHoy {
+  fecha: string;
+  docenteNombre: string;
+  destacadaId: string | null;
+  minutosAntes: number;
+  firmaWebHabilitada: boolean;
+  sesiones: Sesion[];
+}

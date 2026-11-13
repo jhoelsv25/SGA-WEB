@@ -68,7 +68,7 @@ export function BloqueModal({
       title={bloque ? "Editar bloque de horario" : "Registrar bloque de horario"}
       description="Configura la clase o receso escolar. Puedes definir franjas simples o bloques dobles."
       icon={Calendar03Icon}
-      size="md"
+      size="lg"
     >
       {open ? (
         <BloqueForm
