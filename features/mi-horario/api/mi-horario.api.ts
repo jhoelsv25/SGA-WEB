@@ -36,4 +36,26 @@ export const miHorarioApi = {
     );
     return data;
   },
+
+  /**
+   * Descarga el horario semanal del docente autenticado en PDF.
+   * Endpoint: GET /horarios/mi-horario/pdf
+   */
+  async descargarMiHorarioDocentePdf(): Promise<Blob> {
+    const { data } = await apiClient.get<Blob>("/horarios/mi-horario/pdf", {
+      responseType: "blob",
+    });
+    return data;
+  },
+
+  /**
+   * Descarga el horario semanal de un estudiante en PDF.
+   * Endpoint: GET /horarios/estudiante/:estudianteId/pdf
+   */
+  async descargarHorarioEstudiantePdf(estudianteId: string): Promise<Blob> {
+    const { data } = await apiClient.get<Blob>(`/horarios/estudiante/${estudianteId}/pdf`, {
+      responseType: "blob",
+    });
+    return data;
+  },
 };

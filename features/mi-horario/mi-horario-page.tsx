@@ -5,13 +5,16 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Calendar03Icon,
   Clock01Icon,
+  Download01Icon,
   RefreshIcon,
   Book02Icon,
   DashboardSquare01Icon,
 } from "@hugeicons/core-free-icons";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { EmptyState } from "@/components/common/empty-state";
+import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { miHorarioApi } from "./api/mi-horario.api";
 import { TEXTOS_MI_HORARIO } from "./consts";
 import { useMiHorarioActivo } from "./hooks";
 import { calcularFranjasHorarias } from "./utils";
@@ -43,6 +47,29 @@ export function MiHorarioPage() {
 
   // Modo de visualización: "semana" (grilla completa) o "dia" (selector por día)
   const [modoVista, setModoVista] = React.useState<"semana" | "dia">("semana");
+  const [exportandoPdf, setExportandoPdf] = React.useState(false);
+
+  const handleExportarPdf = async () => {
+    setExportandoPdf(true);
+    try {
+      const blob =
+        rol === "docente"
+          ? await miHorarioApi.descargarMiHorarioDocentePdf()
+          : await miHorarioApi.descargarHorarioEstudiantePdf(estudianteSeleccionadoId ?? "");
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = rol === "docente" ? "mi-horario-docente.pdf" : "mi-horario.pdf";
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("No se pudo generar el PDF del horario.");
+    } finally {
+      setExportandoPdf(false);
+    }
+  };
 
   const franjas = React.useMemo(() => {
     return calcularFranjasHorarias(bloques);
@@ -73,6 +100,27 @@ export function MiHorarioPage() {
         actions={
           rol === "docente" || rol === "estudiante" || rol === "apoderado" ? (
             <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleExportarPdf}
+                disabled={
+                  exportandoPdf ||
+                  isLoading ||
+                  bloques.length === 0 ||
+                  (rol !== "docente" && !estudianteSeleccionadoId)
+                }
+                aria-label="Exportar horario en PDF"
+                className="h-10 gap-1.5 rounded-full px-3.5 text-xs font-semibold"
+              >
+                {exportandoPdf ? (
+                  <Spinner className="size-3.5" />
+                ) : (
+                  <HugeiconsIcon icon={Download01Icon} className="size-3.5" aria-hidden="true" />
+                )}
+                <span className="hidden sm:inline">Exportar PDF</span>
+              </Button>
               <Button
                 type="button"
                 variant="outline"
