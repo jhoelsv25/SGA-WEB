@@ -280,6 +280,24 @@ export const adminNavigation: NavSection[] = [
           "Consolidado de cumplimiento de mis clases por bimestre y solicitudes de revisión",
       },
       {
+        id: "admin-observaciones-aula",
+        label: "Observaciones de aula",
+        link: "/admin/observaciones-aula",
+        icon: Task01Icon,
+        roles: ["admin"],
+        description:
+          "Cronograma de visitas, toma de notas, calificación por niveles y retroalimentación del docente",
+      },
+      {
+        id: "admin-mis-observaciones",
+        label: "Mis observaciones",
+        link: "/admin/mis-observaciones",
+        icon: Task01Icon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Visitas a mi aula, niveles por desempeño y compromisos de mejora",
+      },
+      {
         id: "admin-indicadores",
         label: "Indicadores",
         link: "/admin/indicadores",

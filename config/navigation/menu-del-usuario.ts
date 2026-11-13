@@ -53,6 +53,8 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/pendientes-seguimiento",
   "/admin/informe-horas-efectivas",
   "/admin/mi-seguimiento",
+  "/admin/observaciones-aula",
+  "/admin/mis-observaciones",
   "/admin/indicadores",
   "/admin/mis-indicadores",
 ]);
