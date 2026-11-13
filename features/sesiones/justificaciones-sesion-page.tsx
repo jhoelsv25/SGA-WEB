@@ -9,6 +9,7 @@ import { SelectOption } from "@/components/common/select";
 import { Spinner } from "@/components/common/spinner";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/features/auth";
 import { formatDate } from "@/lib/formatters/date";
 import { DetalleSolicitud, ModalTexto } from "./components";
 import {
@@ -22,7 +23,13 @@ import type { SolicitudJustificacion } from "./types";
 
 const TODOS = "todos";
 
+/** Quienes resuelven las justificaciones; el Director solo consulta (P-49). */
+const ROLES_RESUELVEN = ["Subdirector", "Administrador"];
+
 export function JustificacionesSesionPage() {
+  const { data: sesion } = useSession();
+  const rolActivo = sesion?.user.activeRoleName ?? sesion?.user.roles?.[0] ?? "";
+  const puedeResolver = ROLES_RESUELVEN.includes(rolActivo);
   const [motivo, setMotivo] = React.useState<string>(TODOS);
   const [soloVencidas, setSoloVencidas] = React.useState(false);
   const { data: motivos = [] } = useMotivosJustificacion();
@@ -176,25 +183,33 @@ export function JustificacionesSesionPage() {
                   >
                     {verDetalle === s.id ? "Ocultar detalle" : "Ver detalle"}
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="min-h-10"
-                    onClick={() => setARechazar(s)}
-                  >
-                    Rechazar
-                  </Button>
-                  <Button
-                    type="button"
-                    className="min-h-10 gap-2"
-                    disabled={aprobar.isPending}
-                    onClick={() => aprobarSolicitud(s)}
-                  >
-                    {aprobar.isPending && aprobar.variables?.id === s.id && (
-                      <Spinner className="size-4" />
-                    )}
-                    Aprobar
-                  </Button>
+                  {puedeResolver ? (
+                    <>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="min-h-10"
+                        onClick={() => setARechazar(s)}
+                      >
+                        Rechazar
+                      </Button>
+                      <Button
+                        type="button"
+                        className="min-h-10 gap-2"
+                        disabled={aprobar.isPending}
+                        onClick={() => aprobarSolicitud(s)}
+                      >
+                        {aprobar.isPending && aprobar.variables?.id === s.id && (
+                          <Spinner className="size-4" />
+                        )}
+                        Aprobar
+                      </Button>
+                    </>
+                  ) : (
+                    <p className="text-muted-foreground self-center text-xs">
+                      Solo consulta: la resuelve el Subdirector.
+                    </p>
+                  )}
                 </div>
               </div>
               {verDetalle === s.id && (
