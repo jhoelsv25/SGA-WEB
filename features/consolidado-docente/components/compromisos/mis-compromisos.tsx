@@ -10,12 +10,21 @@ import { CompromisoTarjeta } from "./compromiso-tarjeta";
 
 export interface MisCompromisosProps {
   consolidadoId: string;
+  /** Compromiso al que apunta el aviso de la campanita. */
+  compromisoIdEnlace?: string;
 }
 
 /** Compromisos del docente en «Mi seguimiento»: solo los suyos y sin historial de versiones. */
-export function MisCompromisos({ consolidadoId }: MisCompromisosProps) {
+export function MisCompromisos({ consolidadoId, compromisoIdEnlace }: MisCompromisosProps) {
   const { data: compromisos = [], isLoading } = useCompromisosQuery(consolidadoId);
   const { mutate: marcarEnterado, isPending, variables } = useCompromisoEnteradoMutation();
+
+  React.useEffect(() => {
+    if (!compromisoIdEnlace || compromisos.length === 0) return;
+    document
+      .getElementById(`compromiso-${compromisoIdEnlace}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [compromisoIdEnlace, compromisos.length]);
 
   if (isLoading) {
     return (
@@ -43,6 +52,7 @@ export function MisCompromisos({ consolidadoId }: MisCompromisosProps) {
           <CompromisoTarjeta
             key={c.id}
             compromiso={c}
+            resaltado={compromisoIdEnlace === c.compromisoId}
             acciones={
               !c.enteradoEn && !c.anulado ? (
                 <Button

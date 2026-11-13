@@ -8,14 +8,21 @@ import type { CompromisoItem } from "../../types";
 
 export interface CompromisoTarjetaProps {
   compromiso: CompromisoItem;
+  /** Se resalta cuando el usuario llega desde un aviso enlazado a este compromiso. */
+  resaltado?: boolean;
   /** Botones de acción que cambian según quién mira (Director o docente). */
   acciones?: React.ReactNode;
 }
 
-export function CompromisoTarjeta({ compromiso, acciones }: CompromisoTarjetaProps) {
+export function CompromisoTarjeta({ compromiso, resaltado, acciones }: CompromisoTarjetaProps) {
   const config = ESTADOS_COMPROMISO_CONFIG[compromiso.estado];
   return (
-    <li className="border-border/60 bg-card flex flex-col gap-2 rounded-xl border p-3 text-xs">
+    <li
+      id={`compromiso-${compromiso.compromisoId}`}
+      className={`border-border/60 bg-card flex flex-col gap-2 rounded-xl border p-3 text-xs ${
+        resaltado ? "ring-primary ring-2" : ""
+      }`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <p className="text-foreground text-sm font-medium">{compromiso.descripcion}</p>
         <div className="flex flex-wrap items-center gap-1.5">

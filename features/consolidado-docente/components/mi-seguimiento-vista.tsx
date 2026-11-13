@@ -34,6 +34,7 @@ import { ModalSolicitarRevision } from "./modals";
 export function MiSeguimientoVista() {
   const searchParams = useSearchParams();
   const periodoUrl = searchParams.get("periodoId") ?? "";
+  const compromisoUrl = searchParams.get("compromisoId") ?? "";
   const { anio } = useAnioLectivo();
   const bimestres = anio?.bimestres ?? [];
   const primerBimestreId = bimestres[0]?.id ?? "";
@@ -247,7 +248,7 @@ export function MiSeguimientoVista() {
 
           <HorasPedagogicasCards consolidado={consolidado} variante="docente" />
 
-          <MisCompromisos consolidadoId={consolidado.id} />
+          <MisCompromisos consolidadoId={consolidado.id} compromisoIdEnlace={compromisoUrl} />
 
           {/* Tabla de sesiones del docente */}
           <div className="space-y-3">
