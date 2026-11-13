@@ -63,8 +63,7 @@ export default function OpenGraphImage() {
           Intranet Educativa y Gestión Académica
         </div>
         <div style={{ fontSize: 26, color: "rgba(255,255,255,0.86)", lineHeight: 1.4 }}>
-          {siteConfig.institution.name} · {siteConfig.institution.administration.ugel},{" "}
-          {siteConfig.institution.administration.dre}
+          {`${siteConfig.institution.name} · ${siteConfig.institution.administration.ugel}, ${siteConfig.institution.administration.dre}`}
         </div>
       </div>
 
