@@ -75,3 +75,14 @@ export async function getCargaSeccion(seccionId: string): Promise<CargaSeccionHo
   );
   return data;
 }
+
+export async function descargarHorarioSeccionPdf(
+  seccionId: string,
+  docenteId?: string,
+): Promise<Blob> {
+  const { data } = await apiClient.get<Blob>(`/horarios/seccion/${seccionId}/pdf`, {
+    params: docenteId ? { docenteId } : undefined,
+    responseType: "blob",
+  });
+  return data;
+}

@@ -44,7 +44,7 @@ export function ModalResumenHoras({
       title="Consistencia de Horas vs. Plan de Estudios"
       description="Comparativa de horas semanales planificadas en el horario frente a la malla curricular oficial."
       icon={Clock01Icon}
-      size="xl"
+      size="6xl"
     >
       <div className="space-y-4">
         {/* Tarjeta de Resumen General con Progreso */}
