@@ -208,6 +208,11 @@ export function CarnetModal({ open, onOpenChange, personaId }: CarnetModalProps)
                       </span>
                     </p>
                   )}
+                  {carne.gradoNombre && carne.seccionNombre && (
+                    <p className="text-primary text-[10px] font-semibold">
+                      {carne.gradoNombre} · Sección {carne.seccionNombre}
+                    </p>
+                  )}
                   <div className="pt-0.5">
                     <span className="text-muted-foreground block text-[8px] tracking-wider uppercase">
                       Código de Marcación

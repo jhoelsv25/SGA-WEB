@@ -14,10 +14,11 @@ import type {
 
 export const DOCENTES_QUERY_KEY = ["docentes"] as const;
 
-export function useDocentesQuery(params: DocenteQueryParams = {}) {
+export function useDocentesQuery(params: DocenteQueryParams = {}, enabled = true) {
   return useQuery<PaginatedDocentesResponse, ApiClientError>({
     queryKey: [...DOCENTES_QUERY_KEY, params],
     queryFn: () => docentesApi.getDocentes(params),
+    enabled,
   });
 }
 

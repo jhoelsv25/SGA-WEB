@@ -18,6 +18,8 @@ export interface CarneDatos {
   tipoRol: string;
   codigoCredencial: string;
   codigoInstitucional?: string | null;
+  gradoNombre?: string | null;
+  seccionNombre?: string | null;
   emitidaEn: string;
   institucion?: {
     nombre: string;

@@ -42,6 +42,7 @@ export function MiHorarioPage() {
     refetch,
     misEstudiantes,
     estudianteSeleccionadoId,
+    estudianteObjetivoId,
     seleccionarEstudiante,
   } = useMiHorarioActivo();
 
@@ -55,7 +56,7 @@ export function MiHorarioPage() {
       const blob =
         rol === "docente"
           ? await miHorarioApi.descargarMiHorarioDocentePdf()
-          : await miHorarioApi.descargarHorarioEstudiantePdf(estudianteSeleccionadoId ?? "");
+          : await miHorarioApi.descargarHorarioEstudiantePdf(estudianteObjetivoId ?? "");
       const url = URL.createObjectURL(blob);
       const enlace = document.createElement("a");
       enlace.href = url;
@@ -109,7 +110,7 @@ export function MiHorarioPage() {
                   exportandoPdf ||
                   isLoading ||
                   bloques.length === 0 ||
-                  (rol !== "docente" && !estudianteSeleccionadoId)
+                  (rol !== "docente" && !estudianteObjetivoId)
                 }
                 aria-label="Exportar horario en PDF"
                 className="h-10 gap-1.5 rounded-full px-3.5 text-xs font-semibold"

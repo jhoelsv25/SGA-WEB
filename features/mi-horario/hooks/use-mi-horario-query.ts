@@ -184,6 +184,7 @@ export function useMiHorarioActivo() {
     refetch,
     misEstudiantes,
     estudianteSeleccionadoId: estudianteIdApoderado,
+    estudianteObjetivoId: rol === "estudiante" ? estudianteId : estudianteIdApoderado,
     seleccionarEstudiante: setEstudianteElegidoId,
   };
 }

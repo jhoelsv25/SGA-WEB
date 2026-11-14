@@ -47,7 +47,11 @@ export function AdminGuard({ children }: AdminGuardProps) {
     if (!isLoading) {
       if (isError || !session?.user) {
         router.replace(`/login?redirectTo=${encodeURIComponent(pathname)}`);
-      } else if (session.user.mustChangePassword && pathname !== "/change-password") {
+      } else if (
+        session.user.mustChangePassword &&
+        !session.user.impersonatedBy &&
+        pathname !== "/change-password"
+      ) {
         router.replace("/change-password");
       }
     }
@@ -118,7 +122,11 @@ export function AdminGuard({ children }: AdminGuardProps) {
   }
 
   // Si requiere cambio obligatorio de contraseña y aún no redirigió
-  if (session.user.mustChangePassword && pathname !== "/change-password") {
+  if (
+    session.user.mustChangePassword &&
+    !session.user.impersonatedBy &&
+    pathname !== "/change-password"
+  ) {
     return (
       <div className="bg-background relative flex min-h-screen w-full items-center justify-center px-4">
         <div className="animate-in fade-in flex flex-col items-center gap-3 text-center duration-200">

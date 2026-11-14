@@ -22,7 +22,9 @@ export interface UseLoginOptions {
 
 /** Destino tras ingresar: cambio obligatorio de contraseña o la página pedida. */
 function destinoTrasIngresar(data: AuthResponse, redirectTo?: string): string {
-  return data.user?.mustChangePassword ? "/change-password" : redirectTo || "/admin/dashboard";
+  return data.user?.mustChangePassword && !data.user?.impersonatedBy
+    ? "/change-password"
+    : redirectTo || "/admin/dashboard";
 }
 
 /**
@@ -196,11 +198,13 @@ export function useImpersonate() {
       if (data.accessToken) {
         setAccessToken(data.accessToken);
       }
-      queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      void queryClient.cancelQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
       queryClient.setQueryData(["auth", "session"], data);
       toast.success(data.message ?? "Vista simulada iniciada.");
-      router.push(destinoTrasIngresar(data));
-      router.refresh();
+      router.replace(destinoTrasIngresar(data));
+      setTimeout(() => {
+        queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      }, 150);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -222,11 +226,13 @@ export function useStopImpersonate() {
       if (data.accessToken) {
         setAccessToken(data.accessToken);
       }
-      queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      void queryClient.cancelQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
       queryClient.setQueryData(["auth", "session"], data);
       toast.success(data.message ?? "Sesión restaurada.");
-      router.push("/admin/users");
-      router.refresh();
+      router.replace("/admin/users");
+      setTimeout(() => {
+        queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      }, 150);
     },
     onError: (error) => {
       toast.error(error.message);

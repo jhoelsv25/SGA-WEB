@@ -148,6 +148,57 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
         <div className="space-y-6 lg:col-span-2">
           <DetalleAsignacionEscolar matricula={matricula} />
           <DetalleEstudianteCard estudiante={matricula.estudiante} />
+
+          {/* Apoderados Responsables */}
+          <Card className="border-border/60 bg-card/60 rounded-2xl shadow-2xs">
+            <CardHeader className="border-border/50 border-b px-5 py-3">
+              <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                Apoderado(s) Responsable(s)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5">
+              {matricula.apoderados && matricula.apoderados.length > 0 ? (
+                <div className="space-y-3">
+                  {matricula.apoderados.map((ap) => (
+                    <div
+                      key={ap.id}
+                      className="border-border/50 bg-background/60 flex flex-col justify-between gap-2 rounded-xl border p-3.5 sm:flex-row sm:items-center"
+                    >
+                      <div className="space-y-0.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-foreground text-sm font-semibold">
+                            {ap.nombreCompleto}
+                          </span>
+                          <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-medium capitalize">
+                            {ap.parentesco}
+                          </span>
+                          {ap.esPrincipal && (
+                            <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold">
+                              Principal
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-muted-foreground font-mono text-xs">
+                          <span className="uppercase">{ap.tipoDocumento}</span>:{" "}
+                          {ap.numeroDocumento}
+                        </p>
+                      </div>
+                      <div className="text-muted-foreground text-xs sm:text-right">
+                        <span className="block text-[10px] uppercase">Teléfono</span>
+                        <span className="text-foreground font-medium">
+                          {ap.telefono || "No registrado"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-xs">
+                  El estudiante no cuenta con un apoderado vinculado registrado.
+                </p>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-6">

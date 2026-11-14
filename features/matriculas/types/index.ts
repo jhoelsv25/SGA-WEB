@@ -11,12 +11,23 @@ export interface MatriculaEstudianteInfo {
   estado?: string;
 }
 
+export interface ApoderadoMatriculaResumen {
+  id: string;
+  nombreCompleto: string;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  parentesco: string;
+  telefono?: string | null;
+  esPrincipal: boolean;
+}
+
 export interface MatriculaItem {
   id: string;
   codigo: string;
   anioAcademicoId: string;
   anioNumero: number;
   estudiante: MatriculaEstudianteInfo;
+  apoderados?: ApoderadoMatriculaResumen[];
   gradoId: string;
   gradoNumero: number;
   gradoNombre: string;

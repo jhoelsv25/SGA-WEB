@@ -50,7 +50,10 @@ export function TableroFiltros({
   const [mostrarAvanzados, setMostrarAvanzados] = React.useState(false);
 
   // Consultas de catálogos para los selectores
-  const { data: docentesResponse } = useDocentesQuery({ limit: 100, estado: "activo" });
+  const { data: docentesResponse } = useDocentesQuery(
+    { limit: 100, estado: "activo" },
+    !ocultarDocente,
+  );
   const { data: cursosResponse } = useCursosQuery();
   const { data: seccionesResponse } = useSeccionesQuery();
 

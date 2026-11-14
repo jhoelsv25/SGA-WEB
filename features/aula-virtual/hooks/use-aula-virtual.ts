@@ -61,6 +61,7 @@ export function useAula(cursoSeccionId: string) {
   return useQuery({
     queryKey: aulaKeys.aula(anio?.id, cursoSeccionId),
     queryFn: () => getAula(cursoSeccionId),
+    enabled: Boolean(cursoSeccionId),
     staleTime: 30_000,
     gcTime: 5 * 60_000,
     retry: false,
