@@ -37,7 +37,6 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/mis-libretas",
   "/admin/marcaciones-hoy",
   "/admin/marcacion-manual",
-  "/admin/marcaciones-pendientes",
   "/admin/asistencia",
   "/admin/asistencia-seccion",
   "/admin/mi-asistencia",

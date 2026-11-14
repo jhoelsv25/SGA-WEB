@@ -198,12 +198,17 @@ export function useImpersonate() {
       if (data.accessToken) {
         setAccessToken(data.accessToken);
       }
-      void queryClient.cancelQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      void queryClient.cancelQueries({
+        predicate: (q) => q.queryKey[0] !== "auth" && q.queryKey[0] !== "anios-academicos",
+      });
       queryClient.setQueryData(["auth", "session"], data);
       toast.success(data.message ?? "Vista simulada iniciada.");
       router.replace(destinoTrasIngresar(data));
       setTimeout(() => {
-        queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+        queryClient.removeQueries({
+          predicate: (q) => q.queryKey[0] !== "auth" && q.queryKey[0] !== "anios-academicos",
+        });
+        void queryClient.invalidateQueries({ queryKey: ["anios-academicos"] });
       }, 150);
     },
     onError: (error) => {
@@ -226,12 +231,17 @@ export function useStopImpersonate() {
       if (data.accessToken) {
         setAccessToken(data.accessToken);
       }
-      void queryClient.cancelQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+      void queryClient.cancelQueries({
+        predicate: (q) => q.queryKey[0] !== "auth" && q.queryKey[0] !== "anios-academicos",
+      });
       queryClient.setQueryData(["auth", "session"], data);
       toast.success(data.message ?? "Sesión restaurada.");
       router.replace("/admin/users");
       setTimeout(() => {
-        queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
+        queryClient.removeQueries({
+          predicate: (q) => q.queryKey[0] !== "auth" && q.queryKey[0] !== "anios-academicos",
+        });
+        void queryClient.invalidateQueries({ queryKey: ["anios-academicos"] });
       }, 150);
     },
     onError: (error) => {

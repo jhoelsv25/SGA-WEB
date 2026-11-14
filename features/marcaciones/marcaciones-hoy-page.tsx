@@ -8,7 +8,6 @@ import {
   RefreshIcon,
   CheckmarkCircle02Icon,
   AlertCircleIcon,
-  FingerPrintIcon,
   Add01Icon,
   Calendar03Icon,
   StudentIcon,
@@ -227,17 +226,6 @@ export function MarcacionesHoyPage() {
                 aria-hidden="true"
               />
               <span className="hidden sm:inline">Actualizar</span>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="h-9 gap-1.5 rounded-xl px-3 text-xs font-semibold shadow-2xs"
-            >
-              <Link href="/admin/marcaciones-pendientes">
-                <HugeiconsIcon icon={FingerPrintIcon} className="text-primary size-3.5" />
-                <span className="hidden sm:inline">Marcaciones pendientes</span>
-              </Link>
             </Button>
             <Button
               asChild
