@@ -3,17 +3,31 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { BubbleChatIcon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
+import {
+  BubbleChatIcon,
+  CheckmarkCircle02Icon,
+  Notification03Icon,
+} from "@hugeicons/core-free-icons";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePushNotifications } from "@/features/notificaciones";
 import { useVariablesQuery, useUpdateVariableMutation } from "@/features/variables-sistema";
 
 export function TabNotificaciones() {
   const { data: variables = [], isLoading } = useVariablesQuery();
   const updateVariableMutation = useUpdateVariableMutation();
+  const {
+    isSupported: isPushSupported,
+    isSubscribed: isPushSubscribed,
+    permission: pushPermission,
+    isLoading: isPushLoading,
+    subscribe: subscribePush,
+    unsubscribe: unsubscribePush,
+    testNotification: testPushNotification,
+  } = usePushNotifications();
 
   const getBoolVariable = React.useCallback(
     (codigo: string, defaultValue = true): boolean => {
@@ -128,6 +142,82 @@ export function TabNotificaciones() {
             </div>
           </div>
         )}
+
+        {/* Suscripción Web Push en este dispositivo */}
+        <div className="border-border/60 bg-muted/20 flex flex-col justify-between gap-3 rounded-xl border p-3.5 sm:flex-row sm:items-center">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <HugeiconsIcon icon={Notification03Icon} className="text-primary size-4" />
+              <span className="text-foreground text-xs font-semibold">
+                Notificaciones Push en este dispositivo
+              </span>
+              {!isPushSupported ? (
+                <Badge variant="outline" className="text-[10px]">
+                  No soportado
+                </Badge>
+              ) : isPushSubscribed ? (
+                <Badge
+                  variant="outline"
+                  className="border-emerald-500/40 bg-emerald-500/10 text-[10px] text-emerald-600"
+                >
+                  Suscripción activa
+                </Badge>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="border-amber-500/40 bg-amber-500/10 text-[10px] text-amber-600"
+                >
+                  {pushPermission === "denied" ? "Permiso bloqueado" : "No suscrito"}
+                </Badge>
+              )}
+            </div>
+            <p className="text-muted-foreground text-[11px]">
+              {!isPushSupported
+                ? "Tu navegador actual no soporta notificaciones Web Push."
+                : pushPermission === "denied"
+                  ? "Bloqueaste las notificaciones en este navegador. Habilítalas en la configuración del sitio para suscribirte."
+                  : isPushSubscribed
+                    ? "Este navegador está suscrito y recibirá alertas en tiempo real."
+                    : "Activa las notificaciones push para recibir avisos en este dispositivo aunque cierres la pestaña."}
+            </p>
+          </div>
+
+          {isPushSupported && (
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              {isPushSubscribed ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isPushLoading}
+                    onClick={() => void testPushNotification()}
+                  >
+                    Probar Push
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    disabled={isPushLoading}
+                    onClick={() => void unsubscribePush()}
+                  >
+                    Desactivar
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={isPushLoading || pushPermission === "denied"}
+                  onClick={() => void subscribePush()}
+                >
+                  {isPushLoading ? "Verificando..." : "Activar notificaciones Push"}
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Acceso a módulos de emisión */}
         <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">

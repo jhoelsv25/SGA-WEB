@@ -50,24 +50,16 @@ export function resolveBackendUrl(url: string): string {
 const TOKEN_STORAGE_KEY = "sga_access_token";
 
 export function getAccessToken(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return localStorage.getItem(TOKEN_STORAGE_KEY);
-  } catch {
-    return null;
-  }
+  return null;
 }
 
-export function setAccessToken(token: string | null): void {
+export function setAccessToken(_token: string | null): void {
   if (typeof window === "undefined") return;
   try {
-    if (token) {
-      localStorage.setItem(TOKEN_STORAGE_KEY, token);
-    } else {
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-    }
+    // Limpiar cualquier token legado; la sesión vive únicamente en la cookie HttpOnly del servidor
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
   } catch {
-    // Almacenamiento local restringido o lleno
+    // Almacenamiento local restringido
   }
 }
 
@@ -85,12 +77,8 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Interceptor de solicitudes para inyectar Bearer token si existe en storage
+// Interceptor de solicitudes: la autenticación viaja en cookie HttpOnly (withCredentials: true)
 apiClient.interceptors.request.use((config) => {
-  const token = getAccessToken();
-  if (token && !config.headers.Authorization) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
   const anioId = idAnioLectivoActivo();
   if (anioId) {
     config.headers[HEADER_ANIO_ACADEMICO] = anioId;
