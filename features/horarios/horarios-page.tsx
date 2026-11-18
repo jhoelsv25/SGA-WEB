@@ -19,13 +19,16 @@ import {
 import {
   useCargaSeccionQuery,
   useCreateBloqueMutation,
+  useCrearBloquesLoteMutation,
   useDeleteBloqueMutation,
   useGrillaPropuestaQuery,
   useHorarioSeccionQuery,
   useHorariosDialogs,
   useHorariosSeleccion,
+  useProponerHorarioIaMutation,
   usePuedeGestionarHorarios,
 } from "./hooks";
+import type { PropuestaHorarioIaResponse } from "./types";
 import { GrillaSemanal } from "./views";
 import { ajustarHoraFinAlHueco } from "./utils";
 import { descargarHorarioSeccionPdf } from "./api";
@@ -83,7 +86,10 @@ export function HorariosPage() {
   const dialogs = useHorariosDialogs();
   const crearBloqueMutation = useCreateBloqueMutation();
   const deleteBloqueMutation = useDeleteBloqueMutation();
+  const proponerIaMutation = useProponerHorarioIaMutation();
+  const crearBloquesLoteMutation = useCrearBloquesLoteMutation();
 
+  const [propuestaIa, setPropuestaIa] = useState<PropuestaHorarioIaResponse | null>(null);
   const [modalHorasOpen, setModalHorasOpen] = useState(false);
   const [docenteFiltroId, setDocenteFiltroId] = useState<string | null>(null);
 
@@ -91,10 +97,17 @@ export function HorariosPage() {
   const bloquesHorario = useMemo(() => horarioData?.bloques ?? [], [horarioData]);
   const advertenciasPlan = useMemo(() => horarioData?.advertencias ?? [], [horarioData]);
   const resumenHoras = useMemo(() => horarioData?.resumenHoras ?? [], [horarioData]);
-  const bloquesPropuestos = useMemo(
-    () => (grillaPropuestaActiva ? (grillaPropuestaData?.bloques ?? []) : []),
-    [grillaPropuestaActiva, grillaPropuestaData],
-  );
+  const bloquesPropuestos = useMemo(() => {
+    if (propuestaIa) {
+      return propuestaIa.bloques.map((b) => ({
+        diaSemana: b.diaSemana,
+        horaInicio: b.horaInicio,
+        horaFin: b.horaFin,
+        tipoBloque: b.tipoBloque,
+      }));
+    }
+    return grillaPropuestaActiva ? (grillaPropuestaData?.bloques ?? []) : [];
+  }, [propuestaIa, grillaPropuestaActiva, grillaPropuestaData]);
 
   const docentesDeLaSeccion = useMemo(() => {
     const map = new Map<string, string>();
@@ -183,6 +196,49 @@ export function HorariosPage() {
     }
   };
 
+  const handleProponerIa = async () => {
+    if (!seccionId) return;
+    try {
+      const res = await proponerIaMutation.mutateAsync({ seccionId });
+      setGrillaPropuestaActiva(false);
+      setPropuestaIa(res);
+      toast.success(
+        res.usandoIa
+          ? "Propuesta de horario generada con IA (sin cruces)."
+          : "Propuesta de horario generada con algoritmo base (sin cruces).",
+      );
+    } catch {
+      // Notificado en toast
+    }
+  };
+
+  const handleGuardarPropuestaIa = async () => {
+    if (!seccionId || !propuestaIa) return;
+    const bloquesAGuardar = propuestaIa.bloques
+      .filter((b) => b.tipoBloque === "receso" || Boolean(b.cursoSeccionId))
+      .map((b) => ({
+        diaSemana: b.diaSemana,
+        horaInicio: b.horaInicio,
+        horaFin: b.horaFin,
+        tipoBloque: b.tipoBloque,
+        ...(b.tipoBloque === "clase" ? { cursoSeccionId: b.cursoSeccionId } : {}),
+      }));
+    if (bloquesAGuardar.length === 0) return;
+
+    try {
+      await crearBloquesLoteMutation.mutateAsync({
+        seccionId,
+        payload: {
+          bloques: bloquesAGuardar,
+          reemplazarExistentes: bloquesHorario.length > 0,
+        },
+      });
+      setPropuestaIa(null);
+    } catch {
+      // Notificado en toast
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
@@ -195,9 +251,11 @@ export function HorariosPage() {
             seccionId={seccionId}
             seccionesMismoGradoCount={seccionesMismoGrado.length}
             isLoadingPropuesta={isLoadingPropuesta}
+            isLoadingIa={proponerIaMutation.isPending}
             isExportandoPdf={exportandoPdf}
             grillaPropuestaActiva={grillaPropuestaActiva}
             onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
+            onProponerIa={() => void handleProponerIa()}
             onDescartarPropuesta={() => setGrillaPropuestaActiva(false)}
             onCopiarHorario={() => dialogs.setCopiarModalOpen(true)}
             onExportarPdf={() => void handleExportarPdf()}
@@ -258,6 +316,45 @@ export function HorariosPage() {
                 mensajeVigencia={mensajeVigencia}
                 onDismissMensaje={() => setMensajeVigencia(null)}
               />
+            )}
+
+            {/* Banner de propuesta IA lista para guardar en lote */}
+            {propuestaIa && (
+              <div className="border-primary/40 bg-primary/5 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3">
+                <div className="space-y-1">
+                  <p className="text-foreground text-xs font-semibold">
+                    Propuesta {propuestaIa.usandoIa ? "con IA" : "automática"} lista:{" "}
+                    {propuestaIa.bloques.filter((b) => b.cursoSeccionId).length} bloques de clase
+                    asignados
+                  </p>
+                  {propuestaIa.advertencias.length > 0 && (
+                    <p className="text-muted-foreground text-[11px]">
+                      {propuestaIa.advertencias.join(" ")}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPropuestaIa(null)}
+                    disabled={crearBloquesLoteMutation.isPending}
+                    className="h-8 rounded-lg px-3 text-xs"
+                  >
+                    Descartar
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => void handleGuardarPropuestaIa()}
+                    disabled={crearBloquesLoteMutation.isPending}
+                    className="h-8 rounded-lg px-3 text-xs font-semibold"
+                  >
+                    Guardar propuesta en lote
+                  </Button>
+                </div>
+              </div>
             )}
 
             {/* Barra compacta y limpia de Horas vs Plan */}

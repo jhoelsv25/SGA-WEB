@@ -7,14 +7,16 @@ import { toast } from "@/lib/toast";
 import {
   copiarHorario,
   createBloque,
+  crearBloquesLote,
   deleteBloque,
   getCargaSeccion,
   getGrillaPropuesta,
   getHorarioSeccion,
   getSeccionesPorGrado,
+  proponerHorarioIa,
   updateBloque,
 } from "../api";
-import type { CreateBloquePayload, UpdateBloquePayload } from "../types";
+import type { CrearBloquesLotePayload, CreateBloquePayload, UpdateBloquePayload } from "../types";
 
 export const horariosKeys = {
   all: ["horarios"] as const,
@@ -176,6 +178,40 @@ export function useCopiarHorarioMutation() {
     },
     onError: (error: unknown) => {
       toast.error(extraerMensajeError(error, "No se pudo copiar el horario."));
+    },
+  });
+}
+
+export function useProponerHorarioIaMutation() {
+  return useMutation({
+    mutationFn: ({
+      seccionId,
+      preferencias,
+      horaEntrada,
+    }: {
+      seccionId: string;
+      preferencias?: string;
+      horaEntrada?: string;
+    }) => proponerHorarioIa(seccionId, { preferencias, horaEntrada }),
+    onError: (error: unknown) => {
+      toast.error(extraerMensajeError(error, "No se pudo generar la propuesta de horario."));
+    },
+  });
+}
+
+export function useCrearBloquesLoteMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ seccionId, payload }: { seccionId: string; payload: CrearBloquesLotePayload }) =>
+      crearBloquesLote(seccionId, payload),
+    onSuccess: (res, { seccionId }) => {
+      queryClient.invalidateQueries({ queryKey: horariosKeys.all });
+      queryClient.invalidateQueries({ queryKey: ["secciones", "carga", seccionId] });
+      toast.success(`Horario guardado (${res.totalCreados} bloques).`);
+    },
+    onError: (error: unknown) => {
+      toast.error(extraerMensajeError(error, "No se pudieron guardar los bloques en lote."));
     },
   });
 }

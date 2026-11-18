@@ -19,9 +19,14 @@ import {
   getPanelSesionesHoy,
   rechazarJustificacion,
   solicitarJustificacion,
+  sugerirTemaSesion,
 } from "../api";
 import { INTERVALO_PANEL_SESIONES_MS, MENU_JUSTIFICACIONES_SESION } from "../consts";
-import type { FiltrosBandejaJustificaciones, SolicitudJustificacionPayload } from "../types";
+import type {
+  FiltrosBandejaJustificaciones,
+  MensajeSesion,
+  SolicitudJustificacionPayload,
+} from "../types";
 import { extraerMensajeSesion } from "../utils";
 
 export const sesionesKeys = {
@@ -178,9 +183,29 @@ export function useSolicitarJustificacion() {
 
 export function useFirmarIngresoWeb() {
   return useMutacionSesion(
-    ({ id, tema }: { id: string; tema: string }) => firmarIngresoWeb(id, tema),
-    (r) => extraerMensajeSesion(r, "Ingreso de sesión firmado."),
+    ({
+      id,
+      tema,
+      crearEnAulaVirtual,
+    }: {
+      id: string;
+      tema: string;
+      crearEnAulaVirtual?: boolean;
+    }) => firmarIngresoWeb(id, tema, crearEnAulaVirtual),
+    (r) => {
+      const resp = r as MensajeSesion | undefined;
+      const base = extraerMensajeSesion(r, "Ingreso de sesión firmado.");
+      return resp?.aulaVirtualCreada ? `${base} Borrador creado en Aula Virtual.` : base;
+    },
   );
+}
+
+export function useSugerirTemaSesion() {
+  return useMutation({
+    mutationFn: ({ id, borrador }: { id: string; borrador?: string }) =>
+      sugerirTemaSesion(id, borrador),
+    onError: (error: ApiClientError) => toast.error(error.message),
+  });
 }
 
 export function useFirmarSalidaWeb() {

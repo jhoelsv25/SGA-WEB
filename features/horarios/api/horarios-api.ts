@@ -1,11 +1,14 @@
 import { apiClient } from "@/lib/api-client";
 import type {
   BloqueMutacionResponse,
+  BloquesLoteResponse,
   CargaSeccionHorarioResponse,
   CopiarHorarioResponse,
   CreateBloquePayload,
+  CrearBloquesLotePayload,
   GrillaPropuestaResponse,
   HorarioSeccionResponse,
+  PropuestaHorarioIaResponse,
   SeccionHorarioItem,
   UpdateBloquePayload,
 } from "../types";
@@ -84,5 +87,27 @@ export async function descargarHorarioSeccionPdf(
     params: docenteId ? { docenteId } : undefined,
     responseType: "blob",
   });
+  return data;
+}
+
+export async function proponerHorarioIa(
+  seccionId: string,
+  payload: { horaEntrada?: string; preferencias?: string } = {},
+): Promise<PropuestaHorarioIaResponse> {
+  const { data } = await apiClient.post<PropuestaHorarioIaResponse>(
+    `/horarios/seccion/${seccionId}/proponer-ia`,
+    payload,
+  );
+  return data;
+}
+
+export async function crearBloquesLote(
+  seccionId: string,
+  payload: CrearBloquesLotePayload,
+): Promise<BloquesLoteResponse> {
+  const { data } = await apiClient.post<BloquesLoteResponse>(
+    `/horarios/seccion/${seccionId}/bloques/lote`,
+    payload,
+  );
   return data;
 }

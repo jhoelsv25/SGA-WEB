@@ -16,9 +16,11 @@ interface HorariosHeaderActionsProps {
   seccionId: string | null;
   seccionesMismoGradoCount: number;
   isLoadingPropuesta: boolean;
+  isLoadingIa?: boolean;
   isExportandoPdf?: boolean;
   grillaPropuestaActiva?: boolean;
   onProponerGrilla: () => void;
+  onProponerIa?: () => void;
   onDescartarPropuesta?: () => void;
   onCopiarHorario: () => void;
   onExportarPdf: () => void;
@@ -30,9 +32,11 @@ export function HorariosHeaderActions({
   seccionId,
   seccionesMismoGradoCount,
   isLoadingPropuesta,
+  isLoadingIa = false,
   isExportandoPdf = false,
   grillaPropuestaActiva = false,
   onProponerGrilla,
+  onProponerIa,
   onDescartarPropuesta,
   onCopiarHorario,
   onExportarPdf,
@@ -61,11 +65,25 @@ export function HorariosHeaderActions({
               variant="outline"
               size="sm"
               onClick={onProponerGrilla}
-              disabled={isLoadingPropuesta}
+              disabled={isLoadingPropuesta || isLoadingIa}
               className="h-11 min-h-11 min-w-11 gap-1.5 rounded-full px-4 text-xs font-semibold"
             >
               <HugeiconsIcon icon={Clock01Icon} className="size-3.5" />
               <span>Generar horario base</span>
+            </Button>
+          )}
+
+          {onProponerIa && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onProponerIa}
+              disabled={isLoadingIa || isLoadingPropuesta}
+              className="border-primary/40 text-primary hover:bg-primary/5 h-11 min-h-11 min-w-11 gap-1.5 rounded-full px-4 text-xs font-semibold"
+            >
+              {isLoadingIa && <Spinner className="size-3.5" />}
+              <span>Proponer con IA</span>
             </Button>
           )}
 

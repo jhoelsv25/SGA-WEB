@@ -23,6 +23,7 @@ export const SESIONES_ENDPOINTS = {
   APROBAR_JUSTIFICACION: (id: string) => `/sesiones-clase/${id}/justificacion/aprobar`,
   RECHAZAR_JUSTIFICACION: (id: string) => `/sesiones-clase/${id}/justificacion/rechazar`,
   CORREGIR_TEMA: (id: string) => `/sesiones-clase/${id}/tema`,
+  SUGERIR_TEMA: (id: string) => `/sesiones-clase/${id}/sugerir-tema`,
   SOLICITAR_JUSTIFICACION: (id: string) => `/sesiones-clase/${id}/justificacion`,
   KIOSKO_SESIONES: "/sesiones-clase/kiosko/sesiones",
   KIOSKO_INGRESO: (sesionId: string) => `/sesiones-clase/kiosko/${sesionId}/ingreso`,

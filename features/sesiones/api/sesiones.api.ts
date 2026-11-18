@@ -13,6 +13,7 @@ import type {
   SesionesKiosko,
   SolicitudJustificacion,
   SolicitudJustificacionPayload,
+  SugerirTemaResponse,
 } from "../types";
 import { cabeceraKiosko } from "../utils";
 
@@ -86,14 +87,34 @@ export async function getMiJornadaHoy(): Promise<MiJornadaHoy> {
   }
 }
 
-export async function firmarIngresoWeb(id: string, tema: string): Promise<MensajeSesion> {
+export async function firmarIngresoWeb(
+  id: string,
+  tema: string,
+  crearEnAulaVirtual?: boolean,
+): Promise<MensajeSesion> {
   try {
     const { data } = await apiClient.post<MensajeSesion>(SESIONES_ENDPOINTS.FIRMAR_INGRESO(id), {
       tema,
+      ...(crearEnAulaVirtual ? { crearEnAulaVirtual: true } : {}),
     });
     return data;
   } catch (error) {
     handleApiError(error, "No se pudo firmar el ingreso de la sesión.");
+  }
+}
+
+export async function sugerirTemaSesion(
+  id: string,
+  borrador?: string,
+): Promise<SugerirTemaResponse> {
+  try {
+    const { data } = await apiClient.post<SugerirTemaResponse>(
+      SESIONES_ENDPOINTS.SUGERIR_TEMA(id),
+      borrador ? { borrador } : {},
+    );
+    return data;
+  } catch (error) {
+    handleApiError(error, "No se pudieron obtener sugerencias de tema.");
   }
 }
 

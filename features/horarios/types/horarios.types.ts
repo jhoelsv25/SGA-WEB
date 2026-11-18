@@ -111,3 +111,31 @@ export interface CargaSeccionHorarioResponse {
   seccionId: string;
   items: CargaItemHorario[];
 }
+
+export interface BloquePropuestoIa {
+  diaSemana: number;
+  horaInicio: string;
+  horaFin: string;
+  tipoBloque: "clase" | "receso";
+  cursoSeccionId: string | null;
+  cursoNombre: string | null;
+  docenteId: string | null;
+}
+
+export interface PropuestaHorarioIaResponse {
+  horaEntrada: string;
+  bloques: BloquePropuestoIa[];
+  usandoIa: boolean;
+  advertencias: string[];
+}
+
+export interface CrearBloquesLotePayload {
+  bloques: CreateBloquePayload[];
+  reemplazarExistentes?: boolean;
+}
+
+export interface BloquesLoteResponse {
+  bloques: BloqueHorario[];
+  totalCreados: number;
+  advertencias: string[];
+}

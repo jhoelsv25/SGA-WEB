@@ -7,13 +7,19 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Spinner } from "@/components/common/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useSession } from "@/features/auth";
 import { cn } from "@/lib/utils";
 import { MENU_MIS_SESIONES } from "../consts";
-import { useFirmarIngresoWeb, useFirmarSalidaWeb, useMiJornadaHoy } from "../hooks";
+import {
+  useFirmarIngresoWeb,
+  useFirmarSalidaWeb,
+  useMiJornadaHoy,
+  useSugerirTemaSesion,
+} from "../hooks";
 import { evaluarVentanaCliente, horaActualLima, horaDesdeMinutos, minutosDeHora } from "../utils";
 import { EstadoSesionBadge } from "./estado-sesion";
 
@@ -25,6 +31,8 @@ export function HeaderSesionDocente() {
   const [open, setOpen] = React.useState(false);
   const [elegidaId, setElegidaId] = React.useState<string | null>(null);
   const [tema, setTema] = React.useState("");
+  const [crearEnAulaVirtual, setCrearEnAulaVirtual] = React.useState(false);
+  const [sugerenciasIa, setSugerenciasIa] = React.useState<string[]>([]);
   const [reloj, setReloj] = React.useState(horaActualLima);
 
   React.useEffect(() => {
@@ -36,6 +44,7 @@ export function HeaderSesionDocente() {
   const { data, isLoading } = useMiJornadaHoy(esDocente);
   const firmarIngresoMutation = useFirmarIngresoWeb();
   const firmarSalidaMutation = useFirmarSalidaWeb();
+  const sugerirTemaMutation = useSugerirTemaSesion();
 
   if (!esDocente) return null;
 
@@ -46,6 +55,13 @@ export function HeaderSesionDocente() {
     sesiones.find((s) => s.id === data?.destacadaId) ??
     sesiones[0] ??
     null;
+
+  const temasRecientesCurso = elegida
+    ? (data?.temasRecientes?.find(
+        (t) => t.cursoNombre === elegida.cursoNombre && t.seccionNombre === elegida.seccionNombre,
+      )?.temas ?? [])
+    : [];
+  const chipsSugerencias = sugerenciasIa.length > 0 ? sugerenciasIa : temasRecientesCurso;
 
   const hayEnCurso = sesiones.some((s) => s.estado === "en_curso");
   const hayPorFirmarEnVentana = sesiones.some(
@@ -58,8 +74,26 @@ export function HeaderSesionDocente() {
   const handleFirmarIngreso = () => {
     if (!elegida || !tema.trim()) return;
     firmarIngresoMutation.mutate(
-      { id: elegida.id, tema: tema.trim() },
-      { onSuccess: () => setTema("") },
+      { id: elegida.id, tema: tema.trim(), crearEnAulaVirtual },
+      {
+        onSuccess: () => {
+          setTema("");
+          setCrearEnAulaVirtual(false);
+          setSugerenciasIa([]);
+        },
+      },
+    );
+  };
+
+  const handleSugerirTema = () => {
+    if (!elegida || sugerirTemaMutation.isPending) return;
+    sugerirTemaMutation.mutate(
+      { id: elegida.id, borrador: tema.trim() || undefined },
+      {
+        onSuccess: (res) => {
+          setSugerenciasIa(res.sugerencias);
+        },
+      },
     );
   };
 
@@ -153,7 +187,10 @@ export function HeaderSesionDocente() {
                   <li key={s.id}>
                     <button
                       type="button"
-                      onClick={() => setElegidaId(s.id)}
+                      onClick={() => {
+                        setElegidaId(s.id);
+                        setSugerenciasIa([]);
+                      }}
                       className={cn(
                         "border-border/70 hover:border-primary/40 flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left transition-colors",
                         s.id === elegida?.id && "border-primary bg-primary/5",
@@ -195,19 +232,73 @@ export function HeaderSesionDocente() {
                     El bloque ya finalizó. No se puede firmar el ingreso.
                   </p>
                 ) : (
-                  <div className="space-y-2 border-t pt-3">
-                    <Label htmlFor="header-tema-sesion" className="text-xs font-medium">
-                      Tema de la sesión *
-                    </Label>
+                  <div className="space-y-2.5 border-t pt-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <Label htmlFor="header-tema-sesion" className="text-xs font-medium">
+                        Tema de la sesión *
+                      </Label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-primary h-6 px-2 text-[11px]"
+                        disabled={procesando || sugerirTemaMutation.isPending}
+                        onClick={handleSugerirTema}
+                      >
+                        {sugerirTemaMutation.isPending && <Spinner className="mr-1 size-3" />}
+                        Sugerir con IA
+                      </Button>
+                    </div>
                     <Input
                       id="header-tema-sesion"
                       value={tema}
                       onChange={(e) => setTema(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && tema.trim() && !procesando) {
+                          e.preventDefault();
+                          handleFirmarIngreso();
+                        }
+                      }}
                       placeholder="Ej. Ecuaciones cuadráticas"
                       maxLength={500}
                       disabled={procesando}
                       className="h-9 text-xs"
                     />
+                    {chipsSugerencias.length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-muted-foreground text-[10px] font-medium">
+                          {sugerenciasIa.length > 0
+                            ? "Sugerencias generadas:"
+                            : "Últimos temas dictados:"}
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {chipsSugerencias.map((sugerencia) => (
+                            <button
+                              key={sugerencia}
+                              type="button"
+                              disabled={procesando}
+                              onClick={() => setTema(sugerencia)}
+                              className="bg-muted hover:bg-muted/80 text-foreground max-w-full truncate rounded-full px-2 py-0.5 text-[11px] transition-colors"
+                              title={sugerencia}
+                            >
+                              {sugerencia}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <label
+                      htmlFor="header-crear-aula-virtual"
+                      className="text-muted-foreground flex cursor-pointer items-center gap-2 text-[11px]"
+                    >
+                      <Checkbox
+                        id="header-crear-aula-virtual"
+                        checked={crearEnAulaVirtual}
+                        onCheckedChange={(checked) => setCrearEnAulaVirtual(checked === true)}
+                        disabled={procesando}
+                      />
+                      <span>Crear borrador en Aula Virtual</span>
+                    </label>
                     <Button
                       type="button"
                       size="sm"

@@ -119,6 +119,17 @@ export interface MisSesiones {
 export interface MensajeSesion {
   mensaje: string;
   sesion: Sesion;
+  aulaVirtualCreada?: boolean;
+}
+
+export interface TemaRecienteCurso {
+  cursoNombre: string;
+  seccionNombre: string;
+  temas: string[];
+}
+
+export interface SugerirTemaResponse {
+  sugerencias: string[];
 }
 
 export interface SesionesKiosko {
@@ -140,4 +151,5 @@ export interface MiJornadaHoy {
   minutosAntes: number;
   firmaWebHabilitada: boolean;
   sesiones: Sesion[];
+  temasRecientes?: TemaRecienteCurso[];
 }
