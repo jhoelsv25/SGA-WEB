@@ -9,7 +9,7 @@ import type {
   ForgotPasswordPayload,
   LoginCredentials,
 } from "../types/auth.types";
-import { type ApiClientError, setAccessToken } from "@/lib/api-client";
+import { type ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
 
 export interface UseLoginOptions {
@@ -53,9 +53,6 @@ export function useLogin(options?: UseLoginOptions) {
     mutationKey: ["auth", "login"],
     mutationFn: (credentials) => authApi.login(credentials),
     onSuccess: (data) => {
-      if (data.accessToken) {
-        setAccessToken(data.accessToken);
-      }
       queryClient.setQueryData(["auth", "session"], data);
 
       // Primer ingreso: antes de elegir rol debe cambiar la contraseña temporal
@@ -135,7 +132,6 @@ export function useChangePassword(options?: UseChangePasswordOptions) {
       } catch {
         // Si falla el cierre en el servidor, igual se limpia la sesión local
       }
-      setAccessToken(null);
       queryClient.clear();
       toast.success(
         data.message
@@ -169,9 +165,6 @@ export function useSelectRole(options?: UseSelectRoleOptions) {
     mutationKey: ["auth", "select-role"],
     mutationFn: (roleId) => authApi.switchRole(roleId),
     onSuccess: (data) => {
-      if (data.accessToken) {
-        setAccessToken(data.accessToken);
-      }
       // El menú y los datos cargados dependen del rol elegido
       queryClient.removeQueries({ predicate: (q) => q.queryKey[0] !== "auth" });
       queryClient.setQueryData(["auth", "session"], data);
@@ -195,9 +188,6 @@ export function useImpersonate() {
     mutationKey: ["auth", "impersonate"],
     mutationFn: ({ userId, roleId }) => authApi.impersonate(userId, roleId),
     onSuccess: (data) => {
-      if (data.accessToken) {
-        setAccessToken(data.accessToken);
-      }
       void queryClient.cancelQueries({
         predicate: (q) => q.queryKey[0] !== "auth" && q.queryKey[0] !== "anios-academicos",
       });
@@ -228,9 +218,6 @@ export function useStopImpersonate() {
     mutationKey: ["auth", "stop-impersonate"],
     mutationFn: () => authApi.stopImpersonate(),
     onSuccess: (data) => {
-      if (data.accessToken) {
-        setAccessToken(data.accessToken);
-      }
       void queryClient.cancelQueries({
         predicate: (q) => q.queryKey[0] !== "auth" && q.queryKey[0] !== "anios-academicos",
       });
@@ -266,7 +253,6 @@ export function useLogout(options?: UseLogoutOptions) {
     mutationKey: ["auth", "logout"],
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
-      setAccessToken(null);
       options?.onSuccess?.();
       queryClient.clear();
       router.push("/login");

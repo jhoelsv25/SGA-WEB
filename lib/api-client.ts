@@ -25,7 +25,7 @@ export class ApiClientError extends Error {
   }
 }
 
-type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean; _csrfRetry?: boolean };
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
@@ -47,22 +47,6 @@ export function resolveBackendUrl(url: string): string {
   return `${getBackendOrigin()}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
-const TOKEN_STORAGE_KEY = "sga_access_token";
-
-export function getAccessToken(): string | null {
-  return null;
-}
-
-export function setAccessToken(_token: string | null): void {
-  if (typeof window === "undefined") return;
-  try {
-    // Limpiar cualquier token legado; la sesión vive únicamente en la cookie HttpOnly del servidor
-    localStorage.removeItem(TOKEN_STORAGE_KEY);
-  } catch {
-    // Almacenamiento local restringido
-  }
-}
-
 /**
  * Cliente centralizado de Axios para la comunicación con el Backend.
  * withCredentials: true asegura el envío/recepción de cookies HttpOnly (sesión, refresh token).
@@ -77,12 +61,52 @@ export const apiClient: AxiosInstance = axios.create({
   },
 });
 
+let csrfTokenEnMemoria: string | null = null;
+let csrfPromise: Promise<string | null> | null = null;
+
+async function obtenerCsrfToken(): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  if (csrfTokenEnMemoria) return csrfTokenEnMemoria;
+
+  csrfPromise ??= axios
+    .create({
+      baseURL: API_BASE_URL,
+      timeout: 10000,
+      withCredentials: true,
+    })
+    .get<{ csrfToken: string }>("/auth/csrf-token")
+    .then((res) => {
+      csrfTokenEnMemoria = res.data?.csrfToken ?? null;
+      return csrfTokenEnMemoria;
+    })
+    .catch(() => null)
+    .finally(() => {
+      csrfPromise = null;
+    });
+
+  return csrfPromise;
+}
+
 // Interceptor de solicitudes: la autenticación viaja en cookie HttpOnly (withCredentials: true)
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use(async (config) => {
   const anioId = idAnioLectivoActivo();
   if (anioId) {
     config.headers[HEADER_ANIO_ACADEMICO] = anioId;
   }
+
+  const metodo = (config.method ?? "get").toLowerCase();
+  const url = config.url ?? "";
+  const esMutacion =
+    metodo === "post" || metodo === "put" || metodo === "patch" || metodo === "delete";
+  const omiteCsrf = url.includes("/auth/login") || url.includes("/auth/register");
+
+  if (esMutacion && !omiteCsrf) {
+    const csrf = await obtenerCsrfToken();
+    if (csrf) {
+      config.headers["x-csrf-token"] = csrf;
+    }
+  }
+
   return config;
 });
 
@@ -100,6 +124,7 @@ async function refreshSessionTokens(): Promise<boolean> {
     });
 
     await refreshAxios.get("/auth/refresh-token");
+    csrfTokenEnMemoria = null;
     return true;
   } catch {
     return false;
@@ -108,12 +133,39 @@ async function refreshSessionTokens(): Promise<boolean> {
 
 // Interceptor de respuestas para refresco silencioso y normalización de errores
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const url = response.config?.url ?? "";
+    if (
+      url.includes("/auth/login") ||
+      url.includes("/auth/switch-role") ||
+      url.includes("/auth/logout")
+    ) {
+      csrfTokenEnMemoria = null;
+    }
+    return response;
+  },
   async (error: unknown) => {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<ApiErrorPayload>;
       const originalRequest = axiosError.config as RetryConfig | undefined;
       const status = axiosError.response?.status;
+
+      const mensajeError = axiosError.response?.data?.message ?? "";
+      const codigoError = axiosError.response?.data?.code ?? "";
+      if (
+        status === 403 &&
+        originalRequest &&
+        !originalRequest._csrfRetry &&
+        (mensajeError.toLowerCase().includes("csrf") || codigoError.toUpperCase().includes("CSRF"))
+      ) {
+        originalRequest._csrfRetry = true;
+        csrfTokenEnMemoria = null;
+        const nuevoCsrf = await obtenerCsrfToken();
+        if (nuevoCsrf) {
+          originalRequest.headers["x-csrf-token"] = nuevoCsrf;
+          return apiClient(originalRequest);
+        }
+      }
 
       const url = originalRequest?.url || "";
       const isAuthRoute =
@@ -135,8 +187,7 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         }
 
-        // Si falló el refresh y estamos en el cliente, limpiar token y redirigir a login
-        setAccessToken(null);
+        // Si falló el refresh y estamos en el cliente, redirigir a login
         if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
           // eslint-disable-next-line @next/next/no-location-assign-relative-destination
           window.location.href = `/login?expired=true&redirectTo=${encodeURIComponent(

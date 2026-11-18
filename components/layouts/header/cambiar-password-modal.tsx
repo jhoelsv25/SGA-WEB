@@ -25,7 +25,7 @@ import {
   type ChangePasswordFormValues,
 } from "@/features/auth/schemas/change-password.schema";
 import { toast } from "@/lib/toast";
-import { setAccessToken, type ApiClientError } from "@/lib/api-client";
+import { type ApiClientError } from "@/lib/api-client";
 
 interface CambiarPasswordModalProps {
   open: boolean;
@@ -91,7 +91,6 @@ export function CambiarPasswordModal({ open, onOpenChange }: CambiarPasswordModa
       } catch {
         // En caso de que el backend ya haya revocado la sesión
       }
-      setAccessToken(null);
       queryClient.clear();
       router.replace("/login?passwordChanged=true");
       router.refresh();

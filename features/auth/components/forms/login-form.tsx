@@ -11,7 +11,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLogin, useLogout, useSelectRole, useSession } from "../../hooks/use-auth";
 import type { AuthResponse } from "../../types/auth.types";
 import { getRememberedUsername, saveRememberedUsername } from "../../utils/auth-storage.utils";
-import { getAccessToken } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -264,8 +263,8 @@ function LoginFormInner() {
     );
   }
 
-  // Solo mostrar el spinner de validación de token si el componente ya montó en cliente
-  if (isMounted && !isExpired && isCheckingSession && !!getAccessToken()) {
+  // Solo mostrar el spinner de validación de sesión si el componente ya montó en cliente
+  if (isMounted && !isExpired && isCheckingSession) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-8">
         <Spinner size="md" className="text-primary" />

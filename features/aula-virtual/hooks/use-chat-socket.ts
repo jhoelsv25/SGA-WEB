@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { io, type Socket } from "socket.io-client";
-import { getAccessToken, getBackendOrigin } from "@/lib/api-client";
+import { getBackendOrigin } from "@/lib/api-client";
 import { aulaKeys } from "./query-keys";
 import type { MensajeChat } from "../types";
 
@@ -29,14 +29,10 @@ export function useChatSocket(cursoSeccionId: string) {
 
     if (!entrada) {
       const baseUrl = getBackendOrigin();
-      const token = getAccessToken();
 
       const nuevoSocket = io(`${baseUrl}/chat-aula`, {
         transports: ["websocket", "polling"],
         withCredentials: true,
-        auth: {
-          token: token ?? undefined,
-        },
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,

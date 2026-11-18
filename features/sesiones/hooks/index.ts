@@ -104,9 +104,8 @@ export function useMiJornadaHoy(enabled: boolean) {
     queryKey: sesionesKeys.jornadaHoy(anio?.id),
     queryFn: getMiJornadaHoy,
     enabled,
-    refetchInterval: 60_000,
-    refetchIntervalInBackground: false,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 2 * 60_000,
     gcTime: 5 * 60_000,
   });
 }
