@@ -167,7 +167,12 @@ function PantallaSeleccionRol(props: {
 function LoginFormInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/admin/dashboard";
+  const redirectParam = searchParams.get("redirectTo");
+  // Nunca volver a /change-password por un redirectTo arrastrado: ya se resuelve según mustChangePassword.
+  const redirectTo =
+    redirectParam && !redirectParam.startsWith("/change-password")
+      ? redirectParam
+      : "/admin/dashboard";
   const isExpired = searchParams.get("expired") === "true";
 
   const { data: session, isLoading: isCheckingSession } = useSession();
