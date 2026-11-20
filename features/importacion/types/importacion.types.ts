@@ -61,3 +61,39 @@ export interface EstadoImportacionJobResponse {
   resultado?: EjecutarImportacionResponse;
   error?: string;
 }
+
+export type TipoFotosImportacion = "estudiantes" | "docentes";
+
+export interface IniciarFotosJobResponse {
+  jobId: string;
+  mensaje: string;
+  totalArchivos: number;
+}
+
+export interface DetalleFotoAsignada {
+  archivo: string;
+  personaId: string;
+  nombreCompleto: string;
+  fotoUrl: string;
+}
+
+export interface DetalleFotoOmitida {
+  archivo: string;
+  motivo: string;
+}
+
+export interface ResultadoFotos {
+  total: number;
+  exitosos: number;
+  omitidos: number;
+  asignados: DetalleFotoAsignada[];
+  detallesOmitidos: DetalleFotoOmitida[];
+}
+
+export interface EstadoFotosJobResponse {
+  id: string;
+  estado: "esperando" | "procesando" | "completado" | "fallido";
+  progreso: number;
+  resultado?: ResultadoFotos;
+  error?: string;
+}

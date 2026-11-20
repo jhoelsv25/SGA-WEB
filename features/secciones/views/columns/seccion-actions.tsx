@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { BookOpen01Icon, Download01Icon } from "@hugeicons/core-free-icons";
 import { TableRowActions } from "@/components/common/row-actions";
 import type { RowActionCustomItem } from "@/components/common/row-actions/types";
+import { toast } from "@/lib/toast";
 import { credencialesApi } from "@/features/credenciales/api/credenciales.api";
 import type { Seccion } from "../../types";
 
@@ -40,10 +41,17 @@ export function SeccionActions({
       label: "Descargar Carnés en PDF",
       icon: Download01Icon,
       onClick: async () => {
-        await credencialesApi.descargarCarnesSeccionPdf(
-          seccion.id,
-          `carnes-${seccion.gradoNombre.replace(/\s+/g, "_")}_${seccion.nombre}.pdf`,
-        );
+        try {
+          await credencialesApi.descargarCarnesSeccionPdf(
+            seccion.id,
+            `carnes-${seccion.gradoNombre.replace(/\s+/g, "_")}_${seccion.nombre}.pdf`,
+          );
+          toast.success("Carnés descargados exitosamente.");
+        } catch (error: unknown) {
+          const mensaje =
+            error instanceof Error ? error.message : "Error al descargar los carnés de la sección.";
+          toast.error(mensaje);
+        }
       },
     },
   ];
