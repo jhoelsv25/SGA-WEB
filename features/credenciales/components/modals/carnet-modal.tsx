@@ -19,6 +19,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { useCarneDatosQuery } from "../../hooks/use-credenciales";
 import { credencialesApi } from "../../api/credenciales.api";
+import { toast } from "@/lib/toast";
 
 interface CarnetModalProps {
   open: boolean;
@@ -66,7 +67,8 @@ export function CarnetModal({ open, onOpenChange, personaId }: CarnetModalProps)
         : `carnet-${personaId}.pdf`;
       await credencialesApi.descargarCarnePdf(personaId, filename);
     } catch (err) {
-      console.error("Error al descargar carné PDF:", err);
+      const msg = err instanceof Error ? err.message : "Error al descargar carné PDF.";
+      toast.error(msg);
     } finally {
       setIsDownloadingPdf(false);
     }

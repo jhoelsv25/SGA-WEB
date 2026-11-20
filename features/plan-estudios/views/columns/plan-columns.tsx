@@ -43,10 +43,12 @@ export function getPlanColumns({
       cell: ({ row }) => {
         const curso = row.original.curso;
         return (
-          <div>
-            <p className="text-foreground font-semibold">{curso.nombre}</p>
+          <div className="max-w-xs min-w-0 md:max-w-sm">
+            <p className="text-foreground truncate font-semibold">{curso.nombre}</p>
             {curso.descripcion && (
-              <p className="text-muted-foreground line-clamp-1 text-xs">{curso.descripcion}</p>
+              <p className="text-muted-foreground line-clamp-1 text-xs" title={curso.descripcion}>
+                {curso.descripcion}
+              </p>
             )}
           </div>
         );

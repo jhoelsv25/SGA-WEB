@@ -196,7 +196,16 @@ apiClient.interceptors.response.use(
         }
       }
 
-      const data = axiosError.response?.data;
+      let data = axiosError.response?.data;
+      if (typeof Blob !== "undefined" && data instanceof Blob) {
+        try {
+          const text = await data.text();
+          data = JSON.parse(text);
+        } catch {
+          // El blob no es JSON, se conserva el contenido original
+        }
+      }
+
       let detailedMessage =
         data?.message || axiosError.message || "Ocurrió un error inesperado en la solicitud.";
 

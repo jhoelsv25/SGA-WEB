@@ -3,6 +3,7 @@
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  Camera01Icon,
   FileImportIcon,
   MoreHorizontalIcon,
   RefreshIcon,
@@ -17,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ImportarModal } from "@/features/importacion/components/modals/importar-modal";
+import { CargarFotosModal, ImportarModal } from "@/features/importacion";
 import type { TipoImportacion } from "@/features/importacion/types/importacion.types";
 import { BuscarPersonaModal, type DestinoFichaUnica } from "./modals/buscar-persona-modal";
 import type { Persona } from "../types/personas.types";
@@ -49,6 +50,9 @@ export function RegistroPersonaAcciones({
 }: RegistroPersonaAccionesProps) {
   const [buscarOpen, setBuscarOpen] = React.useState(false);
   const [masivoOpen, setMasivoOpen] = React.useState(false);
+  const [fotosOpen, setFotosOpen] = React.useState(false);
+
+  const esEstudianteODocente = tipoImportacion === "estudiantes" || tipoImportacion === "docentes";
 
   return (
     <>
@@ -71,6 +75,12 @@ export function RegistroPersonaAcciones({
             <HugeiconsIcon icon={FileImportIcon} className="h-4 w-4" />
             Cargar masivo (Excel)
           </DropdownMenuItem>
+          {esEstudianteODocente && (
+            <DropdownMenuItem onSelect={() => setFotosOpen(true)}>
+              <HugeiconsIcon icon={Camera01Icon} className="h-4 w-4" />
+              Cargar fotos masivas
+            </DropdownMenuItem>
+          )}
           {extraMenuItems}
           {onRefresh ? (
             <>
@@ -98,6 +108,14 @@ export function RegistroPersonaAcciones({
         tipo={tipoImportacion}
         onSuccess={onImportSuccess}
       />
+      {esEstudianteODocente && (
+        <CargarFotosModal
+          open={fotosOpen}
+          onOpenChange={setFotosOpen}
+          tipo={tipoImportacion as "estudiantes" | "docentes"}
+          onSuccess={onImportSuccess ?? onRefresh}
+        />
+      )}
     </>
   );
 }

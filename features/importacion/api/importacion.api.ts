@@ -1,7 +1,9 @@
 import { apiClient, handleApiError } from "@/lib/api-client";
 import type {
   EjecutarImportacionInput,
+  EstadoFotosJobResponse,
   EstadoImportacionJobResponse,
+  IniciarFotosJobResponse,
   IniciarImportacionResponse,
   PrevisualizarImportacionInput,
   TipoImportacion,
@@ -63,6 +65,34 @@ export const importacionApi = {
       return response.data;
     } catch (error) {
       handleApiError(error, "Error al descargar el reporte de credenciales.");
+    }
+  },
+
+  async subirFotosMasivas(formData: FormData): Promise<IniciarFotosJobResponse> {
+    try {
+      const { data } = await apiClient.post<IniciarFotosJobResponse>(
+        "/importacion/fotos-masivas",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al subir el lote de fotos masivas.");
+    }
+  },
+
+  async getEstadoFotosJob(jobId: string): Promise<EstadoFotosJobResponse> {
+    try {
+      const { data } = await apiClient.get<EstadoFotosJobResponse>(
+        `/importacion/fotos-masivas/jobs/${jobId}`,
+      );
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al consultar el progreso del procesamiento de fotos.");
     }
   },
 };
