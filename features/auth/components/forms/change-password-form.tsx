@@ -38,10 +38,16 @@ export function ChangePasswordForm() {
   const { mutate: changePassword, isPending: isSubmitting, isSuccess, error } = useChangePassword();
 
   React.useEffect(() => {
-    if (!isSuccess && !isCheckingSession && (isError || !session?.user)) {
-      router.replace("/login?redirectTo=/change-password");
+    // Mientras se guarda (onSuccess cierra la sesión antes de marcar "éxito") no se debe
+    // redirigir al login con redirectTo=/change-password: provocaría volver aquí tras ingresar.
+    if (isSubmitting || isSuccess) return;
+    if (!isCheckingSession && (isError || !session?.user)) {
+      router.replace("/login");
+    } else if (session?.user && !session.user.mustChangePassword) {
+      // La contraseña ya fue cambiada: esta pantalla no corresponde.
+      router.replace("/admin/dashboard");
     }
-  }, [isSuccess, isCheckingSession, isError, session, router]);
+  }, [isSubmitting, isSuccess, isCheckingSession, isError, session, router]);
 
   const newPasswordValue = useWatch({ control, name: "newPassword" }) ?? "";
   const currentPasswordValue = useWatch({ control, name: "currentPassword" }) ?? "";
