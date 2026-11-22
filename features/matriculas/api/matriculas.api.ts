@@ -3,12 +3,17 @@ import type {
   CambiarSeccionPayload,
   CrearMatriculaPayload,
   CrearMatriculaResponse,
+  EgresarSeccionPayload,
+  EgresarSeccionResponse,
   MatriculaItem,
   MatriculaMasivaPayload,
   MatriculaMasivaResponse,
   MatricularLotePayload,
   MatriculaQueryParams,
   PaginatedMatriculasResponse,
+  PreviewEgresoResponse,
+  PreviewPromocionResponse,
+  ResumenPromocionResponse,
   RetirarMatriculaPayload,
   TrasladarMatriculaPayload,
 } from "../types";
@@ -48,6 +53,44 @@ export async function matricularMasivo(
   payload: MatriculaMasivaPayload,
 ): Promise<MatriculaMasivaResponse> {
   const response = await apiClient.post<MatriculaMasivaResponse>("/matriculas/masiva", payload);
+  return response.data;
+}
+
+export async function getResumenPromocion(
+  anioOrigenId: string,
+  anioDestinoId?: string,
+): Promise<ResumenPromocionResponse> {
+  const response = await apiClient.get<ResumenPromocionResponse>("/matriculas/promocion/resumen", {
+    params: anioDestinoId ? { anioOrigenId, anioDestinoId } : { anioOrigenId },
+  });
+  return response.data;
+}
+
+export async function getPreviewPromocion(
+  seccionOrigenId: string,
+  seccionDestinoId: string,
+): Promise<PreviewPromocionResponse> {
+  const response = await apiClient.get<PreviewPromocionResponse>("/matriculas/promocion/preview", {
+    params: { seccionOrigenId, seccionDestinoId },
+  });
+  return response.data;
+}
+
+export async function getPreviewEgreso(seccionId: string): Promise<PreviewEgresoResponse> {
+  const response = await apiClient.get<PreviewEgresoResponse>(
+    "/matriculas/promocion/egreso-preview",
+    { params: { seccionId } },
+  );
+  return response.data;
+}
+
+export async function egresarSeccion(
+  payload: EgresarSeccionPayload,
+): Promise<EgresarSeccionResponse> {
+  const response = await apiClient.post<EgresarSeccionResponse>(
+    "/matriculas/promocion/egresar-seccion",
+    payload,
+  );
   return response.data;
 }
 

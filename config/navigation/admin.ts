@@ -19,7 +19,6 @@ import {
   ChartBarLineIcon,
   Settings02Icon,
   FileEditIcon,
-  AlertCircleIcon,
   Task01Icon,
 } from "@hugeicons/core-free-icons";
 import type { NavSection } from "./types";
@@ -53,7 +52,8 @@ export const adminNavigation: NavSection[] = [
         icon: Calendar03Icon,
         permissions: ["admin:academic-years:manage"],
         roles: ["admin"],
-        description: "Apertura de año académico, bimestres y fechas límite",
+        description: "Apertura de año académico, bimestres, cierre y promoción anual",
+        rutasIncluidas: ["/admin/academic-years/cierre"],
       },
       {
         id: "admin-curriculum",
@@ -157,19 +157,12 @@ export const adminNavigation: NavSection[] = [
     items: [
       {
         id: "admin-marcaciones-hoy",
-        label: "Marcaciones de hoy",
+        label: "Control de Asistencia",
         link: "/admin/marcaciones-hoy",
         icon: Clock01Icon,
         roles: ["admin"],
-        description: "Quién marcó hoy, tardanzas y quiénes aún no llegan",
-      },
-      {
-        id: "admin-marcacion-manual",
-        label: "Marcación manual",
-        link: "/admin/marcacion-manual",
-        icon: Clock01Icon,
-        roles: ["admin"],
-        description: "Registro de marcaciones a mano con hora real y motivo",
+        description: "Marcaciones en vivo, registro manual y asistencia por sección",
+        rutasIncluidas: ["/admin/marcacion-manual", "/admin/asistencia-seccion"],
       },
       {
         id: "admin-asistencia",
@@ -179,14 +172,6 @@ export const adminNavigation: NavSection[] = [
         roles: ["admin"],
         ocultarAlAdministrador: true,
         description: "Asistencia de los estudiantes en cada sesión de clase",
-      },
-      {
-        id: "admin-asistencia-seccion",
-        label: "Asistencia de mi sección",
-        link: "/admin/asistencia-seccion",
-        icon: UserGroupIcon,
-        roles: ["admin"],
-        description: "Faltas y tardanzas por estudiante, al colegio y por curso",
       },
       {
         id: "admin-mi-asistencia",
@@ -204,19 +189,35 @@ export const adminNavigation: NavSection[] = [
     items: [
       {
         id: "admin-sesiones-hoy",
-        label: "Sesiones de hoy",
+        label: "Sesiones y Ausencias",
         link: "/admin/sesiones-hoy",
         icon: Clock01Icon,
         roles: ["admin"],
-        description: "Firmas de las sesiones del día, en vivo y con alertas",
+        description: "Sesiones del día, justificaciones y supervisión de ausencias docentes",
+        rutasIncluidas: ["/admin/justificaciones-sesion", "/admin/ausencias-docentes"],
       },
       {
-        id: "admin-justificaciones-sesion",
-        label: "Justificaciones de sesiones",
-        link: "/admin/justificaciones-sesion",
-        icon: CheckmarkCircle02Icon,
+        id: "admin-consolidados-docentes",
+        label: "Consolidado y Aula",
+        link: "/admin/consolidados-docentes",
+        icon: File01Icon,
         roles: ["admin"],
-        description: "Aprobar o rechazar justificaciones de sesiones no cumplidas",
+        description:
+          "Consolidados bimestrales, pendientes, informe de horas efectivas y observaciones de aula",
+        rutasIncluidas: [
+          "/admin/pendientes-seguimiento",
+          "/admin/informe-horas-efectivas",
+          "/admin/observaciones-aula",
+        ],
+      },
+      {
+        id: "admin-indicadores",
+        label: "Indicadores",
+        link: "/admin/indicadores",
+        icon: ChartBarLineIcon,
+        roles: ["admin"],
+        description:
+          "Indicadores de la tesis (CSP, ISA, IGM), indicadores de apoyo del seguimiento docente y panel directivo (RF-020)",
       },
       {
         id: "admin-mis-sesiones",
@@ -228,14 +229,6 @@ export const adminNavigation: NavSection[] = [
         description: "Historial de mis sesiones, tema y justificaciones",
       },
       {
-        id: "admin-ausencias-docentes",
-        label: "Ausencias docentes",
-        link: "/admin/ausencias-docentes",
-        icon: AlertCircleIcon,
-        roles: ["admin"],
-        description: "Supervisión y control de ausencias de docentes en sesiones de clase",
-      },
-      {
         id: "admin-mis-ausencias",
         label: "Mis ausencias",
         link: "/admin/mis-ausencias",
@@ -243,31 +236,6 @@ export const adminNavigation: NavSection[] = [
         roles: ["admin"],
         ocultarAlAdministrador: true,
         description: "Historial de ausencias en sesiones de clase y presentación de descargos",
-      },
-      {
-        id: "admin-consolidados-docentes",
-        label: "Consolidados docentes",
-        link: "/admin/consolidados-docentes",
-        icon: File01Icon,
-        roles: ["admin"],
-        description:
-          "Fichas de seguimiento bimestral, cumplimiento de horas y decisiones del Director",
-      },
-      {
-        id: "admin-pendientes-seguimiento",
-        label: "Pendientes de seguimiento",
-        link: "/admin/pendientes-seguimiento",
-        icon: Task01Icon,
-        roles: ["admin"],
-        description: "Justificaciones, descargos, consolidados y compromisos por atender",
-      },
-      {
-        id: "admin-informe-horas-efectivas",
-        label: "Informe de horas efectivas",
-        link: "/admin/informe-horas-efectivas",
-        icon: Clock01Icon,
-        roles: ["admin"],
-        description: "Informe mensual de horas pedagógicas programadas, dictadas y perdidas",
       },
       {
         id: "admin-mi-seguimiento",
@@ -280,15 +248,6 @@ export const adminNavigation: NavSection[] = [
           "Consolidado de cumplimiento de mis clases por bimestre y solicitudes de revisión",
       },
       {
-        id: "admin-observaciones-aula",
-        label: "Observaciones de aula",
-        link: "/admin/observaciones-aula",
-        icon: Task01Icon,
-        roles: ["admin"],
-        description:
-          "Cronograma de visitas, toma de notas, calificación por niveles y retroalimentación del docente",
-      },
-      {
         id: "admin-mis-observaciones",
         label: "Mis observaciones",
         link: "/admin/mis-observaciones",
@@ -296,15 +255,6 @@ export const adminNavigation: NavSection[] = [
         roles: ["admin"],
         ocultarAlAdministrador: true,
         description: "Visitas a mi aula, niveles por desempeño y compromisos de mejora",
-      },
-      {
-        id: "admin-indicadores",
-        label: "Indicadores",
-        link: "/admin/indicadores",
-        icon: ChartBarLineIcon,
-        roles: ["admin"],
-        description:
-          "Indicadores de la tesis (CSP, ISA, IGM), indicadores de apoyo del seguimiento docente y panel directivo (RF-020)",
       },
       {
         id: "admin-mis-indicadores",
@@ -346,6 +296,20 @@ export const adminNavigation: NavSection[] = [
         permissions: ["conducta:ver", "conducta:registrar"],
         roles: ["admin"],
         description: "Incidencias, méritos y observaciones formativas del estudiante",
+      },
+    ],
+  },
+  {
+    title: "Reportes",
+    items: [
+      {
+        id: "admin-reportes",
+        label: "Centro de Reportes",
+        link: "/admin/reportes",
+        icon: ChartBarLineIcon,
+        roles: ["admin"],
+        description:
+          "Descarga oficial en Excel y PDF filtrada por año académico, bimestre y sección",
       },
     ],
   },

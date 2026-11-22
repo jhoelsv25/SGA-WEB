@@ -85,6 +85,7 @@ export interface MatriculaMasivaPayload {
   seccionDestinoId: string;
   estudianteIds?: string[];
   fechaMatricula?: string;
+  esRepitente?: boolean;
 }
 
 export interface MatricularLotePayload {
@@ -101,12 +102,80 @@ export interface MatriculaNoProcesadaItem {
 }
 
 export interface MatriculaMasivaResponse {
-  mensaje: string;
-  totalProcesados: number;
-  totalExitosos: number;
-  totalFallidos: number;
+  message: string;
+  totalMatriculados: number;
+  totalNoMatriculados: number;
   matriculados: MatriculaItem[];
   noMatriculados: MatriculaNoProcesadaItem[];
+}
+
+export interface PreviewEstudianteItem {
+  estudianteId: string;
+  nombreCompleto: string;
+  numeroDocumento: string;
+  tipoDocumento: string;
+  motivo?: string;
+}
+
+export interface PreviewSeccionInfo {
+  id: string;
+  nombre: string;
+  grado: string;
+  anio: number;
+  totalCulminados?: number;
+  vacantesDisponibles?: number;
+}
+
+export interface PreviewPromocionResponse {
+  seccionOrigen: PreviewSeccionInfo;
+  seccionDestino: PreviewSeccionInfo;
+  aPromover: PreviewEstudianteItem[];
+  noPromovidos: PreviewEstudianteItem[];
+  totalAPromover: number;
+  totalNoPromovidos: number;
+  sinVacantes: number;
+}
+
+export interface PreviewEgresoResponse {
+  seccion: PreviewSeccionInfo;
+  aEgresar: PreviewEstudianteItem[];
+  noEgresables: PreviewEstudianteItem[];
+  totalAEgresar: number;
+  totalNoEgresables: number;
+}
+
+export interface EgresarSeccionPayload {
+  seccionId: string;
+  estudianteIds?: string[];
+}
+
+export interface EgresarSeccionResponse {
+  message: string;
+  totalEgresados: number;
+  totalNoEgresados: number;
+  egresados: Array<{ estudianteId: string; nombreCompleto: string }>;
+  noEgresados: Array<{ estudianteId: string; nombreCompleto: string; motivo: string }>;
+}
+
+export interface ResumenSeccionPromocionItem {
+  seccionId: string;
+  gradoNumero: number;
+  gradoNombre: string;
+  nombre: string;
+  totalCulminados: number;
+  yaMatriculadosDestino: number;
+  yaEgresados: number;
+  pendientes: number;
+}
+
+export interface ResumenPromocionResponse {
+  anioOrigenId: string;
+  anioDestinoId: string | null;
+  totalCulminados: number;
+  totalMatriculadosDestino: number;
+  totalEgresados: number;
+  totalPendientes: number;
+  secciones: ResumenSeccionPromocionItem[];
 }
 
 export interface RetirarMatriculaPayload {

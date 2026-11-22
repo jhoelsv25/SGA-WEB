@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Calendar03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { Calendar03Icon, PlusSignIcon, RefreshIcon } from "@hugeicons/core-free-icons";
 import { ConfirmDialog, type ConfirmVariant } from "@/components/common/confirm-dialog";
 import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
@@ -80,10 +80,18 @@ export function AniosPage() {
           { label: "Año académico" },
         ]}
         actions={
-          <Button onClick={() => setCrearAbierto(true)}>
-            <HugeiconsIcon icon={PlusSignIcon} className="size-4" />
-            Nuevo año
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" asChild>
+              <Link href="/admin/academic-years/cierre">
+                <HugeiconsIcon icon={RefreshIcon} className="size-4" />
+                Cierre y promoción
+              </Link>
+            </Button>
+            <Button onClick={() => setCrearAbierto(true)}>
+              <HugeiconsIcon icon={PlusSignIcon} className="size-4" />
+              Nuevo año
+            </Button>
+          </div>
         }
       />
 

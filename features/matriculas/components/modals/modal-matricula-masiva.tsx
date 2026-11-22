@@ -38,8 +38,8 @@ export function ModalMatriculaMasiva({ open, onOpenChange }: ModalMatriculaMasiv
               <span>Proceso Masivo Completado</span>
             </div>
             <p className="text-muted-foreground">
-              Se matricularon con éxito <strong>{resultado.totalExitosos}</strong> estudiantes en la
-              sección destino.
+              Se matricularon con éxito <strong>{resultado.totalMatriculados}</strong> estudiantes
+              en la sección destino.
             </p>
           </div>
 

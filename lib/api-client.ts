@@ -90,7 +90,7 @@ async function obtenerCsrfToken(): Promise<string | null> {
 // Interceptor de solicitudes: la autenticación viaja en cookie HttpOnly (withCredentials: true)
 apiClient.interceptors.request.use(async (config) => {
   const anioId = idAnioLectivoActivo();
-  if (anioId) {
+  if (anioId && !config.headers[HEADER_ANIO_ACADEMICO]) {
     config.headers[HEADER_ANIO_ACADEMICO] = anioId;
   }
 

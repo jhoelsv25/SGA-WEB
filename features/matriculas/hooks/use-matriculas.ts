@@ -6,8 +6,12 @@ import {
   cambiarSeccionMatricula,
   crearMatricula,
   descargarConstanciaPdf,
+  egresarSeccion,
   getMatriculas,
   getMatriculaById,
+  getPreviewEgreso,
+  getPreviewPromocion,
+  getResumenPromocion,
   matricularLote,
   matricularMasivo,
   retirarMatricula,
@@ -18,12 +22,17 @@ import type {
   CambiarSeccionPayload,
   CrearMatriculaPayload,
   CrearMatriculaResponse,
+  EgresarSeccionPayload,
+  EgresarSeccionResponse,
   MatriculaItem,
   MatriculaMasivaPayload,
   MatriculaMasivaResponse,
   MatricularLotePayload,
   MatriculaQueryParams,
   PaginatedMatriculasResponse,
+  PreviewEgresoResponse,
+  PreviewPromocionResponse,
+  ResumenPromocionResponse,
   RetirarMatriculaPayload,
   TrasladarMatriculaPayload,
 } from "../types";
@@ -53,6 +62,7 @@ export function useCrearMatriculaMutation(onSuccess?: () => void) {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: MATRICULAS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["secciones"] });
+      queryClient.invalidateQueries({ queryKey: ["promocion-resumen"] });
       toast.success(`Matrícula registrada exitosamente (${data.matricula.codigo}).`);
       if (data.advertencia) {
         toast.warning(data.advertencia, { duration: 6000 });
@@ -73,11 +83,56 @@ export function useMatriculaMasivaMutation(onSuccess?: (res: MatriculaMasivaResp
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: MATRICULAS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["secciones"] });
-      toast.success(data.mensaje);
+      queryClient.invalidateQueries({ queryKey: ["promocion-preview"] });
+      queryClient.invalidateQueries({ queryKey: ["promocion-resumen"] });
+      toast.success(data.message);
       onSuccess?.(data);
     },
     onError: (error) => {
       toast.error(error.message || "Error en la matrícula masiva.");
+    },
+  });
+}
+
+export function useResumenPromocionQuery(anioOrigenId: string, anioDestinoId?: string) {
+  return useQuery<ResumenPromocionResponse, ApiClientError>({
+    queryKey: ["promocion-resumen", anioOrigenId, anioDestinoId ?? ""],
+    queryFn: () => getResumenPromocion(anioOrigenId, anioDestinoId || undefined),
+    enabled: Boolean(anioOrigenId),
+  });
+}
+
+export function usePreviewPromocionQuery(seccionOrigenId: string, seccionDestinoId: string) {
+  return useQuery<PreviewPromocionResponse, ApiClientError>({
+    queryKey: ["promocion-preview", seccionOrigenId, seccionDestinoId],
+    queryFn: () => getPreviewPromocion(seccionOrigenId, seccionDestinoId),
+    enabled: Boolean(seccionOrigenId && seccionDestinoId),
+  });
+}
+
+export function usePreviewEgresoQuery(seccionId: string) {
+  return useQuery<PreviewEgresoResponse, ApiClientError>({
+    queryKey: ["egreso-preview", seccionId],
+    queryFn: () => getPreviewEgreso(seccionId),
+    enabled: Boolean(seccionId),
+  });
+}
+
+export function useEgresarSeccionMutation(onSuccess?: (res: EgresarSeccionResponse) => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation<EgresarSeccionResponse, ApiClientError, EgresarSeccionPayload>({
+    mutationFn: (payload) => egresarSeccion(payload),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: MATRICULAS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["estudiantes"] });
+      queryClient.invalidateQueries({ queryKey: ["egreso-preview"] });
+      queryClient.invalidateQueries({ queryKey: ["promocion-resumen"] });
+      toast.success(data.message);
+      onSuccess?.(data);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Error al egresar estudiantes.");
     },
   });
 }
@@ -91,7 +146,7 @@ export function useMatricularLoteMutation(onSuccess?: (res: MatriculaMasivaRespo
       queryClient.invalidateQueries({ queryKey: MATRICULAS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["secciones"] });
       queryClient.invalidateQueries({ queryKey: ["estudiantes"] });
-      toast.success(data.mensaje);
+      toast.success(data.message);
       onSuccess?.(data);
     },
     onError: (error) => {
