@@ -56,6 +56,7 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/mis-observaciones",
   "/admin/indicadores",
   "/admin/mis-indicadores",
+  "/admin/reportes",
 ]);
 
 interface OpcionesMenu {
@@ -65,13 +66,17 @@ interface OpcionesMenu {
   menuRoutes?: readonly string[];
 }
 
-function filtrarItems(items: NavItem[], esVisible: (item: NavItem) => boolean): NavItem[] {
+function filtrarItems(
+  items: NavItem[],
+  esVisible: (item: NavItem) => boolean,
+  resolverEnlace: (item: NavItem) => NavItem,
+): NavItem[] {
   return items.flatMap((item) => {
     if (item.items?.length) {
-      const hijos = filtrarItems(item.items, esVisible);
+      const hijos = filtrarItems(item.items, esVisible, resolverEnlace);
       return hijos.length > 0 ? [{ ...item, items: hijos }] : [];
     }
-    return esVisible(item) ? [item] : [];
+    return esVisible(item) ? [resolverEnlace(item)] : [];
   });
 }
 
@@ -86,10 +91,26 @@ export function menuDelUsuario({ esAdministrador, menuRoutes = [] }: OpcionesMen
     if (!RUTAS_CON_PAGINA.has(item.link)) return false;
     if (item.ocultarAlAdministrador && esAdministrador) return false;
     if (item.link === RUTA_INICIO || esAdministrador) return true;
-    return asignadas.has(item.link);
+    if (asignadas.has(item.link)) return true;
+    return Boolean(
+      item.rutasIncluidas?.some((ruta) => RUTAS_CON_PAGINA.has(ruta) && asignadas.has(ruta)),
+    );
+  };
+
+  const resolverEnlace = (item: NavItem): NavItem => {
+    if (esAdministrador || item.link === RUTA_INICIO || asignadas.has(item.link)) {
+      return item;
+    }
+    const alternativa = item.rutasIncluidas?.find(
+      (ruta) => RUTAS_CON_PAGINA.has(ruta) && asignadas.has(ruta),
+    );
+    return alternativa ? { ...item, link: alternativa } : item;
   };
 
   return adminNavigation
-    .map((seccion) => ({ ...seccion, items: filtrarItems(seccion.items, esVisible) }))
+    .map((seccion) => ({
+      ...seccion,
+      items: filtrarItems(seccion.items, esVisible, resolverEnlace),
+    }))
     .filter((seccion) => seccion.items.length > 0);
 }

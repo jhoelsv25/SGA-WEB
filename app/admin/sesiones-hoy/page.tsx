@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SectionRouteTabs } from "@/components/common/section-route-tabs";
 import { SesionesHoyPage } from "@/features/sesiones";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function SesionesHoyRoute() {
-  return <SesionesHoyPage />;
+  return (
+    <div className="space-y-4">
+      <SectionRouteTabs grupo="sesiones-ausencias" />
+      <SesionesHoyPage />
+    </div>
+  );
 }

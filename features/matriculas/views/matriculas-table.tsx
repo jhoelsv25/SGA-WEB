@@ -10,12 +10,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/common/data-table";
 import {
   CheckmarkCircle02Icon,
+  Download01Icon,
   UserRemove01Icon,
   ArrowRight01Icon,
   UserGroupIcon,
   UserAdd01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { toast } from "sonner";
+import { descargarMatriculasExcel } from "@/features/reportes";
 import { getMatriculaColumns } from "./columns";
 import {
   ModalBuscarEstudiante,
@@ -207,12 +210,34 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
           ) : undefined
         }
         secondaryActions={
-          puedeGestionar ? (
-            <DropdownMenuItem onSelect={() => setModalMasivaOpen(true)}>
-              <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
-              Matrícula masiva
+          <>
+            {puedeGestionar ? (
+              <DropdownMenuItem onSelect={() => setModalMasivaOpen(true)}>
+                <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
+                Matrícula masiva
+              </DropdownMenuItem>
+            ) : null}
+            <DropdownMenuItem
+              onSelect={() => {
+                void descargarMatriculasExcel({
+                  gradoId: gradoId && gradoId !== "all" ? gradoId : undefined,
+                  seccionId: seccionId && seccionId !== "all" ? seccionId : undefined,
+                  tipo: tipo && tipo !== "all" ? tipo : undefined,
+                  estado: estado && estado !== "all" ? estado : undefined,
+                  search: search && search.length >= 2 ? search : undefined,
+                })
+                  .then((nombre) => toast.success(`Nómina descargada: ${nombre}`))
+                  .catch((err: unknown) =>
+                    toast.error(
+                      err instanceof Error ? err.message : "No se pudo exportar la nómina.",
+                    ),
+                  );
+              }}
+            >
+              <HugeiconsIcon icon={Download01Icon} className="size-4" />
+              Exportar Excel
             </DropdownMenuItem>
-          ) : undefined
+          </>
         }
       />
 

@@ -1,8 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
+import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CheckmarkCircle02Icon, RefreshIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
+import { Button } from "@/components/ui/button";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { MatriculasTable } from "./views";
 import { useSession } from "@/features/auth";
@@ -39,6 +42,16 @@ export function MatriculasPage() {
           { label: "Comunidad y Matrícula" },
           { label: "Matrícula y Traslados" },
         ]}
+        actions={
+          puedeGestionar ? (
+            <Button variant="outline" size="sm" asChild className="gap-1.5">
+              <Link href="/admin/academic-years/cierre">
+                <HugeiconsIcon icon={RefreshIcon} className="size-4" />
+                Cierre y promoción anual
+              </Link>
+            </Button>
+          ) : undefined
+        }
       />
 
       {/* Contenido Principal */}

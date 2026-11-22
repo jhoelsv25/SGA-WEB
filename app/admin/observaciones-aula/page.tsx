@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SectionRouteTabs } from "@/components/common/section-route-tabs";
 import { ObservacionesAulaPage } from "@/features/observaciones-aula";
 
 export const metadata: Metadata = {
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function ObservacionesAulaRoute() {
-  return <ObservacionesAulaPage />;
+  return (
+    <div className="space-y-4">
+      <SectionRouteTabs grupo="consolidado-aula" />
+      <ObservacionesAulaPage />
+    </div>
+  );
 }

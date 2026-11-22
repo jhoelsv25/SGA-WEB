@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SectionRouteTabs } from "@/components/common/section-route-tabs";
 import { MarcacionManualPage } from "@/features/marcaciones";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function MarcacionManualRoute() {
-  return <MarcacionManualPage />;
+  return (
+    <div className="space-y-4">
+      <SectionRouteTabs grupo="control-asistencia" />
+      <MarcacionManualPage />
+    </div>
+  );
 }
