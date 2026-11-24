@@ -8,7 +8,9 @@ import type {
   DesempenoCatalogo,
   DocumentoSesion,
   EnfoqueCatalogo,
+  FiltroHistorial,
   GuardarPlanificacionPayload,
+  ItemHistorial,
   HorasRealesPayload,
   OpcionCatalogo,
   PanelSupervision,
@@ -143,4 +145,16 @@ export const registrarHorasReales = (sesionId: string, payload: HorasRealesPaylo
   pedir(
     apiClient.put<{ mensaje: string }>(E.HORAS_REALES(sesionId), payload),
     "No se pudieron registrar las horas reales.",
+  );
+
+export const getHistorial = (filtro: FiltroHistorial) =>
+  pedir(
+    apiClient.get<ItemHistorial[]>(E.HISTORIAL, { params: filtro }),
+    "Error al cargar el historial de planificaciones.",
+  );
+
+export const getHistorialSupervision = (filtro: FiltroHistorial) =>
+  pedir(
+    apiClient.get<ItemHistorial[]>(E.SUPERVISION_HISTORIAL, { params: filtro }),
+    "Error al cargar las planificaciones.",
   );

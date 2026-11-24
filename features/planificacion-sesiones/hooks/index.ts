@@ -13,6 +13,8 @@ import {
   getDesempenos,
   getDocumento,
   getEnfoques,
+  getHistorial,
+  getHistorialSupervision,
   getOpciones,
   getPanelSupervision,
   getPlanificacion,
@@ -22,7 +24,7 @@ import {
   marcarLista,
   registrarHorasReales,
 } from "../api";
-import type { GuardarPlanificacionPayload, HorasRealesPayload } from "../types";
+import type { FiltroHistorial, GuardarPlanificacionPayload, HorasRealesPayload } from "../types";
 
 export const planKeys = {
   all: ["planificacion-sesiones"] as const,
@@ -204,4 +206,12 @@ export function useEsDocente() {
   const { data } = useSession();
   const rol = data?.user.activeRoleName ?? data?.user.roles?.[0] ?? "";
   return rol === "Docente";
+}
+
+export function useHistorial(filtro: FiltroHistorial, supervision: boolean, habilitado = true) {
+  return useQuery({
+    queryKey: [...planKeys.all, "historial", supervision, filtro],
+    queryFn: () => (supervision ? getHistorialSupervision(filtro) : getHistorial(filtro)),
+    enabled: habilitado,
+  });
 }

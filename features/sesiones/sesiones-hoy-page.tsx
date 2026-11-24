@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AlertCircleIcon,
@@ -101,21 +102,30 @@ export function SesionesHoyPage() {
         icon={Clock01Icon}
         breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Sesiones de hoy" }]}
         actions={
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => void refetch()}
-            disabled={isFetching}
-            aria-label="Actualizar sesiones"
-            className="min-h-10 gap-1.5 rounded-full px-3.5 text-xs font-semibold shadow-2xs"
-          >
-            <HugeiconsIcon
-              icon={RefreshIcon}
-              className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}
-              aria-hidden="true"
-            />
-            <span className="hidden sm:inline">Actualizar en vivo</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="min-h-10 rounded-full px-3.5 text-xs font-semibold"
+            >
+              <Link href="/admin/sesiones-hoy/planificaciones">Planificaciones por bimestre</Link>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void refetch()}
+              disabled={isFetching}
+              aria-label="Actualizar sesiones"
+              className="min-h-10 gap-1.5 rounded-full px-3.5 text-xs font-semibold shadow-2xs"
+            >
+              <HugeiconsIcon
+                icon={RefreshIcon}
+                className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}
+                aria-hidden="true"
+              />
+              <span className="hidden sm:inline">Actualizar en vivo</span>
+            </Button>
+          </div>
         }
       />
 

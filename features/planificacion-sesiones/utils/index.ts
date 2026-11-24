@@ -76,3 +76,35 @@ export function guardarArchivo(blob: Blob, nombre: string) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+export function desplazarDias(fechaIso: string, dias: number): string {
+  const [a, m, d] = fechaIso.split("-").map(Number);
+  const f = new Date(Date.UTC(a ?? 1970, (m ?? 1) - 1, d ?? 1));
+  f.setUTCDate(f.getUTCDate() + dias);
+  return f.toISOString().slice(0, 10);
+}
+
+/** Lunes de la semana de una fecha ISO. */
+export function lunesDeFecha(fechaIso: string): string {
+  const [a, m, d] = fechaIso.split("-").map(Number);
+  const dia = new Date(Date.UTC(a ?? 1970, (m ?? 1) - 1, d ?? 1)).getUTCDay() || 7;
+  return desplazarDias(fechaIso, -(dia - 1));
+}
+
+export interface SemanaDeBimestre {
+  numero: number;
+  desde: string;
+  hasta: string;
+}
+
+/** Semanas (lunes a viernes) que cubre un bimestre, numeradas desde 1. */
+export function semanasDeBimestre(fechaInicio: string, fechaFin: string): SemanaDeBimestre[] {
+  const fin = fechaFin.slice(0, 10);
+  const semanas: SemanaDeBimestre[] = [];
+  let lunes = lunesDeFecha(fechaInicio.slice(0, 10));
+  while (lunes <= fin) {
+    semanas.push({ numero: semanas.length + 1, desde: lunes, hasta: desplazarDias(lunes, 6) });
+    lunes = desplazarDias(lunes, 7);
+  }
+  return semanas;
+}

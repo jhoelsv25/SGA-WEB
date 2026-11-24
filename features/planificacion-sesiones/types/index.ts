@@ -196,6 +196,29 @@ export interface DocumentoSesion {
   borrador: boolean;
 }
 
+export interface ItemHistorial {
+  id: string;
+  fecha: string;
+  numero: number | null;
+  titulo: string;
+  estado: EstadoPlanificacion;
+  docenteId: string;
+  docenteNombre: string;
+  horaInicio: string;
+  horaFin: string;
+  cursoNombre: string;
+  seccionNombre: string;
+  gradoNombre: string;
+  comentarios: number;
+}
+
+export interface FiltroHistorial {
+  desde: string;
+  hasta: string;
+  estado?: EstadoPlanificacion;
+  docenteId?: string;
+}
+
 export interface SesionSupervision {
   sesionId: string;
   estadoSesion: string;

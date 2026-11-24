@@ -7,13 +7,15 @@ import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { HistorialPlanificacionesView } from "./historial-page";
 import { ESTADOS_PLANIFICACION, MENU_PLANIFICACION_SESIONES } from "../consts";
 import { useCopiarPlanificacion, useSemana } from "../hooks";
 import type { BloqueSemana } from "../types";
 import { DIAS, desplazarSemana, hoyIso, recortarHora } from "../utils";
 
 /** Semana del docente: cada bloque de su horario con el estado de su sesión. */
-export function SemanaPlanificacionPage() {
+function SemanaView() {
   const [fecha, setFecha] = React.useState(hoyIso());
   const { data, isLoading, isError, error, refetch } = useSemana(fecha);
   const copiar = useCopiarPlanificacion();
@@ -155,5 +157,23 @@ export function SemanaPlanificacionPage() {
         )}
       </PageState>
     </div>
+  );
+}
+
+/** Pantalla del docente: su semana y todo su historial por bimestre. */
+export function SemanaPlanificacionPage() {
+  return (
+    <Tabs defaultValue="semana" className="gap-4">
+      <TabsList>
+        <TabsTrigger value="semana">Semana</TabsTrigger>
+        <TabsTrigger value="historial">Historial por bimestre</TabsTrigger>
+      </TabsList>
+      <TabsContent value="semana">
+        <SemanaView />
+      </TabsContent>
+      <TabsContent value="historial">
+        <HistorialPlanificacionesView />
+      </TabsContent>
+    </Tabs>
   );
 }

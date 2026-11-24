@@ -21,6 +21,8 @@ export const ESTADOS_PLANIFICACION = {
 export const PLANIFICACION_ENDPOINTS = {
   BASE: "/planificacion-sesiones",
   SEMANA: "/planificacion-sesiones/semana",
+  HISTORIAL: "/planificacion-sesiones/historial",
+  SUPERVISION_HISTORIAL: "/supervision-planificaciones/historial",
   POR_ID: (id: string) => `/planificacion-sesiones/${id}`,
   LISTA: (id: string) => `/planificacion-sesiones/${id}/lista`,
   COPIAR: (id: string) => `/planificacion-sesiones/${id}/copiar`,
