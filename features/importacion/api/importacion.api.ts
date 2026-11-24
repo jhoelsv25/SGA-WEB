@@ -24,9 +24,18 @@ export const importacionApi = {
 
   async previsualizar(input: PrevisualizarImportacionInput): Promise<VistaPreviaResponse> {
     try {
+      const formData = new FormData();
+      formData.append("tipo", input.tipo);
+      formData.append("archivo", input.archivo);
+
       const { data } = await apiClient.post<VistaPreviaResponse>(
         "/importacion/previsualizar",
-        input,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
       return data;
     } catch (error) {

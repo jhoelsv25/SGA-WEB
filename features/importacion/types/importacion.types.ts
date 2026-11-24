@@ -12,6 +12,7 @@ export interface FilaPrevisualizada {
 }
 
 export interface VistaPreviaResponse {
+  loteId?: string;
   totalFilas: number;
   validasCount: number;
   omitidasCount: number;
@@ -38,12 +39,12 @@ export interface EjecutarImportacionResponse {
 
 export interface PrevisualizarImportacionInput {
   tipo: TipoImportacion;
-  filas: Record<string, unknown>[];
+  archivo: File;
 }
 
 export interface EjecutarImportacionInput {
   tipo: TipoImportacion;
-  filas: Record<string, unknown>[];
+  loteId: string;
 }
 
 export interface IniciarImportacionResponse {

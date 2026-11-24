@@ -40,7 +40,7 @@ import type {
   TipoImportacion,
   VistaPreviaResponse,
 } from "../../types/importacion.types";
-import { exportCredencialesReport, parseExcelFile } from "../../utils/excel-parser";
+import { exportCredencialesReport } from "../../utils/excel-parser";
 
 interface ImportarModalProps {
   open: boolean;
@@ -168,7 +168,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
     }
   }, [paso, estadoJobQuery.data, onSuccess, queryClient, tipo]);
 
-  // Manejar subida y análisis previo del archivo Excel
+  // Manejar subida y análisis previo del archivo Excel en el backend (multipart/form-data)
   const handleFileSelect = async (file: File | null) => {
     setSelectedFile(file);
     setParseError(undefined);
@@ -177,16 +177,9 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
 
     setIsParsing(true);
     try {
-      const filas = await parseExcelFile(file);
-      if (filas.length > 500) {
-        throw new Error(
-          `El archivo contiene ${filas.length} filas. El límite máximo por lote es de 500 filas.`,
-        );
-      }
-
       const preview = await previsualizarMutation.mutateAsync({
         tipo,
-        filas,
+        archivo: file,
       });
 
       setVistaPrevia(preview);
@@ -200,22 +193,17 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
     }
   };
 
-  // Confirmar y ejecutar la importación masiva
+  // Confirmar y ejecutar la importación masiva usando el loteId previsualizado
   const handleConfirmarImportacion = async () => {
-    if (!vistaPrevia || vistaPrevia.validasCount === 0) {
+    if (!vistaPrevia || vistaPrevia.validasCount === 0 || !vistaPrevia.loteId) {
       toast.error("No hay filas válidas para importar en este lote.");
       return;
     }
 
     try {
-      // Filtrar sólo las filas con estado "valida" para ejecutar
-      const filasValidas = vistaPrevia.filas
-        .filter((f) => f.estado === "valida")
-        .map((f) => f.datos);
-
       const res = await ejecutarMutation.mutateAsync({
         tipo,
-        filas: filasValidas,
+        loteId: vistaPrevia.loteId,
       });
 
       if (res.estado === "completado" && res.resultado) {
@@ -360,10 +348,10 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
               <FileDropzone
                 file={selectedFile}
                 onFileSelect={handleFileSelect}
-                accept=".xlsx, .xls"
-                acceptedFormats={[".xlsx", ".xls"]}
+                accept=".xlsx"
+                acceptedFormats={[".xlsx"]}
                 title="Arrastre el archivo Excel aquí o haga clic para examinar"
-                description="Soporta archivos .xlsx y .xls de hasta 500 filas de registros"
+                description="Soporta archivos .xlsx de hasta 500 filas de registros"
                 disabled={isParsing || previsualizarMutation.isPending}
                 error={parseError}
               />
