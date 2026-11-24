@@ -32,6 +32,7 @@ export const importacionApi = {
         "/importacion/previsualizar",
         formData,
         {
+          timeout: 60_000,
           headers: {
             "Content-Type": "multipart/form-data",
           },

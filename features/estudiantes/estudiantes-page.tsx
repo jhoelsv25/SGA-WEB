@@ -4,15 +4,23 @@ import * as React from "react";
 import { RegistroPersonaAcciones } from "@/features/personas/components/registro-persona-acciones";
 import type { Persona } from "@/features/personas/types/personas.types";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { StudentIcon, FileExportIcon } from "@hugeicons/core-free-icons";
+import {
+  ArrowRight01Icon,
+  CheckmarkCircle02Icon,
+  FileExportIcon,
+  StudentIcon,
+  UserGroupIcon,
+  UserRemove01Icon,
+} from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
+import { Card, CardContent } from "@/components/ui/card";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useCursorPagination } from "@/hooks/use-cursor-pagination";
 import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { estudianteFilterDefs } from "./config/filters";
-import { useEstudiantesQuery } from "./hooks/use-estudiantes";
+import { useEstudiantesQuery, useResumenEstudiantesQuery } from "./hooks/use-estudiantes";
 import { EstudiantesTable } from "./views/estudiantes-table";
 import { CreateEstudianteModal } from "./components/modals/create-estudiante-modal";
 import { CredentialsModal } from "./components/modals/credentials-modal";
@@ -42,14 +50,21 @@ export function EstudiantesPage() {
     resetDeps: [search, estado],
   });
 
+  const searchLimpio = search ? search.trim() : undefined;
+
   const { data, isLoading, refetch, isFetching } = useEstudiantesQuery({
     cursor: pagination.cursor,
     limit,
-    search: search ? search.trim() : undefined,
+    search: searchLimpio,
     estado,
   });
 
+  const { data: resumen, refetch: refetchResumen } = useResumenEstudiantesQuery({
+    search: searchLimpio,
+  });
+
   const estudiantes = data?.data ?? [];
+  const totalBajas = (resumen?.retirados ?? 0) + (resumen?.egresados ?? 0);
 
   const { exportar, isExporting } = useExportarReporte("estudiantes");
 
@@ -70,6 +85,61 @@ export function EstudiantesPage() {
         icon={StudentIcon}
       />
 
+      {/* Métricas del Padrón */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-border/60">
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">Total en Padrón</p>
+              <p className="text-2xl font-bold">{resumen?.total ?? 0}</p>
+            </div>
+            <div className="bg-primary/10 text-primary rounded-full p-2.5">
+              <HugeiconsIcon icon={UserGroupIcon} className="size-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60">
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">Estudiantes Activos</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                {resumen?.activos ?? 0}
+              </p>
+            </div>
+            <div className="rounded-full bg-emerald-500/10 p-2.5 text-emerald-600">
+              <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60">
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">Trasladados</p>
+              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                {resumen?.trasladados ?? 0}
+              </p>
+            </div>
+            <div className="rounded-full bg-amber-500/10 p-2.5 text-amber-600">
+              <HugeiconsIcon icon={ArrowRight01Icon} className="size-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60">
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">Retirados / Egresados</p>
+              <p className="text-destructive text-2xl font-bold">{totalBajas}</p>
+            </div>
+            <div className="bg-destructive/10 text-destructive rounded-full p-2.5">
+              <HugeiconsIcon icon={UserRemove01Icon} className="size-5" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="space-y-4">
         <ListToolbar
           filterDefs={estudianteFilterDefs}
@@ -81,8 +151,14 @@ export function EstudiantesPage() {
                 tipoImportacion="estudiantes"
                 onVincular={(persona) => abrirRegistro(persona)}
                 onRegistrar={() => abrirRegistro(null)}
-                onImportSuccess={() => void refetch()}
-                onRefresh={() => void refetch()}
+                onImportSuccess={() => {
+                  void refetch();
+                  void refetchResumen();
+                }}
+                onRefresh={() => {
+                  void refetch();
+                  void refetchResumen();
+                }}
                 isRefreshing={isFetching}
                 extraMenuItems={
                   <DropdownMenuItem

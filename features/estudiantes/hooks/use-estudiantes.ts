@@ -9,6 +9,7 @@ import type {
   Estudiante,
   EstudianteQueryParams,
   PaginatedEstudiantesResponse,
+  ResumenEstudiantesResponse,
   UpdateEstudianteInput,
 } from "../types/estudiantes.types";
 
@@ -18,6 +19,14 @@ export function useEstudiantesQuery(params: EstudianteQueryParams = {}) {
   return useQuery<PaginatedEstudiantesResponse, ApiClientError>({
     queryKey: [...ESTUDIANTES_QUERY_KEY, params],
     queryFn: () => estudiantesApi.getEstudiantes(params),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useResumenEstudiantesQuery(params: Pick<EstudianteQueryParams, "search"> = {}) {
+  return useQuery<ResumenEstudiantesResponse, ApiClientError>({
+    queryKey: [...ESTUDIANTES_QUERY_KEY, "resumen", params],
+    queryFn: () => estudiantesApi.getResumenEstudiantes(params),
     placeholderData: keepPreviousData,
   });
 }

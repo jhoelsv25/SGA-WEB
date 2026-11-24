@@ -30,7 +30,7 @@ import {
   ModalConstanciaPdf,
   type OperacionMatriculaTipo,
 } from "../components";
-import { useMatriculasQuery } from "../hooks";
+import { useMatriculasQuery, useResumenMatriculasQuery } from "../hooks";
 import { useSeccionesQuery } from "@/features/secciones";
 import type { Seccion } from "@/features/secciones/types";
 import { useGradosQuery } from "@/features/grados/hooks";
@@ -92,6 +92,16 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
   });
 
   // Consulta de matrículas conectada a cursor y filtros
+  const filtrosResumen = React.useMemo(
+    () => ({
+      search: search && search.length >= 2 ? search : undefined,
+      gradoId: gradoId && gradoId !== "all" ? gradoId : undefined,
+      seccionId: seccionId && seccionId !== "all" ? seccionId : undefined,
+      tipo: tipo && tipo !== "all" ? (tipo as TipoMatricula) : undefined,
+    }),
+    [search, gradoId, seccionId, tipo],
+  );
+
   const {
     data: matriculasData,
     isLoading,
@@ -100,36 +110,25 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
   } = useMatriculasQuery({
     cursor: pagination.cursor,
     limit,
-    search: search && search.length >= 2 ? search : undefined,
-    gradoId: gradoId && gradoId !== "all" ? gradoId : undefined,
-    seccionId: seccionId && seccionId !== "all" ? seccionId : undefined,
-    tipo: tipo && tipo !== "all" ? (tipo as TipoMatricula) : undefined,
+    ...filtrosResumen,
     estado: estado && estado !== "all" ? (estado as EstadoMatricula) : undefined,
   });
 
+  const { data: resumenData, refetch: refetchResumen } = useResumenMatriculasQuery(filtrosResumen);
+
   const matriculas = React.useMemo(() => matriculasData?.data ?? [], [matriculasData]);
 
-  // Métricas de cabecera
-  const metricas = React.useMemo(() => {
-    const totalMatriculados = matriculas.filter((m) => m.estado === "matriculado").length;
-    const totalRetirados = matriculas.filter((m) => m.estado === "retirado").length;
-    const totalTrasladados = matriculas.filter((m) => m.estado === "trasladado").length;
-
-    let vacantesTotales = 0;
-    let vacantesOcupadas = 0;
-    (seccionesData as Seccion[] | undefined)?.forEach((sec: Seccion) => {
-      vacantesTotales += sec.vacantes;
-      vacantesOcupadas += sec.matriculados;
-    });
-
-    return {
-      totalMatriculados,
-      totalRetirados,
-      totalTrasladados,
-      vacantesLibres: Math.max(0, vacantesTotales - vacantesOcupadas),
-      vacantesTotales,
-    };
-  }, [matriculas, seccionesData]);
+  // Métricas reales del año lectivo respetando los filtros activos
+  const metricas = React.useMemo(
+    () => ({
+      totalMatriculados: resumenData?.totalMatriculados ?? 0,
+      totalRetirados: resumenData?.totalRetirados ?? 0,
+      totalTrasladados: resumenData?.totalTrasladados ?? 0,
+      vacantesLibres: resumenData?.vacantesDisponibles ?? 0,
+      vacantesTotales: resumenData?.vacantesTotales ?? 0,
+    }),
+    [resumenData],
+  );
 
   // Columnas de TanStack Table
   const columns = React.useMemo(
@@ -152,7 +151,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         <Card className="border-border/60">
           <CardContent className="flex items-center justify-between p-4">
             <div className="space-y-1">
-              <p className="text-muted-foreground text-xs font-medium">Estudiantes en Página</p>
+              <p className="text-muted-foreground text-xs font-medium">Total Matriculados</p>
               <p className="text-2xl font-bold">{metricas.totalMatriculados}</p>
             </div>
             <div className="rounded-full bg-emerald-500/10 p-2.5 text-emerald-600">
@@ -165,7 +164,14 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
           <CardContent className="flex items-center justify-between p-4">
             <div className="space-y-1">
               <p className="text-muted-foreground text-xs font-medium">Vacantes Disponibles</p>
-              <p className="text-primary text-2xl font-bold">{metricas.vacantesLibres}</p>
+              <div className="flex items-baseline gap-1.5">
+                <p className="text-primary text-2xl font-bold">{metricas.vacantesLibres}</p>
+                {metricas.vacantesTotales > 0 && (
+                  <span className="text-muted-foreground text-xs">
+                    / {metricas.vacantesTotales}
+                  </span>
+                )}
+              </div>
             </div>
             <div className="bg-primary/10 text-primary rounded-full p-2.5">
               <HugeiconsIcon icon={UserGroupIcon} className="size-5" />
@@ -202,7 +208,10 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
       <ListToolbar
         filterDefs={filterDefs}
         listFilters={listFilters}
-        onRefresh={() => void refetch()}
+        onRefresh={() => {
+          void refetch();
+          void refetchResumen();
+        }}
         isRefreshing={isFetching}
         actions={
           puedeGestionar ? (
@@ -286,7 +295,10 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         open={modalImportarOpen}
         onOpenChange={setModalImportarOpen}
         tipo="matriculas"
-        onSuccess={() => void refetch()}
+        onSuccess={() => {
+          void refetch();
+          void refetchResumen();
+        }}
       />
 
       <ModalOperacionMatricula

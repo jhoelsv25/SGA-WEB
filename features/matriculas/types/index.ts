@@ -57,6 +57,15 @@ export interface MatriculaQueryParams {
   limit?: number;
 }
 
+export interface ResumenMatriculasResponse {
+  totalMatriculados: number;
+  totalRetirados: number;
+  totalTrasladados: number;
+  vacantesTotales: number;
+  vacantesOcupadas: number;
+  vacantesDisponibles: number;
+}
+
 export interface PaginatedMatriculasResponse {
   data: MatriculaItem[];
   nextCursor: string | null;

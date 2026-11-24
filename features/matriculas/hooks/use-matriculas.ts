@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ApiClientError } from "@/lib/api-client";
 import {
@@ -11,6 +11,7 @@ import {
   getMatriculaById,
   getPreviewEgreso,
   getPreviewPromocion,
+  getResumenMatriculas,
   getResumenPromocion,
   matricularLote,
   matricularMasivo,
@@ -32,6 +33,7 @@ import type {
   PaginatedMatriculasResponse,
   PreviewEgresoResponse,
   PreviewPromocionResponse,
+  ResumenMatriculasResponse,
   ResumenPromocionResponse,
   RetirarMatriculaPayload,
   TrasladarMatriculaPayload,
@@ -43,6 +45,17 @@ export function useMatriculasQuery(params: MatriculaQueryParams = {}) {
   return useQuery<PaginatedMatriculasResponse, ApiClientError>({
     queryKey: [...MATRICULAS_QUERY_KEY, params],
     queryFn: () => getMatriculas(params),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useResumenMatriculasQuery(
+  params: Omit<MatriculaQueryParams, "cursor" | "limit" | "estado"> = {},
+) {
+  return useQuery<ResumenMatriculasResponse, ApiClientError>({
+    queryKey: [...MATRICULAS_QUERY_KEY, "resumen", params],
+    queryFn: () => getResumenMatriculas(params),
+    placeholderData: keepPreviousData,
   });
 }
 

@@ -13,6 +13,7 @@ import type {
   PaginatedMatriculasResponse,
   PreviewEgresoResponse,
   PreviewPromocionResponse,
+  ResumenMatriculasResponse,
   ResumenPromocionResponse,
   RetirarMatriculaPayload,
   TrasladarMatriculaPayload,
@@ -32,6 +33,22 @@ export async function getMatriculas(
   if (params?.limit !== undefined) queryParams.limit = params.limit;
 
   const response = await apiClient.get<PaginatedMatriculasResponse>("/matriculas", {
+    params: queryParams,
+  });
+  return response.data;
+}
+
+export async function getResumenMatriculas(
+  params?: Omit<MatriculaQueryParams, "cursor" | "limit" | "estado">,
+): Promise<ResumenMatriculasResponse> {
+  const queryParams: Record<string, string> = {};
+  if (params?.anioAcademicoId) queryParams.anioAcademicoId = params.anioAcademicoId;
+  if (params?.gradoId) queryParams.gradoId = params.gradoId;
+  if (params?.seccionId) queryParams.seccionId = params.seccionId;
+  if (params?.tipo) queryParams.tipo = params.tipo;
+  if (params?.search) queryParams.search = params.search;
+
+  const response = await apiClient.get<ResumenMatriculasResponse>("/matriculas/resumen", {
     params: queryParams,
   });
   return response.data;

@@ -6,6 +6,7 @@ import type {
   Estudiante,
   EstudianteQueryParams,
   PaginatedEstudiantesResponse,
+  ResumenEstudiantesResponse,
   UpdateEstudianteInput,
 } from "../types/estudiantes.types";
 
@@ -18,6 +19,19 @@ export const estudiantesApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al cargar la lista de estudiantes.");
+    }
+  },
+
+  async getResumenEstudiantes(
+    params: Pick<EstudianteQueryParams, "search"> = {},
+  ): Promise<ResumenEstudiantesResponse> {
+    try {
+      const { data } = await apiClient.get<ResumenEstudiantesResponse>("/estudiantes/resumen", {
+        params,
+      });
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al cargar el resumen del padrón de estudiantes.");
     }
   },
 
