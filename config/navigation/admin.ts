@@ -229,6 +229,23 @@ export const adminNavigation: NavSection[] = [
         description: "Historial de mis sesiones, tema y justificaciones",
       },
       {
+        id: "admin-planificacion-sesiones",
+        label: "Planificación de sesiones",
+        link: "/admin/planificacion-sesiones",
+        icon: FileEditIcon,
+        roles: ["admin"],
+        ocultarAlAdministrador: true,
+        description: "Planifique sus sesiones de aprendizaje con el formato estándar",
+      },
+      {
+        id: "admin-catalogo-curricular",
+        label: "Catálogo curricular",
+        link: "/admin/catalogo-curricular",
+        icon: BookOpen01Icon,
+        roles: ["admin"],
+        description: "Competencias, capacidades y desempeños del CNEB por grado",
+      },
+      {
         id: "admin-mis-ausencias",
         label: "Mis ausencias",
         link: "/admin/mis-ausencias",

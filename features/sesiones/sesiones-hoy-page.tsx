@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePuedeGestionarAusencias } from "@/features/ausencias-docente/hooks";
 import { RegistrarAusenciaModal } from "@/features/ausencias-docente/components/registro";
+import { ModalHorasReales } from "@/features/planificacion-sesiones";
 import { ModalReemplazo } from "./components";
 import { getSesionesHoyColumns } from "./views";
 import { usePanelSesionesHoy, usePuedeGestionarSesiones } from "./hooks";
@@ -27,6 +28,7 @@ export function SesionesHoyPage() {
   const puedeGestionarAusencias = usePuedeGestionarAusencias();
   const [aReemplazar, setAReemplazar] = React.useState<Sesion | null>(null);
   const [aRegistrarAusencia, setARegistrarAusencia] = React.useState<Sesion | null>(null);
+  const [aHorasReales, setAHorasReales] = React.useState<Sesion | null>(null);
 
   // Filtros reactivos
   const [busqueda, setBusqueda] = React.useState("");
@@ -49,6 +51,7 @@ export function SesionesHoyPage() {
         puedeGestionarAusencias,
         onReemplazo: handleReemplazo,
         onRegistrarAusencia: handleRegistrarAusencia,
+        onHorasReales: setAHorasReales,
       }),
     [puedeGestionar, puedeGestionarAusencias, handleReemplazo, handleRegistrarAusencia],
   );
@@ -304,6 +307,10 @@ export function SesionesHoyPage() {
         sesion={aRegistrarAusencia}
         open={Boolean(aRegistrarAusencia)}
         onOpenChange={(abierto) => !abierto && setARegistrarAusencia(null)}
+      />
+      <ModalHorasReales
+        sesion={aHorasReales}
+        onOpenChange={(abierto) => !abierto && setAHorasReales(null)}
       />
     </div>
   );

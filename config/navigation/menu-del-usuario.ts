@@ -42,6 +42,8 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/mi-asistencia",
   "/admin/sesiones-hoy",
   "/admin/mis-sesiones",
+  "/admin/planificacion-sesiones",
+  "/admin/catalogo-curricular",
   "/admin/justificaciones-sesion",
   "/admin/aula-virtual",
   "/admin/solicitudes-cambio-fecha",

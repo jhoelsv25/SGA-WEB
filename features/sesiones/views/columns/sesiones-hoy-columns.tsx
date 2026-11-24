@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserRemove01Icon } from "@hugeicons/core-free-icons";
@@ -15,6 +16,7 @@ export interface SesionesHoyColumnsOptions {
   puedeGestionarAusencias: boolean;
   onReemplazo: (sesion: SesionPanel) => void;
   onRegistrarAusencia: (sesion: SesionPanel) => void;
+  onHorasReales: (sesion: SesionPanel) => void;
 }
 
 export function getSesionesHoyColumns({
@@ -22,6 +24,7 @@ export function getSesionesHoyColumns({
   puedeGestionarAusencias,
   onReemplazo,
   onRegistrarAusencia,
+  onHorasReales,
 }: SesionesHoyColumnsOptions): ColumnDef<SesionPanel>[] {
   return [
     {
@@ -81,6 +84,28 @@ export function getSesionesHoyColumns({
       },
     },
     {
+      id: "planificacion",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Planificación" />,
+      cell: ({ row }) => {
+        const p = row.original.planificacion;
+        if (!p) {
+          return (
+            <StatusBadge tone="neutral" size="sm">
+              Sin planificación
+            </StatusBadge>
+          );
+        }
+        return (
+          <Link
+            href={`/admin/sesiones-hoy/planificacion/${p.id}`}
+            className="text-primary text-xs font-medium underline-offset-2 hover:underline"
+          >
+            Ver sesión planificada
+          </Link>
+        );
+      },
+    },
+    {
       id: "firmas",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Firmas" />,
       cell: ({ row }) => <HorasFirmadas sesion={row.original} />,
@@ -115,7 +140,7 @@ export function getSesionesHoyColumns({
         const habilitarReemplazo = puedeGestionar && !s.horaIngreso;
         const habilitarAusencia = puedeGestionarAusencias && s.horaIngreso === null;
 
-        if (!habilitarReemplazo && !habilitarAusencia) return null;
+        if (!habilitarReemplazo && !habilitarAusencia && !puedeGestionar) return null;
 
         return (
           <div className="flex flex-wrap items-center justify-end gap-1.5">
@@ -130,6 +155,17 @@ export function getSesionesHoyColumns({
               >
                 <HugeiconsIcon icon={UserRemove01Icon} className="size-3.5" aria-hidden="true" />
                 <span>Registrar ausencia</span>
+              </Button>
+            )}
+            {puedeGestionar && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="min-h-9"
+                onClick={() => onHorasReales(s)}
+              >
+                Horas en aula
               </Button>
             )}
             {habilitarReemplazo && (
