@@ -316,7 +316,7 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
             <span
               className={`text-xs sm:text-sm ${pasoEfectivo === "result" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
             >
-              Credenciales emitidas
+              {tipo === "matriculas" ? "Matrículas registradas" : "Credenciales emitidas"}
             </span>
           </div>
         </div>
@@ -640,12 +640,14 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
               </div>
               <div>
                 <h3 className="text-foreground text-base font-semibold">
-                  Procesando e inscribiendo en el sistema institucional
+                  {tipo === "matriculas"
+                    ? "Procesando y registrando matrículas escolares"
+                    : "Procesando e inscribiendo en el sistema institucional"}
                 </h3>
                 <p className="text-muted-foreground mx-auto mt-1 max-w-md text-xs">
-                  El lote de {vistaPrevia?.validasCount ?? 0} registros está siendo validado y
-                  registrado en la base de datos oficial, emitiendo legajos escolares y credenciales
-                  seguras de acceso.
+                  {tipo === "matriculas"
+                    ? `El lote de ${vistaPrevia?.validasCount ?? 0} matrículas está siendo registrado en sus secciones correspondientes, generando códigos de matrícula y libretas escolares.`
+                    : `El lote de ${vistaPrevia?.validasCount ?? 0} registros está siendo validado y registrado en la base de datos oficial, emitiendo legajos escolares y credenciales seguras de acceso.`}
                 </p>
               </div>
 
@@ -686,10 +688,20 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
 
             <div className="bg-muted/40 text-muted-foreground mx-auto max-w-lg rounded-lg border p-4 text-xs">
               <p>
-                💡 <strong>Aviso institucional:</strong> Al culminar el procesamiento, podrá
-                descargar el acta y reporte oficial en Excel con las cuentas de acceso, contraseñas
-                temporales y PINs de marcación escolar para su entrega personal y resguardo
-                confidencial.
+                {tipo === "matriculas" ? (
+                  <>
+                    💡 <strong>Aviso institucional:</strong> Al finalizar el procesamiento, las
+                    matrículas quedarán activas en sus secciones asignadas y las vacantes se
+                    actualizarán automáticamente.
+                  </>
+                ) : (
+                  <>
+                    💡 <strong>Aviso institucional:</strong> Al culminar el procesamiento, podrá
+                    descargar el acta y reporte oficial en Excel con las cuentas de acceso,
+                    contraseñas temporales y PINs de marcación escolar para su entrega personal y
+                    resguardo confidencial.
+                  </>
+                )}
               </p>
             </div>
 
@@ -707,7 +719,11 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
             <div className="rounded-lg border border-emerald-500/20 bg-emerald-50/50 p-4 dark:bg-emerald-950/20">
               <div className="flex items-center gap-2.5 font-semibold text-emerald-700 dark:text-emerald-300">
                 <HugeiconsIcon icon={CheckmarkCircle01Icon} className="h-5 w-5 text-emerald-600" />
-                <span>Inscripción completada exitosamente</span>
+                <span>
+                  {tipo === "matriculas"
+                    ? "Matrículas registradas exitosamente"
+                    : "Inscripción completada exitosamente"}
+                </span>
               </div>
               <p className="text-muted-foreground mt-1 text-xs">{resultadoEfectivo.mensaje}</p>
             </div>
