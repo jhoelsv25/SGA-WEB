@@ -97,17 +97,19 @@ export function useOpciones() {
   });
 }
 
-export function useGuardarPlanificacion() {
+export function useGuardarPlanificacion(silencioso = false) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: GuardarPlanificacionPayload) => guardarPlanificacion(payload),
     onSuccess: (r) => {
-      toast.success(r.mensaje);
+      if (!silencioso) toast.success(r.mensaje);
       qc.setQueryData(planKeys.detalle(r.planificacion.id), r.planificacion);
       void qc.invalidateQueries({ queryKey: [...planKeys.all, "semana"] });
       void qc.invalidateQueries({ queryKey: planKeys.documento(r.planificacion.id) });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      if (!silencioso) toast.error(e.message);
+    },
   });
 }
 

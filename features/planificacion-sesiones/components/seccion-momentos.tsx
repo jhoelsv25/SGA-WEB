@@ -52,7 +52,9 @@ export function SeccionMomentos({ valor, minutosBloque, onChange, disabled }: Pr
           </div>
           <Textarea
             id={`m-${m.codigo}`}
-            rows={4}
+            rows={5}
+            className="text-base"
+            placeholder={m.ejemplo}
             disabled={disabled}
             value={de(m.codigo).actividades ?? ""}
             onChange={(e) => poner(m.codigo, { actividades: e.target.value })}

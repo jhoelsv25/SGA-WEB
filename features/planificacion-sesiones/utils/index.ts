@@ -108,3 +108,4 @@ export function semanasDeBimestre(fechaInicio: string, fechaFin: string): Semana
   }
   return semanas;
 }
+export * from "./progreso";

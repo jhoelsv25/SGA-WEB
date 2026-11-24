@@ -2,13 +2,25 @@ export const MENU_PLANIFICACION_SESIONES = "/admin/planificacion-sesiones";
 export const MENU_CATALOGO_CURRICULAR = "/admin/catalogo-curricular";
 
 export const MOMENTOS = [
-  { codigo: "inicio", nombre: "Inicio", ayuda: "Motivación, saberes previos y propósito." },
+  {
+    codigo: "inicio",
+    nombre: "Inicio",
+    ayuda: "Motivación, saberes previos y propósito.",
+    ejemplo:
+      "Ej.: Saludo, pregunta motivadora, recojo de saberes previos y presentación del propósito.",
+  },
   {
     codigo: "desarrollo",
     nombre: "Desarrollo",
     ayuda: "Estrategias y proceso didáctico (teoría, ejercicios).",
+    ejemplo: "Ej.: Explicación con ejemplos en la pizarra, práctica guiada y trabajo en parejas.",
   },
-  { codigo: "cierre", nombre: "Cierre", ayuda: "Metacognición y evaluación." },
+  {
+    codigo: "cierre",
+    nombre: "Cierre",
+    ayuda: "Metacognición y evaluación.",
+    ejemplo: "Ej.: Preguntas de reflexión (¿qué aprendí?, ¿cómo lo aprendí?) y ficha de salida.",
+  },
 ] as const;
 
 export const ESTADOS_PLANIFICACION = {
