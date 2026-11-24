@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ApiClientError } from "@/lib/api-client";
 import { estudiantesApi } from "../api/estudiantes.api";
@@ -18,6 +18,7 @@ export function useEstudiantesQuery(params: EstudianteQueryParams = {}) {
   return useQuery<PaginatedEstudiantesResponse, ApiClientError>({
     queryKey: [...ESTUDIANTES_QUERY_KEY, params],
     queryFn: () => estudiantesApi.getEstudiantes(params),
+    placeholderData: keepPreviousData,
   });
 }
 

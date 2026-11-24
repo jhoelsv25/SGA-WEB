@@ -1,11 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { TableRowActions } from "@/components/common/row-actions";
 import {
   Delete02Icon,
   PrinterIcon,
   RefreshIcon,
   ShieldCheckIcon,
+  ViewIcon,
 } from "@hugeicons/core-free-icons";
 import type { Estudiante } from "../../types/estudiantes.types";
 
@@ -26,6 +28,8 @@ export function EstudianteActions({
   onReemitirCredencial,
   onVerHistorial,
 }: EstudianteActionsProps) {
+  const router = useRouter();
+
   return (
     <TableRowActions
       header={{
@@ -40,6 +44,12 @@ export function EstudianteActions({
       onEdit={() => onEdit(estudiante)}
       editLabel="Editar ficha de estudiante"
       items={[
+        {
+          key: "ver-detalle",
+          label: "Ver expediente completo",
+          icon: ViewIcon,
+          onClick: () => router.push(`/admin/estudiantes/${estudiante.id}`),
+        },
         ...(onPrintCarne
           ? [
               {
