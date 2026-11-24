@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AlertCircleIcon,
@@ -16,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePuedeGestionarAusencias } from "@/features/ausencias-docente/hooks";
 import { RegistrarAusenciaModal } from "@/features/ausencias-docente/components/registro";
+import { ModalHorasReales } from "@/features/planificacion-sesiones";
 import { ModalReemplazo } from "./components";
 import { getSesionesHoyColumns } from "./views";
 import { usePanelSesionesHoy, usePuedeGestionarSesiones } from "./hooks";
@@ -27,6 +29,7 @@ export function SesionesHoyPage() {
   const puedeGestionarAusencias = usePuedeGestionarAusencias();
   const [aReemplazar, setAReemplazar] = React.useState<Sesion | null>(null);
   const [aRegistrarAusencia, setARegistrarAusencia] = React.useState<Sesion | null>(null);
+  const [aHorasReales, setAHorasReales] = React.useState<Sesion | null>(null);
 
   // Filtros reactivos
   const [busqueda, setBusqueda] = React.useState("");
@@ -49,6 +52,7 @@ export function SesionesHoyPage() {
         puedeGestionarAusencias,
         onReemplazo: handleReemplazo,
         onRegistrarAusencia: handleRegistrarAusencia,
+        onHorasReales: setAHorasReales,
       }),
     [puedeGestionar, puedeGestionarAusencias, handleReemplazo, handleRegistrarAusencia],
   );
@@ -98,21 +102,30 @@ export function SesionesHoyPage() {
         icon={Clock01Icon}
         breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Sesiones de hoy" }]}
         actions={
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => void refetch()}
-            disabled={isFetching}
-            aria-label="Actualizar sesiones"
-            className="min-h-10 gap-1.5 rounded-full px-3.5 text-xs font-semibold shadow-2xs"
-          >
-            <HugeiconsIcon
-              icon={RefreshIcon}
-              className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}
-              aria-hidden="true"
-            />
-            <span className="hidden sm:inline">Actualizar en vivo</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="min-h-10 rounded-full px-3.5 text-xs font-semibold"
+            >
+              <Link href="/admin/sesiones-hoy/planificaciones">Planificaciones por bimestre</Link>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void refetch()}
+              disabled={isFetching}
+              aria-label="Actualizar sesiones"
+              className="min-h-10 gap-1.5 rounded-full px-3.5 text-xs font-semibold shadow-2xs"
+            >
+              <HugeiconsIcon
+                icon={RefreshIcon}
+                className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}
+                aria-hidden="true"
+              />
+              <span className="hidden sm:inline">Actualizar en vivo</span>
+            </Button>
+          </div>
         }
       />
 
@@ -304,6 +317,10 @@ export function SesionesHoyPage() {
         sesion={aRegistrarAusencia}
         open={Boolean(aRegistrarAusencia)}
         onOpenChange={(abierto) => !abierto && setARegistrarAusencia(null)}
+      />
+      <ModalHorasReales
+        sesion={aHorasReales}
+        onOpenChange={(abierto) => !abierto && setAHorasReales(null)}
       />
     </div>
   );

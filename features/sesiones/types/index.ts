@@ -39,6 +39,8 @@ export interface Sesion {
   salidaAutomatica: boolean;
   observaciones: string | null;
   justificacion: JustificacionSesion | null;
+  /** RF-024: sesión planificada por el docente; null si no planificó. */
+  planificacion?: { id: string; estado: "borrador" | "lista" | "ejecutada" } | null;
 }
 
 export interface SesionPanel extends Sesion {
