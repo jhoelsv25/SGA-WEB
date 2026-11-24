@@ -54,6 +54,14 @@ export interface EstudianteQueryParams {
   estado?: EstadoEstudiante;
 }
 
+export interface ResumenEstudiantesResponse {
+  total: number;
+  activos: number;
+  trasladados: number;
+  retirados: number;
+  egresados: number;
+}
+
 export interface CreateEstudianteInput {
   personaId?: string;
   nuevaPersona?: CreatePersonaInput;
