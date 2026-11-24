@@ -8,6 +8,7 @@ import { PageState } from "@/components/common/page-state";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GrillaSemana } from "../components/grilla-semana";
 import { HistorialPlanificacionesView } from "./historial-page";
 import { ESTADOS_PLANIFICACION, MENU_PLANIFICACION_SESIONES } from "../consts";
 import { useCopiarPlanificacion, useSemana } from "../hooks";
@@ -20,6 +21,7 @@ function SemanaView() {
   const { data, isLoading, isError, error, refetch } = useSemana(fecha);
   const copiar = useCopiarPlanificacion();
   const [origen, setOrigen] = React.useState<BloqueSemana | null>(null);
+  const [vista, setVista] = React.useState<"horario" | "lista">("horario");
 
   const porFecha = React.useMemo(() => {
     const mapa = new Map<string, BloqueSemana[]>();
@@ -69,46 +71,70 @@ function SemanaView() {
             <p className="text-muted-foreground text-sm">
               Del {data.desde} al {data.hasta}
             </p>
-            {porFecha.map(([dia, bloques]) => (
-              <section key={dia} className="space-y-2">
-                <h2 className="text-base font-semibold">
-                  {DIAS[bloques[0]?.bloque.diaSemana ?? 0]} · {dia}
-                </h2>
-                <ul className="space-y-2">
-                  {bloques.map((b) => {
-                    const e = ESTADOS_PLANIFICACION[b.estado];
-                    return (
-                      <li
-                        key={`${b.bloque.horarioId}-${b.fecha}`}
-                        className="border-border/80 bg-card flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <div className="space-y-0.5 text-sm">
-                          <p className="font-medium">
-                            {recortarHora(b.bloque.horaInicio)}–{recortarHora(b.bloque.horaFin)} ·{" "}
-                            {b.bloque.cursoNombre}
-                          </p>
-                          <p className="text-muted-foreground text-xs">
-                            {b.bloque.gradoNombre} {b.bloque.seccionNombre}
-                            {b.titulo ? ` · ${b.titulo}` : ""}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <StatusBadge tone={e.tono}>{e.etiqueta}</StatusBadge>
-                          {b.planificacionId && b.estado !== "ejecutada" && (
-                            <Button variant="outline" onClick={() => setOrigen(b)}>
-                              Copiar a otra sección
+            <div className="flex gap-2" role="group" aria-label="Forma de ver la semana">
+              <Button
+                type="button"
+                variant={vista === "horario" ? "default" : "outline"}
+                className="rounded-full"
+                aria-pressed={vista === "horario"}
+                onClick={() => setVista("horario")}
+              >
+                Como mi horario
+              </Button>
+              <Button
+                type="button"
+                variant={vista === "lista" ? "default" : "outline"}
+                className="rounded-full"
+                aria-pressed={vista === "lista"}
+                onClick={() => setVista("lista")}
+              >
+                Lista por día
+              </Button>
+            </div>
+            {vista === "horario" && <GrillaSemana desde={data.desde} bloques={data.bloques} />}
+            {vista === "lista" &&
+              porFecha.map(([dia, bloques]) => (
+                <section key={dia} className="space-y-2">
+                  <h2 className="text-base font-semibold">
+                    {DIAS[bloques[0]?.bloque.diaSemana ?? 0]} · {dia}
+                  </h2>
+                  <ul className="space-y-2">
+                    {bloques.map((b) => {
+                      const e = ESTADOS_PLANIFICACION[b.estado];
+                      return (
+                        <li
+                          key={`${b.bloque.horarioId}-${b.fecha}`}
+                          className="border-border/80 bg-card flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                          <div className="space-y-0.5 text-sm">
+                            <p className="font-medium">
+                              {recortarHora(b.bloque.horaInicio)}–{recortarHora(b.bloque.horaFin)} ·{" "}
+                              {b.bloque.cursoNombre}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                              {b.bloque.gradoNombre} {b.bloque.seccionNombre}
+                              {b.titulo ? ` · ${b.titulo}` : ""}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <StatusBadge tone={e.tono}>{e.etiqueta}</StatusBadge>
+                            {b.planificacionId && b.estado !== "ejecutada" && (
+                              <Button variant="outline" onClick={() => setOrigen(b)}>
+                                Copiar a otra sección
+                              </Button>
+                            )}
+                            <Button asChild variant="outline">
+                              <Link href={href(b)}>
+                                {b.planificacionId ? "Abrir" : "Planificar"}
+                              </Link>
                             </Button>
-                          )}
-                          <Button asChild variant="outline">
-                            <Link href={href(b)}>{b.planificacionId ? "Abrir" : "Planificar"}</Link>
-                          </Button>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            ))}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              ))}
             {origen && (
               <section className="border-border/80 space-y-2 rounded-2xl border p-4">
                 <h2 className="text-sm font-semibold">
