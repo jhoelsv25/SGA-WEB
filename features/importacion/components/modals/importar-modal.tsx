@@ -56,6 +56,7 @@ const TITULOS_TIPO: Record<TipoImportacion, string> = {
   estudiantes: "Padrón de Estudiantes",
   docentes: "Plana Docente",
   apoderados: "Padrón de Apoderados",
+  matriculas: "Nómina de Matrículas",
 };
 
 /**
@@ -148,6 +149,9 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
       // Invalida y refresca inmediatamente la lista de la pantalla
       queryClient.invalidateQueries({ queryKey: [tipo] });
       queryClient.invalidateQueries({ queryKey: ["personas"] });
+      if (tipo === "matriculas") {
+        queryClient.invalidateQueries({ queryKey: ["secciones"] });
+      }
     }
     onOpenChange(newOpen);
   };
@@ -160,6 +164,9 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
         toast.success(estadoJobQuery.data.mensaje || "Importación masiva completada con éxito.");
         queryClient.invalidateQueries({ queryKey: [tipo] });
         queryClient.invalidateQueries({ queryKey: ["personas"] });
+        if (tipo === "matriculas") {
+          queryClient.invalidateQueries({ queryKey: ["secciones"] });
+        }
         onSuccess?.();
       } else if (estadoJobQuery.data.estado === "fallido") {
         hasNotifiedRef.current = true;
@@ -455,9 +462,13 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-16 text-center">Fila</TableHead>
-                      <TableHead>Documento</TableHead>
-                      <TableHead>Nombres y Apellidos</TableHead>
-                      <TableHead>Identificador / Clave</TableHead>
+                      <TableHead>{tipo === "matriculas" ? "Código SIAGIE" : "Documento"}</TableHead>
+                      <TableHead>
+                        {tipo === "matriculas" ? "Estudiante" : "Nombres y Apellidos"}
+                      </TableHead>
+                      <TableHead>
+                        {tipo === "matriculas" ? "Grado / Sección" : "Identificador / Clave"}
+                      </TableHead>
                       <TableHead className="text-center">Estado</TableHead>
                       <TableHead>Observación</TableHead>
                     </TableRow>
@@ -479,40 +490,72 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                             {fila.numeroFila}
                           </TableCell>
                           <TableCell className="text-xs font-medium">
-                            {(
-                              getDato(fila.datos, "tipoDocumento", "tipo_documento", "tipo") ||
-                              "DNI"
-                            ).toUpperCase()}
-                            :{" "}
-                            {getDato(
-                              fila.datos,
-                              "numeroDocumento",
-                              "numero_documento",
-                              "documento",
-                              "dni",
-                              "num_doc",
-                            ) || "—"}
+                            {tipo === "matriculas" ? (
+                              <span className="font-mono">
+                                {getDato(
+                                  fila.datos,
+                                  "codigoSiagie",
+                                  "codigo_siagie",
+                                  "numeroDocumento",
+                                  "dni",
+                                ) || "—"}
+                              </span>
+                            ) : (
+                              <>
+                                {(
+                                  getDato(fila.datos, "tipoDocumento", "tipo_documento", "tipo") ||
+                                  "DNI"
+                                ).toUpperCase()}
+                                :{" "}
+                                {getDato(
+                                  fila.datos,
+                                  "numeroDocumento",
+                                  "numero_documento",
+                                  "documento",
+                                  "dni",
+                                  "num_doc",
+                                ) || "—"}
+                              </>
+                            )}
                           </TableCell>
                           <TableCell className="text-xs font-medium">
-                            {[
-                              getDato(fila.datos, "nombres", "nombre"),
-                              getDato(fila.datos, "apellidoPaterno", "apellido_paterno", "paterno"),
-                              getDato(fila.datos, "apellidoMaterno", "apellido_materno", "materno"),
-                            ]
-                              .filter(Boolean)
-                              .join(" ") || "—"}
+                            {tipo === "matriculas"
+                              ? getDato(fila.datos, "estudianteNombre") || "—"
+                              : [
+                                  getDato(fila.datos, "nombres", "nombre"),
+                                  getDato(
+                                    fila.datos,
+                                    "apellidoPaterno",
+                                    "apellido_paterno",
+                                    "paterno",
+                                  ),
+                                  getDato(
+                                    fila.datos,
+                                    "apellidoMaterno",
+                                    "apellido_materno",
+                                    "materno",
+                                  ),
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ") || "—"}
                           </TableCell>
                           <TableCell className="text-muted-foreground font-mono text-xs">
-                            {getDato(
-                              fila.datos,
-                              "codigoSiagie",
-                              "codigo_siagie",
-                              "codigoDocente",
-                              "codigo_docente",
-                              "codigoSiagieEstudiante",
-                              "codigo",
-                              "siagie",
-                            ) || "—"}
+                            {tipo === "matriculas"
+                              ? getDato(fila.datos, "gradoSeccion") ||
+                                [getDato(fila.datos, "grado"), getDato(fila.datos, "seccion")]
+                                  .filter(Boolean)
+                                  .join(" - ") ||
+                                "—"
+                              : getDato(
+                                  fila.datos,
+                                  "codigoSiagie",
+                                  "codigo_siagie",
+                                  "codigoDocente",
+                                  "codigo_docente",
+                                  "codigoSiagieEstudiante",
+                                  "codigo",
+                                  "siagie",
+                                ) || "—"}
                           </TableCell>
                           <TableCell className="text-center">
                             {fila.estado === "valida" && (

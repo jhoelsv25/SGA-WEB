@@ -11,6 +11,7 @@ import { DataTable } from "@/components/common/data-table";
 import {
   CheckmarkCircle02Icon,
   Download01Icon,
+  Upload01Icon,
   UserRemove01Icon,
   ArrowRight01Icon,
   UserGroupIcon,
@@ -18,6 +19,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { toast } from "sonner";
+import { ImportarModal } from "@/features/importacion";
 import { descargarMatriculasExcel } from "@/features/reportes";
 import { getMatriculaColumns } from "./columns";
 import {
@@ -47,6 +49,7 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
   const [buscarOpen, setBuscarOpen] = React.useState(false);
   const [estudianteElegido, setEstudianteElegido] = React.useState<Estudiante | null>(null);
   const [modalMasivaOpen, setModalMasivaOpen] = React.useState(false);
+  const [modalImportarOpen, setModalImportarOpen] = React.useState(false);
   const [operacionActiva, setOperacionActiva] = React.useState<{
     matricula: MatriculaItem | null;
     tipo: OperacionMatriculaTipo;
@@ -212,10 +215,16 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
         secondaryActions={
           <>
             {puedeGestionar ? (
-              <DropdownMenuItem onSelect={() => setModalMasivaOpen(true)}>
-                <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
-                Matrícula masiva
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem onSelect={() => setModalImportarOpen(true)}>
+                  <HugeiconsIcon icon={Upload01Icon} className="size-4" />
+                  Importar desde Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setModalMasivaOpen(true)}>
+                  <HugeiconsIcon icon={UserGroupIcon} className="size-4" />
+                  Matrícula masiva
+                </DropdownMenuItem>
+              </>
             ) : null}
             <DropdownMenuItem
               onSelect={() => {
@@ -272,6 +281,13 @@ export function MatriculasTable({ puedeGestionar = true }: MatriculasTableProps)
       />
 
       <ModalMatriculaMasiva open={modalMasivaOpen} onOpenChange={setModalMasivaOpen} />
+
+      <ImportarModal
+        open={modalImportarOpen}
+        onOpenChange={setModalImportarOpen}
+        tipo="matriculas"
+        onSuccess={() => void refetch()}
+      />
 
       <ModalOperacionMatricula
         matricula={operacionActiva.matricula}
