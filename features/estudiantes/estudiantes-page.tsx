@@ -100,7 +100,7 @@ export function EstudiantesPage() {
 
         <EstudiantesTable
           estudiantes={estudiantes}
-          isLoading={isLoading}
+          isLoading={isLoading || (isFetching && estudiantes.length === 0)}
           cursorPagination={{
             ...pagination.getPaginationProps(data),
             isLoading: isFetching,

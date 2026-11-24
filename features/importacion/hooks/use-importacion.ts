@@ -1,5 +1,7 @@
+import * as React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/lib/api-client";
 import { importacionApi } from "../api/importacion.api";
 import type {
   EjecutarImportacionInput,
@@ -56,6 +58,46 @@ export function useEjecutarImportacion() {
 export function useEstadoJobQuery(jobId?: string, enabled = true) {
   const queryClient = useQueryClient();
 
+  React.useEffect(() => {
+    if (!jobId || !enabled) return;
+
+    const url = `${API_BASE_URL}/importacion/jobs/${jobId}/progreso`;
+    let es: EventSource | null = null;
+
+    try {
+      es = new EventSource(url, { withCredentials: true });
+
+      es.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data) as EstadoImportacionJobResponse;
+          queryClient.setQueryData(["importacion", "job", jobId], data);
+
+          if (data.estado === "completado" || data.estado === "fallido") {
+            if (data.estado === "completado") {
+              queryClient.invalidateQueries({ queryKey: ["estudiantes"] });
+              queryClient.invalidateQueries({ queryKey: ["docentes"] });
+              queryClient.invalidateQueries({ queryKey: ["apoderados"] });
+              queryClient.invalidateQueries({ queryKey: ["personas"] });
+            }
+            es?.close();
+          }
+        } catch {
+          // Si el mensaje no es JSON válido, ignorar
+        }
+      };
+
+      es.onerror = () => {
+        es?.close();
+      };
+    } catch {
+      // Si el navegador no soporta EventSource o falla la inicialización
+    }
+
+    return () => {
+      es?.close();
+    };
+  }, [jobId, enabled, queryClient]);
+
   return useQuery<EstadoImportacionJobResponse, Error>({
     queryKey: ["importacion", "job", jobId],
     queryFn: async () => {
@@ -69,14 +111,7 @@ export function useEstadoJobQuery(jobId?: string, enabled = true) {
       return res;
     },
     enabled: Boolean(jobId) && enabled,
-    refetchInterval: (query) => {
-      const data = query.state.data;
-      if (!data) return 1000;
-      if (data.estado === "completado" || data.estado === "fallido") {
-        return false;
-      }
-      return 1000;
-    },
+    refetchInterval: false,
   });
 }
 
