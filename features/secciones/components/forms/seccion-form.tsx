@@ -242,7 +242,7 @@ export function SeccionForm({
           disabled={isLoading}
         />
         <p className="text-muted-foreground text-xs">
-          Un docente activo puede ser tutor de una sola sección por año académico.
+          Un docente activo puede ser tutor de una o más secciones en el año académico.
         </p>
         {errors.tutorId && (
           <p className="text-destructive text-xs font-medium">{errors.tutorId.message}</p>

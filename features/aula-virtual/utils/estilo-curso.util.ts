@@ -18,6 +18,7 @@ export function obtenerEstiloCurso(curso: {
   }
 
   if (nombre.includes("mat")) return PALETAS_AREA.matematica;
+  if (nombre.includes("quechua")) return PALETAS_AREA.quechua;
   if (nombre.includes("comunic")) return PALETAS_AREA.comunicacion;
   if (nombre.includes("ingl")) return PALETAS_AREA.ingles;
   if (nombre.includes("arte") || nombre.includes("cultura")) return PALETAS_AREA.arte_cultura;

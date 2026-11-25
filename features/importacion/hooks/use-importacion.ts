@@ -78,6 +78,11 @@ export function useEstadoJobQuery(jobId?: string, enabled = true) {
               queryClient.invalidateQueries({ queryKey: ["docentes"] });
               queryClient.invalidateQueries({ queryKey: ["apoderados"] });
               queryClient.invalidateQueries({ queryKey: ["personas"] });
+              queryClient.invalidateQueries({ queryKey: ["matriculas"] });
+              queryClient.invalidateQueries({ queryKey: ["secciones"] });
+              queryClient.invalidateQueries({ queryKey: ["carga-academica"] });
+              queryClient.invalidateQueries({ queryKey: ["horarios"] });
+              queryClient.invalidateQueries({ queryKey: ["plan-estudios"] });
             }
             es?.close();
           }
@@ -107,6 +112,11 @@ export function useEstadoJobQuery(jobId?: string, enabled = true) {
         queryClient.invalidateQueries({ queryKey: ["docentes"] });
         queryClient.invalidateQueries({ queryKey: ["apoderados"] });
         queryClient.invalidateQueries({ queryKey: ["personas"] });
+        queryClient.invalidateQueries({ queryKey: ["matriculas"] });
+        queryClient.invalidateQueries({ queryKey: ["secciones"] });
+        queryClient.invalidateQueries({ queryKey: ["carga-academica"] });
+        queryClient.invalidateQueries({ queryKey: ["horarios"] });
+        queryClient.invalidateQueries({ queryKey: ["plan-estudios"] });
       }
       return res;
     },

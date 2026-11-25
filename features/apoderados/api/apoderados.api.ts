@@ -4,6 +4,7 @@ import type {
   CreateApoderadoPayload,
   CreateApoderadoResponse,
   PaginatedApoderadosResponse,
+  ResumenApoderadosResponse,
   UpdateApoderadoPayload,
   VincularEstudiantePayload,
   VinculoFamiliar,
@@ -26,6 +27,19 @@ export const apoderadosApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al cargar la lista de apoderados.");
+    }
+  },
+
+  async getResumenApoderados(
+    params: Omit<ApoderadosQueryParams, "cursor" | "limit"> = {},
+  ): Promise<ResumenApoderadosResponse> {
+    try {
+      const { data } = await apiClient.get<ResumenApoderadosResponse>("/apoderados/resumen", {
+        params,
+      });
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al cargar el resumen de apoderados.");
     }
   },
 

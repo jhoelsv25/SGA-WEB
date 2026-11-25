@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ApiClientError } from "@/lib/api-client";
 import { docentesApi } from "../api/docentes.api";
@@ -9,6 +9,7 @@ import type {
   Docente,
   DocenteQueryParams,
   PaginatedDocentesResponse,
+  ResumenDocentesResponse,
   UpdateDocenteInput,
 } from "../types/docentes.types";
 
@@ -19,6 +20,19 @@ export function useDocentesQuery(params: DocenteQueryParams = {}, enabled = true
     queryKey: [...DOCENTES_QUERY_KEY, params],
     queryFn: () => docentesApi.getDocentes(params),
     enabled,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useResumenDocentesQuery(
+  params: Omit<DocenteQueryParams, "cursor" | "limit"> = {},
+  enabled = true,
+) {
+  return useQuery<ResumenDocentesResponse, ApiClientError>({
+    queryKey: [...DOCENTES_QUERY_KEY, "resumen", params],
+    queryFn: () => docentesApi.getResumenDocentes(params),
+    enabled,
+    placeholderData: keepPreviousData,
   });
 }
 

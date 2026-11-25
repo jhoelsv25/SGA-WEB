@@ -3,18 +3,22 @@
 import * as React from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  UserGroupIcon,
-  UserAdd01Icon,
   FileExportIcon,
   FileImportIcon,
+  IdIcon,
+  Key01Icon,
+  UserAdd01Icon,
+  UserGroupIcon,
+  UserQuestion01Icon,
 } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useExportarReporte } from "@/hooks/use-exportar-reporte";
 import { personaFilterDefs } from "./config/filters";
-import { usePersonasQuery } from "./hooks/use-personas";
+import { usePersonasQuery, useResumenPersonasQuery } from "./hooks/use-personas";
 import { PersonasTable } from "./views/personas-table";
 import { CreatePersonaModal } from "./components/modals/create-persona-modal";
 import { ImportarModal } from "@/features/importacion";
@@ -57,10 +61,18 @@ export function PersonasPage() {
     setPageIndex(0);
   }
 
+  const searchLimpio = search ? search.trim() : undefined;
+
   const { data, isLoading, refetch, isFetching } = usePersonasQuery({
     cursor: currentCursor,
     limit,
-    search: search ? search.trim() : undefined,
+    search: searchLimpio,
+    tipoDocumento,
+    esProvisional,
+  });
+
+  const { data: resumen, refetch: refetchResumen } = useResumenPersonasQuery({
+    search: searchLimpio,
     tipoDocumento,
     esProvisional,
   });
@@ -96,12 +108,72 @@ export function PersonasPage() {
         ]}
       />
 
+      {/* Métricas del Padrón Único */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="border-border/60">
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">Total en Padrón</p>
+              <p className="text-2xl font-bold">{resumen?.total ?? 0}</p>
+            </div>
+            <div className="bg-primary/10 text-primary rounded-full p-2.5">
+              <HugeiconsIcon icon={UserGroupIcon} className="size-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60">
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">Con Ficha Académica</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                {resumen?.conFicha ?? 0}
+              </p>
+            </div>
+            <div className="rounded-full bg-emerald-500/10 p-2.5 text-emerald-600">
+              <HugeiconsIcon icon={IdIcon} className="size-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60">
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">Con Acceso Digital</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {resumen?.conCuenta ?? 0}
+              </p>
+            </div>
+            <div className="rounded-full bg-blue-500/10 p-2.5 text-blue-600">
+              <HugeiconsIcon icon={Key01Icon} className="size-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60">
+          <CardContent className="flex items-center justify-between p-4">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">Provisionales</p>
+              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                {resumen?.provisionales ?? 0}
+              </p>
+            </div>
+            <div className="rounded-full bg-amber-500/10 p-2.5 text-amber-600">
+              <HugeiconsIcon icon={UserQuestion01Icon} className="size-5" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="space-y-4">
         {/* Barra de Herramientas y Filtros común */}
         <ListToolbar
           filterDefs={personaFilterDefs}
           listFilters={listFilters}
-          onRefresh={() => void refetch()}
+          onRefresh={() => {
+            void refetch();
+            void refetchResumen();
+          }}
           isRefreshing={isFetching}
           actions={
             <Button size="sm" onClick={() => setCreateModalOpen(true)} className="h-10 gap-2">
@@ -131,7 +203,7 @@ export function PersonasPage() {
         {/* Tabla estandarizada con DataTable y paginación por cursores */}
         <PersonasTable
           personas={personas}
-          isLoading={isLoading}
+          isLoading={isLoading || (isFetching && personas.length === 0)}
           cursorPagination={{
             hasNextPage: Boolean(data?.hasMore && data?.nextCursor),
             hasPreviousPage: pageIndex > 0,
@@ -147,7 +219,10 @@ export function PersonasPage() {
         open={importOpen}
         onOpenChange={setImportOpen}
         tipo="personas"
-        onSuccess={() => void refetch()}
+        onSuccess={() => {
+          void refetch();
+          void refetchResumen();
+        }}
       />
 
       {/* Modal para Crear Persona */}

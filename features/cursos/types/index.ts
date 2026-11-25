@@ -1,6 +1,7 @@
 export type AreaCurricular =
   | "matematica"
   | "comunicacion"
+  | "quechua"
   | "ingles"
   | "arte_cultura"
   | "ciencias_sociales"

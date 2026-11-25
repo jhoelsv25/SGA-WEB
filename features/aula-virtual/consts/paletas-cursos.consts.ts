@@ -15,6 +15,10 @@ export const PALETAS_AREA: Record<string, EstiloCursoPaleta> = {
     gradient: "from-rose-600 via-red-700 to-neutral-900",
     accent: "bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300",
   },
+  quechua: {
+    gradient: "from-amber-500 via-orange-600 to-stone-900",
+    accent: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+  },
   ingles: {
     gradient: "from-purple-600 via-violet-800 to-slate-900",
     accent: "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",

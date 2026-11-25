@@ -114,3 +114,10 @@ export interface PaginatedApoderadosResponse {
   hasMore: boolean;
   limit: number;
 }
+
+export interface ResumenApoderadosResponse {
+  total: number;
+  conEstudiantes: number;
+  principales: number;
+  conCuenta: number;
+}

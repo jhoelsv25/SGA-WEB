@@ -113,22 +113,27 @@ apiClient.interceptors.request.use(async (config) => {
 let refreshPromise: Promise<boolean> | null = null;
 
 /**
- * Solicita renovación silenciosa de tokens (GET /auth/refresh-token).
+ * Solicita renovación silenciosa de tokens mediante cookies HttpOnly (GET /auth/refresh-token).
+ * Comparte la promesa activa para evitar rotaciones simultáneas repetidas.
  */
-async function refreshSessionTokens(): Promise<boolean> {
-  try {
-    const refreshAxios = axios.create({
+export async function renovarSesionSilenciosa(): Promise<boolean> {
+  refreshPromise ??= axios
+    .create({
       baseURL: API_BASE_URL,
       timeout: 10000,
       withCredentials: true,
+    })
+    .get("/auth/refresh-token")
+    .then(() => {
+      csrfTokenEnMemoria = null;
+      return true;
+    })
+    .catch(() => false)
+    .finally(() => {
+      refreshPromise = null;
     });
 
-    await refreshAxios.get("/auth/refresh-token");
-    csrfTokenEnMemoria = null;
-    return true;
-  } catch {
-    return false;
-  }
+  return refreshPromise;
 }
 
 // Interceptor de respuestas para refresco silencioso y normalización de errores
@@ -177,11 +182,7 @@ apiClient.interceptors.response.use(
       if (status === 401 && originalRequest && !originalRequest._retry && !isAuthRoute) {
         originalRequest._retry = true;
 
-        refreshPromise ??= refreshSessionTokens().finally(() => {
-          refreshPromise = null;
-        });
-
-        const refreshed = await refreshPromise;
+        const refreshed = await renovarSesionSilenciosa();
 
         if (refreshed) {
           return apiClient(originalRequest);

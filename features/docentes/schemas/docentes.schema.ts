@@ -31,11 +31,7 @@ export const createDocenteSchema = z.object({
   nuevaPersona: personaBaseSchema.optional(),
 
   // Datos laborales de la ficha
-  codigo: z
-    .string()
-    .min(1, "El código de docente es obligatorio.")
-    .max(20, "Máximo 20 caracteres.")
-    .trim(),
+  codigo: z.string().max(20, "Máximo 20 caracteres.").trim().optional().or(z.literal("")),
   especialidad: z.string().max(100).optional().or(z.literal("")),
   tituloProfesional: z.string().max(150).optional().or(z.literal("")),
   tipoContrato: z.enum(["nombrado", "contratado", "practicante"], {
