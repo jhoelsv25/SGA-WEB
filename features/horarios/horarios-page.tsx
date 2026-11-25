@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Calendar03Icon, Clock01Icon, School01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { StatusBadge } from "@/components/common/status-badge";
 import { useGradosQuery } from "@/features/grados";
+import { ImportarButton } from "@/features/importacion";
 import {
   AvisoSeccionCerrada,
   AvisosYAdvertencias,
@@ -31,7 +32,6 @@ import {
 import type { PropuestaHorarioIaResponse } from "./types";
 import { GrillaSemanal } from "./views";
 import { ajustarHoraFinAlHueco } from "./utils";
-import { descargarHorarioSeccionPdf } from "./api";
 import { toast } from "@/lib/toast";
 
 export function HorariosPage() {
@@ -45,7 +45,7 @@ export function HorariosPage() {
     refetch: refetchGrados,
   } = useGradosQuery();
 
-  // Hook de selección sincronizada de grado y sección
+  // Hook de selección sincronizada con la URL de grado, sección y docente
   const {
     gradoId,
     seccionesDelGrado,
@@ -54,9 +54,11 @@ export function HorariosPage() {
     seccionId,
     seccionActual,
     seccionesMismoGrado,
+    docenteFiltroId: docenteUrlId,
     seleccionarGrado,
     seleccionarSeccion,
-  } = useHorariosSeleccion(grados);
+    seleccionarDocente,
+  } = useHorariosSeleccion(grados, isLoadingGrados);
 
   const seccionCerrada = seccionActual?.estado === "cerrada";
   const puedeGestionar = permisoGestionar && !seccionCerrada;
@@ -91,7 +93,6 @@ export function HorariosPage() {
 
   const [propuestaIa, setPropuestaIa] = useState<PropuestaHorarioIaResponse | null>(null);
   const [modalHorasOpen, setModalHorasOpen] = useState(false);
-  const [docenteFiltroId, setDocenteFiltroId] = useState<string | null>(null);
 
   const cargaItems = useMemo(() => cargaData?.items ?? [], [cargaData]);
   const bloquesHorario = useMemo(() => horarioData?.bloques ?? [], [horarioData]);
@@ -120,6 +121,18 @@ export function HorariosPage() {
       .map(([id, nombre]) => ({ id, nombre }))
       .sort((a, b) => a.nombre.localeCompare(b.nombre));
   }, [cargaItems]);
+
+  const docenteFiltroId = useMemo(() => {
+    if (!docenteUrlId) return null;
+    if (isLoadingCarga) return docenteUrlId;
+    return docentesDeLaSeccion.some((d) => d.id === docenteUrlId) ? docenteUrlId : null;
+  }, [docenteUrlId, docentesDeLaSeccion, isLoadingCarga]);
+
+  useEffect(() => {
+    if (!isLoadingCarga && seccionId && docenteUrlId && !docenteFiltroId) {
+      seleccionarDocente(null);
+    }
+  }, [docenteFiltroId, docenteUrlId, isLoadingCarga, seccionId, seleccionarDocente]);
 
   const totalesHoras = useMemo(() => {
     return resumenHoras.reduce(
@@ -157,28 +170,6 @@ export function HorariosPage() {
       if (res.mensaje) setMensajeVigencia(res.mensaje);
     } catch {
       // Notificado en toast
-    }
-  };
-
-  const [exportandoPdf, setExportandoPdf] = useState(false);
-
-  const handleExportarPdf = async () => {
-    if (!seccionId) return;
-    setExportandoPdf(true);
-    try {
-      const blob = await descargarHorarioSeccionPdf(seccionId, docenteFiltroId ?? undefined);
-      const url = URL.createObjectURL(blob);
-      const enlace = document.createElement("a");
-      enlace.href = url;
-      enlace.download = `horario-seccion.pdf`;
-      document.body.appendChild(enlace);
-      enlace.click();
-      enlace.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      toast.error("No se pudo generar el PDF del horario.");
-    } finally {
-      setExportandoPdf(false);
     }
   };
 
@@ -246,21 +237,33 @@ export function HorariosPage() {
         description="Planificación de bloques y grilla semanal por sección escolar"
         icon={Calendar03Icon}
         actions={
-          <HorariosHeaderActions
-            puedeGestionar={puedeGestionar}
-            seccionId={seccionId}
-            seccionesMismoGradoCount={seccionesMismoGrado.length}
-            isLoadingPropuesta={isLoadingPropuesta}
-            isLoadingIa={proponerIaMutation.isPending}
-            isExportandoPdf={exportandoPdf}
-            grillaPropuestaActiva={grillaPropuestaActiva}
-            onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
-            onProponerIa={() => void handleProponerIa()}
-            onDescartarPropuesta={() => setGrillaPropuestaActiva(false)}
-            onCopiarHorario={() => dialogs.setCopiarModalOpen(true)}
-            onExportarPdf={() => void handleExportarPdf()}
-            onNuevoBloque={() => dialogs.abrirNuevoBloque(1, "", "", "clase", null)}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            {permisoGestionar && (
+              <ImportarButton
+                tipo="horarios"
+                label="Importar Excel"
+                onSuccess={() => {
+                  if (seccionId) void refetchHorario();
+                }}
+                className="h-11 min-h-11 rounded-full px-4 font-semibold"
+              />
+            )}
+            <HorariosHeaderActions
+              puedeGestionar={puedeGestionar}
+              gradoId={gradoId}
+              seccionId={seccionId}
+              docenteId={docenteFiltroId}
+              seccionesMismoGradoCount={seccionesMismoGrado.length}
+              isLoadingPropuesta={isLoadingPropuesta}
+              isLoadingIa={proponerIaMutation.isPending}
+              grillaPropuestaActiva={grillaPropuestaActiva}
+              onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
+              onProponerIa={() => void handleProponerIa()}
+              onDescartarPropuesta={() => setGrillaPropuestaActiva(false)}
+              onCopiarHorario={() => dialogs.setCopiarModalOpen(true)}
+              onNuevoBloque={() => dialogs.abrirNuevoBloque(1, "", "", "clase", null)}
+            />
+          </div>
         }
       />
 
@@ -272,7 +275,6 @@ export function HorariosPage() {
             seleccionarGrado(gId);
             setGrillaPropuestaActiva(false);
             setMensajeVigencia(null);
-            setDocenteFiltroId(null);
           }}
           secciones={seccionesDelGrado}
           seccionSeleccionadaId={seccionId}
@@ -280,12 +282,11 @@ export function HorariosPage() {
             seleccionarSeccion(sId);
             setGrillaPropuestaActiva(false);
             setMensajeVigencia(null);
-            setDocenteFiltroId(null);
           }}
           isLoadingSecciones={isLoadingSeccionesGrado}
           docentes={docentesDeLaSeccion}
           docenteSeleccionadoId={docenteFiltroId}
-          onSelectDocente={(dId) => setDocenteFiltroId(dId)}
+          onSelectDocente={(dId) => seleccionarDocente(dId)}
         />
       </div>
 

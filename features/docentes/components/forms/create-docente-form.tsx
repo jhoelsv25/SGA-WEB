@@ -111,7 +111,7 @@ export function CreateDocenteForm({
       await onSubmit({
         personaId: personaVinculada.id,
         darBajaFichaActual: requiereBaja ? { motivo: motivoBaja.trim() } : undefined,
-        codigo: values.codigo.trim(),
+        codigo: values.codigo?.trim() || undefined,
         especialidad: values.especialidad?.trim() || undefined,
         tituloProfesional: values.tituloProfesional?.trim() || undefined,
         tipoContrato: values.tipoContrato,
@@ -132,7 +132,7 @@ export function CreateDocenteForm({
           celular: values.nuevaPersona.celular?.trim() || undefined,
           correo: values.nuevaPersona.correo?.trim() || undefined,
         },
-        codigo: values.codigo.trim(),
+        codigo: values.codigo?.trim() || undefined,
         especialidad: values.especialidad?.trim() || undefined,
         tituloProfesional: values.tituloProfesional?.trim() || undefined,
         tipoContrato: values.tipoContrato,
@@ -329,11 +329,12 @@ export function CreateDocenteForm({
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="codigo" className="text-sm font-medium">
-                  Código de docente *
+                  Código de docente{" "}
+                  <span className="text-muted-foreground font-normal">(opcional)</span>
                 </Label>
                 <Input
                   id="codigo"
-                  placeholder="Ej. DOC015"
+                  placeholder="Auto: 20261124000001"
                   disabled={isLoading}
                   {...register("codigo")}
                 />

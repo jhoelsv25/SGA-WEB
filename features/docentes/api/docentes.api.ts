@@ -6,6 +6,7 @@ import type {
   Docente,
   DocenteQueryParams,
   PaginatedDocentesResponse,
+  ResumenDocentesResponse,
   UpdateDocenteInput,
 } from "../types/docentes.types";
 
@@ -16,6 +17,19 @@ export const docentesApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al cargar la lista de docentes.");
+    }
+  },
+
+  async getResumenDocentes(
+    params: Omit<DocenteQueryParams, "cursor" | "limit"> = {},
+  ): Promise<ResumenDocentesResponse> {
+    try {
+      const { data } = await apiClient.get<ResumenDocentesResponse>("/docentes/resumen", {
+        params,
+      });
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al cargar el resumen de docentes.");
     }
   },
 

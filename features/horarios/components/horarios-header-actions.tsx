@@ -1,52 +1,45 @@
 "use client";
 
-import {
-  Clock01Icon,
-  Copy01Icon,
-  Download01Icon,
-  PlusSignIcon,
-  Cancel01Icon,
-} from "@hugeicons/core-free-icons";
+import { Clock01Icon, Copy01Icon, PlusSignIcon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/common/spinner";
+import { ExportarHorariosDropdown } from "./exportar-horarios-dropdown";
 
 interface HorariosHeaderActionsProps {
   puedeGestionar: boolean;
+  gradoId: string | null;
   seccionId: string | null;
+  docenteId?: string | null;
   seccionesMismoGradoCount: number;
   isLoadingPropuesta: boolean;
   isLoadingIa?: boolean;
-  isExportandoPdf?: boolean;
   grillaPropuestaActiva?: boolean;
   onProponerGrilla: () => void;
   onProponerIa?: () => void;
   onDescartarPropuesta?: () => void;
   onCopiarHorario: () => void;
-  onExportarPdf: () => void;
   onNuevoBloque: () => void;
 }
 
 export function HorariosHeaderActions({
   puedeGestionar,
+  gradoId,
   seccionId,
+  docenteId = null,
   seccionesMismoGradoCount,
   isLoadingPropuesta,
   isLoadingIa = false,
-  isExportandoPdf = false,
   grillaPropuestaActiva = false,
   onProponerGrilla,
   onProponerIa,
   onDescartarPropuesta,
   onCopiarHorario,
-  onExportarPdf,
   onNuevoBloque,
 }: HorariosHeaderActionsProps) {
-  if (!seccionId) return null;
-
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {puedeGestionar && (
+      {puedeGestionar && seccionId && (
         <>
           {grillaPropuestaActiva ? (
             <Button
@@ -101,23 +94,14 @@ export function HorariosHeaderActions({
         </>
       )}
 
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={onExportarPdf}
-        disabled={isExportandoPdf}
-        className="h-11 min-h-11 min-w-11 gap-1.5 rounded-full px-4 text-xs font-semibold"
-      >
-        {isExportandoPdf ? (
-          <Spinner className="size-3.5" />
-        ) : (
-          <HugeiconsIcon icon={Download01Icon} className="size-3.5" />
-        )}
-        <span>Exportar PDF</span>
-      </Button>
+      <ExportarHorariosDropdown
+        gradoId={gradoId}
+        seccionId={seccionId}
+        docenteId={docenteId}
+        mostrarSeccionActual
+      />
 
-      {puedeGestionar && (
+      {puedeGestionar && seccionId && (
         <Button
           type="button"
           size="sm"

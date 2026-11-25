@@ -111,3 +111,10 @@ export interface CargoAsignadoResponse {
   cargoVigente: string;
   rolesSugeridosIds: string[];
 }
+
+export interface ResumenPersonasResponse {
+  total: number;
+  conFicha: number;
+  conCuenta: number;
+  provisionales: number;
+}

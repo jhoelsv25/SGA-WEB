@@ -55,12 +55,22 @@ export interface DocenteQueryParams {
   estado?: EstadoDocente;
 }
 
+export interface ResumenDocentesResponse {
+  total: number;
+  activos: number;
+  licencia: number;
+  cesados: number;
+  nombrados: number;
+  contratados: number;
+  practicantes: number;
+}
+
 export interface CreateDocenteInput {
   personaId?: string;
   nuevaPersona?: CreatePersonaInput;
   /** RF-007 V4: baja de la otra ficha académica vigente (cambio de condición). */
   darBajaFichaActual?: DarBajaFichaActualInput;
-  codigo: string;
+  codigo?: string;
   especialidad?: string;
   tituloProfesional?: string;
   tipoContrato: TipoContrato;

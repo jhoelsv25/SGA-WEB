@@ -10,6 +10,7 @@ import type { TipoImportacion } from "../types/importacion.types";
 interface ImportarButtonProps {
   tipo: TipoImportacion;
   onSuccess?: () => void;
+  label?: string;
   className?: string;
   variant?: "default" | "outline" | "secondary" | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
@@ -18,6 +19,7 @@ interface ImportarButtonProps {
 export function ImportarButton({
   tipo,
   onSuccess,
+  label = "Importar Excel",
   className,
   variant = "outline",
   size = "sm",
@@ -27,13 +29,14 @@ export function ImportarButton({
   return (
     <>
       <Button
+        type="button"
         variant={variant}
         size={size}
         onClick={() => setOpen(true)}
         className={`h-8 gap-1.5 text-xs ${className ?? ""}`}
       >
         <HugeiconsIcon icon={FileImportIcon} className="h-4 w-4" />
-        Importar Excel
+        {label}
       </Button>
 
       <ImportarModal open={open} onOpenChange={setOpen} tipo={tipo} onSuccess={onSuccess} />

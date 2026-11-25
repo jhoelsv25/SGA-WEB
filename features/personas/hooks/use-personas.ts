@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ApiClientError } from "@/lib/api-client";
 import { personasApi } from "../api/personas.api";
@@ -10,6 +10,7 @@ import type {
   PaginatedPersonasResponse,
   Persona,
   PersonaQueryParams,
+  ResumenPersonasResponse,
   SearchPersonaResult,
   UpdatePersonaInput,
 } from "../types/personas.types";
@@ -20,6 +21,17 @@ export function usePersonasQuery(params: PersonaQueryParams = {}) {
   return useQuery<PaginatedPersonasResponse, ApiClientError>({
     queryKey: [...PERSONAS_QUERY_KEY, params],
     queryFn: () => personasApi.getPersonas(params),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useResumenPersonasQuery(
+  params: Pick<PersonaQueryParams, "search" | "tipoDocumento" | "esProvisional"> = {},
+) {
+  return useQuery<ResumenPersonasResponse, ApiClientError>({
+    queryKey: [...PERSONAS_QUERY_KEY, "resumen", params],
+    queryFn: () => personasApi.getResumenPersonas(params),
+    placeholderData: keepPreviousData,
   });
 }
 

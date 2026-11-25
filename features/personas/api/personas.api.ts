@@ -7,6 +7,7 @@ import type {
   PaginatedPersonasResponse,
   Persona,
   PersonaQueryParams,
+  ResumenPersonasResponse,
   SearchPersonaResult,
   UpdatePersonaInput,
 } from "../types/personas.types";
@@ -18,6 +19,19 @@ export const personasApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al cargar la lista de personas.");
+    }
+  },
+
+  async getResumenPersonas(
+    params: Pick<PersonaQueryParams, "search" | "tipoDocumento" | "esProvisional"> = {},
+  ): Promise<ResumenPersonasResponse> {
+    try {
+      const { data } = await apiClient.get<ResumenPersonasResponse>("/personas/resumen", {
+        params,
+      });
+      return data;
+    } catch (error) {
+      handleApiError(error, "Error al cargar el resumen del padrón de personas.");
     }
   },
 

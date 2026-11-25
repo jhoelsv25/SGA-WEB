@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { HorariosPage } from "@/features/horarios";
 
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminHorariosPage() {
-  return <HorariosPage />;
+  return (
+    <Suspense fallback={null}>
+      <HorariosPage />
+    </Suspense>
+  );
 }

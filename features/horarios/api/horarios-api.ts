@@ -79,6 +79,16 @@ export async function getCargaSeccion(seccionId: string): Promise<CargaSeccionHo
   return data;
 }
 
+function extraerNombreArchivo(
+  headers: Record<string, unknown> | undefined,
+  fallback: string,
+): string {
+  const disposicion = headers?.["content-disposition"];
+  if (typeof disposicion !== "string") return fallback;
+  const match = /filename="?([^";]+)"?/i.exec(disposicion);
+  return match?.[1] ?? fallback;
+}
+
 export async function descargarHorarioSeccionPdf(
   seccionId: string,
   docenteId?: string,
@@ -88,6 +98,52 @@ export async function descargarHorarioSeccionPdf(
     responseType: "blob",
   });
   return data;
+}
+
+export async function descargarHorariosConsolidadoPdf(params?: {
+  gradoId?: string;
+  seccionId?: string;
+  docenteId?: string;
+}): Promise<{ blob: Blob; nombreArchivo: string }> {
+  const res = await apiClient.get<Blob>("/horarios/pdf", {
+    params,
+    responseType: "blob",
+  });
+  return {
+    blob: res.data,
+    nombreArchivo: extraerNombreArchivo(
+      res.headers as Record<string, unknown>,
+      "horarios-colegio.pdf",
+    ),
+  };
+}
+
+export async function descargarHorariosExcel(params?: {
+  gradoId?: string;
+  seccionId?: string;
+}): Promise<{ blob: Blob; nombreArchivo: string }> {
+  const res = await apiClient.get<Blob>("/exportacion/horarios", {
+    params,
+    responseType: "blob",
+  });
+  return {
+    blob: res.data,
+    nombreArchivo: extraerNombreArchivo(
+      res.headers as Record<string, unknown>,
+      "sga_horarios.xlsx",
+    ),
+  };
+}
+
+export function guardarBlobDescarga(blob: Blob, nombreArchivo: string): void {
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = nombreArchivo;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  URL.revokeObjectURL(url);
 }
 
 export async function proponerHorarioIa(

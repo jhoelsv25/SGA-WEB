@@ -4,6 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "@/features/auth";
+import { renovarSesionSilenciosa } from "@/lib/api-client";
 import { siteConfig } from "@/config";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ShieldCheckIcon } from "@hugeicons/core-free-icons";
@@ -56,6 +57,29 @@ export function AdminGuard({ children }: AdminGuardProps) {
       }
     }
   }, [isLoading, isError, session, router, pathname]);
+
+  // Renovación silenciosa proactiva por cookie HttpOnly mientras la pestaña esté abierta
+  React.useEffect(() => {
+    if (!session?.user) return;
+
+    const INTERVALO_MS = 30 * 60 * 1000;
+    let ultimoRefresco = Date.now();
+
+    const intentarRefresco = () => {
+      if (Date.now() - ultimoRefresco < INTERVALO_MS) return;
+      ultimoRefresco = Date.now();
+      void renovarSesionSilenciosa();
+    };
+
+    const interval = setInterval(intentarRefresco, 5 * 60 * 1000);
+    const onFocus = () => intentarRefresco();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [session?.user]);
 
   // Pantalla de carga / verificación estética de alto nivel
   if (isLoading) {

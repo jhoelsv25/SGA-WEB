@@ -163,7 +163,7 @@ export function ClonarSeccionesModal({ open, onOpenChange }: ClonarSeccionesModa
                   Intentar conservar tutores asignados
                 </label>
                 <p className="text-muted-foreground text-[11px]">
-                  Asigna al mismo docente tutor si continúa activo y libre en el año actual.
+                  Asigna al mismo docente tutor si continúa activo en el año actual.
                 </p>
               </div>
             </div>

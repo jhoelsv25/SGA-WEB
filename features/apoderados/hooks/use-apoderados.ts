@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ApiClientError } from "@/lib/api-client";
 import { apoderadosApi, type ApoderadosQueryParams } from "../api/apoderados.api";
@@ -7,6 +7,7 @@ import type {
   CreateApoderadoPayload,
   CreateApoderadoResponse,
   PaginatedApoderadosResponse,
+  ResumenApoderadosResponse,
   UpdateApoderadoPayload,
   VincularEstudiantePayload,
   VinculoFamiliar,
@@ -18,6 +19,17 @@ export function useApoderadosQuery(params: ApoderadosQueryParams = {}) {
   return useQuery<PaginatedApoderadosResponse, ApiClientError>({
     queryKey: [...APODERADOS_QUERY_KEY, params],
     queryFn: () => apoderadosApi.getApoderados(params),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useResumenApoderadosQuery(
+  params: Omit<ApoderadosQueryParams, "cursor" | "limit"> = {},
+) {
+  return useQuery<ResumenApoderadosResponse, ApiClientError>({
+    queryKey: [...APODERADOS_QUERY_KEY, "resumen", params],
+    queryFn: () => apoderadosApi.getResumenApoderados(params),
+    placeholderData: keepPreviousData,
   });
 }
 

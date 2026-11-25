@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/features/auth";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { ApiClientError } from "@/lib/api-client";
@@ -48,6 +48,7 @@ export function useSeccionesQuery(params?: SeccionQueryParams, enabled = true) {
     queryKey: seccionesKeys.list(anio?.id, params),
     queryFn: () => getSecciones(params),
     enabled,
+    placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 2,
   });
 }

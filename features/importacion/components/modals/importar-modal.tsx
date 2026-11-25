@@ -57,6 +57,8 @@ const TITULOS_TIPO: Record<TipoImportacion, string> = {
   docentes: "Plana Docente",
   apoderados: "Padrón de Apoderados",
   matriculas: "Nómina de Matrículas",
+  carga_academica: "Carga Académica y Tutores",
+  horarios: "Horarios de Secciones",
 };
 
 /**
@@ -316,7 +318,13 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
             <span
               className={`text-xs sm:text-sm ${pasoEfectivo === "result" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
             >
-              {tipo === "matriculas" ? "Matrículas registradas" : "Credenciales emitidas"}
+              {tipo === "matriculas"
+                ? "Matrículas registradas"
+                : tipo === "carga_academica"
+                  ? "Carga asignada"
+                  : tipo === "horarios"
+                    ? "Horarios registrados"
+                    : "Credenciales emitidas"}
             </span>
           </div>
         </div>
@@ -462,12 +470,30 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-16 text-center">Fila</TableHead>
-                      <TableHead>{tipo === "matriculas" ? "Código SIAGIE" : "Documento"}</TableHead>
                       <TableHead>
-                        {tipo === "matriculas" ? "Estudiante" : "Nombres y Apellidos"}
+                        {tipo === "matriculas"
+                          ? "Código SIAGIE"
+                          : tipo === "carga_academica" || tipo === "horarios"
+                            ? "Grado / Sección"
+                            : "Documento"}
                       </TableHead>
                       <TableHead>
-                        {tipo === "matriculas" ? "Grado / Sección" : "Identificador / Clave"}
+                        {tipo === "matriculas"
+                          ? "Estudiante"
+                          : tipo === "carga_academica"
+                            ? "Curso"
+                            : tipo === "horarios"
+                              ? "Bloque Horario"
+                              : "Nombres y Apellidos"}
+                      </TableHead>
+                      <TableHead>
+                        {tipo === "matriculas"
+                          ? "Grado / Sección"
+                          : tipo === "carga_academica"
+                            ? "Docente"
+                            : tipo === "horarios"
+                              ? "Curso / Tipo"
+                              : "Identificador / Clave"}
                       </TableHead>
                       <TableHead className="text-center">Estado</TableHead>
                       <TableHead>Observación</TableHead>
@@ -500,6 +526,12 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                                   "dni",
                                 ) || "—"}
                               </span>
+                            ) : tipo === "carga_academica" || tipo === "horarios" ? (
+                              getDato(fila.datos, "gradoSeccion") ||
+                              [getDato(fila.datos, "grado"), getDato(fila.datos, "seccion")]
+                                .filter(Boolean)
+                                .join(" - ") ||
+                              "—"
                             ) : (
                               <>
                                 {(
@@ -521,23 +553,35 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                           <TableCell className="text-xs font-medium">
                             {tipo === "matriculas"
                               ? getDato(fila.datos, "estudianteNombre") || "—"
-                              : [
-                                  getDato(fila.datos, "nombres", "nombre"),
-                                  getDato(
-                                    fila.datos,
-                                    "apellidoPaterno",
-                                    "apellido_paterno",
-                                    "paterno",
-                                  ),
-                                  getDato(
-                                    fila.datos,
-                                    "apellidoMaterno",
-                                    "apellido_materno",
-                                    "materno",
-                                  ),
-                                ]
-                                  .filter(Boolean)
-                                  .join(" ") || "—"}
+                              : tipo === "carga_academica"
+                                ? getDato(fila.datos, "cursoNombre", "curso") || "—"
+                                : tipo === "horarios"
+                                  ? getDato(fila.datos, "horarioTexto") ||
+                                    [
+                                      getDato(fila.datos, "diaSemana"),
+                                      getDato(fila.datos, "horaInicio"),
+                                      getDato(fila.datos, "horaFin"),
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" ") ||
+                                    "—"
+                                  : [
+                                      getDato(fila.datos, "nombres", "nombre"),
+                                      getDato(
+                                        fila.datos,
+                                        "apellidoPaterno",
+                                        "apellido_paterno",
+                                        "paterno",
+                                      ),
+                                      getDato(
+                                        fila.datos,
+                                        "apellidoMaterno",
+                                        "apellido_materno",
+                                        "materno",
+                                      ),
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" ") || "—"}
                           </TableCell>
                           <TableCell className="text-muted-foreground font-mono text-xs">
                             {tipo === "matriculas"
@@ -546,16 +590,20 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                                   .filter(Boolean)
                                   .join(" - ") ||
                                 "—"
-                              : getDato(
-                                  fila.datos,
-                                  "codigoSiagie",
-                                  "codigo_siagie",
-                                  "codigoDocente",
-                                  "codigo_docente",
-                                  "codigoSiagieEstudiante",
-                                  "codigo",
-                                  "siagie",
-                                ) || "—"}
+                              : tipo === "carga_academica"
+                                ? getDato(fila.datos, "docenteNombre", "docente") || "—"
+                                : tipo === "horarios"
+                                  ? getDato(fila.datos, "cursoNombre", "curso", "tipoBloque") || "—"
+                                  : getDato(
+                                      fila.datos,
+                                      "codigoSiagie",
+                                      "codigo_siagie",
+                                      "codigoDocente",
+                                      "codigo_docente",
+                                      "codigoSiagieEstudiante",
+                                      "codigo",
+                                      "siagie",
+                                    ) || "—"}
                           </TableCell>
                           <TableCell className="text-center">
                             {fila.estado === "valida" && (
@@ -642,12 +690,20 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                 <h3 className="text-foreground text-base font-semibold">
                   {tipo === "matriculas"
                     ? "Procesando y registrando matrículas escolares"
-                    : "Procesando e inscribiendo en el sistema institucional"}
+                    : tipo === "carga_academica"
+                      ? "Asignando carga académica y tutores"
+                      : tipo === "horarios"
+                        ? "Registrando bloques de horario por sección"
+                        : "Procesando e inscribiendo en el sistema institucional"}
                 </h3>
                 <p className="text-muted-foreground mx-auto mt-1 max-w-md text-xs">
                   {tipo === "matriculas"
                     ? `El lote de ${vistaPrevia?.validasCount ?? 0} matrículas está siendo registrado en sus secciones correspondientes, generando códigos de matrícula y libretas escolares.`
-                    : `El lote de ${vistaPrevia?.validasCount ?? 0} registros está siendo validado y registrado en la base de datos oficial, emitiendo legajos escolares y credenciales seguras de acceso.`}
+                    : tipo === "carga_academica"
+                      ? `El lote de ${vistaPrevia?.validasCount ?? 0} asignaciones está actualizando la carga académica y tutorías de las secciones.`
+                      : tipo === "horarios"
+                        ? `El lote de ${vistaPrevia?.validasCount ?? 0} bloques está siendo validado y guardado en la grilla horaria del año escolar.`
+                        : `El lote de ${vistaPrevia?.validasCount ?? 0} registros está siendo validado y registrado en la base de datos oficial, emitiendo legajos escolares y credenciales seguras de acceso.`}
                 </p>
               </div>
 
@@ -694,6 +750,12 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                     matrículas quedarán activas en sus secciones asignadas y las vacantes se
                     actualizarán automáticamente.
                   </>
+                ) : tipo === "carga_academica" || tipo === "horarios" ? (
+                  <>
+                    💡 <strong>Aviso institucional:</strong> Al culminar el procesamiento, la
+                    configuración académica quedará lista inmediatamente para consultar horarios y
+                    generar sesiones de clase.
+                  </>
                 ) : (
                   <>
                     💡 <strong>Aviso institucional:</strong> Al culminar el procesamiento, podrá
@@ -722,7 +784,11 @@ export function ImportarModal({ open, onOpenChange, tipo, onSuccess }: ImportarM
                 <span>
                   {tipo === "matriculas"
                     ? "Matrículas registradas exitosamente"
-                    : "Inscripción completada exitosamente"}
+                    : tipo === "carga_academica"
+                      ? "Carga académica asignada exitosamente"
+                      : tipo === "horarios"
+                        ? "Horarios registrados exitosamente"
+                        : "Inscripción completada exitosamente"}
                 </span>
               </div>
               <p className="text-muted-foreground mt-1 text-xs">{resultadoEfectivo.mensaje}</p>

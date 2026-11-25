@@ -5,4 +5,5 @@ export * from "./resumen-horas-panel";
 export * from "./selector-grado-seccion";
 export * from "./lista-cursos-carga";
 export * from "./horarios-header-actions";
+export * from "./exportar-horarios-dropdown";
 export * from "./aviso-seccion-cerrada";

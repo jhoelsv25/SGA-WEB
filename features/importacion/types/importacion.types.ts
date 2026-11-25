@@ -1,4 +1,11 @@
-export type TipoImportacion = "personas" | "estudiantes" | "docentes" | "apoderados" | "matriculas";
+export type TipoImportacion =
+  | "personas"
+  | "estudiantes"
+  | "docentes"
+  | "apoderados"
+  | "matriculas"
+  | "carga_academica"
+  | "horarios";
 
 export type EstadoFilaImportacion = "valida" | "ya_registrada" | "error";
 export type AccionFilaImportacion = "crear" | "reutilizar" | "omitir";
