@@ -17,6 +17,7 @@ import { Spinner } from "@/components/common/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
+import { bimestrePorDefecto } from "@/features/anio-escolar/utils";
 import { formatDate } from "@/lib/formatters/date";
 import { toast } from "@/lib/toast";
 import { descargarFichaPdf } from "../api";
@@ -37,12 +38,12 @@ export function MiSeguimientoVista() {
   const compromisoUrl = searchParams.get("compromisoId") ?? "";
   const { anio } = useAnioLectivo();
   const bimestres = anio?.bimestres ?? [];
-  const primerBimestreId = bimestres[0]?.id ?? "";
+  const bimestreInicialId = bimestrePorDefecto(bimestres)?.id ?? "";
   const [periodoSeleccionado, setPeriodoSeleccionado] = React.useState<string>("");
   const [descargandoPdf, setDescargandoPdf] = React.useState(false);
   const [abrirSolicitud, setAbrirSolicitud] = React.useState(false);
 
-  const periodoActivo = periodoSeleccionado || periodoUrl || primerBimestreId;
+  const periodoActivo = periodoSeleccionado || periodoUrl || bimestreInicialId;
 
   const { data, isLoading } = useMiSeguimientoQuery(periodoActivo, Boolean(periodoActivo));
 
