@@ -105,6 +105,7 @@ export function HorariosPage() {
         horaInicio: b.horaInicio,
         horaFin: b.horaFin,
         tipoBloque: b.tipoBloque,
+        cursoNombre: b.cursoNombre,
       }));
     }
     return grillaPropuestaActiva ? (grillaPropuestaData?.bloques ?? []) : [];
@@ -187,19 +188,24 @@ export function HorariosPage() {
     }
   };
 
-  const handleProponerIa = async () => {
+  const handleProponerIa = async (valores: { horaEntrada?: string; preferencias?: string }) => {
     if (!seccionId) return;
     try {
-      const res = await proponerIaMutation.mutateAsync({ seccionId });
+      const res = await proponerIaMutation.mutateAsync({
+        seccionId,
+        horaEntrada: valores.horaEntrada,
+        preferencias: valores.preferencias,
+      });
       setGrillaPropuestaActiva(false);
       setPropuestaIa(res);
+      dialogs.setProponerIaModalOpen(false);
       toast.success(
         res.usandoIa
           ? "Propuesta de horario generada con IA (sin cruces)."
           : "Propuesta de horario generada con algoritmo base (sin cruces).",
       );
     } catch {
-      // Notificado en toast
+      // Notificado en toast. El modal sigue abierto.
     }
   };
 
@@ -258,7 +264,7 @@ export function HorariosPage() {
               isLoadingIa={proponerIaMutation.isPending}
               grillaPropuestaActiva={grillaPropuestaActiva}
               onProponerGrilla={() => dialogs.setProponerModalOpen(true)}
-              onProponerIa={() => void handleProponerIa()}
+              onProponerIa={() => dialogs.setProponerIaModalOpen(true)}
               onDescartarPropuesta={() => setGrillaPropuestaActiva(false)}
               onCopiarHorario={() => dialogs.setCopiarModalOpen(true)}
               onNuevoBloque={() => dialogs.abrirNuevoBloque(1, "", "", "clase", null)}
@@ -429,10 +435,12 @@ export function HorariosPage() {
         cargaItems={cargaItems}
         dialogs={dialogs}
         isLoadingPropuesta={isLoadingPropuesta}
+        isLoadingIa={proponerIaMutation.isPending}
         onEjecutarPropuestaGrilla={(hora) => {
           setHoraEntradaGrilla(hora);
           setGrillaPropuestaActiva(true);
         }}
+        onEjecutarPropuestaIa={(valores) => void handleProponerIa(valores)}
         onConfirmarEliminacion={handleConfirmarEliminacion}
         isDeleting={deleteBloqueMutation.isPending}
         onMensajeVigencia={(msj) => setMensajeVigencia(msj)}

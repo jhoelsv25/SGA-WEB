@@ -20,6 +20,7 @@ export function useHorariosDialogs() {
 
   const [copiarModalOpen, setCopiarModalOpen] = useState(false);
   const [proponerModalOpen, setProponerModalOpen] = useState(false);
+  const [proponerIaModalOpen, setProponerIaModalOpen] = useState(false);
   const [eliminarDialogOpen, setEliminarDialogOpen] = useState(false);
   const [bloqueAEliminar, setBloqueAEliminar] = useState<BloqueHorario | null>(null);
 
@@ -62,6 +63,8 @@ export function useHorariosDialogs() {
     setCopiarModalOpen,
     proponerModalOpen,
     setProponerModalOpen,
+    proponerIaModalOpen,
+    setProponerIaModalOpen,
     eliminarDialogOpen,
     setEliminarDialogOpen,
     bloqueAEliminar,

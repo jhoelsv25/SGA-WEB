@@ -32,6 +32,7 @@ export interface BloquePropuesta {
   horaInicio: string;
   horaFin: string;
   tipoBloque: TipoBloque;
+  cursoNombre?: string | null;
 }
 
 export interface GrillaPropuestaResponse {

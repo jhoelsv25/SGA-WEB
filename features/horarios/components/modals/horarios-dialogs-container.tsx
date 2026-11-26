@@ -3,9 +3,11 @@
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import type { CargaItemHorario, SeccionHorarioItem } from "../../types";
 import type { useHorariosDialogs } from "../../hooks/use-horarios-dialogs";
+import type { ProponerIaValores } from "../forms/proponer-ia-form";
 import { BloqueModal } from "./bloque-modal";
 import { CopiarHorarioModal } from "./copiar-horario-modal";
 import { ProponerGrillaModal } from "./proponer-grilla-modal";
+import { ProponerIaModal } from "./proponer-ia-modal";
 
 interface HorariosDialogsContainerProps {
   seccionId: string | null;
@@ -14,7 +16,9 @@ interface HorariosDialogsContainerProps {
   cargaItems: CargaItemHorario[];
   dialogs: ReturnType<typeof useHorariosDialogs>;
   isLoadingPropuesta: boolean;
+  isLoadingIa?: boolean;
   onEjecutarPropuestaGrilla: (hora?: string) => void;
+  onEjecutarPropuestaIa: (valores: ProponerIaValores) => void;
   onConfirmarEliminacion: () => void;
   isDeleting: boolean;
   onMensajeVigencia: (msj: string) => void;
@@ -27,7 +31,9 @@ export function HorariosDialogsContainer({
   cargaItems,
   dialogs,
   isLoadingPropuesta,
+  isLoadingIa = false,
   onEjecutarPropuestaGrilla,
+  onEjecutarPropuestaIa,
   onConfirmarEliminacion,
   isDeleting,
   onMensajeVigencia,
@@ -57,6 +63,13 @@ export function HorariosDialogsContainer({
         onOpenChange={dialogs.setProponerModalOpen}
         onProponer={onEjecutarPropuestaGrilla}
         isLoading={isLoadingPropuesta}
+      />
+
+      <ProponerIaModal
+        open={dialogs.proponerIaModalOpen}
+        onOpenChange={dialogs.setProponerIaModalOpen}
+        onProponer={onEjecutarPropuestaIa}
+        isLoading={isLoadingIa}
       />
 
       {seccionActual && (
