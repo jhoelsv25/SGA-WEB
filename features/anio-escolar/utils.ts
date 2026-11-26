@@ -1,3 +1,5 @@
+import type { EstadoBimestre } from "./types";
+
 export function formatoFecha(iso: string | null | undefined): string {
   if (!iso) return "—";
   const [anio, mes, dia] = iso.slice(0, 10).split("-");
@@ -32,4 +34,15 @@ export function fechasSugeridas(anio: number) {
       { numero: 4, fechaInicio: `${anio}-10-04`, fechaFin: `${anio}-12-17` },
     ],
   };
+}
+
+/** Bimestre que se muestra al abrir una vista: el en curso; si no hay, el último cerrado. */
+export function bimestrePorDefecto<T extends { estado: EstadoBimestre }>(
+  bimestres: T[],
+): T | undefined {
+  return (
+    bimestres.find((b) => b.estado === "en_curso") ??
+    bimestres.findLast((b) => b.estado === "cerrado") ??
+    bimestres[0]
+  );
 }

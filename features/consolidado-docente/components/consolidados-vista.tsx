@@ -9,6 +9,7 @@ import { ListToolbar } from "@/components/common/list-toolbar";
 import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
+import { bimestrePorDefecto } from "@/features/anio-escolar/utils";
 import { useSession } from "@/features/auth";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { toast } from "@/lib/toast";
@@ -44,7 +45,7 @@ export function ConsolidadosVista() {
     activeRole === "Administrador";
 
   const bimestres = React.useMemo(() => anio?.bimestres ?? [], [anio?.bimestres]);
-  const primerBimestreId = bimestres[0]?.id ?? "";
+  const bimestreInicialId = bimestrePorDefecto(bimestres)?.id ?? "";
 
   // Filtros sincronizados con la URL
   const filterDefs = React.useMemo(() => generarFiltroDefsConsolidados(bimestres), [bimestres]);
@@ -52,7 +53,7 @@ export function ConsolidadosVista() {
 
   const periodoFiltro = listFilters.getString("periodoId");
   const periodoActivo =
-    (periodoFiltro && periodoFiltro !== "all" ? periodoFiltro : primerBimestreId) || "";
+    (periodoFiltro && periodoFiltro !== "all" ? periodoFiltro : bimestreInicialId) || "";
   const estadoFiltro = listFilters.getString("estado");
   const decisionFiltro = listFilters.getString("decision");
   const busquedaTexto = listFilters.getString("search");
