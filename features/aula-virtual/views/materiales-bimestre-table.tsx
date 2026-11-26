@@ -97,16 +97,30 @@ export function MaterialesBimestreTable() {
             </span>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-foreground text-2xl font-extrabold tracking-tight">
-                {data.totales.porcentajeATiempo}%
+                {data.totales.planificados === 0 ? "—" : `${data.totales.porcentajeATiempo}%`}
               </span>
               <StatusBadge
-                tone={data.totales.porcentajeATiempo >= 80 ? "success" : "warning"}
+                tone={
+                  data.totales.planificados === 0
+                    ? "neutral"
+                    : data.totales.porcentajeATiempo >= 80
+                      ? "success"
+                      : "warning"
+                }
                 className="text-[10px]"
               >
-                {data.totales.porcentajeATiempo >= 80 ? "Óptimo" : "Mejorable"}
+                {data.totales.planificados === 0
+                  ? "Sin datos"
+                  : data.totales.porcentajeATiempo >= 80
+                    ? "Óptimo"
+                    : "Mejorable"}
               </StatusBadge>
             </div>
-            <span className="text-muted-foreground/80 text-[11px]">Materiales a tiempo</span>
+            <span className="text-muted-foreground/80 text-[11px]">
+              {data.totales.planificados === 0
+                ? "Nada planificado en el bimestre"
+                : "Materiales a tiempo"}
+            </span>
           </div>
 
           {/* Planificados */}

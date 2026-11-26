@@ -184,7 +184,7 @@ export function SolicitudesCambioFechaPage() {
           <p className="text-foreground mt-2 text-2xl font-extrabold tracking-tight">
             {metricas.total}
           </p>
-          <span className="text-muted-foreground/80 text-[11px]">En el periodo actual</span>
+          <span className="text-muted-foreground/80 text-[11px]">En el año académico</span>
         </div>
 
         <div
@@ -313,7 +313,7 @@ export function SolicitudesCambioFechaPage() {
           title:
             busqueda || filtroEstado !== "todas"
               ? "No se encontraron solicitudes"
-              : "No hay solicitudes pendientes",
+              : "No hay solicitudes",
           description:
             busqueda || filtroEstado !== "todas"
               ? "Prueba cambiando el término de búsqueda o el filtro seleccionado."

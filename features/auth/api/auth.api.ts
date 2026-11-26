@@ -23,7 +23,7 @@ export const authApi = {
     } catch (error) {
       handleApiError(
         error,
-        "No se pudo procesar la solicitud. Verifica el usuario y tu fecha de nacimiento.",
+        "No se pudo verificar la identidad. Revisa el usuario y la fecha de nacimiento.",
       );
     }
   },
