@@ -49,7 +49,11 @@ export function MaterialesTab({
     return (
       <EmptyState
         title="Aún no hay unidades"
-        description="Crea la primera unidad para empezar a planificar materiales de reforzamiento."
+        description={
+          puedeAdministrar
+            ? "Crea la primera unidad para empezar a planificar materiales de reforzamiento."
+            : "El docente de esta aula todavía no ha publicado unidades."
+        }
         icon={BookOpen01Icon}
         action={
           puedeAdministrar && onNuevaUnidad ? (

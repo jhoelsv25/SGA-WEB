@@ -366,7 +366,7 @@ export function AulaVirtualPage({
           seccionNombre={cursoInfo?.seccionNombre || aula.seccionNombre}
           puedeAdministrar={aula.puedeAdministrar}
           anioCerrado={anioCerrado}
-          soloLectura={false}
+          soloLectura={esDirectivo}
         />
       )}
     </div>
