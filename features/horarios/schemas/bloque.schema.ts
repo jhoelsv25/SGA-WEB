@@ -58,3 +58,18 @@ export const proponerGrillaSchema = z.object({
 });
 
 export type ProponerGrillaFormValues = z.infer<typeof proponerGrillaSchema>;
+
+export const proponerIaSchema = z.object({
+  horaEntrada: z
+    .string()
+    .regex(REGEX_HORA_HH_MM, "Formato de hora inválido (HH:mm)")
+    .optional()
+    .or(z.literal("")),
+  preferencias: z
+    .string()
+    .max(500, "Las preferencias no pueden exceder 500 caracteres")
+    .optional()
+    .or(z.literal("")),
+});
+
+export type ProponerIaFormValues = z.infer<typeof proponerIaSchema>;

@@ -122,7 +122,11 @@ export function CeldaPropuesta({
           handleAccion();
         }
       }}
-      aria-label={`Franja disponible ${diaNombre} de ${propuesta.horaInicio} a ${propuesta.horaFin}`}
+      aria-label={
+        propuesta.cursoNombre
+          ? `Sugerido ${propuesta.cursoNombre}, ${diaNombre} de ${propuesta.horaInicio} a ${propuesta.horaFin}`
+          : `Franja disponible ${diaNombre} de ${propuesta.horaInicio} a ${propuesta.horaFin}`
+      }
     >
       {cursoSeleccionado ? (
         <div className="flex flex-col items-center gap-1 text-center">
@@ -137,8 +141,8 @@ export function CeldaPropuesta({
             icon={PlusSignIcon}
             className="text-muted-foreground group-hover:text-primary size-3.5 transition-colors"
           />
-          <span className="text-muted-foreground group-hover:text-foreground text-[10px] font-medium transition-colors">
-            Disponible
+          <span className="text-muted-foreground group-hover:text-foreground text-center text-[10px] font-medium transition-colors">
+            {propuesta.cursoNombre ? `Sugerido: ${propuesta.cursoNombre}` : "Disponible"}
           </span>
         </div>
       )}
