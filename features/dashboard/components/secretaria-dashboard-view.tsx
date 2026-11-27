@@ -42,9 +42,9 @@ export function SecretariaDashboardView({ data }: SecretariaDashboardViewProps) 
       {/* KPIs de Secretaría (RF-021) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <KpiCard
-          title="Matrículas del Mes"
+          title="Matriculados"
           value={kpis.matriculasMes}
-          subtitle="Estudiantes matriculados activos"
+          subtitle="Matrícula activa del año"
           icon={StudentIcon}
           variant="primary"
         />
@@ -59,7 +59,7 @@ export function SecretariaDashboardView({ data }: SecretariaDashboardViewProps) 
         <KpiCard
           title="Sin Apoderado"
           value={kpis.estudiantesSinApoderado}
-          subtitle="Pendientes de vinculación"
+          subtitle="Estudiantes registrados sin apoderado"
           icon={AlertCircleIcon}
           variant={kpis.estudiantesSinApoderado > 0 ? "warning" : undefined}
         />
@@ -74,8 +74,12 @@ export function SecretariaDashboardView({ data }: SecretariaDashboardViewProps) 
 
         <KpiCard
           title="Asistencia Hoy"
-          value={`${kpis.asistenciaHoyPorcentaje}%`}
-          subtitle="Asistencia general del día"
+          value={kpis.asistenciaHoyPorcentaje === null ? "—" : `${kpis.asistenciaHoyPorcentaje}%`}
+          subtitle={
+            kpis.asistenciaHoyPorcentaje === null
+              ? "Hoy no se espera asistencia"
+              : "Asistencia general del día"
+          }
           icon={Exchange01Icon}
           variant="success"
         />

@@ -16,6 +16,7 @@ interface GetEstudianteColumnsOptions {
   onPrintCarne?: (estudiante: Estudiante) => void;
   onReemitirCredencial?: (estudiante: Estudiante) => void;
   onVerHistorial?: (estudiante: Estudiante) => void;
+  onCambiarPin?: (estudiante: Estudiante) => void;
 }
 
 const estadoBadges: Record<EstadoEstudiante, { label: string; className: string }> = {
@@ -43,6 +44,7 @@ export function getEstudianteColumns({
   onPrintCarne,
   onReemitirCredencial,
   onVerHistorial,
+  onCambiarPin,
 }: GetEstudianteColumnsOptions): ColumnDef<Estudiante>[] {
   return [
     {
@@ -193,6 +195,7 @@ export function getEstudianteColumns({
           onPrintCarne={onPrintCarne}
           onReemitirCredencial={onReemitirCredencial}
           onVerHistorial={onVerHistorial}
+          onCambiarPin={onCambiarPin}
         />
       ),
     },

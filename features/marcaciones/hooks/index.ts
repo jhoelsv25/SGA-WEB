@@ -5,7 +5,13 @@ import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
 import { useSession } from "@/features/auth";
 import { ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/toast";
-import { getPanelMarcacionesHoy, justificarMarcacion, registrarMarcacionManual } from "../api";
+import {
+  getControlDiario,
+  getControlMensual,
+  getPanelMarcacionesHoy,
+  justificarMarcacion,
+  registrarMarcacionManual,
+} from "../api";
 import { INTERVALO_PANEL_MS } from "../consts";
 import type { JustificarMarcacionPayload, RegistrarMarcacionManualPayload } from "../types";
 
@@ -23,6 +29,26 @@ export function usePanelMarcacionesHoy() {
     refetchIntervalInBackground: false,
     staleTime: 10_000,
     gcTime: 5 * 60_000,
+  });
+}
+
+/** Personal de un día. Solo el día de hoy se actualiza solo. */
+export function useControlDiario(fecha: string, esHoy: boolean) {
+  return useQuery({
+    queryKey: [...marcacionesKeys.all, "control-diario", fecha] as const,
+    queryFn: () => getControlDiario(fecha),
+    refetchInterval: esHoy ? INTERVALO_PANEL_MS : false,
+    refetchIntervalInBackground: false,
+    staleTime: 10_000,
+  });
+}
+
+export function useControlMensual(personaId: string | null, mes: string) {
+  return useQuery({
+    queryKey: [...marcacionesKeys.all, "control-mensual", personaId, mes] as const,
+    queryFn: () => getControlMensual(personaId!, mes),
+    enabled: personaId !== null,
+    staleTime: 30_000,
   });
 }
 

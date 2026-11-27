@@ -7,6 +7,8 @@ import { EditDocenteModal } from "../components/modals/edit-docente-modal";
 import { CesarDocenteModal } from "../components/modals/cesar-docente-modal";
 import { CredentialsModal } from "../components/modals/credentials-modal";
 import { CarnetModal } from "../../credenciales/components/modals/carnet-modal";
+import { CambiarPinModal } from "../../credenciales/components/modals/cambiar-pin-modal";
+import { usePuedeCambiarPin } from "../../credenciales/hooks/use-puede-cambiar-pin";
 import { ReemitirCredencialModal } from "../../credenciales/components/modals/reemitir-credencial-modal";
 import { CodigoBiometricoModal } from "@/features/biometrico";
 import { HistorialCriticoModal } from "@/features/personas";
@@ -41,6 +43,8 @@ export function DocentesTable({ docentes, isLoading, cursorPagination }: Docente
     pin: string;
   } | null>(null);
   const [credentialsModalOpen, setCredentialsModalOpen] = React.useState(false);
+  const puedeCambiarPin = usePuedeCambiarPin();
+  const [pinDe, setPinDe] = React.useState<Docente | null>(null);
 
   const handleEdit = React.useCallback((docente: Docente) => {
     setSelectedDocente(docente);
@@ -90,9 +94,17 @@ export function DocentesTable({ docentes, isLoading, cursorPagination }: Docente
         onPrintCarne: handlePrintCarne,
         onReemitirCredencial: handleReemitir,
         onVerHistorial: handleVerHistorial,
+        onCambiarPin: puedeCambiarPin ? setPinDe : undefined,
         onCodigoBiometrico: setCodigoBiometricoDe,
       }),
-    [handleEdit, handleCesar, handlePrintCarne, handleReemitir, handleVerHistorial],
+    [
+      handleEdit,
+      handleCesar,
+      handlePrintCarne,
+      handleReemitir,
+      handleVerHistorial,
+      puedeCambiarPin,
+    ],
   );
 
   return (
@@ -111,6 +123,16 @@ export function DocentesTable({ docentes, isLoading, cursorPagination }: Docente
         nombreCompleto={codigoBiometricoDe?.persona.nombreCompleto ?? ""}
         onOpenChange={(abierto) => !abierto && setCodigoBiometricoDe(null)}
       />
+
+      {/* Cambio de PIN de marcación: solo Soporte TI (RF-007) */}
+      {pinDe && (
+        <CambiarPinModal
+          personaId={pinDe.personaId}
+          nombreCompleto={pinDe.persona.nombreCompleto}
+          open
+          onOpenChange={(abierto) => !abierto && setPinDe(null)}
+        />
+      )}
 
       {/* Modal para Editar Docente */}
       <EditDocenteModal

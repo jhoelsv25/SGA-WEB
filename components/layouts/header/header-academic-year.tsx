@@ -49,9 +49,9 @@ function ChipAnioLectivo({
     <div
       role="status"
       aria-label={ariaLabel}
-      className="border-border/60 bg-muted/40 text-foreground/90 flex h-11 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-semibold sm:h-auto sm:min-h-8 sm:py-1"
+      className="border-primary bg-primary text-primary-foreground flex h-11 items-center gap-1.5 rounded-2xl border px-2.5 text-xs font-semibold sm:h-auto sm:min-h-8 sm:py-1"
     >
-      <HugeiconsIcon icon={Calendar03Icon} className="text-primary size-3.5 shrink-0" />
+      <HugeiconsIcon icon={Calendar03Icon} className="size-3.5 shrink-0" />
       {children}
     </div>
   );
@@ -63,7 +63,7 @@ function ResumenAnio({ anio }: { anio: AnioAcademico }) {
       <span className="text-xs font-semibold sm:hidden">{anio.anio}</span>
       <div className="hidden flex-col text-left sm:flex">
         <span className="text-xs font-semibold">Año académico {anio.anio}</span>
-        <span className="text-muted-foreground text-xs font-normal">{detalleDeAnio(anio)}</span>
+        <span className="text-xs font-normal opacity-85">{detalleDeAnio(anio)}</span>
       </div>
     </>
   );
@@ -127,7 +127,8 @@ export function HeaderAcademicYearSelect() {
       placeholder="Sin año en curso"
       searchPlaceholder="Buscar año académico..."
       emptyMessage="No hay años académicos."
-      className="border-border/60 bg-muted/40 hover:bg-muted/70 h-11 min-h-11 w-auto max-w-36 min-w-28 shrink rounded-lg px-2 py-1 text-xs font-semibold shadow-none sm:h-auto sm:min-h-8 sm:max-w-64 sm:min-w-44 sm:px-2.5 [&_span>span.text-muted-foreground]:hidden sm:[&_span>span.text-muted-foreground]:block"
+      // En color primario sólido: es el contexto de todo lo que se ve y debe notarse.
+      className="border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground hover:border-primary dark:border-primary dark:bg-primary dark:hover:bg-primary/90 aria-expanded:bg-primary aria-expanded:text-primary-foreground dark:aria-expanded:bg-primary [&_span.text-muted-foreground]:text-primary-foreground/85 [&_svg]:text-primary-foreground h-11 min-h-11 w-auto max-w-44 min-w-28 shrink rounded-2xl px-2 py-1 text-xs font-semibold shadow-none sm:h-auto sm:min-h-8 sm:max-w-64 sm:min-w-44 sm:px-2.5 [&_span>span.text-muted-foreground]:hidden sm:[&_span>span.text-muted-foreground]:block [&_svg]:opacity-100"
     />
   );
 }

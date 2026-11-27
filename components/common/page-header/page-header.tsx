@@ -17,7 +17,9 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 pb-6 sm:flex-row sm:items-center sm:justify-between",
+        // En claro la cabecera va en un panel blanco sobre el fondo gris; en oscuro queda sin panel.
+        "bg-card border-border/70 flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5",
+        "dark:rounded-none dark:border-0 dark:bg-transparent dark:p-0 dark:pb-6 dark:sm:p-0 dark:sm:pb-6",
         className,
       )}
     >
@@ -40,7 +42,10 @@ export function PageHeader({
                     />
                   )}
                   {crumb.href && !isLast ? (
-                    <Link href={crumb.href} className="hover:text-foreground transition-colors">
+                    <Link
+                      href={crumb.href}
+                      className="hover:text-foreground transition-colors pointer-coarse:inline-flex pointer-coarse:min-h-7 pointer-coarse:items-center"
+                    >
                       {crumb.label}
                     </Link>
                   ) : (
@@ -56,7 +61,7 @@ export function PageHeader({
 
         <div className="flex items-center gap-3">
           {icon && (
-            <div className="bg-secondary text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
+            <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
               <HugeiconsIcon icon={icon} size={22} strokeWidth={2} />
             </div>
           )}

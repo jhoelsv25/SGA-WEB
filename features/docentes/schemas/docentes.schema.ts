@@ -14,7 +14,7 @@ export type CesarDocenteFormValues = z.infer<typeof cesarDocenteSchema>;
 export const editDocenteSchema = z.object({
   especialidad: z.string().max(100, "Máximo 100 caracteres.").optional().or(z.literal("")),
   tituloProfesional: z.string().max(150, "Máximo 150 caracteres.").optional().or(z.literal("")),
-  tipoContrato: z.enum(["nombrado", "contratado", "practicante"], {
+  tipoContrato: z.enum(["nombrado", "contratado", "destacado", "encargado", "practicante"], {
     message: "Seleccione un régimen de contrato válido.",
   }),
   jornadaHoras: z.union([z.literal(20), z.literal(24), z.literal(30), z.literal(40)]),
@@ -34,7 +34,7 @@ export const createDocenteSchema = z.object({
   codigo: z.string().max(20, "Máximo 20 caracteres.").trim().optional().or(z.literal("")),
   especialidad: z.string().max(100).optional().or(z.literal("")),
   tituloProfesional: z.string().max(150).optional().or(z.literal("")),
-  tipoContrato: z.enum(["nombrado", "contratado", "practicante"], {
+  tipoContrato: z.enum(["nombrado", "contratado", "destacado", "encargado", "practicante"], {
     message: "Seleccione un régimen de contrato válido.",
   }),
   jornadaHoras: z.union([z.literal(20), z.literal(24), z.literal(30), z.literal(40)]),

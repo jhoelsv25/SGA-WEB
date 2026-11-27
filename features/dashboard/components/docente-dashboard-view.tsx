@@ -55,7 +55,7 @@ export function DocenteDashboardView({ data }: DocenteDashboardViewProps) {
         <KpiCard
           title="Mis Cursos"
           value={kpis.misCursos}
-          subtitle={`${kpis.misSecciones} secciones asignadas`}
+          subtitle={`${kpis.misSecciones} ${kpis.misSecciones === 1 ? "sección asignada" : "secciones asignadas"}`}
           icon={BookOpen01Icon}
           variant="primary"
         />

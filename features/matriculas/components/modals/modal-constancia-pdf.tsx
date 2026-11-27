@@ -86,7 +86,7 @@ function ConstanciaPdfViewerContent({
   return (
     <div className="space-y-4 py-2">
       {/* Cabecera institucional de la constancia */}
-      <div className="border-border/80 from-primary/10 via-primary/5 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-linear-to-r to-amber-500/10 p-3.5">
+      <div className="border-border/80 bg-card flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3.5">
         <div className="flex items-center gap-3">
           <div className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-white p-1 shadow-xs dark:bg-slate-900">
             <Image

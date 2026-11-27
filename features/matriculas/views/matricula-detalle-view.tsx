@@ -150,7 +150,7 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
           <DetalleEstudianteCard estudiante={matricula.estudiante} />
 
           {/* Apoderados Responsables */}
-          <Card className="border-border/60 bg-card/60 rounded-2xl shadow-2xs">
+          <Card className="border-border/60 bg-card rounded-2xl shadow-2xs">
             <CardHeader className="border-border/50 border-b px-5 py-3">
               <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 Apoderado(s) Responsable(s)
@@ -162,7 +162,7 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
                   {matricula.apoderados.map((ap) => (
                     <div
                       key={ap.id}
-                      className="border-border/50 bg-background/60 flex flex-col justify-between gap-2 rounded-xl border p-3.5 sm:flex-row sm:items-center"
+                      className="border-border/50 bg-background flex flex-col justify-between gap-2 rounded-xl border p-3.5 sm:flex-row sm:items-center"
                     >
                       <div className="space-y-0.5">
                         <div className="flex flex-wrap items-center gap-2">
@@ -209,7 +209,7 @@ export function MatriculaDetalleView({ matriculaId }: MatriculaDetalleViewProps)
 
           {/* Resumen de Certificación */}
 
-          <Card className="border-border/60 bg-card/60 rounded-2xl shadow-2xs">
+          <Card className="border-border/60 bg-card rounded-2xl shadow-2xs">
             <CardHeader className="border-border/50 border-b px-5 py-3">
               <CardTitle className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                 Auditoría del Registro

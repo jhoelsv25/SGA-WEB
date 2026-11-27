@@ -29,6 +29,10 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/turnos",
   "/admin/equipos",
   "/admin/variables",
+  "/admin/biometrico",
+  "/admin/biometrico/sincronizaciones",
+  "/admin/biometrico/equipos",
+  "/admin/aprobacion-dispositivos",
   "/admin/academic-years",
   "/admin/calendario",
   "/admin/mi-horario",
@@ -41,6 +45,7 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/asistencia-seccion",
   "/admin/mi-asistencia",
   "/admin/sesiones-hoy",
+  "/admin/sesiones-hoy/planificaciones",
   "/admin/mis-sesiones",
   "/admin/planificacion-sesiones",
   "/admin/catalogo-curricular",
@@ -76,7 +81,10 @@ function filtrarItems(
   return items.flatMap((item) => {
     if (item.items?.length) {
       const hijos = filtrarItems(item.items, esVisible, resolverEnlace);
-      return hijos.length > 0 ? [{ ...item, items: hijos }] : [];
+      // Un grupo con una sola opción visible la muestra directamente, sin un clic de más.
+      if (hijos.length <= 1) return hijos;
+      // El grupo enlaza a su primera opción visible, para no llevar a una ruta no asignada.
+      return [{ ...item, link: hijos[0].link, items: hijos }];
     }
     return esVisible(item) ? [resolverEnlace(item)] : [];
   });
@@ -93,14 +101,18 @@ export function menuDelUsuario({ esAdministrador, menuRoutes = [] }: OpcionesMen
     if (!RUTAS_CON_PAGINA.has(item.link)) return false;
     if (item.ocultarAlAdministrador && esAdministrador) return false;
     if (item.link === RUTA_INICIO || esAdministrador) return true;
-    if (asignadas.has(item.link)) return true;
+    if (asignadas.has(item.rutaPermiso ?? item.link)) return true;
     return Boolean(
       item.rutasIncluidas?.some((ruta) => RUTAS_CON_PAGINA.has(ruta) && asignadas.has(ruta)),
     );
   };
 
   const resolverEnlace = (item: NavItem): NavItem => {
-    if (esAdministrador || item.link === RUTA_INICIO || asignadas.has(item.link)) {
+    if (
+      esAdministrador ||
+      item.link === RUTA_INICIO ||
+      asignadas.has(item.rutaPermiso ?? item.link)
+    ) {
       return item;
     }
     const alternativa = item.rutasIncluidas?.find(
@@ -110,9 +122,11 @@ export function menuDelUsuario({ esAdministrador, menuRoutes = [] }: OpcionesMen
   };
 
   return adminNavigation
-    .map((seccion) => ({
-      ...seccion,
-      items: filtrarItems(seccion.items, esVisible, resolverEnlace),
-    }))
+    .map((seccion) => {
+      const items = filtrarItems(seccion.items, esVisible, resolverEnlace);
+      const [primero] = items;
+      const aplanar = items.length === 1 && primero.mostrarHijosSiEsUnico && primero.items;
+      return { ...seccion, items: aplanar || items };
+    })
     .filter((seccion) => seccion.items.length > 0);
 }

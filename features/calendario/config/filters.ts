@@ -9,13 +9,10 @@ export const calendarioFilterDefs: readonly ListFilterDef[] = [
     placeholder: "Buscar por título del evento...",
   },
   {
-    type: "select",
-    key: "tipo",
-    label: "Tipo",
-    options: [
-      { label: "Todos los tipos", value: "all" },
-      ...TIPOS_EVENTO.map((tipo) => ({ label: ETIQUETAS_EVENTO[tipo], value: tipo })),
-    ],
+    // Tipos desmarcados en las casillas; sin valor se ven todos.
+    type: "multiSelect",
+    key: "ocultar",
+    options: TIPOS_EVENTO.map((tipo) => ({ label: ETIQUETAS_EVENTO[tipo], value: tipo })),
   },
   {
     type: "select",

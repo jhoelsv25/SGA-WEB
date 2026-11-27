@@ -160,7 +160,7 @@ export function ModalHistorialAusencia({
 
                   {/* Motivo del cambio obligatorio */}
                   {v.motivoCambio && (
-                    <div className="border-border/50 bg-background/80 mt-2.5 rounded-lg border p-2 text-xs">
+                    <div className="border-border/50 bg-background mt-2.5 rounded-lg border p-2 text-xs">
                       <p className="text-primary font-semibold">Motivo del cambio:</p>
                       <p className="text-foreground">{v.motivoCambio}</p>
                     </div>

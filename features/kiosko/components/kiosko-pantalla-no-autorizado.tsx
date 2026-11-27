@@ -5,6 +5,8 @@ import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, RefreshIcon, SecurityLockIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import { ESTADO_SOLICITUD_KIOSKO } from "@/features/equipos/consts";
+import { useSolicitudKiosko } from "@/features/equipos/hooks/use-solicitudes-kiosko";
 
 interface KioskoPantallaNoAutorizadoProps {
   tieneTokenLocal: boolean;
@@ -17,6 +19,16 @@ export function KioskoPantallaNoAutorizado({
   horaActual,
   onReintentar,
 }: KioskoPantallaNoAutorizadoProps) {
+  const solicitud = useSolicitudKiosko(onReintentar);
+
+  const mensajeSolicitud = solicitud.isError
+    ? solicitud.error.message
+    : solicitud.data?.estado === ESTADO_SOLICITUD_KIOSKO.RECHAZADA
+      ? "La solicitud fue rechazada. Comuníquese con el administrador."
+      : solicitud.data?.estado === ESTADO_SOLICITUD_KIOSKO.APROBADA
+        ? "Equipo aprobado. Si no se activa, revise que el kiosko esté activo."
+        : "Pida al administrador que apruebe este código. La pantalla se activará sola.";
+
   return (
     <div
       role="alert"
@@ -38,8 +50,18 @@ export function KioskoPantallaNoAutorizado({
           </h1>
           <p className="text-muted-foreground pt-1 text-xs leading-relaxed">
             Para operar este kiosko de asistencia o firma de sesiones, el personal de Soporte TI
-            debe registrar y autorizar este navegador desde el panel de administración.
+            debe aprobarlo en Kiosko → Aprobar dispositivos.
           </p>
+        </div>
+
+        <div className="border-primary/30 bg-primary/5 space-y-1.5 rounded-xl border p-4">
+          <p className="text-muted-foreground text-xs font-semibold uppercase">
+            Código de este equipo
+          </p>
+          <p className="text-primary font-mono text-2xl font-extrabold tracking-wider select-text">
+            {solicitud.data?.codigo ?? "—"}
+          </p>
+          <p className="text-muted-foreground text-xs">{mensajeSolicitud}</p>
         </div>
 
         <div className="border-border/80 bg-muted/40 space-y-2 rounded-xl border p-3.5 text-left font-mono text-xs">

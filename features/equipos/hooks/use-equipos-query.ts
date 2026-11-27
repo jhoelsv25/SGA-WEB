@@ -101,8 +101,8 @@ export function useAutorizarEquipoMutation() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: equipoKeys.lists() });
       // Guardar token en localStorage para que este dispositivo quede autorizado
-      if (typeof window !== "undefined" && data.token) {
-        localStorage.setItem(KIOSK_TOKEN_STORAGE_KEY, data.token);
+      if (typeof window !== "undefined" && data.tokenAutorizacion) {
+        localStorage.setItem(KIOSK_TOKEN_STORAGE_KEY, data.tokenAutorizacion);
       }
       toast.success("Equipo autorizado. Ya puede usarse como kiosko.");
     },

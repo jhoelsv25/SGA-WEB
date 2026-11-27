@@ -1,4 +1,5 @@
-import { extraerPrimerNombreYApellido } from "./formato";
+import { nombreParaVoz } from "./formato";
+import type { EstadoMarcacion, ResultadoMarcacion } from "../types";
 
 /**
  * Gestor de audio y síntesis de voz para el terminal Kiosko.
@@ -155,12 +156,9 @@ function buscarVozEspanol(): SpeechSynthesisVoice | null {
   }
 }
 
-/**
- * Momento 1 de locución: Anuncia en voz alta el nombre corto de la persona
- * (primer nombre y primer apellido) al resolver su código.
- */
-export function locutarNombrePersona(nombreCompleto: string, sonidoHabilitado = true): void {
-  if (!sonidoHabilitado) return;
+/** Dice un texto en voz alta. Sin soporte de voz en el navegador, no hace nada. */
+export function locutar(texto: string, sonidoHabilitado = true): void {
+  if (!sonidoHabilitado || !texto) return;
 
   try {
     if (
@@ -170,51 +168,6 @@ export function locutarNombrePersona(nombreCompleto: string, sonidoHabilitado = 
     ) {
       return;
     }
-
-    const nombreCorto = extraerPrimerNombreYApellido(nombreCompleto);
-    if (!nombreCorto) return;
-
-    const utterance = new SpeechSynthesisUtterance(nombreCorto);
-    const voz = buscarVozEspanol();
-    if (voz) {
-      utterance.voice = voz;
-      utterance.lang = voz.lang;
-    } else {
-      utterance.lang = "es-PE";
-    }
-
-    utterance.rate = 1.25;
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  } catch {
-    // Degrada silenciosamente
-  }
-}
-
-/**
- * Momento 2 de locución: Dice únicamente la palabra "Registrado" o "Registrada"
- * al confirmar la marcación según el género de la persona.
- */
-export function locutarMarcacionRegistrada(genero?: string, sonidoHabilitado = true): void {
-  if (!sonidoHabilitado) return;
-
-  try {
-    if (
-      typeof window === "undefined" ||
-      !("speechSynthesis" in window) ||
-      !window.speechSynthesis
-    ) {
-      return;
-    }
-
-    const esFemenino =
-      String(genero || "")
-        .trim()
-        .toUpperCase() === "FEMALE";
-    const texto = esFemenino ? "Registrada." : "Registrado.";
 
     const utterance = new SpeechSynthesisUtterance(texto);
     const voz = buscarVozEspanol();
@@ -225,13 +178,37 @@ export function locutarMarcacionRegistrada(genero?: string, sonidoHabilitado = t
       utterance.lang = "es-PE";
     }
 
-    utterance.rate = 1.25;
+    utterance.rate = 1.05;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
 
+    // Corta la frase anterior: en una fila de personas solo importa la de quien está marcando.
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   } catch {
     // Degrada silenciosamente
   }
+}
+
+/** Dice el nombre de la persona seguido del resultado, en una sola frase. */
+export function locutarConNombre(
+  nombreCompleto: string,
+  frase: string,
+  sonidoHabilitado = true,
+): void {
+  const nombre = nombreParaVoz(nombreCompleto);
+  locutar(nombre ? `${nombre}. ${frase}` : frase, sonidoHabilitado);
+}
+
+const FRASE_POR_ESTADO: Partial<Record<EstadoMarcacion, string>> = {
+  tardanza: ", con tardanza",
+  salida_anticipada: ", antes de la hora",
+  fuera_de_horario: ", fuera de horario",
+};
+
+/** Lo que dice el kiosko de asistencia después del nombre. */
+export function fraseDeVoz(resultado: Pick<ResultadoMarcacion, "tipo" | "estado">): string {
+  if (resultado.estado === "ya_marco") return "No se registró una nueva marca.";
+  const base = resultado.tipo === "salida" ? "Salida registrada" : "Entrada registrada";
+  return `${base}${FRASE_POR_ESTADO[resultado.estado] ?? ""}.`;
 }

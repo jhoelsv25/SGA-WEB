@@ -4,6 +4,7 @@ import * as React from "react";
 import { useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserCheck01Icon, ShieldCheckIcon } from "@hugeicons/core-free-icons";
+import { ApiClientError } from "@/lib/api-client";
 import { Spinner } from "@/components/common/spinner";
 import { KIOSK_TOKEN_STORAGE_KEY } from "@/features/equipos/consts";
 import { parseUsuariosPermitidos } from "@/features/equipos";
@@ -26,8 +27,9 @@ import {
   TIEMPO_AUTO_CIERRE_AVISO_MS,
   TIEMPO_AUTO_LIMPIEZA_ERROR_MS,
   kioskoAudio,
-  locutarMarcacionRegistrada,
-  locutarNombrePersona,
+  locutar,
+  locutarConNombre,
+  fraseDeVoz,
   servicioMarcacion,
   useColaMarcaciones,
   useConexionRed,
@@ -92,9 +94,15 @@ function KioskoContent() {
   const {
     data: validationResult,
     isLoading: isValidating,
-    isError: hasValidationError,
+    isError: falloValidacion,
+    error: errorValidacion,
     refetch: checkToken,
   } = useValidarKioskoQuery(effectiveToken || undefined);
+
+  // Un 401 es una respuesta válida (clave no autorizada), no una caída de conexión
+  const claveRechazada =
+    errorValidacion instanceof ApiClientError && errorValidacion.statusCode === 401;
+  const hasValidationError = falloValidacion && !claveRechazada;
 
   // Reloj digital en tiempo real sincronizado
   const { horaFormateada, fechaFormateada } = useRelojDigital();
@@ -210,7 +218,7 @@ function KioskoContent() {
             equipoId: validationResult?.equipo?.id,
           });
 
-          locutarMarcacionRegistrada(undefined, sonidoHabilitado);
+          locutar("Marcación guardada.", sonidoHabilitado);
           kioskoAudio.reproducirExito(sonidoHabilitado);
 
           mostrarAvisoConTiempo(
@@ -238,11 +246,6 @@ function KioskoContent() {
           // Fase 1: Resolver código de identificación
           const resolucion = await servicioMarcacion.resolverCodigo(codigoAProcesar.trim());
 
-          // Momento 1: Locutar nombre en voz alta si el servicio resolvió a la persona
-          if (resolucion.persona.nombre) {
-            locutarNombrePersona(resolucion.persona.nombre, sonidoHabilitado);
-          }
-
           if (resolucion.requierePin) {
             setPersonaResuelta(resolucion.persona);
             setPaso("pin");
@@ -260,8 +263,7 @@ function KioskoContent() {
             tokenEquipo: effectiveToken,
           });
 
-          // Momento 2: Locutar confirmación según género
-          locutarMarcacionRegistrada(resultado.persona.genero, sonidoHabilitado);
+          locutarConNombre(resultado.persona.nombre, fraseDeVoz(resultado), sonidoHabilitado);
           kioskoAudio.reproducirExito(sonidoHabilitado);
 
           mostrarAvisoConTiempo(
@@ -269,7 +271,7 @@ function KioskoContent() {
               tipo: "exito",
               titulo:
                 resultado.estado === "ya_marco"
-                  ? "Marcación ya registrada"
+                  ? "No se registró una nueva marca"
                   : "Marcación Registrada",
               mensaje: resultado.mensaje || "Asistencia registrada correctamente.",
               persona: resultado.persona,
@@ -291,13 +293,16 @@ function KioskoContent() {
             tokenEquipo: effectiveToken,
           });
 
-          locutarMarcacionRegistrada(resultado.persona.genero, sonidoHabilitado);
+          locutarConNombre(resultado.persona.nombre, fraseDeVoz(resultado), sonidoHabilitado);
           kioskoAudio.reproducirExito(sonidoHabilitado);
 
           mostrarAvisoConTiempo(
             {
               tipo: "exito",
-              titulo: "Marcación Registrada",
+              titulo:
+                resultado.estado === "ya_marco"
+                  ? "No se registró una nueva marca"
+                  : "Marcación Registrada",
               mensaje: resultado.mensaje || "Firma y asistencia registradas con éxito.",
               persona: resultado.persona,
               tipoMarcacion: resultado.tipo,
@@ -319,7 +324,7 @@ function KioskoContent() {
               equipoId: validationResult?.equipo?.id,
             });
 
-            locutarMarcacionRegistrada(undefined, sonidoHabilitado);
+            locutar("Marcación guardada.", sonidoHabilitado);
             kioskoAudio.reproducirExito(sonidoHabilitado);
 
             mostrarAvisoConTiempo(

@@ -4,17 +4,17 @@ import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Key01Icon,
   Logout01Icon,
   School01Icon,
   UserIcon,
   SecurityLockIcon,
   Settings02Icon,
+  UnfoldMoreIcon,
 } from "@hugeicons/core-free-icons";
 import { siteConfig } from "@/config";
 import { useLogout } from "@/features/auth";
-import { CambiarPinModal } from "@/features/credenciales";
-import { getInitials } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useOptionalDashboardRole } from "../dashboard-role-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -35,9 +35,10 @@ export interface HeaderUserMenuProps {
 }
 
 export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
+  const { state, isMobile } = useSidebar();
+  const contraida = state === "collapsed" && !isMobile;
   const [perfilModalOpen, setPerfilModalOpen] = React.useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = React.useState(false);
-  const [pinModalOpen, setPinModalOpen] = React.useState(false);
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
   // RF-001 V3: el rol se elige al iniciar sesión; aquí solo se muestra el activo
@@ -52,30 +53,47 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="hover:bg-accent/60 h-11 gap-2.5 rounded-full px-1.5 py-1 transition-all md:px-2"
+            className={cn(
+              "hover:bg-sidebar-accent aria-expanded:bg-sidebar-accent h-13 w-full justify-start gap-2.5 rounded-sm px-2",
+              contraida && "size-10 justify-center p-0",
+            )}
             aria-label={`Menú de usuario${rolActivo ? `, rol ${rolActivo}` : ""}`}
           >
-            <Avatar className="ring-border/80 size-8 shrink-0 rounded-full shadow-2xs ring-1">
+            <Avatar className="ring-border/80 size-9 shrink-0 rounded-lg ring-1 after:rounded-lg">
               <AvatarImage src={user?.avatar} alt="" />
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+              <AvatarFallback className="bg-primary/10 text-primary rounded-lg text-xs font-bold">
                 {iniciales}
               </AvatarFallback>
             </Avatar>
 
-            <div className="hidden text-left leading-tight md:flex md:flex-col">
-              <span className="text-foreground max-w-30 truncate text-sm font-semibold lg:max-w-38">
-                {nombre}
-              </span>
+            <div
+              className={cn(
+                "flex min-w-0 flex-1 flex-col text-left leading-tight",
+                contraida && "hidden",
+              )}
+            >
+              <span className="text-foreground truncate text-sm font-semibold">{nombre}</span>
               {rolActivo ? (
-                <span className="text-muted-foreground max-w-30 truncate text-xs lg:max-w-38">
+                <span className="text-muted-foreground truncate text-xs font-normal">
                   Rol: {rolActivo}
                 </span>
               ) : null}
             </div>
+            {!contraida && (
+              <HugeiconsIcon
+                icon={UnfoldMoreIcon}
+                className="text-muted-foreground size-4 shrink-0"
+              />
+            )}
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="w-68 rounded-2xl p-2" align="end" sideOffset={10}>
+        <DropdownMenuContent
+          className="w-68 rounded-2xl p-2"
+          side={isMobile ? "top" : "right"}
+          align="end"
+          sideOffset={14}
+        >
           <DropdownMenuLabel className="p-0 font-normal">
             <div className="flex items-center gap-3 px-2 py-2 text-left">
               <Avatar className="ring-primary/20 size-10 rounded-xl ring-1">
@@ -123,15 +141,6 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
             <span>Cambiar contraseña</span>
           </DropdownMenuItem>
 
-          {/* Opción Mi credencial: Cambiar PIN de marcación (RF-007 HU5) */}
-          <DropdownMenuItem
-            onClick={() => setPinModalOpen(true)}
-            className="flex h-10 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium"
-          >
-            <HugeiconsIcon icon={Key01Icon} className="text-primary size-4 shrink-0" />
-            <span>Mi credencial (PIN)</span>
-          </DropdownMenuItem>
-
           {/* Opción Configuración del Sistema */}
           <DropdownMenuItem asChild>
             <Link
@@ -164,19 +173,10 @@ export function HeaderUserMenu({ user }: HeaderUserMenuProps) {
         currentUser={dashboard?.currentUser}
         rolActivo={rolActivo}
         onOpenCambiarPassword={() => setPasswordModalOpen(true)}
-        onOpenCambiarPin={() => setPinModalOpen(true)}
       />
 
       {/* Modal Cambiar Contraseña */}
       <CambiarPasswordModal open={passwordModalOpen} onOpenChange={setPasswordModalOpen} />
-
-      {/* Modal Cambiar PIN */}
-      <CambiarPinModal
-        open={pinModalOpen}
-        onOpenChange={setPinModalOpen}
-        nombreCompleto={nombre}
-        requierePinActual={true}
-      />
     </>
   );
 }

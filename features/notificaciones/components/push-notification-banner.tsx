@@ -86,25 +86,16 @@ export function PushNotificationBanner({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border transition-all duration-300 ${
-        isSubscribed
-          ? "via-background to-background border-emerald-500/30 bg-linear-to-r from-emerald-950/20 dark:from-emerald-950/40"
-          : "border-primary/30 from-primary/10 via-background to-background dark:from-primary/20 bg-linear-to-r"
-      } p-5 shadow-lg backdrop-blur-sm ${className}`}
+      className={`bg-card rounded-2xl border p-5 shadow-xs ${
+        isSubscribed ? "border-emerald-500/30" : "border-primary/30"
+      } ${className}`}
     >
-      {/* Círculo difuminado de fondo para efecto glow */}
-      <div
-        className={`pointer-events-none absolute -top-12 -right-12 size-40 rounded-full opacity-30 blur-3xl ${
-          isSubscribed ? "bg-emerald-500" : "bg-primary"
-        }`}
-      />
-
       <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Lado izquierdo: Icono con efecto onda + textos explicativos */}
         <div className="flex items-start gap-4">
           <div className="relative shrink-0">
             <div
-              className={`flex size-12 items-center justify-center rounded-2xl shadow-inner transition-colors ${
+              className={`flex size-12 items-center justify-center rounded-2xl transition-colors ${
                 isSubscribed
                   ? "border border-emerald-500/20 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
                   : "bg-primary/15 text-primary border-primary/20 border"

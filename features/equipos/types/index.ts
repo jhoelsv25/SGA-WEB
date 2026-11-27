@@ -44,10 +44,9 @@ export interface UpdateEquipoPayload {
 
 export interface AutorizarEquipoResponse {
   message: string;
-  equipoId: string;
-  nombre: string;
-  token: string;
-  autorizadoEn: string;
+  /** Clave secreta del kiosko; la API la entrega solo en esta respuesta. */
+  tokenAutorizacion: string;
+  equipo: Equipo;
 }
 
 export interface ValidarEquipoResponse {
@@ -62,4 +61,18 @@ export interface ValidarEquipoResponse {
     proposito: PropositoEquipo;
     usuariosPermitidos: UsuarioPermitido[] | string;
   };
+}
+
+export interface EstadoSolicitudKiosko {
+  codigo: string;
+  estado: number;
+}
+
+export interface SolicitudKiosko extends EstadoSolicitudKiosko {
+  id: string;
+  equipoId?: string | null;
+  equipoNombre?: string | null;
+  solicitadoEn: string;
+  ultimaConsultaEn: string;
+  resueltoEn?: string | null;
 }

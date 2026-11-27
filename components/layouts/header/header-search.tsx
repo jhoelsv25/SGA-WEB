@@ -35,13 +35,13 @@ function RenderSearchIcon({
   return <HugeiconsIcon icon={Search01Icon} className={className} />;
 }
 
-export interface SidebarSearchProps {
+export interface HeaderSearchProps {
   sections: NavSection[];
 }
 
-export function SidebarSearch({ sections }: SidebarSearchProps) {
+export function HeaderSearch({ sections }: HeaderSearchProps) {
   const router = useRouter();
-  const { state, setOpenMobile, isMobile } = useSidebar();
+  const { setOpenMobile, isMobile } = useSidebar();
   const [openDialog, setOpenDialog] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -124,45 +124,37 @@ export function SidebarSearch({ sections }: SidebarSearchProps) {
     }
   };
 
-  const isCollapsed = state === "collapsed";
-
   return (
     <>
       <button
         type="button"
+        data-buscador-portal
         onClick={() => setOpenDialog(true)}
         className={cn(
-          "group/search flex w-full items-center gap-2.5 transition-all duration-200 outline-none",
-          "border-sidebar-border hover:border-primary/30 border",
-          "bg-sidebar-accent/50 hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-foreground",
-          "focus-visible:ring-primary/25 shadow-2xs focus-visible:ring-2",
-          isCollapsed
-            ? "mx-auto size-9 justify-center rounded-full p-0"
-            : "h-9.5 rounded-full px-3 text-left",
+          "group/search flex shrink-0 items-center justify-center gap-2.5 transition-colors outline-none",
+          "text-muted-foreground hover:text-foreground focus-visible:ring-primary/25 focus-visible:ring-2",
+          // En pantallas angostas queda solo el icono.
+          "size-11 rounded-full",
+          "lg:border-border lg:bg-muted/40 lg:hover:border-primary/30 lg:h-9 lg:w-72 lg:justify-start lg:rounded-2xl lg:border lg:px-3",
         )}
         title="Buscar módulo o función (Ctrl + K)"
         aria-label="Buscar módulo o función (Ctrl + K)"
       >
         <HugeiconsIcon
           icon={Search01Icon}
-          className="text-muted-foreground/80 group-hover/search:text-primary size-4 shrink-0 transition-colors"
+          className="group-hover/search:text-primary size-4 shrink-0 transition-colors"
         />
-
-        {!isCollapsed && (
-          <>
-            <span className="text-muted-foreground/80 group-hover/search:text-foreground flex-1 truncate text-xs font-normal">
-              Buscar en el portal...
-            </span>
-            <kbd className="border-border/80 bg-background/80 text-muted-foreground pointer-events-none hidden h-5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-xs font-semibold select-none sm:inline-flex">
-              <span className="text-xs">⌘</span>K
-            </kbd>
-          </>
-        )}
+        <span className="hidden flex-1 truncate text-left text-xs font-normal lg:block">
+          Buscar en el portal...
+        </span>
+        <kbd className="border-border/80 bg-background text-muted-foreground pointer-events-none hidden h-5 items-center gap-0.5 rounded-md border px-1.5 font-mono text-xs font-semibold select-none lg:inline-flex">
+          <span className="text-xs">⌘</span>K
+        </kbd>
       </button>
 
       {/* Modal interactivo de búsqueda estilo Command Palette */}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="border-border/70 max-w-md overflow-hidden rounded-2xl border p-0 shadow-2xl backdrop-blur-xl sm:max-w-lg">
+        <DialogContent className="border-border/70 max-w-md overflow-hidden rounded-2xl border p-0 shadow-2xl sm:max-w-lg">
           <DialogHeader className="sr-only">
             <DialogTitle>Buscador institucional</DialogTitle>
             <DialogDescription>

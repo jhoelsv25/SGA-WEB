@@ -55,12 +55,9 @@ export function useCambiarPinMutation(onSuccessCallback?: () => void) {
   return useMutation<
     { mensaje: string },
     ApiClientError,
-    { personaId?: string; input: CambiarPinInput }
+    { personaId: string; input: CambiarPinInput }
   >({
-    mutationFn: ({ personaId, input }) =>
-      personaId
-        ? credencialesApi.cambiarPinPersona(personaId, input)
-        : credencialesApi.cambiarMiPin(input),
+    mutationFn: ({ personaId, input }) => credencialesApi.cambiarPinPersona(personaId, input),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: CREDENCIALES_QUERY_KEY });
       toast.success("PIN de marcación actualizado.", {

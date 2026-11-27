@@ -251,7 +251,7 @@ export function SeccionesTable() {
       </div>
 
       {/* Barra de herramientas y filtros responsivos (360px móvil y escritorio) */}
-      <div className="border-border/60 bg-card/60 flex flex-col gap-3 rounded-2xl border p-3.5 shadow-2xs backdrop-blur-xs sm:flex-row sm:items-center sm:justify-between sm:p-4">
+      <div className="border-border/60 bg-card flex flex-col gap-3 rounded-2xl border p-3.5 shadow-2xs sm:flex-row sm:items-center sm:justify-between sm:p-4">
         {/* Controles de filtrado */}
         <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
           <div className="w-full sm:w-56">

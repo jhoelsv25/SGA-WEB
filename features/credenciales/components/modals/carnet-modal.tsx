@@ -127,7 +127,7 @@ export function CarnetModal({ open, onOpenChange, personaId }: CarnetModalProps)
           <div className="flex justify-center p-2">
             <div
               id="carnet-printable"
-              className="border-border/80 from-card via-background to-muted/30 relative w-full max-w-105 overflow-hidden rounded-2xl border-2 bg-linear-to-br p-4 shadow-xl transition-all print:m-0 print:border-none print:shadow-none"
+              className="border-border/80 bg-card relative w-full max-w-105 overflow-hidden rounded-2xl border-2 p-4 shadow-xl transition-all print:m-0 print:border-none print:shadow-none"
               style={{
                 aspectRatio: "1.586 / 1",
               }}

@@ -138,7 +138,7 @@ export function DateTimePicker({
 
       <PopoverContent
         align="start"
-        className="border-border/80 bg-popover/95 w-auto rounded-2xl p-0 shadow-2xl backdrop-blur-md"
+        className="border-border/80 bg-popover w-auto rounded-2xl p-0 shadow-2xl"
       >
         {/* Atajos Rápidos Superiores */}
         <div className="border-border/60 flex items-center gap-1.5 border-b p-2.5">

@@ -16,15 +16,6 @@ export const credencialesApi = {
     }
   },
 
-  async cambiarMiPin(input: CambiarPinInput): Promise<{ mensaje: string }> {
-    try {
-      const { data } = await apiClient.patch<{ mensaje: string }>("/credenciales/mi-pin", input);
-      return data;
-    } catch (error) {
-      handleApiError(error, "Error al actualizar el PIN de marcación.");
-    }
-  },
-
   async cambiarPinPersona(personaId: string, input: CambiarPinInput): Promise<{ mensaje: string }> {
     try {
       const { data } = await apiClient.patch<{ mensaje: string }>(

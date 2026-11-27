@@ -3,7 +3,7 @@ import { SectionRouteTabs } from "@/components/common/section-route-tabs";
 import { MarcacionesHoyPage } from "@/features/marcaciones";
 
 export const metadata: Metadata = {
-  title: "Marcaciones de hoy | SGA",
+  title: "Control diario de asistencia | SGA",
   description: "Panel en vivo de las marcaciones de estudiantes y personal.",
 };
 

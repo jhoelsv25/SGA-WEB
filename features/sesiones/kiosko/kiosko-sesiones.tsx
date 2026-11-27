@@ -14,6 +14,7 @@ import {
   TIEMPO_AUTO_CIERRE_AVISO_MS,
   TIEMPO_AUTO_LIMPIEZA_ERROR_MS,
   kioskoAudio,
+  locutarConNombre,
   useConexionRed,
   useInactividad,
   useRelojDigital,
@@ -98,6 +99,11 @@ export function KioskoSesiones({ token, equipo }: KioskoSesionesProps) {
     setProcesando(true);
     try {
       const respuesta = await sesionesEnKiosko(token, cred);
+      locutarConNombre(
+        respuesta.docenteNombre,
+        respuesta.sesiones.length === 0 ? (respuesta.mensaje ?? "") : "Elija su clase.",
+        sonido,
+      );
       if (respuesta.sesiones.length === 0) {
         mostrarAviso(
           { tipo: "info", titulo: respuesta.docenteNombre, mensaje: respuesta.mensaje ?? "" },
@@ -128,6 +134,11 @@ export function KioskoSesiones({ token, equipo }: KioskoSesionesProps) {
           ? await firmarIngreso(token, elegidaId, { ...cred, tema })
           : await firmarSalida(token, elegidaId, cred);
       kioskoAudio.reproducirExito(sonido);
+      locutarConNombre(
+        datos?.docenteNombre ?? "",
+        tipo === "ingreso" ? "Ingreso firmado." : "Salida firmada.",
+        sonido,
+      );
       mostrarAviso(
         {
           tipo: "exito",

@@ -147,11 +147,9 @@ export function DashboardHeaderFilters({
     [],
   );
 
+  // Panel de fondo sólido (sin degradados ni transparencias) con una franja del color primario.
   return (
-    <section className="from-primary/8 via-primary/3 to-card/50 relative overflow-hidden rounded-3xl bg-linear-to-br p-5.5 shadow-xs sm:p-7">
-      <div className="bg-primary/10 pointer-events-none absolute -top-12 -right-12 size-56 rounded-full blur-3xl" />
-      <div className="bg-primary/5 pointer-events-none absolute right-1/3 -bottom-12 size-48 rounded-full blur-2xl" />
-
+    <section className="bg-card border-border border-l-primary relative rounded-2xl border border-l-4 p-4 shadow-sm sm:p-5">
       <div className="relative flex flex-col gap-4 sm:gap-5 md:flex-row md:items-center md:justify-between">
         <div className="flex items-start gap-4 sm:items-center sm:gap-5">
           <Avatar className="ring-primary/10 border-primary/20 size-13 shrink-0 rounded-2xl border shadow-sm ring-4 sm:size-14">
@@ -223,7 +221,7 @@ export function DashboardHeaderFilters({
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="bg-card/90 hover:bg-card border-border/40 h-9.5 gap-2 rounded-xl px-3.5 text-xs font-medium shadow-xs transition-all"
+                className="bg-card hover:bg-muted border-border h-9.5 gap-2 rounded-xl px-3.5 text-xs font-medium shadow-xs transition-all"
               >
                 <HugeiconsIcon icon={FilterIcon} className="text-primary size-3.5" />
                 <span className="hidden sm:inline">Filtros:</span>
@@ -325,7 +323,7 @@ export function DashboardHeaderFilters({
             size="icon"
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="bg-card/90 hover:bg-card border-border/40 text-muted-foreground hover:text-foreground size-9.5 shrink-0 rounded-xl shadow-xs transition-all"
+            className="bg-card hover:bg-card border-border/40 text-muted-foreground hover:text-foreground size-9.5 shrink-0 rounded-xl shadow-xs transition-all"
             title="Actualizar datos"
           >
             <HugeiconsIcon

@@ -175,7 +175,7 @@ export function PlanEstudiosTable({
       </div>
 
       {/* Header del Grado Seleccionado */}
-      <div className="border-border/80 bg-card/60 flex flex-col gap-4 rounded-2xl border p-4 shadow-xs backdrop-blur-xs sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-border/80 bg-card flex flex-col gap-4 rounded-2xl border p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-xl">
             <HugeiconsIcon icon={BookOpen01Icon} className="size-5" />

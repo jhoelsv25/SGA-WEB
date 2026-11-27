@@ -1,7 +1,5 @@
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -9,10 +7,7 @@ import {
   ArrowRight01Icon,
   Award01Icon,
   Book02Icon,
-  Calendar03Icon,
-  CheckmarkCircle02Icon,
   LogInIcon,
-  Shield01Icon,
   TeacherIcon,
   Time02Icon,
 } from "@hugeicons/core-free-icons";
@@ -22,6 +17,21 @@ const ACCESOS_RAPIDOS = [
   { label: "Estudiantes", href: "/#modulos" },
   { label: "Apoderados", href: "/#modulos" },
   { label: "Dirección", href: "/#modulos" },
+];
+
+const SERVICIOS_PORTADA = [
+  {
+    titulo: "Sesiones de clase",
+    detalle: "Firma de ingreso, tema del día y seguimiento docente.",
+    icono: TeacherIcon,
+  },
+  {
+    titulo: "Control de asistencia",
+    detalle: "Marcación en kiosko con cálculo automático de tardanzas.",
+    icono: Time02Icon,
+  },
+  { titulo: "Aula virtual", detalle: "Materiales y tareas por bimestre.", icono: Book02Icon },
+  { titulo: "Libretas SIAGIE", detalle: "Descarga segura para familias.", icono: Award01Icon },
 ];
 
 export function HeroSection() {
@@ -102,134 +112,22 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Columna visual: Vista previa tipo Intranet Escolar */}
-          <div className="lg:col-span-6">
-            <div className="border-border/80 bg-card/95 relative overflow-hidden rounded-3xl border shadow-2xl backdrop-blur-md">
-              {/* Barra superior de ventana de intranet */}
-              <div className="border-border/70 bg-muted/50 flex items-center justify-between border-b px-4 py-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="bg-card ring-border flex size-8 items-center justify-center rounded-lg p-1 ring-1">
-                    <Image
-                      src={siteConfig.branding.logo}
-                      alt={`Insignia ${siteConfig.institution.shortName}`}
-                      width={24}
-                      height={24}
-                      priority
-                      className="object-contain"
-                    />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-foreground text-xs font-bold">
-                      Portal {siteConfig.acronym} · Intranet
-                    </p>
-                    <p className="text-muted-foreground text-[11px]">
-                      {siteConfig.institution.administration.ugel} ·{" "}
-                      {siteConfig.institution.administration.dre}
-                    </p>
-                  </div>
+          {/* Columna de servicios: lista abierta, sin tarjetas */}
+          <ul className="divide-border border-border divide-y border-y lg:col-span-5 lg:col-start-8">
+            {SERVICIOS_PORTADA.map((item) => (
+              <li key={item.titulo} className="flex items-start gap-4 py-5">
+                <HugeiconsIcon
+                  icon={item.icono}
+                  className="text-primary mt-0.5 size-6 shrink-0"
+                  aria-hidden="true"
+                />
+                <div>
+                  <p className="text-foreground text-base font-bold">{item.titulo}</p>
+                  <p className="text-muted-foreground mt-0.5 text-sm">{item.detalle}</p>
                 </div>
-                <Badge
-                  variant="outline"
-                  className="border-emerald-500/30 bg-emerald-500/10 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
-                >
-                  En línea
-                </Badge>
-              </div>
-
-              {/* Contenido simulado de la intranet */}
-              <div className="space-y-3.5 p-5">
-                {/* Banner interno institucional */}
-                <div className="from-primary to-primary/85 text-primary-foreground relative overflow-hidden rounded-2xl bg-linear-to-r p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[11px] font-medium opacity-85">
-                        {siteConfig.institution.motto}
-                      </p>
-                      <p className="mt-0.5 text-base font-bold">Año Académico · Nivel Secundaria</p>
-                    </div>
-                    <div className="bg-primary-foreground/15 flex size-10 shrink-0 items-center justify-center rounded-xl">
-                      <HugeiconsIcon icon={Calendar03Icon} className="size-5" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mosaico de módulos vivos */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className="border-border/70 bg-muted/30 rounded-2xl border p-3.5">
-                    <div className="flex items-center justify-between">
-                      <span className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
-                        <HugeiconsIcon icon={TeacherIcon} className="size-4" />
-                      </span>
-                      <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                        Jornada activa
-                      </span>
-                    </div>
-                    <p className="text-foreground mt-2.5 text-sm font-bold">Sesiones de clase</p>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      Firma de ingreso, tema del día y seguimiento docente.
-                    </p>
-                  </div>
-
-                  <div className="border-border/70 bg-muted/30 rounded-2xl border p-3.5">
-                    <div className="flex items-center justify-between">
-                      <span className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
-                        <HugeiconsIcon icon={Time02Icon} className="size-4" />
-                      </span>
-                      <span className="text-muted-foreground text-[11px] font-medium">
-                        Portería
-                      </span>
-                    </div>
-                    <p className="text-foreground mt-2.5 text-sm font-bold">
-                      Control de asistencia
-                    </p>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      Marcación en kiosko con cálculo automático de tardanzas.
-                    </p>
-                  </div>
-
-                  <div className="border-border/70 bg-muted/30 rounded-2xl border p-3.5">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
-                        <HugeiconsIcon icon={Book02Icon} className="size-4" />
-                      </span>
-                      <div>
-                        <p className="text-foreground text-sm font-bold">Aula virtual</p>
-                        <p className="text-muted-foreground text-[11px]">
-                          Materiales y tareas por bimestre
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-border/70 bg-muted/30 rounded-2xl border p-3.5">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg">
-                        <HugeiconsIcon icon={Award01Icon} className="size-4" />
-                      </span>
-                      <div>
-                        <p className="text-foreground text-sm font-bold">Libretas SIAGIE</p>
-                        <p className="text-muted-foreground text-[11px]">
-                          Descarga segura para familias
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Pie de confianza */}
-                <div className="border-border/60 text-muted-foreground flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-[11px]">
-                  <span className="flex items-center gap-1.5">
-                    <HugeiconsIcon icon={CheckmarkCircle02Icon} className="text-primary size-3.5" />
-                    Acceso seguro para familias y docentes
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <HugeiconsIcon icon={Shield01Icon} className="text-primary size-3.5" />
-                    Ley N.° 29733
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

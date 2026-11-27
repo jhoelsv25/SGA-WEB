@@ -61,7 +61,7 @@ export function KpiCard({
   return (
     <Card
       className={cn(
-        "border-border/30 bg-card group relative overflow-hidden rounded-2xl border p-4.5 shadow-xs transition-all duration-200 hover:shadow-sm sm:p-5",
+        "border-border dark:border-border/30 bg-card group relative overflow-hidden rounded-2xl border p-4.5 shadow-xs transition-all duration-200 hover:shadow-sm sm:p-5",
         styles.border,
         className,
       )}

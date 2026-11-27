@@ -103,7 +103,7 @@ export function TableRowActions<TStatus extends string = string>({
           <DropdownMenuContent
             align="end"
             sideOffset={6}
-            className="border-border/60 bg-popover/95 w-56 rounded-xl p-1.5 shadow-xl backdrop-blur-md"
+            className="border-border/60 bg-popover w-56 rounded-xl p-1.5 shadow-xl"
           >
             {/* Cabecera / Identificador de fila */}
             {header && (
@@ -154,7 +154,7 @@ export function TableRowActions<TStatus extends string = string>({
                   <HugeiconsIcon icon={StatusIcon} size={15} />
                   <span>{statusPicker.label || "Actualizar estado"}</span>
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="border-border/60 bg-popover/95 w-52 rounded-xl p-1.5 shadow-xl backdrop-blur-md">
+                <DropdownMenuSubContent className="border-border/60 bg-popover w-52 rounded-xl p-1.5 shadow-xl">
                   <div className="border-border/40 mb-1 border-b px-2 py-1">
                     <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
                       <HugeiconsIcon icon={StatusIcon} size={12} />

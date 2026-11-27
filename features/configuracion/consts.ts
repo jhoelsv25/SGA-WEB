@@ -2,8 +2,6 @@ import {
   School01Icon,
   SlidersHorizontalIcon,
   Clock01Icon,
-  ComputerIcon,
-  FingerPrintScanIcon,
   SecurityLockIcon,
   Notification01Icon,
 } from "@hugeicons/core-free-icons";
@@ -29,20 +27,6 @@ export const MENU_ITEMS: ItemMenuConfig[] = [
     label: "Turnos y Horarios",
     descripcion: "Jornadas, entrada y salida oficial",
     icono: Clock01Icon,
-    grupo: "general",
-  },
-  {
-    id: "equipos",
-    label: "Equipos en Red",
-    descripcion: "Kioskos y terminales autorizados",
-    icono: ComputerIcon,
-    grupo: "general",
-  },
-  {
-    id: "biometrico",
-    label: "Biométrico",
-    descripcion: "Horas de sincronización del reloj",
-    icono: FingerPrintScanIcon,
     grupo: "general",
   },
   {

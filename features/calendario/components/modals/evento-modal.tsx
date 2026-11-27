@@ -35,6 +35,7 @@ export function EventoModal({
           fechaInicio: dia,
           fechaFin: dia,
           suspendeClases: true,
+          personalLabora: false,
         }
       : null);
 

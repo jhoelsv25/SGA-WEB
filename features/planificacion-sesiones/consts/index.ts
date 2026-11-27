@@ -55,3 +55,4 @@ export const PLANIFICACION_ENDPOINTS = {
   HORAS_REALES: (sesionId: string) =>
     `/supervision-planificaciones/sesiones/${sesionId}/horas-reales`,
 } as const;
+export * from "./documento-sesion";

@@ -70,7 +70,7 @@ export function CurriculumPage() {
         errorTitle="Error al cargar la estructura académica"
       >
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full gap-6">
-          <div className="border-border/80 -mx-4 overflow-x-auto border-b px-4 sm:mx-0 sm:px-0">
+          <div className="border-border/70 bg-card dark:border-border/80 overflow-x-auto rounded-xl border px-2 dark:rounded-none dark:border-0 dark:border-b dark:bg-transparent dark:px-0">
             <TabsList
               variant="line"
               className="h-auto min-w-full justify-start gap-2 rounded-none border-b-0 p-0 sm:min-w-0 sm:gap-4"

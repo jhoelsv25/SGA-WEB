@@ -248,7 +248,7 @@ export function CargarFotosModal({ open, onOpenChange, tipo, onSuccess }: Cargar
                     {archivos.map((file, idx) => (
                       <div
                         key={`${file.name}-${idx}`}
-                        className="bg-background/80 flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-xs shadow-2xs"
+                        className="bg-background flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-xs shadow-2xs"
                       >
                         <div className="flex min-w-0 items-center gap-2">
                           <HugeiconsIcon
@@ -380,7 +380,7 @@ export function CargarFotosModal({ open, onOpenChange, tipo, onSuccess }: Cargar
                     {resultado.asignados.map((a, i) => (
                       <div
                         key={`${a.personaId}-${i}`}
-                        className="bg-background/80 flex items-center justify-between rounded px-2 py-1 text-xs"
+                        className="bg-background flex items-center justify-between rounded px-2 py-1 text-xs"
                       >
                         <span className="text-foreground max-w-xs truncate font-semibold">
                           {a.nombreCompleto}
@@ -407,7 +407,7 @@ export function CargarFotosModal({ open, onOpenChange, tipo, onSuccess }: Cargar
                     {resultado.detallesOmitidos.map((o, i) => (
                       <div
                         key={`${o.archivo}-${i}`}
-                        className="bg-background/80 flex items-center justify-between rounded px-2 py-1 text-xs"
+                        className="bg-background flex items-center justify-between rounded px-2 py-1 text-xs"
                       >
                         <span className="text-foreground font-mono font-medium">{o.archivo}</span>
                         <span className="text-muted-foreground max-w-xs truncate text-[11px]">

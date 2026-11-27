@@ -11,11 +11,6 @@ export type ReemitirCredencialFormValues = z.infer<typeof reemitirCredencialSche
 
 export const cambiarPinSchema = z
   .object({
-    pinActual: z
-      .string()
-      .regex(/^[0-9]{4}$/, "El PIN actual debe tener 4 dígitos numéricos")
-      .optional()
-      .or(z.literal("")),
     nuevoPin: z
       .string()
       .regex(/^[0-9]{4}$/, "El nuevo PIN debe tener exactamente 4 dígitos numéricos"),

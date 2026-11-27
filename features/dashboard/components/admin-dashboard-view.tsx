@@ -41,6 +41,8 @@ import type { AdminDashboardData } from "../types/dashboard.types";
 
 interface AdminDashboardViewProps {
   data: AdminDashboardData;
+  /** Indica si el rol activo tiene la pantalla; los enlaces a las que no tiene se ocultan. */
+  puedeIr?: (ruta: string) => boolean;
 }
 
 const chartConfigRoles = {
@@ -65,7 +67,7 @@ const chartConfigActividad = {
   },
 } satisfies ChartConfig;
 
-export function AdminDashboardView({ data }: AdminDashboardViewProps) {
+export function AdminDashboardView({ data, puedeIr = () => true }: AdminDashboardViewProps) {
   const {
     kpis,
     distribucionRoles,
@@ -82,73 +84,80 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Accesos Rápidos de Administración y Seguridad (RF-021 HU 1 y HU 5) */}
+      {/* Accesos de administración: solo los que el rol tiene asignados */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <Link
-          href="/admin/users"
-          className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
-        >
-          <span className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground flex size-8 items-center justify-center rounded-lg transition-colors">
-            <HugeiconsIcon icon={UserIcon} className="size-4" />
-          </span>
-          <span className="text-foreground text-xs font-semibold">Usuarios</span>
-          <span className="text-muted-foreground text-[10px]">Gestión y accesos</span>
-        </Link>
-
-        <Link
-          href="/admin/roles"
-          className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
-        >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 transition-colors group-hover:bg-purple-600 group-hover:text-white">
-            <HugeiconsIcon icon={SecurityLockIcon} className="size-4" />
-          </span>
-          <span className="text-foreground text-xs font-semibold">Matriz Roles</span>
-          <span className="text-muted-foreground text-[10px]">Permisos por menú</span>
-        </Link>
-
-        <Link
-          href="/admin/audit"
-          className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
-        >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white">
-            <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-4" />
-          </span>
-          <span className="text-foreground text-xs font-semibold">Auditoría</span>
-          <span className="text-muted-foreground text-[10px]">Eventos inmutables</span>
-        </Link>
-
-        <Link
-          href="/admin/equipos"
-          className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
-        >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
-            <HugeiconsIcon icon={ComputerIcon} className="size-4" />
-          </span>
-          <span className="text-foreground text-xs font-semibold">Equipos</span>
-          <span className="text-muted-foreground text-[10px]">Control de red</span>
-        </Link>
-
-        <Link
-          href="/admin/institucion"
-          className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
-        >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 transition-colors group-hover:bg-amber-600 group-hover:text-white">
-            <HugeiconsIcon icon={Database01Icon} className="size-4" />
-          </span>
-          <span className="text-foreground text-xs font-semibold">Institución</span>
-          <span className="text-muted-foreground text-[10px]">Variables y sede</span>
-        </Link>
-
-        <Link
-          href="/admin/academic-years"
-          className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
-        >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-600 transition-colors group-hover:bg-cyan-600 group-hover:text-white">
-            <HugeiconsIcon icon={ServerStack03Icon} className="size-4" />
-          </span>
-          <span className="text-foreground text-xs font-semibold">Año Escolar</span>
-          <span className="text-muted-foreground text-[10px]">Ciclos y períodos</span>
-        </Link>
+        {puedeIr("/admin/users") && (
+          <Link
+            href="/admin/users"
+            className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
+          >
+            <span className="bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground flex size-8 items-center justify-center rounded-lg transition-colors">
+              <HugeiconsIcon icon={UserIcon} className="size-4" />
+            </span>
+            <span className="text-foreground text-xs font-semibold">Usuarios</span>
+            <span className="text-muted-foreground text-[10px]">Gestión y accesos</span>
+          </Link>
+        )}
+        {puedeIr("/admin/roles") && (
+          <Link
+            href="/admin/roles"
+            className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
+          >
+            <span className="flex size-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 transition-colors group-hover:bg-purple-600 group-hover:text-white">
+              <HugeiconsIcon icon={SecurityLockIcon} className="size-4" />
+            </span>
+            <span className="text-foreground text-xs font-semibold">Matriz Roles</span>
+            <span className="text-muted-foreground text-[10px]">Permisos por menú</span>
+          </Link>
+        )}
+        {puedeIr("/admin/audit") && (
+          <Link
+            href="/admin/audit"
+            className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
+          >
+            <span className="flex size-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white">
+              <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-4" />
+            </span>
+            <span className="text-foreground text-xs font-semibold">Auditoría</span>
+            <span className="text-muted-foreground text-[10px]">Eventos inmutables</span>
+          </Link>
+        )}
+        {puedeIr("/admin/equipos") && (
+          <Link
+            href="/admin/equipos"
+            className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
+          >
+            <span className="flex size-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+              <HugeiconsIcon icon={ComputerIcon} className="size-4" />
+            </span>
+            <span className="text-foreground text-xs font-semibold">Equipos</span>
+            <span className="text-muted-foreground text-[10px]">Control de red</span>
+          </Link>
+        )}
+        {puedeIr("/admin/institucion") && (
+          <Link
+            href="/admin/institucion"
+            className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
+          >
+            <span className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 transition-colors group-hover:bg-amber-600 group-hover:text-white">
+              <HugeiconsIcon icon={Database01Icon} className="size-4" />
+            </span>
+            <span className="text-foreground text-xs font-semibold">Institución</span>
+            <span className="text-muted-foreground text-[10px]">Variables y sede</span>
+          </Link>
+        )}
+        {puedeIr("/admin/academic-years") && (
+          <Link
+            href="/admin/academic-years"
+            className="border-border/50 bg-card hover:border-primary/40 hover:bg-muted/40 group flex flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center shadow-2xs transition-all"
+          >
+            <span className="flex size-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-600 transition-colors group-hover:bg-cyan-600 group-hover:text-white">
+              <HugeiconsIcon icon={ServerStack03Icon} className="size-4" />
+            </span>
+            <span className="text-foreground text-xs font-semibold">Año Escolar</span>
+            <span className="text-muted-foreground text-[10px]">Ciclos y períodos</span>
+          </Link>
+        )}
       </div>
 
       {/* Alerta de Seguridad si hay cuentas bloqueadas */}
@@ -164,9 +173,11 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
               bloqueada(s) por intentos fallidos recurrentes.
             </span>
           </div>
-          <Button asChild size="sm" variant="outline" className="h-7 border-amber-500/40 text-xs">
-            <Link href="/admin/users">Desbloquear cuentas</Link>
-          </Button>
+          {puedeIr("/admin/users") && (
+            <Button asChild size="sm" variant="outline" className="h-7 border-amber-500/40 text-xs">
+              <Link href="/admin/users">Desbloquear cuentas</Link>
+            </Button>
+          )}
         </div>
       )}
 
@@ -382,12 +393,14 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
                   <HugeiconsIcon icon={CheckmarkCircle02Icon} className="size-3 text-emerald-500" />
                   Inmutable
                 </Badge>
-                <Button asChild variant="ghost" size="sm" className="text-primary h-7 text-xs">
-                  <Link href="/admin/audit">
-                    Ver todo
-                    <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
-                  </Link>
-                </Button>
+                {puedeIr("/admin/audit") && (
+                  <Button asChild variant="ghost" size="sm" className="text-primary h-7 text-xs">
+                    <Link href="/admin/audit">
+                      Ver todo
+                      <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
           </CardHeader>
@@ -500,12 +513,14 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
                     Dispositivos registrados recientemente
                   </CardDescription>
                 </div>
-                <Button asChild variant="ghost" size="sm" className="text-primary h-7 text-xs">
-                  <Link href="/admin/equipos">
-                    Gestionar
-                    <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
-                  </Link>
-                </Button>
+                {puedeIr("/admin/equipos") && (
+                  <Button asChild variant="ghost" size="sm" className="text-primary h-7 text-xs">
+                    <Link href="/admin/equipos">
+                      Gestionar
+                      <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
+                    </Link>
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent className="space-y-2 pt-0">
@@ -525,9 +540,7 @@ export function AdminDashboardView({ data }: AdminDashboardViewProps) {
                       </span>
                       <div className="min-w-0">
                         <p className="text-foreground truncate font-medium">{eq.nombre}</p>
-                        <p className="text-muted-foreground truncate text-[10px]">
-                          {eq.tipo}
-                        </p>
+                        <p className="text-muted-foreground truncate text-[10px]">{eq.tipo}</p>
                       </div>
                     </div>
                     <Badge
