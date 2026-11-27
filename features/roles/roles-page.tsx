@@ -5,6 +5,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { IdVerifiedIcon, ShieldCheckIcon } from "@hugeicons/core-free-icons";
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PermisosPorRol } from "./components/permisos/permisos-por-rol";
 import { RolesTable } from "./views/table/roles-table";
 
 export function RolesPage() {
@@ -29,7 +31,23 @@ export function RolesPage() {
         }
       />
 
-      <RolesTable />
+      <Tabs defaultValue="permisos" className="gap-4">
+        <TabsList>
+          <TabsTrigger value="permisos" className="px-4">
+            Permisos por rol
+          </TabsTrigger>
+          <TabsTrigger value="roles" className="px-4">
+            Lista de roles
+          </TabsTrigger>
+        </TabsList>
+        {/* Se mantiene montado para no perder cambios sin guardar al cambiar de pestaña. */}
+        <TabsContent value="permisos" forceMount className="data-[state=inactive]:hidden">
+          <PermisosPorRol />
+        </TabsContent>
+        <TabsContent value="roles">
+          <RolesTable />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

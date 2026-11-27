@@ -10,3 +10,4 @@ export * from "./components/modals/autorizar-modal";
 export * from "./views/table/columns";
 export * from "./views/table/equipos-table";
 export * from "./equipos-page";
+export * from "./aprobacion-dispositivos-page";

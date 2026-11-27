@@ -14,23 +14,27 @@ export function NavInstitution() {
           size="lg"
           asChild
           tooltip={`${siteConfig.institution.name} · ${siteConfig.institution.location.reference}`}
-          className="hover:bg-sidebar-accent/70 data-[state=open]:bg-sidebar-accent group/menu-button h-13 rounded-2xl p-2 transition-all duration-200"
+          className="hover:bg-sidebar-accent/70 data-[state=open]:bg-sidebar-accent group/menu-button h-12 rounded-sm p-1.5 transition-all duration-200 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0!"
         >
-          <Link href={RUTA_INICIO} className="flex items-center gap-3">
-            {/* Logo en contenedor premium con sutil gradiente y brillo */}
-            <div className="from-primary/15 via-primary/5 border-primary/20 group-hover/menu-button:border-primary/40 relative flex size-10 shrink-0 items-center justify-center rounded-xl border bg-linear-to-br to-transparent p-1.5 shadow-xs transition-all duration-300 group-hover/menu-button:scale-[1.02] group-hover/menu-button:shadow-sm">
+          <Link
+            href={RUTA_INICIO}
+            aria-label={`Ir al inicio: ${siteConfig.institution.shortName}`}
+            className="flex items-center gap-3"
+          >
+            {/* Logo sin recuadro, centrado en un espacio fijo */}
+            <span className="flex size-9 shrink-0 items-center justify-center">
               <Image
                 src={siteConfig.branding.logo}
                 alt={`Logo ${siteConfig.institution.shortName}`}
-                width={26}
-                height={26}
+                width={36}
+                height={36}
                 priority
-                className="object-contain drop-shadow-xs"
+                className="size-9 object-contain"
               />
-            </div>
+            </span>
 
             {/* Datos Institucionales elegantes y nítidos */}
-            <div className="grid flex-1 text-left leading-tight">
+            <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
               <span className="text-foreground group-hover/menu-button:text-primary text-sm font-bold tracking-tight transition-colors">
                 {siteConfig.institution.shortName}
               </span>

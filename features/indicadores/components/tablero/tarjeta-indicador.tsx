@@ -173,7 +173,7 @@ export function TarjetaIndicador({ indicador, className }: TarjetaIndicadorProps
 
         {/* Alerta de Sin Datos */}
         {indicador.sinDatos && (
-          <div className="border-border/80 bg-background/50 text-muted-foreground flex items-start gap-2 rounded-lg border p-3 text-xs">
+          <div className="border-border/80 bg-background text-muted-foreground flex items-start gap-2 rounded-lg border p-3 text-xs">
             <HugeiconsIcon
               icon={InformationCircleIcon}
               size={16}
@@ -204,7 +204,7 @@ export function TarjetaIndicador({ indicador, className }: TarjetaIndicadorProps
 
           {/* Desglose Condicional según Indicador */}
           {expandido && (
-            <div className="bg-card/60 mt-2.5 space-y-2 rounded-lg p-3 text-xs">
+            <div className="bg-card mt-2.5 space-y-2 rounded-lg p-3 text-xs">
               {indicador.indicador === "CSP" && (
                 <DesgloseCspVista desglose={indicador.desglose as DesgloseCspDto} />
               )}

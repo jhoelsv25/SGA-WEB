@@ -258,6 +258,14 @@
     @apply border-none shadow-sm ring-0 transition-shadow duration-200;
   }
 
+  /*
+   * En claro las tarjetas del panel llevan un borde suave para no perderse en el fondo gris.
+   * Va en esta capa para que una tarjeta pueda seguir poniendo su propio color de borde.
+   */
+  :root:not(.dark) [data-slot="sidebar-inset"] [data-slot="card"] {
+    border: 1px solid var(--border);
+  }
+
   /* Popovers, Menús y Selects flotantes con sombra profunda elegante y sin bordes */
   [data-slot="popover-content"],
   [data-slot="dropdown-menu-content"],
@@ -284,4 +292,98 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/*
+ * Fondo del panel: en claro es el gris casi blanco de Azure DevOps, para que destaquen la
+ * cabecera y las tarjetas blancas. En oscuro no cambia.
+ */
+:root {
+  --fondo-app: #f8f8f8;
+}
+
+.dark {
+  --fondo-app: var(--background);
+}
+
+/*
+ * Selectores tipo «pastillas» del panel en claro: el gris por defecto se pierde sobre el fondo,
+ * así que van en blanco con borde y la opción elegida usa el color primario.
+ */
+:root:not(.dark) [data-slot="sidebar-inset"] [data-slot="tabs-list"][data-variant="default"] {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+}
+
+:root:not(.dark)
+  [data-slot="sidebar-inset"]
+  [data-slot="tabs-list"][data-variant="default"]
+  [data-slot="tabs-trigger"][data-state="active"] {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: none;
+}
+
+/* Barra superior estilo Azure: sus botones son casi cuadrados; los selectores siguen redondeados. */
+[data-barra-superior]
+  :is(button:not([role="combobox"], [data-buscador-portal]), a[data-slot="button"]) {
+  border-radius: 2px;
+}
+
+/*
+ * Franja de la opción elegida. Se resuelve en la raíz porque la barra oscura redefine
+ * `--primary` como blanco.
+ */
+:root {
+  --franja: var(--primary);
+}
+
+/*
+ * La barra lateral sigue el tema: en claro es un gris suave (estilo Azure) y en oscuro usa los
+ * tokens de abajo. `.tema-barra` sirve para lo que se dibuja fuera, como el menú emergente.
+ */
+[data-sidebar="sidebar"],
+.tema-barra {
+  /* Resaltados del menú (en claro se reemplazan por los grises de Azure). */
+  --menu-hover: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --menu-seccion: color-mix(in oklab, var(--foreground) 3%, transparent);
+  --menu-grupo: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --menu-activo: color-mix(in oklab, var(--foreground) 10%, transparent);
+}
+
+/* Colores tomados de Azure DevOps en claro. */
+:root:not(.dark) [data-sidebar="sidebar"],
+:root:not(.dark) .tema-barra {
+  --sidebar: #eaeaea;
+  --sidebar-accent: #e1e1e1;
+  --sidebar-border: #dadada;
+  --menu-hover: #e1e1e1;
+  --menu-seccion: #e4e4e4;
+  --menu-grupo: #dcdcdc;
+  --menu-activo: #cfcfcf;
+}
+
+.dark [data-sidebar="sidebar"],
+.dark .tema-barra {
+  --sidebar: oklch(0.232 0.003 30);
+  --sidebar-foreground: oklch(0.9 0.003 30);
+  --sidebar-accent: oklch(0.32 0.004 30);
+  --sidebar-accent-foreground: oklch(0.99 0 0);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.7 0 0);
+  --background: oklch(0.232 0.003 30);
+  --foreground: oklch(0.96 0.002 30);
+  --card: oklch(0.232 0.003 30);
+  --popover: oklch(0.232 0.003 30);
+  --popover-foreground: oklch(0.96 0.002 30);
+  --muted: oklch(0.29 0.004 30);
+  --muted-foreground: oklch(0.72 0.004 30);
+  --accent: oklch(0.32 0.004 30);
+  --accent-foreground: oklch(0.99 0 0);
+  --primary: oklch(0.99 0 0);
+  --primary-foreground: oklch(0.2 0.003 30);
+  --border: oklch(1 0 0 / 11%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.7 0 0);
+  color: var(--sidebar-foreground);
 }

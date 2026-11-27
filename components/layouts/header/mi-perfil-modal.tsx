@@ -8,7 +8,6 @@ import {
   SecurityLockIcon,
   School01Icon,
   CheckmarkCircle02Icon,
-  Key01Icon,
   Cancel01Icon,
 } from "@hugeicons/core-free-icons";
 import { Modal } from "@/components/common/modal";
@@ -27,7 +26,6 @@ interface MiPerfilModalProps {
   currentUser?: CurrentUser | null;
   rolActivo?: string;
   onOpenCambiarPassword?: () => void;
-  onOpenCambiarPin?: () => void;
 }
 
 export function MiPerfilModal({
@@ -37,7 +35,6 @@ export function MiPerfilModal({
   currentUser,
   rolActivo,
   onOpenCambiarPassword,
-  onOpenCambiarPin,
 }: MiPerfilModalProps) {
   const nombre = user?.name ?? currentUser?.firstName ?? "Usuario";
   const email = user?.email ?? currentUser?.email ?? "No registrado";
@@ -71,20 +68,6 @@ export function MiPerfilModal({
               >
                 <HugeiconsIcon icon={SecurityLockIcon} className="text-primary size-3.5" />
                 Cambiar clave
-              </Button>
-            )}
-            {onOpenCambiarPin && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  onOpenChange(false);
-                  onOpenCambiarPin();
-                }}
-                className="h-8 gap-1.5 text-xs"
-              >
-                <HugeiconsIcon icon={Key01Icon} className="text-primary size-3.5" />
-                Mi PIN
               </Button>
             )}
           </div>

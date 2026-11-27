@@ -6,6 +6,7 @@ import { TableRowActions } from "@/components/common/row-actions";
 import {
   BookOpen01Icon,
   FingerPrintIcon,
+  Key01Icon,
   PrinterIcon,
   RefreshIcon,
   ShieldCheckIcon,
@@ -20,6 +21,7 @@ interface DocenteActionsProps {
   onPrintCarne?: (docente: Docente) => void;
   onReemitirCredencial?: (docente: Docente) => void;
   onVerHistorial?: (docente: Docente) => void;
+  onCambiarPin?: (docente: Docente) => void;
   onCodigoBiometrico?: (docente: Docente) => void;
 }
 
@@ -30,6 +32,7 @@ export function DocenteActions({
   onPrintCarne,
   onReemitirCredencial,
   onVerHistorial,
+  onCambiarPin,
   onCodigoBiometrico,
 }: DocenteActionsProps) {
   const router = useRouter();
@@ -82,6 +85,16 @@ export function DocenteActions({
                 label: "Carné perdido (Reemitir)",
                 icon: RefreshIcon,
                 onClick: () => onReemitirCredencial(docente),
+              },
+            ]
+          : []),
+        ...(onCambiarPin && docente.estado !== "cesado"
+          ? [
+              {
+                key: "cambiar-pin",
+                label: "Cambiar PIN de marcación",
+                icon: Key01Icon,
+                onClick: () => onCambiarPin(docente),
               },
             ]
           : []),

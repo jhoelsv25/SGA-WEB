@@ -96,10 +96,7 @@ export function PushNotificationPromptToast() {
       role="alert"
       aria-live="polite"
     >
-      <div className="border-primary/25 bg-card/95 dark:bg-card/90 dark:border-primary/30 relative overflow-hidden rounded-2xl border p-4.5 shadow-2xl backdrop-blur-xl">
-        {/* Glow difuminado de fondo */}
-        <div className="bg-primary/20 pointer-events-none absolute -top-10 -right-10 size-32 rounded-full blur-2xl" />
-
+      <div className="border-primary/25 bg-card dark:border-primary/30 relative overflow-hidden rounded-2xl border p-4.5 shadow-2xl">
         {/* Botón X de cerrar en la esquina */}
         <button
           onClick={handleDismiss}

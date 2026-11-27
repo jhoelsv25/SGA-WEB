@@ -57,8 +57,12 @@ export interface NavItem {
   disabled?: boolean;
   /** Opción de uso personal: el Administrador no la ve (los demás roles, según Roles-Menú). */
   ocultarAlAdministrador?: boolean;
+  /** La opción se muestra a quien tenga asignada esta ruta en Roles-Menú (si no, su `link`). */
+  rutaPermiso?: string;
   /** Rutas que se abren desde esta opción y mantienen el ítem marcado. */
   rutasIncluidas?: string[];
+  /** Si es lo único de su sección, sus opciones se muestran sin el grupo. */
+  mostrarHijosSiEsUnico?: boolean;
   items?: NavItem[];
 }
 

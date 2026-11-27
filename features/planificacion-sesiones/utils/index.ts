@@ -68,6 +68,27 @@ export function aPayload(p: Planificacion): GuardarPlanificacionPayload {
   };
 }
 
+/**
+ * Lo que se envía al guardar: sin competencias sin elegir ni viñetas vacías (la API exige texto en
+ * cada desempeño y guardaría tal cual las viñetas vacías de materiales).
+ */
+export function limpiarPayload(f: GuardarPlanificacionPayload): GuardarPlanificacionPayload {
+  const llenas = (l?: string[]) => l?.map((x) => x.trim()).filter(Boolean);
+  return {
+    ...f,
+    criterios: llenas(f.criterios),
+    referencias: llenas(f.referencias),
+    materiales: f.materiales && {
+      impresos: llenas(f.materiales.impresos),
+      manipulativos: llenas(f.materiales.manipulativos),
+      digitales: llenas(f.materiales.digitales),
+    },
+    competencias: (f.competencias ?? [])
+      .filter((c) => c.competenciaId)
+      .map((c) => ({ ...c, desempenos: c.desempenos.filter((d) => d.texto.trim()) })),
+  };
+}
+
 export function guardarArchivo(blob: Blob, nombre: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

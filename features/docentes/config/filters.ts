@@ -14,6 +14,8 @@ export const docenteFilterDefs: readonly ListFilterDef[] = [
       { label: "Todos los contratos", value: "all" },
       { label: "Nombrado", value: "nombrado" },
       { label: "Contratado", value: "contratado" },
+      { label: "Destacado", value: "destacado" },
+      { label: "Encargado", value: "encargado" },
       { label: "Practicante", value: "practicante" },
     ],
   },

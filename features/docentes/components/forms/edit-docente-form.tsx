@@ -20,6 +20,8 @@ import type {
 const contratoOptions: { value: TipoContrato; label: string }[] = [
   { value: "nombrado", label: "Nombrado" },
   { value: "contratado", label: "Contratado" },
+  { value: "destacado", label: "Destacado" },
+  { value: "encargado", label: "Encargado" },
   { value: "practicante", label: "Practicante" },
 ];
 

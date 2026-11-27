@@ -178,7 +178,7 @@ export function MiHorarioPage() {
           }}
         >
           {rol === "apoderado" && misEstudiantes.length > 1 && (
-            <div className="border-border/60 bg-card/60 mb-4 flex items-center gap-3 rounded-2xl border p-3 shadow-xs">
+            <div className="border-border/60 bg-card mb-4 flex items-center gap-3 rounded-2xl border p-3 shadow-xs">
               <span className="text-muted-foreground text-xs font-semibold">
                 {TEXTOS_MI_HORARIO.SELECTOR_ESTUDIANTE_LABEL}
               </span>
@@ -201,7 +201,7 @@ export function MiHorarioPage() {
           {bloques.length > 0 && (
             <div className="space-y-4">
               {/* Barra superior de métricas y selector de modo de vista */}
-              <div className="border-border/60 bg-card/60 flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3 shadow-xs">
+              <div className="border-border/60 bg-card flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-3 shadow-xs">
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <Badge variant="secondary" className="gap-1.5 px-3 py-1 font-semibold">
                     <HugeiconsIcon icon={Book02Icon} className="size-3.5" aria-hidden="true" />

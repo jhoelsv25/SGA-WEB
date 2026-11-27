@@ -66,6 +66,34 @@ export function extraerPrimerNombreYApellido(nombreCompleto: string): string {
 }
 
 /**
+ * Nombre para decir en voz alta. El servidor lo envía como "Paterno Materno, Nombres"; se dice el primer nombre y
+ * el apellido paterno (con sus partículas) y se quitan las mayúsculas sostenidas para que la voz no deletree.
+ *
+ * @example
+ * nombreParaVoz("DE LA CRUZ CCORA, HUGO ALBERTO") // "Hugo De La Cruz"
+ */
+export function nombreParaVoz(nombreCompleto: string): string {
+  const [apellidos, nombres] = nombreCompleto.split(",").map((parte) => parte.trim());
+  let corto: string;
+  if (nombres) {
+    const palabras = apellidos.split(/\s+/).filter(Boolean);
+    const particulas = new Set(["de", "del", "la", "las", "los", "san", "santa"]);
+    let fin = 0;
+    while (fin < palabras.length - 1 && particulas.has(palabras[fin].toLowerCase())) fin++;
+    corto = [nombres.split(/\s+/)[0], ...palabras.slice(0, fin + 1)].join(" ");
+  } else {
+    corto = extraerPrimerNombreYApellido(nombreCompleto);
+  }
+  return corto
+    .trim()
+    .toLocaleLowerCase("es-PE")
+    .replace(
+      /(^|\s)(\S)/g,
+      (_, espacio: string, letra: string) => espacio + letra.toLocaleUpperCase("es-PE"),
+    );
+}
+
+/**
  * Formatea una fecha a hora con segundos para el reloj digital de portería.
  */
 export function formatearHora(fecha: Date): string {

@@ -21,6 +21,73 @@ import {
   useDashboard,
 } from "@/features/dashboard";
 
+/** Se compara con el nombre exacto del rol (como en la API del dashboard). */
+const PRIORIDADES_POR_ROL: Record<string, readonly string[]> = {
+  Administrador: [
+    "/admin/users",
+    "/admin/roles",
+    "/admin/academic-years",
+    "/admin/secciones",
+    "/admin/enrollment",
+    "/admin/audit",
+  ],
+  Director: [
+    "/admin/sesiones-hoy",
+    "/admin/consolidados-docentes",
+    "/admin/pendientes-seguimiento",
+    "/admin/indicadores",
+    "/admin/observaciones-aula",
+    "/admin/reportes",
+  ],
+  Subdirector: [
+    "/admin/sesiones-hoy",
+    "/admin/consolidados-docentes",
+    "/admin/pendientes-seguimiento",
+    "/admin/horarios",
+    "/admin/observaciones-aula",
+    "/admin/indicadores",
+  ],
+  Secretaria: [
+    "/admin/marcaciones-hoy",
+    "/admin/marcacion-manual",
+    "/admin/asistencia-seccion",
+    "/admin/libretas",
+    "/admin/reportes",
+  ],
+  Docente: [
+    "/admin/mis-sesiones",
+    "/admin/planificacion-sesiones",
+    "/admin/asistencia",
+    "/admin/aula-virtual",
+    "/admin/mi-horario",
+    "/admin/mi-seguimiento",
+  ],
+  Estudiante: [
+    "/admin/aula-virtual",
+    "/admin/mi-horario",
+    "/admin/mi-asistencia",
+    "/admin/mis-libretas",
+  ],
+  Apoderado: [
+    "/admin/mi-asistencia",
+    "/admin/mis-libretas",
+    "/admin/mi-horario",
+    "/admin/aula-virtual",
+  ],
+};
+
+const DESCRIPCION_POR_ROL: Record<string, string> = {
+  Administrador:
+    "Administra la estructura académica, las cuentas, los permisos y la configuración.",
+  "Soporte TI": "Monitorea las cuentas, los accesos y los equipos del sistema.",
+  Director: "Supervisa el seguimiento docente, la asistencia y los indicadores de gestión.",
+  Subdirector: "Supervisa sesiones, horarios, asistencia y el seguimiento de los docentes.",
+  Secretaria: "Controla matrículas, fichas pendientes y la asistencia del día.",
+  Docente: "Gestiona tus clases de hoy, tu planificación y el aula virtual.",
+  Estudiante: "Revisa tu horario, tus tareas, tu asistencia y tus libretas.",
+  Apoderado: "Revisa la asistencia, el horario, las tareas y las libretas de su hijo(a).",
+};
+
 function esIconoHugeicons(icono: NavItem["icon"]): icono is IconSvgElement {
   return Array.isArray(icono);
 }
@@ -88,91 +155,30 @@ export default function DashboardPage() {
         esAdministrador: rolActivo === "Administrador",
         menuRoutes: currentUser?.menuRoutes,
       })
-        .flatMap((seccion) => seccion.items)
+        // Los accesos son las pantallas: de cada grupo se toman sus opciones.
+        .flatMap((seccion) => seccion.items.flatMap((item) => item.items ?? [item]))
         .filter((item) => item.link !== RUTA_INICIO),
     [rolActivo, currentUser?.menuRoutes],
   );
 
-  // Priorizar los accesos más importantes según el rol
+  // Accesos más usados por cada rol: aparecen primero.
   const accesosPriorizados = React.useMemo(() => {
-    const rol = (rolActivo || "").toLowerCase();
-    let prioridades: readonly string[] = [
-      "/admin/sesiones-hoy",
-      "/admin/aula-virtual",
-      "/admin/marcaciones-hoy",
-      "/admin/enrollment",
-      "/admin/docentes",
-      "/admin/estudiantes",
-    ];
-
-    if (rol.includes("docente") || rol.includes("profesor")) {
-      prioridades = [
-        "/admin/mis-sesiones",
-        "/admin/aula-virtual",
-        "/admin/asistencia-seccion",
-        "/admin/mi-horario",
-        "/admin/mi-seguimiento",
-        "/admin/mis-ausencias",
-      ];
-    } else if (rol.includes("estudiante") || rol.includes("alumno") || rol.includes("apoderado")) {
-      prioridades = [
-        "/admin/aula-virtual",
-        "/admin/mi-horario",
-        "/admin/mi-asistencia",
-        "/admin/mis-libretas",
-        "/admin/comunicados",
-      ];
-    } else if (rol.includes("secretaria") || rol.includes("secretario")) {
-      prioridades = [
-        "/admin/enrollment",
-        "/admin/estudiantes",
-        "/admin/apoderados",
-        "/admin/libretas",
-        "/admin/comunicados",
-        "/admin/asistencia-seccion",
-      ];
-    } else if (rol.includes("admin") || rol.includes("soporte") || rol.includes("ti")) {
-      prioridades = [
-        "/admin/users",
-        "/admin/roles",
-        "/admin/audit",
-        "/admin/institucion",
-        "/admin/equipos",
-        "/admin/academic-years",
-      ];
-    }
-
-    return [...accesos].sort((a, b) => {
-      const idxA = prioridades.indexOf(a.link);
-      const idxB = prioridades.indexOf(b.link);
-      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
-      if (idxA !== -1) return -1;
-      if (idxB !== -1) return 1;
-      return 0;
-    });
+    const prioridades = PRIORIDADES_POR_ROL[rolActivo] ?? [];
+    const orden = (link: string) => {
+      const i = prioridades.indexOf(link);
+      return i === -1 ? prioridades.length : i;
+    };
+    return [...accesos].sort((a, b) => orden(a.link) - orden(b.link));
   }, [accesos, rolActivo]);
+
+  const rutasDelRol = React.useMemo(() => new Set(accesos.map((item) => item.link)), [accesos]);
+  const puedeIr = React.useCallback((ruta: string) => rutasDelRol.has(ruta), [rutasDelRol]);
 
   const accesosVisibles = mostrarTodosAccesos ? accesosPriorizados : accesosPriorizados.slice(0, 6);
 
-  const descripcionRol = React.useMemo(() => {
-    const rol = (rolActivo || "").toLowerCase();
-    if (rol.includes("docente") || rol.includes("profesor")) {
-      return "Gestiona tus clases de hoy, el avance de calificaciones y el aula virtual.";
-    }
-    if (rol.includes("estudiante") || rol.includes("alumno")) {
-      return "Revisa tus horarios, tareas pendientes y calificaciones del ciclo.";
-    }
-    if (rol.includes("apoderado") || rol.includes("padre")) {
-      return "Monitorea la asistencia, horarios y tareas escolares de tus hijos.";
-    }
-    if (rol.includes("secretaria") || rol.includes("secretario")) {
-      return "Supervisa matrículas, gestión documentaria, asistencia escolar y comunicados.";
-    }
-    if (rol.includes("admin") || rol.includes("soporte") || rol.includes("ti")) {
-      return "Monitorea la seguridad del sistema, cuentas de usuario y auditoría.";
-    }
-    return "Supervisa en tiempo real el progreso institucional, asistencia y actividades.";
-  }, [rolActivo]);
+  const descripcionRol =
+    DESCRIPCION_POR_ROL[rolActivo] ??
+    "Use los accesos rápidos para entrar a sus opciones asignadas.";
 
   return (
     <div className="space-y-6 pb-8">
@@ -219,7 +225,9 @@ export default function DashboardPage() {
       ) : (
         <>
           {/* Vista según rol */}
-          {dashboardData?.admin && <AdminDashboardView data={dashboardData.admin} />}
+          {dashboardData?.admin && (
+            <AdminDashboardView data={dashboardData.admin} puedeIr={puedeIr} />
+          )}
 
           {dashboardData?.secretaria && <SecretariaDashboardView data={dashboardData.secretaria} />}
 
@@ -227,7 +235,12 @@ export default function DashboardPage() {
 
           {dashboardData?.docente && <DocenteDashboardView data={dashboardData.docente} />}
 
-          {dashboardData?.estudiante && <EstudianteDashboardView data={dashboardData.estudiante} />}
+          {dashboardData?.estudiante && (
+            <EstudianteDashboardView
+              data={dashboardData.estudiante}
+              esApoderado={dashboardData.rolCategoria === "apoderado"}
+            />
+          )}
 
           {dashboardData?.rolCategoria === "adicional" && (
             <EmptyState

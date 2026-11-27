@@ -54,7 +54,8 @@ export function isoDeFecha(fecha: Date | undefined): string {
 
 export interface FiltroEventos {
   busqueda: string;
-  tipo: string;
+  /** Tipos de evento que no se muestran. */
+  ocultos: string[];
   clases: string;
 }
 
@@ -65,7 +66,7 @@ export function filtrarEventos(
   const busqueda = filtro.busqueda.trim().toLowerCase();
   return eventos.filter((evento) => {
     if (busqueda && !evento.titulo.toLowerCase().includes(busqueda)) return false;
-    if (filtro.tipo && filtro.tipo !== "all" && evento.tipo !== filtro.tipo) return false;
+    if (filtro.ocultos.includes(evento.tipo)) return false;
     if (filtro.clases === "si" && !evento.suspendeClases) return false;
     if (filtro.clases === "no" && evento.suspendeClases) return false;
     return true;
@@ -96,4 +97,24 @@ export function diasSinClasesDe(
     }
   }
   return [...dias].sort();
+}
+
+/** Ejemplo: «Miércoles, 25 de noviembre de 2026». */
+export function fechaLarga(iso: string): string {
+  const texto =
+    fechaDeIso(iso)?.toLocaleDateString("es-PE", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }) ?? iso;
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+/** Semanas completas del mes, de domingo a sábado, incluidos los días vecinos que las rellenan. */
+export function diasDeLaCuadricula(anio: number, mes: number): Date[] {
+  const antes = new Date(anio, mes - 1, 1).getDay();
+  const cantidad = new Date(anio, mes, 0).getDate();
+  const total = Math.ceil((antes + cantidad) / 7) * 7;
+  return Array.from({ length: total }, (_, i) => new Date(anio, mes - 1, i - antes + 1));
 }

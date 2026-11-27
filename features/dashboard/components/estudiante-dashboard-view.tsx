@@ -26,6 +26,8 @@ import type { EstudianteDashboardData } from "../types/dashboard.types";
 
 interface EstudianteDashboardViewProps {
   data: EstudianteDashboardData;
+  /** El apoderado ve los datos de su hijo(a): los textos no le hablan como si fuera el estudiante. */
+  esApoderado?: boolean;
 }
 
 const chartConfigTareas = {
@@ -42,31 +44,46 @@ const chartConfigTareas = {
   },
 } satisfies ChartConfig;
 
-export function EstudianteDashboardView({ data }: EstudianteDashboardViewProps) {
+export function EstudianteDashboardView({
+  data,
+  esApoderado = false,
+}: EstudianteDashboardViewProps) {
   const { kpis, graficoTareas, proximasTareas, horarioHoy } = data;
 
   const totalTareas = kpis.tareasPendientes + kpis.tareasEntregadas;
+  // Sin ninguna marca todavía no hay porcentaje que mostrar (la API devuelve 100 por defecto).
+  const sinAsistencia = kpis.presentes + kpis.tardanzas + kpis.faltas + kpis.justificadas === 0;
 
   return (
     <div className="space-y-6">
       {/* Tarjetas de KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
-          title="Mi Asistencia"
-          value={`${kpis.porcentajeAsistencia}%`}
+          title={esApoderado ? "Asistencia" : "Mi Asistencia"}
+          value={sinAsistencia ? "—" : `${kpis.porcentajeAsistencia}%`}
           subtitle={`${kpis.presentes} asistencias · ${kpis.tardanzas} tardanzas · ${kpis.faltas} faltas`}
           icon={CheckmarkCircle02Icon}
-          variant={kpis.porcentajeAsistencia >= 90 ? "success" : "warning"}
-          trend={{
-            value: kpis.porcentajeAsistencia >= 90 ? "Excelente" : "Regular",
-            positive: kpis.porcentajeAsistencia >= 90,
-          }}
+          variant={sinAsistencia || kpis.porcentajeAsistencia >= 90 ? "success" : "warning"}
+          trend={
+            sinAsistencia
+              ? { value: "Sin registros", neutral: true }
+              : {
+                  value: kpis.porcentajeAsistencia >= 90 ? "Excelente" : "Regular",
+                  positive: kpis.porcentajeAsistencia >= 90,
+                }
+          }
         />
 
         <KpiCard
           title="Tareas Pendientes"
           value={kpis.tareasPendientes}
-          subtitle={kpis.tareasPendientes === 0 ? "¡Estás al día!" : "Tareas por entregar"}
+          subtitle={
+            kpis.tareasPendientes === 0
+              ? esApoderado
+                ? "Está al día"
+                : "¡Estás al día!"
+              : "Tareas por entregar"
+          }
           icon={AlertCircleIcon}
           variant={kpis.tareasPendientes > 0 ? "warning" : "success"}
           trend={{
@@ -98,7 +115,9 @@ export function EstudianteDashboardView({ data }: EstudianteDashboardViewProps) 
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base font-semibold">Tus Actividades y Tareas</CardTitle>
+                <CardTitle className="text-base font-semibold">
+                  {esApoderado ? "Actividades y Tareas" : "Tus Actividades y Tareas"}
+                </CardTitle>
                 <CardDescription className="text-xs">
                   Seguimiento de entregas y evaluaciones próximas
                 </CardDescription>
@@ -114,8 +133,16 @@ export function EstudianteDashboardView({ data }: EstudianteDashboardViewProps) 
           <CardContent className="pt-0">
             {proximasTareas.length === 0 ? (
               <div className="text-muted-foreground flex h-48 flex-col items-center justify-center gap-1.5 text-center text-sm">
-                <p className="font-medium">No tienes tareas asignadas por el momento</p>
-                <p className="text-xs">Revisa más tarde las publicaciones de tus profesores.</p>
+                <p className="font-medium">
+                  {esApoderado
+                    ? "No tiene tareas asignadas por el momento"
+                    : "No tienes tareas asignadas por el momento"}
+                </p>
+                <p className="text-xs">
+                  {esApoderado
+                    ? "Revise más tarde las publicaciones de los profesores."
+                    : "Revisa más tarde las publicaciones de tus profesores."}
+                </p>
               </div>
             ) : (
               <div className="divide-border/50 divide-y">
@@ -195,7 +222,11 @@ export function EstudianteDashboardView({ data }: EstudianteDashboardViewProps) 
                 <DashboardChartEmpty
                   icon={CheckmarkCircle02Icon}
                   title="Sin tareas registradas"
-                  description="No tienes tareas pendientes ni evaluaciones programadas."
+                  description={
+                    esApoderado
+                      ? "No tiene tareas pendientes ni evaluaciones programadas."
+                      : "No tienes tareas pendientes ni evaluaciones programadas."
+                  }
                   className="h-44"
                 />
               ) : (
@@ -259,7 +290,9 @@ export function EstudianteDashboardView({ data }: EstudianteDashboardViewProps) 
             <CardContent className="pt-0">
               {horarioHoy.length === 0 ? (
                 <p className="text-muted-foreground py-2 text-xs">
-                  No tienes clases programadas para hoy.
+                  {esApoderado
+                    ? "No tiene clases programadas para hoy."
+                    : "No tienes clases programadas para hoy."}
                 </p>
               ) : (
                 <div className="divide-border/40 divide-y text-xs">

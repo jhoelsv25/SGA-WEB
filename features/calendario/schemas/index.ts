@@ -12,6 +12,7 @@ export const eventoSchema = z
     fechaInicio: z.string().regex(FECHA, FECHA_INVALIDA),
     fechaFin: z.string().regex(FECHA, FECHA_INVALIDA),
     suspendeClases: z.boolean(),
+    personalLabora: z.boolean(),
   })
   .superRefine((data, ctx) => {
     if (data.fechaFin < data.fechaInicio) {

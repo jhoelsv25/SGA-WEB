@@ -179,7 +179,7 @@ function TableroIndicadoresContenido() {
               variant="outline"
               size="sm"
               onClick={manejarRecargar}
-              className="bg-background/80 gap-2"
+              className="bg-background gap-2"
             >
               <HugeiconsIcon icon={RefreshIcon} size={15} />
               Reintentar

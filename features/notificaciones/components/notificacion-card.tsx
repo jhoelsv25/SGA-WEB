@@ -34,7 +34,7 @@ export function NotificacionCard({
       className={cn(
         "border transition-all duration-200 hover:shadow-sm",
         notificacion.leida
-          ? "bg-card/50 border-border/60 opacity-90"
+          ? "bg-card border-border/60 opacity-90"
           : "bg-card border-primary/20 shadow-xs",
       )}
     >

@@ -95,6 +95,14 @@ export function TurnosPage() {
           className="text-primary mt-0.5 h-5 w-5 shrink-0"
         />
         <div>
+          <p className="mb-2">
+            <strong>El turno de docentes es el horario del Reglamento Interno:</strong> con él se
+            calculan la tardanza y la salida de todos los docentes. Si el reglamento fija el horario
+            según las clases de cada uno, active la variable
+            <code> asistencia.docente_horario_segun_clases</code> en Variables del sistema. La norma
+            de asistencia docente (RSG 326-2017-MINEDU) cuenta la tardanza desde el primer minuto
+            (tolerancia 0).
+          </p>
           <span className="text-foreground font-semibold">Reglas del cálculo de asistencia:</span>{" "}
           Las marcaciones dentro de la ventana de entrada se consideran <strong>a tiempo</strong> si
           ocurren antes de la hora oficial más la tolerancia. Posterior a este margen, se computa

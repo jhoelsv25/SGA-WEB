@@ -241,7 +241,7 @@ export function SelectOption<T extends string = string>({
       </PopoverTrigger>
 
       <PopoverContent
-        className="border-border/80 bg-popover/95 w-[--radix-popover-trigger-width] min-w-72 rounded-2xl p-1 shadow-xl backdrop-blur-md"
+        className="border-border/80 bg-popover w-[--radix-popover-trigger-width] min-w-72 rounded-2xl p-1 shadow-xl"
         align="start"
         sideOffset={6}
         onWheel={(e) => e.stopPropagation()}

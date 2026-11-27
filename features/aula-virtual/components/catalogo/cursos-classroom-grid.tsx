@@ -239,7 +239,7 @@ export function CursosClassroomGrid({
 
       {/* Grid de Materias tipo Google Classroom */}
       {cursosFiltrados.length === 0 ? (
-        <div className="border-border/80 bg-card/40 rounded-2xl border border-dashed p-12 text-center">
+        <div className="border-border/80 bg-card rounded-2xl border border-dashed p-12 text-center">
           <HugeiconsIcon
             icon={BookOpen01Icon}
             size={40}

@@ -3,9 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Calendar03Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
+import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
-import { PageHeader } from "@/components/common/page-header";
 import { PageState } from "@/components/common/page-state";
 import { Button } from "@/components/ui/button";
 import { useAnioLectivo } from "@/features/anio-escolar/anio-lectivo-context";
@@ -44,26 +43,10 @@ export function CalendarioPage() {
   const anioVisible = cursor.anio ?? (data ? Number(data.desde.slice(0, 4)) : undefined);
   const mesVisible = cursor.mes ?? (data ? Number(data.desde.slice(5, 7)) : undefined);
 
+  // En computadora ocupa el alto visible: se reduce el margen del panel y se resta la cabecera.
   return (
-    <div className="animate-in fade-in-50 flex flex-col gap-6 duration-300">
-      <PageHeader
-        title="Calendario escolar"
-        description={
-          anioLectivo
-            ? `Eventos del año académico ${anioLectivo.anio}. Los días sin clases quedan marcados y no cuentan como sesión.`
-            : "Eventos del año académico. Los días sin clases quedan marcados y no cuentan como sesión."
-        }
-        icon={Calendar03Icon}
-        breadcrumbs={[{ label: "Inicio", href: "/admin/dashboard" }, { label: "Calendario" }]}
-        actions={
-          puedeRegistrar ? (
-            <Button onClick={() => setFormulario({})}>
-              <HugeiconsIcon icon={PlusSignIcon} className="size-4" />
-              Registrar evento
-            </Button>
-          ) : null
-        }
-      />
+    <div className="animate-in fade-in-50 flex flex-col gap-3 duration-300 md:-m-2 md:h-[calc(100dvh-5.5rem)] md:min-h-136 lg:-m-4">
+      <h1 className="sr-only">Calendario escolar</h1>
 
       <PageState
         isLoading={cargandoAnio || consulta.isLoading}
@@ -95,7 +78,7 @@ export function CalendarioPage() {
             hasta={data.hasta}
             eventos={data.eventos}
             busqueda={listFilters.getString("q")}
-            tipo={listFilters.getString("tipo")}
+            ocultos={listFilters.getArray("ocultar")}
             clases={listFilters.getString("clases")}
             listFilters={listFilters}
             isRefreshing={consulta.isFetching}
@@ -103,6 +86,18 @@ export function CalendarioPage() {
               void consulta.refetch();
             }}
             puedeRegistrar={puedeRegistrar}
+            acciones={
+              puedeRegistrar ? (
+                <Button
+                  variant="outline"
+                  onClick={() => setFormulario({})}
+                  className="bg-card h-12 gap-2 self-start rounded-2xl px-5 text-sm font-semibold shadow-md"
+                >
+                  <HugeiconsIcon icon={PlusSignIcon} className="text-primary size-5" />
+                  Registrar evento
+                </Button>
+              ) : null
+            }
             onMesAnterior={() => {
               if (!anioId) return;
               setCursores((actual) => ({
@@ -115,6 +110,14 @@ export function CalendarioPage() {
               setCursores((actual) => ({
                 ...actual,
                 [anioId]: desplazarMes(anioVisible, mesVisible, 1),
+              }));
+            }}
+            onHoy={() => {
+              if (!anioId) return;
+              const fecha = new Date();
+              setCursores((actual) => ({
+                ...actual,
+                [anioId]: { anio: fecha.getFullYear(), mes: fecha.getMonth() + 1 },
               }));
             }}
             onSeleccionarDia={puedeRegistrar ? (dia) => setFormulario({ dia }) : undefined}

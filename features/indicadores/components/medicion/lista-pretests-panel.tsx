@@ -212,7 +212,7 @@ export function ListaPretestsPanel({ onRegistrarPretest, className }: ListaPrete
                       <span className="text-muted-foreground block text-[10px] font-medium tracking-wider uppercase">
                         Fuente documental:
                       </span>
-                      <p className="bg-background/80 text-foreground rounded-lg border border-dashed p-2 text-xs leading-relaxed italic">
+                      <p className="bg-background text-foreground rounded-lg border border-dashed p-2 text-xs leading-relaxed italic">
                         «{vigente.fuente}»
                       </p>
                     </div>

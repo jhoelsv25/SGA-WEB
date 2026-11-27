@@ -244,7 +244,8 @@ export interface SecretariaKpis {
   estudiantesSinApoderado: number;
   estudiantesSinDocumento: number;
   libretasPendientes: number;
-  asistenciaHoyPorcentaje: number;
+  /** Null si hoy no se esperaba a ningún estudiante. */
+  asistenciaHoyPorcentaje: number | null;
 }
 
 export interface SecretariaMatriculasGrado {
@@ -275,13 +276,7 @@ export interface SecretariaDashboardData {
 
 export interface DashboardResponse {
   rolCategoria:
-    | "directivo"
-    | "docente"
-    | "estudiante"
-    | "apoderado"
-    | "admin"
-    | "secretaria"
-    | "adicional";
+    "directivo" | "docente" | "estudiante" | "apoderado" | "admin" | "secretaria" | "adicional";
   rolNombre: string;
   periodoActual: PeriodoActualInfo;
   directivo?: DirectivoDashboardData;

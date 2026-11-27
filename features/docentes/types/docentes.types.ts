@@ -4,7 +4,7 @@ import type {
   Persona,
 } from "../../personas/types/personas.types";
 
-export type TipoContrato = "nombrado" | "contratado" | "practicante";
+export type TipoContrato = "nombrado" | "contratado" | "destacado" | "encargado" | "practicante";
 export type JornadaHoras = 20 | 24 | 30 | 40;
 export type EstadoDocente = "activo" | "licencia" | "cesado";
 

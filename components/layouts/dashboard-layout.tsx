@@ -23,12 +23,16 @@ export function DashboardLayout({ children, user: userProp, defaultOpen = true }
 
   return (
     <AnioLectivoProvider>
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar />
-        <SidebarInset className="bg-background flex h-dvh flex-col overflow-hidden">
+      <SidebarProvider
+        defaultOpen={defaultOpen}
+        style={{ "--sidebar-width-icon": "3.75rem" } as React.CSSProperties}
+        className="bg-(--fondo-app)"
+      >
+        <AppSidebar user={activeUser} />
+        <SidebarInset className="flex h-dvh flex-col overflow-hidden bg-(--fondo-app)">
           <ImpersonationBanner />
-          <AppHeader user={activeUser} />
-          <div className="bg-background min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-6 lg:p-8">
+          <AppHeader />
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-(--fondo-app) p-4 md:p-6 lg:p-8">
             <div className="animate-in fade-in duration-300">{children}</div>
           </div>
         </SidebarInset>

@@ -177,9 +177,17 @@ apiClient.interceptors.response.use(
         url.includes("/auth/login") ||
         url.includes("/auth/refresh-token") ||
         url.includes("/auth/register");
+      // El kiosko no tiene sesión: su 401 significa "equipo no autorizado"
+      const esValidacionKiosko = url.includes("/equipos/validar-kiosko");
 
       // Si es 401 y no es petición de autenticación recursiva
-      if (status === 401 && originalRequest && !originalRequest._retry && !isAuthRoute) {
+      if (
+        status === 401 &&
+        originalRequest &&
+        !originalRequest._retry &&
+        !isAuthRoute &&
+        !esValidacionKiosko
+      ) {
         originalRequest._retry = true;
 
         const refreshed = await renovarSesionSilenciosa();

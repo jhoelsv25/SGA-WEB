@@ -40,7 +40,7 @@ const TABS_POR_GRUPO: Record<GrupoTabsSeccion, readonly SectionRouteTab[]> = {
     { href: "/admin/observaciones-aula", label: "Observaciones de aula", icon: Task01Icon },
   ],
   "control-asistencia": [
-    { href: "/admin/marcaciones-hoy", label: "Marcaciones de hoy", icon: Clock01Icon },
+    { href: "/admin/marcaciones-hoy", label: "Control diario", icon: Clock01Icon },
     { href: "/admin/marcacion-manual", label: "Marcación manual", icon: CheckmarkCircle02Icon },
     { href: "/admin/asistencia-seccion", label: "Asistencia por sección", icon: UserGroupIcon },
   ],
@@ -78,7 +78,7 @@ export function SectionRouteTabs({ grupo, className }: SectionRouteTabsProps) {
     <nav
       aria-label="Secciones del módulo"
       className={cn(
-        "border-border/70 bg-muted/30 flex flex-wrap items-center gap-1 rounded-2xl border p-1.5",
+        "border-border/70 bg-card dark:bg-muted/30 flex flex-wrap items-center gap-1 rounded-2xl border p-1.5",
         className,
       )}
     >
@@ -91,8 +91,8 @@ export function SectionRouteTabs({ grupo, className }: SectionRouteTabsProps) {
             className={cn(
               "inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-medium transition-colors",
               activa
-                ? "bg-background text-primary border-border/60 border font-semibold shadow-2xs"
-                : "text-muted-foreground hover:bg-background/60 hover:text-foreground",
+                ? "bg-primary text-primary-foreground dark:bg-background dark:text-primary dark:border-border/60 font-semibold shadow-2xs dark:border"
+                : "text-muted-foreground hover:bg-muted dark:hover:bg-background/60 hover:text-foreground",
             )}
           >
             {tab.icon ? <HugeiconsIcon icon={tab.icon} className="size-3.5 shrink-0" /> : null}

@@ -74,7 +74,7 @@ export function GraficoEvolucionBimestres({
 
       <CardContent className="space-y-6">
         {/* Gráfico SVG de Líneas de Tendencia */}
-        <div className="border-border/50 bg-card/40 w-full overflow-hidden rounded-xl border p-2 shadow-xs sm:p-4">
+        <div className="border-border/50 bg-card w-full overflow-hidden rounded-xl border p-2 shadow-xs sm:p-4">
           <svg
             viewBox={`0 0 ${anchoTotal} ${altoTotal}`}
             preserveAspectRatio="xMidYMid meet"

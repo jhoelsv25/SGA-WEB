@@ -452,7 +452,7 @@ function RoleMenuEditor({ roleDetail, catalog }: RoleMenuEditorProps) {
 
       {/* Barra de acción pegajosa (Sticky Footer) */}
       {!isAdminRole && (
-        <div className="border-border/80 bg-background/95 sticky bottom-0 z-20 -mx-4 mt-6 -mb-6 border-t p-4 shadow-lg backdrop-blur-md sm:mx-0 sm:mb-0 sm:rounded-2xl sm:border">
+        <div className="border-border/80 bg-background sticky bottom-0 z-20 -mx-4 mt-6 -mb-6 border-t p-4 shadow-lg sm:mx-0 sm:mb-0 sm:rounded-2xl sm:border">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2 text-xs">
               {hasChanges ? (

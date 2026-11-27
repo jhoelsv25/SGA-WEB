@@ -182,7 +182,7 @@ export function ComunicadosPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-card/60 space-y-3 rounded-2xl border p-5">
+            <div key={i} className="bg-card space-y-3 rounded-2xl border p-5">
               <div className="flex items-center gap-3">
                 <Skeleton className="h-6 w-20 rounded-md" />
                 <Skeleton className="h-6 w-24 rounded-md" />

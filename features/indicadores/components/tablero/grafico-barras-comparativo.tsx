@@ -57,7 +57,7 @@ export function GraficoBarrasComparativo({
       </div>
 
       {/* Contenedor SVG Responsive */}
-      <div className="border-border/60 bg-card/60 w-full overflow-hidden rounded-xl border p-2 shadow-xs sm:p-4">
+      <div className="border-border/60 bg-card w-full overflow-hidden rounded-xl border p-2 shadow-xs sm:p-4">
         <svg
           viewBox={`0 0 ${anchoTotal} ${altoTotal}`}
           preserveAspectRatio="xMidYMid meet"

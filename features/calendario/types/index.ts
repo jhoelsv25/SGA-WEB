@@ -23,6 +23,8 @@ export interface EventoCalendario {
   fechaInicio: string;
   fechaFin: string;
   suspendeClases: boolean;
+  /** Sin clases, pero docentes y auxiliares trabajan. */
+  personalLabora: boolean;
   mensaje?: string;
 }
 
@@ -42,5 +44,6 @@ export interface GuardarEventoPayload {
   fechaInicio: string;
   fechaFin: string;
   suspendeClases?: boolean;
+  personalLabora?: boolean;
   anioAcademicoId?: string;
 }

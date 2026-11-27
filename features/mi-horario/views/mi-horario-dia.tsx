@@ -32,7 +32,7 @@ export function MiHorarioDia({ bloques }: MiHorarioDiaProps) {
       {/* Selector de días táctil para dispositivos móviles (mínimo 44px de alto) */}
       <nav
         aria-label="Selección de día escolar"
-        className="border-border/60 bg-card/60 flex items-center justify-between gap-1 overflow-x-auto rounded-2xl border p-1.5 shadow-xs"
+        className="border-border/60 bg-card flex items-center justify-between gap-1 overflow-x-auto rounded-2xl border p-1.5 shadow-xs"
       >
         {DIAS_SEMANA_LABORALES.map((dia) => {
           const estaActivo = dia.numero === diaSeleccionado;

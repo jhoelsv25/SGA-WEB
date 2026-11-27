@@ -7,6 +7,8 @@ import { EditEstudianteModal } from "../components/modals/edit-estudiante-modal"
 import { DeleteEstudianteModal } from "../components/modals/delete-estudiante-modal";
 import { CredentialsModal } from "../components/modals/credentials-modal";
 import { CarnetModal } from "../../credenciales/components/modals/carnet-modal";
+import { CambiarPinModal } from "../../credenciales/components/modals/cambiar-pin-modal";
+import { usePuedeCambiarPin } from "../../credenciales/hooks/use-puede-cambiar-pin";
 import { ReemitirCredencialModal } from "../../credenciales/components/modals/reemitir-credencial-modal";
 import { HistorialCriticoModal } from "@/features/personas";
 import type { Estudiante } from "../types/estudiantes.types";
@@ -43,6 +45,8 @@ export function EstudiantesTable({
     pin: string;
   } | null>(null);
   const [credentialsModalOpen, setCredentialsModalOpen] = React.useState(false);
+  const puedeCambiarPin = usePuedeCambiarPin();
+  const [pinDe, setPinDe] = React.useState<Estudiante | null>(null);
 
   const handleEdit = React.useCallback((estudiante: Estudiante) => {
     setSelectedEstudiante(estudiante);
@@ -92,8 +96,16 @@ export function EstudiantesTable({
         onPrintCarne: handlePrintCarne,
         onReemitirCredencial: handleReemitir,
         onVerHistorial: handleVerHistorial,
+        onCambiarPin: puedeCambiarPin ? setPinDe : undefined,
       }),
-    [handleEdit, handleDelete, handlePrintCarne, handleReemitir, handleVerHistorial],
+    [
+      handleEdit,
+      handleDelete,
+      handlePrintCarne,
+      handleReemitir,
+      handleVerHistorial,
+      puedeCambiarPin,
+    ],
   );
 
   return (
@@ -105,6 +117,16 @@ export function EstudiantesTable({
         cursorPagination={cursorPagination}
         emptyMessage="No se encontraron estudiantes en el padrón con los criterios seleccionados."
       />
+
+      {/* Cambio de PIN de marcación: solo Soporte TI (RF-007) */}
+      {pinDe && (
+        <CambiarPinModal
+          personaId={pinDe.personaId}
+          nombreCompleto={pinDe.persona.nombreCompleto}
+          open
+          onOpenChange={(abierto) => !abierto && setPinDe(null)}
+        />
+      )}
 
       {/* Modal para Editar Estudiante */}
       <EditEstudianteModal

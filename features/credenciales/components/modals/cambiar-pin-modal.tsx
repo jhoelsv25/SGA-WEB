@@ -16,9 +16,8 @@ import { useCambiarPinMutation } from "../../hooks/use-credenciales";
 interface CambiarPinModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  personaId?: string;
+  personaId: string;
   nombreCompleto?: string;
-  requierePinActual?: boolean;
 }
 
 export function CambiarPinModal({
@@ -26,7 +25,6 @@ export function CambiarPinModal({
   onOpenChange,
   personaId,
   nombreCompleto,
-  requierePinActual = false,
 }: CambiarPinModalProps) {
   const {
     register,
@@ -36,7 +34,6 @@ export function CambiarPinModal({
   } = useForm<CambiarPinFormValues>({
     resolver: zodResolver(cambiarPinSchema),
     defaultValues: {
-      pinActual: "",
       nuevoPin: "",
       confirmarPin: "",
     },
@@ -44,7 +41,7 @@ export function CambiarPinModal({
 
   React.useEffect(() => {
     if (open) {
-      reset({ pinActual: "", nuevoPin: "", confirmarPin: "" });
+      reset({ nuevoPin: "", confirmarPin: "" });
     }
   }, [open, reset]);
 
@@ -55,10 +52,7 @@ export function CambiarPinModal({
   const onSubmit = async (values: CambiarPinFormValues) => {
     await cambiarPinMutation.mutateAsync({
       personaId,
-      input: {
-        pinActual: values.pinActual?.trim() || undefined,
-        nuevoPin: values.nuevoPin.trim(),
-      },
+      input: { nuevoPin: values.nuevoPin.trim() },
     });
   };
 
@@ -67,7 +61,7 @@ export function CambiarPinModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Cambiar PIN de Marcación"
-      description="El PIN es personal y confidencial, utilizado para registrar asistencia en los kioskos escolares."
+      description="Solo Soporte TI lo cambia. Entregue el nuevo PIN únicamente a la persona."
       icon={Key01Icon}
       size="sm"
     >
@@ -76,26 +70,6 @@ export function CambiarPinModal({
           <div className="border-border/60 bg-muted/30 space-y-0.5 rounded-xl border p-3">
             <span className="text-muted-foreground text-xs">Persona:</span>
             <p className="text-foreground text-xs font-semibold">{nombreCompleto}</p>
-          </div>
-        )}
-
-        {requierePinActual && (
-          <div className="space-y-1.5">
-            <Label htmlFor="pin-actual" className="text-xs">
-              PIN Actual *
-            </Label>
-            <Input
-              id="pin-actual"
-              type="password"
-              maxLength={4}
-              placeholder="••••"
-              {...register("pinActual")}
-              disabled={cambiarPinMutation.isPending}
-              className="h-9 text-center font-mono text-sm tracking-widest"
-            />
-            {errors.pinActual && (
-              <p className="text-destructive text-xs">{errors.pinActual.message}</p>
-            )}
           </div>
         )}
 

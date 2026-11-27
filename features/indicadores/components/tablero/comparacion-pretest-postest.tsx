@@ -150,7 +150,7 @@ function TarjetaComparacionItem({ item }: { item: ComparacionIndicadorItemDto })
         {/* Fila Doble: Pretest vs Postest */}
         <div className="grid grid-cols-2 gap-2 text-xs">
           {/* Columna Pretest */}
-          <div className="border-border/50 bg-background/50 space-y-1 rounded-lg border p-2.5">
+          <div className="border-border/50 bg-background space-y-1 rounded-lg border p-2.5">
             <div className="text-muted-foreground flex items-center gap-1 text-[11px] font-semibold">
               <span className="size-2 rounded-full bg-indigo-500" />
               <span>Pretest</span>
@@ -188,7 +188,7 @@ function TarjetaComparacionItem({ item }: { item: ComparacionIndicadorItemDto })
           </div>
 
           {/* Columna Postest */}
-          <div className="border-border/50 bg-background/50 space-y-1 rounded-lg border p-2.5">
+          <div className="border-border/50 bg-background space-y-1 rounded-lg border p-2.5">
             <div className="text-muted-foreground flex items-center gap-1 text-[11px] font-semibold">
               <span className="size-2 rounded-full bg-emerald-500" />
               <span>Postest</span>

@@ -3,6 +3,8 @@ import type {
   AutorizarEquipoResponse,
   CreateEquipoPayload,
   Equipo,
+  EstadoSolicitudKiosko,
+  SolicitudKiosko,
   UpdateEquipoPayload,
   ValidarEquipoResponse,
 } from "../types";
@@ -64,4 +66,24 @@ export async function validarKiosko(token?: string): Promise<ValidarEquipoRespon
     params: token ? { token } : undefined,
   });
   return response.data;
+}
+
+export async function registrarSolicitudKiosko(secreto: string): Promise<EstadoSolicitudKiosko> {
+  const response = await apiClient.post<EstadoSolicitudKiosko>("/solicitudes-kiosko", {
+    secreto,
+  });
+  return response.data;
+}
+
+export async function getSolicitudesKiosko(): Promise<SolicitudKiosko[]> {
+  const response = await apiClient.get<SolicitudKiosko[]>("/solicitudes-kiosko");
+  return response.data;
+}
+
+export async function aprobarSolicitudKiosko(id: string, equipoId: string): Promise<void> {
+  await apiClient.post(`/solicitudes-kiosko/${id}/aprobar`, { equipoId });
+}
+
+export async function rechazarSolicitudKiosko(id: string): Promise<void> {
+  await apiClient.post(`/solicitudes-kiosko/${id}/rechazar`);
 }

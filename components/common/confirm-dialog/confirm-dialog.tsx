@@ -92,7 +92,7 @@ export function ConfirmDialog({
   return (
     <Dialog open={open} onOpenChange={(val) => !loading && onOpenChange(val)}>
       <DialogContent
-        className="border-border/80 rounded-2xl p-6 shadow-2xl backdrop-blur-md sm:max-w-md"
+        className="border-border/80 rounded-2xl p-6 shadow-2xl sm:max-w-md"
         showCloseButton={!loading}
         onInteractOutside={(e) => {
           if (loading) e.preventDefault();

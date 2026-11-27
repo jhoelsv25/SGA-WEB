@@ -46,6 +46,14 @@ const chartConfigGrados = {
 
 export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
   const { kpis, graficoAsistencia, distribucionGrados, alertasDelDia, docentesSemaforo } = data;
+  // La API devuelve 100 % cuando nadie debía marcar todavía; sin datos se muestra «—».
+  const sinAsistenciaHoy =
+    kpis.asistenciaHoy.totalEsperado === 0 ||
+    kpis.asistenciaHoy.presentes +
+      kpis.asistenciaHoy.tardanzas +
+      kpis.asistenciaHoy.faltas +
+      kpis.asistenciaHoy.justificados ===
+      0;
 
   return (
     <div className="space-y-6">
@@ -79,7 +87,7 @@ export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
                   <span>{alerta.detalle}</span>
                 </div>
               </div>
-              <Button asChild size="sm" variant="outline" className="bg-background/80 h-7 text-xs">
+              <Button asChild size="sm" variant="outline" className="bg-background h-7 text-xs">
                 <Link href={alerta.enlace}>
                   Ver detalle
                   <HugeiconsIcon icon={ArrowRight01Icon} className="ml-1 size-3" />
@@ -107,7 +115,7 @@ export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
             {data.indicadoresTesis.map((ind) => (
               <Card
                 key={ind.codigo}
-                className="border-border/50 bg-card/80 hover:bg-card rounded-2xl p-4 shadow-2xs transition-all"
+                className="border-border/50 bg-card hover:bg-card rounded-2xl p-4 shadow-2xs transition-all"
               >
                 <div className="mb-1.5 flex items-center justify-between gap-2">
                   <span className="text-primary bg-primary/10 rounded-md px-2 py-0.5 text-xs font-bold tracking-wide">
@@ -169,14 +177,22 @@ export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
 
         <KpiCard
           title="Asistencia Hoy"
-          value={`${kpis.asistenciaHoy.porcentaje}%`}
-          subtitle={`${kpis.asistenciaHoy.presentes} presentes · ${kpis.asistenciaHoy.faltas} faltas`}
+          value={sinAsistenciaHoy ? "—" : `${kpis.asistenciaHoy.porcentaje}%`}
+          subtitle={
+            sinAsistenciaHoy
+              ? "Aún no hay marcaciones hoy"
+              : `${kpis.asistenciaHoy.presentes} presentes · ${kpis.asistenciaHoy.faltas} faltas`
+          }
           icon={CheckmarkCircle02Icon}
-          variant={kpis.asistenciaHoy.porcentaje >= 90 ? "success" : "warning"}
-          trend={{
-            value: `${kpis.asistenciaHoy.presentes + kpis.asistenciaHoy.tardanzas}/${kpis.asistenciaHoy.totalEsperado}`,
-            positive: kpis.asistenciaHoy.porcentaje >= 90,
-          }}
+          variant={sinAsistenciaHoy || kpis.asistenciaHoy.porcentaje >= 90 ? "success" : "warning"}
+          trend={
+            sinAsistenciaHoy
+              ? undefined
+              : {
+                  value: `${kpis.asistenciaHoy.presentes + kpis.asistenciaHoy.tardanzas}/${kpis.asistenciaHoy.totalEsperado}`,
+                  positive: kpis.asistenciaHoy.porcentaje >= 90,
+                }
+          }
         />
 
         <KpiCard
@@ -190,7 +206,11 @@ export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
         <KpiCard
           title="Sesiones de Hoy"
           value={`${kpis.sesionesHoy.completadas}/${kpis.sesionesHoy.programadas}`}
-          subtitle={`${kpis.sesionesHoy.porcentajeCumplimiento}% de avance`}
+          subtitle={
+            kpis.sesionesHoy.programadas === 0
+              ? "Sin clases programadas hoy"
+              : `${kpis.sesionesHoy.porcentajeCumplimiento}% de avance`
+          }
           icon={Clock01Icon}
           variant={kpis.sesionesHoy.porcentajeCumplimiento >= 80 ? "success" : "primary"}
         />
@@ -412,7 +432,7 @@ export function DirectivoDashboardView({ data }: DirectivoDashboardViewProps) {
                         {doc.sesionesRegistradas} de {doc.totalSesiones} sesiones
                       </span>
                       <Link
-                        href={`/admin/consolidado-docente?docenteId=${doc.docenteId}`}
+                        href={`/admin/consolidados-docentes?docenteId=${doc.docenteId}`}
                         className="text-primary inline-flex items-center gap-0.5 font-medium hover:underline"
                       >
                         Seguimiento

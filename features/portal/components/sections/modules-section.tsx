@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
   ArrowRight01Icon,
-  Book02Icon,
   CheckmarkCircle02Icon,
   School01Icon,
   TeacherIcon,
@@ -204,41 +203,18 @@ export function ModulesSection() {
             </div>
           </div>
 
-          {/* Vista previa estilizada del rol */}
-          <div className="lg:col-span-6">
-            <div className="border-border/70 from-muted/60 via-muted/30 to-background rounded-2xl border bg-linear-to-br p-5 sm:p-6">
-              <div className="border-border/60 flex items-center justify-between border-b pb-3.5">
-                <div className="flex items-center gap-2.5">
-                  <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-xl">
-                    <HugeiconsIcon icon={Book02Icon} className="size-4.5" />
-                  </span>
-                  <div>
-                    <p className="text-foreground text-sm font-bold">{activo.vistaTitulo}</p>
-                    <p className="text-muted-foreground text-xs">{activo.vistaSubtitulo}</p>
-                  </div>
-                </div>
-                <Badge variant="secondary" className="text-[11px]">
-                  {activo.tab}
-                </Badge>
-              </div>
-
-              <div className="mt-4 space-y-2.5">
-                {activo.itemsVista.map((item) => (
-                  <div
-                    key={item.titulo}
-                    className="border-border/60 bg-card flex items-center justify-between gap-3 rounded-xl border px-4 py-3 shadow-2xs"
-                  >
-                    <span className="text-foreground text-sm font-medium">{item.titulo}</span>
-                    <Badge
-                      variant="outline"
-                      className="border-primary/30 bg-primary/5 text-primary shrink-0 text-[11px]"
-                    >
-                      {item.estado}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* Vista previa del rol: lista abierta */}
+          <div className="lg:col-span-5 lg:col-start-8">
+            <p className="text-foreground text-base font-bold">{activo.vistaTitulo}</p>
+            <p className="text-muted-foreground text-sm">{activo.vistaSubtitulo}</p>
+            <ul className="divide-border border-border mt-4 divide-y border-y">
+              {activo.itemsVista.map((item) => (
+                <li key={item.titulo} className="flex items-center justify-between gap-3 py-3.5">
+                  <span className="text-foreground text-sm">{item.titulo}</span>
+                  <span className="text-primary shrink-0 text-xs font-semibold">{item.estado}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

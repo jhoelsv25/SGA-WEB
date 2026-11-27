@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -45,8 +45,11 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
       fechaInicio: evento?.fechaInicio ?? "",
       fechaFin: evento?.fechaFin ?? "",
       suspendeClases: evento?.suspendeClases ?? true,
+      personalLabora: evento?.personalLabora ?? false,
     },
   });
+
+  const suspende = useWatch({ control: form.control, name: "suspendeClases" });
 
   return (
     <form
@@ -154,6 +157,32 @@ export function EventoForm({ evento, onSubmit, onCancel, isSubmitting = false }:
           Esos días no cuentan como sesión. Las sesiones ya firmadas se conservan.
         </p>
       </div>
+
+      {suspende && (
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <Controller
+              control={form.control}
+              name="personalLabora"
+              render={({ field }) => (
+                <Checkbox
+                  id="personal-labora"
+                  checked={field.value}
+                  disabled={isSubmitting}
+                  onCheckedChange={(marcado) => field.onChange(marcado === true)}
+                />
+              )}
+            />
+            <Label htmlFor="personal-labora" className="text-sm font-medium">
+              El personal trabaja
+            </Label>
+          </div>
+          <p className="text-muted-foreground text-xs">
+            Márcalo en las semanas de gestión: docentes y auxiliares deben registrar su asistencia.
+            No lo marques en feriados.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor="descripcion" className="text-sm font-medium">

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { TableRowActions } from "@/components/common/row-actions";
 import {
   Delete02Icon,
+  Key01Icon,
   PrinterIcon,
   RefreshIcon,
   ShieldCheckIcon,
@@ -18,6 +19,7 @@ interface EstudianteActionsProps {
   onPrintCarne?: (estudiante: Estudiante) => void;
   onReemitirCredencial?: (estudiante: Estudiante) => void;
   onVerHistorial?: (estudiante: Estudiante) => void;
+  onCambiarPin?: (estudiante: Estudiante) => void;
 }
 
 export function EstudianteActions({
@@ -27,6 +29,7 @@ export function EstudianteActions({
   onPrintCarne,
   onReemitirCredencial,
   onVerHistorial,
+  onCambiarPin,
 }: EstudianteActionsProps) {
   const router = useRouter();
 
@@ -67,6 +70,16 @@ export function EstudianteActions({
                 label: "Carné perdido (Reemitir)",
                 icon: RefreshIcon,
                 onClick: () => onReemitirCredencial(estudiante),
+              },
+            ]
+          : []),
+        ...(onCambiarPin
+          ? [
+              {
+                key: "cambiar-pin",
+                label: "Cambiar PIN de marcación",
+                icon: Key01Icon,
+                onClick: () => onCambiarPin(estudiante),
               },
             ]
           : []),
