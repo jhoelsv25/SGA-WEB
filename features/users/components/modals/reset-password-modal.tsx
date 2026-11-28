@@ -24,7 +24,11 @@ import type { TempPasswordResetResponse, UserItem } from "../../types/users.type
 interface ResetPasswordModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: UserItem | null;
+  user:
+    | (Pick<UserItem, "id" | "nombreUsuario"> & {
+        persona: Pick<UserItem["persona"], "nombres" | "apellidoPaterno">;
+      })
+    | null;
   currentUserId?: string;
   /** Solo se llama cuando la clave la generó el sistema (hay que mostrarla una vez). */
   onGenerated: (data: TempPasswordResetResponse, username: string) => void;

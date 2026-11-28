@@ -6,6 +6,7 @@ import {
   BookOpen01Icon,
   Books01Icon,
   Building03Icon,
+  Key01Icon,
   Calendar03Icon,
   CalendarClockIcon,
   CalendarDaysIcon,
@@ -550,6 +551,15 @@ export const adminNavigation: NavSection[] = [
   {
     title: "Configuración del sistema",
     items: [
+      {
+        id: "admin-accesos",
+        label: "Accesos y credenciales",
+        link: "/admin/accesos-credenciales",
+        icon: Key01Icon,
+        permissions: ["admin:users:manage"],
+        roles: ["admin"],
+        description: "Restablecer PIN, carné, código biométrico y contraseña",
+      },
       {
         id: "admin-institution",
         label: "Datos institucionales",

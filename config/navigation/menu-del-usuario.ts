@@ -25,6 +25,7 @@ export const RUTAS_CON_PAGINA: ReadonlySet<string> = new Set([
   "/admin/comunicados",
   "/admin/notificaciones",
   "/admin/institucion",
+  "/admin/accesos-credenciales",
   "/admin/configuracion",
   "/admin/turnos",
   "/admin/equipos",
