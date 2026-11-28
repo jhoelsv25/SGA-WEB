@@ -7,6 +7,8 @@ import { useCompetencias, useDesempenos, useEnfoques } from "../../hooks";
 import type {
   Bloque,
   CompetenciaCatalogo,
+  ConceptoMapa,
+  DocumentoSesion,
   EnfoqueCatalogo,
   EnfoquePlanificado,
   GuardarPlanificacionPayload,
@@ -14,7 +16,7 @@ import type {
   OpcionCatalogo,
   TransversalPlanificada,
 } from "../../types";
-import { sumaMinutos } from "../../utils";
+import { rangoFechas, sumaMinutos } from "../../utils";
 import {
   AccionHoja,
   AyudaHoja,
@@ -24,15 +26,7 @@ import {
   SelectorHoja,
   TextoHoja,
 } from "./campos-hoja";
-import {
-  CeldaHoja,
-  FirmasHoja,
-  Hoja,
-  SeccionHoja,
-  SubseccionHoja,
-  TablaHoja,
-  VinetasHoja,
-} from "./hoja";
+import { CeldaHoja, FirmasHoja, Hoja, TablaHoja, VinetasHoja } from "./hoja";
 
 type Payload = GuardarPlanificacionPayload;
 type CompetenciaForm = NonNullable<Payload["competencias"]>[number];
@@ -45,17 +39,17 @@ export const ANCLAS_HOJA = {
   competencias: "hoja-propositos",
   evaluacion: "hoja-evaluacion",
   secuencia: "hoja-momentos",
-  referencias: "hoja-referencias",
 } as const;
 
 interface Props {
   f: Payload;
   poner: (p: Partial<Payload>) => void;
   bloque: Bloque;
-  /** Datos informativos que llena el sistema (salen del documento guardado). */
-  institucion: string | null;
-  director: string | null;
+  /** Datos que llena el sistema (salen del documento guardado). */
+  documento: DocumentoSesion | undefined;
   docente: string | null;
+  /** Otras secciones del docente en el mismo curso y grado. */
+  otrasSecciones: { cursoSeccionId: string; nombre: string }[];
   borrador: boolean;
   solo: boolean;
   minutosBloque: number;
@@ -74,9 +68,9 @@ export function HojaSesionEditable({
   f,
   poner,
   bloque,
-  institucion,
-  director,
+  documento,
   docente,
+  otrasSecciones,
   borrador,
   solo,
   minutosBloque,
@@ -102,95 +96,155 @@ export function HojaSesionEditable({
   const ponerCompetencia = (i: number, parche: Partial<CompetenciaForm>) =>
     poner({ competencias: filasCompetencia.map((c, k) => (k === i ? { ...c, ...parche } : c)) });
 
-  const datos: [string, React.ReactNode][] = [
-    [F.institucion, institucion ?? <AyudaHoja>{SE_LLENA}</AyudaHoja>],
-    [F.director, director ?? <AyudaHoja>{SE_LLENA}</AyudaHoja>],
-    [F.docente, docente ?? <AyudaHoja>{SE_LLENA}</AyudaHoja>],
-    [F.gradoSeccion, `${bloque.gradoNombre} / ${bloque.seccionNombre}`],
-    [F.area, bloque.cursoNombre],
-    [F.fecha, fechaDocumento(f.fecha)],
+  const adicionales = f.seccionesAdicionales ?? [];
+  const nombresSecciones = [
+    bloque.seccionNombre,
+    ...otrasSecciones.filter((x) => adicionales.includes(x.cursoSeccionId)).map((x) => x.nombre),
+  ].sort((a, b) => a.localeCompare(b));
+  const porGuardar = <AyudaHoja>{SE_LLENA}</AyudaHoja>;
+  // Lo escrito con el formato anterior se muestra junto en la lista de recursos
+  const recursos = [
+    ...(f.materiales?.impresos ?? []),
+    ...(f.materiales?.manipulativos ?? []),
+    ...(f.materiales?.digitales ?? []),
+    ...(f.materiales?.recursos ?? []),
   ];
+  const comunidad = f.materiales?.comunidad ?? [];
+  const listaTextos = (
+    items: string[],
+    etiqueta: string,
+    placeholder: string,
+    onCambio: (items: string[]) => void,
+  ) => (
+    <ListaHoja
+      items={items}
+      texto={(t) => t}
+      conTexto={(_, t) => t}
+      nuevo={(t) => t}
+      etiqueta={etiqueta}
+      placeholder={placeholder}
+      disabled={solo}
+      onCambio={onCambio}
+    />
+  );
 
   return (
     <Hoja etiqueta="Hoja de la sesión de aprendizaje">
       {borrador && <p className="font-bold">{M.borrador}</p>}
       <div id={ANCLAS_HOJA.datos} className="scroll-mt-24 text-center font-bold">
+        {documento?.lema && <p>&quot;{documento.lema}&quot;</p>}
+        <p className="text-[12pt]">{documento?.institucion ?? porGuardar}</p>
         <p className="flex items-baseline justify-center gap-[4pt] text-[14pt]">
-          <span>{M.encabezado}</span>
+          <span>&quot;{M.encabezado}</span>
           <NumeroHoja
             etiqueta="Número de sesión"
             placeholder={M.vacio}
-            className="w-[3.2em] text-left"
+            className="w-[2.4em]"
             disabled={solo}
             valor={f.numero}
             onCambio={(numero) => poner({ numero })}
           />
+          <span>&quot;</span>
         </p>
-        <div className="mx-auto mt-[2pt] mb-[8pt] flex max-w-[90%] items-start justify-center text-[12pt]">
-          <span aria-hidden="true">“</span>
-          <TextoHoja
-            etiqueta="Título de la sesión (obligatorio)"
-            placeholder="Escriba aquí el título de la sesión"
-            className="w-auto flex-1 text-center"
-            unaLinea
-            disabled={solo}
-            valor={f.titulo}
-            onCambio={(titulo) => poner({ titulo })}
-          />
-          <span aria-hidden="true">”</span>
-        </div>
       </div>
 
-      <SeccionHoja>{M.datosInformativos.titulo}</SeccionHoja>
-      <TablaHoja anchos={M.datosInformativos.anchos} etiqueta={M.datosInformativos.titulo}>
-        {datos.map(([k, v]) => (
-          <tr key={k}>
-            <CeldaHoja encabezadoFila negrita>
-              {k}
-            </CeldaHoja>
-            <CeldaHoja>{v}</CeldaHoja>
-          </tr>
-        ))}
-        {(!solo || f.unidad) && (
-          <tr
-            className={f.unidad ? undefined : "opacity-70"}
-            title={
-              f.unidad ? undefined : "Opcional: si la deja vacía, esta fila no sale en el Word."
-            }
-          >
-            <CeldaHoja encabezadoFila negrita>
-              {F.unidad}
-            </CeldaHoja>
-            <CeldaHoja>
-              <TextoHoja
-                etiqueta="Unidad (opcional)"
-                placeholder="Opcional (si queda vacía, no sale en el Word). Ej.: Unidad 7"
-                unaLinea
-                disabled={solo}
-                valor={f.unidad ?? ""}
-                onCambio={(unidad) => poner({ unidad })}
-              />
-            </CeldaHoja>
-          </tr>
-        )}
+      <TablaHoja anchos={M.datosInformativos.anchos} titulo={M.datosInformativos.titulo}>
+        <tr>
+          <CeldaHoja encabezadoFila negrita>
+            {F.docente}
+          </CeldaHoja>
+          <CeldaHoja>{docente ?? porGuardar}</CeldaHoja>
+          <CeldaHoja negrita>{F.area}</CeldaHoja>
+          <CeldaHoja>{bloque.cursoNombre}</CeldaHoja>
+        </tr>
+        <tr>
+          <CeldaHoja encabezadoFila negrita>
+            {F.coordinador}
+          </CeldaHoja>
+          <CeldaHoja>
+            <TextoHoja
+              etiqueta="Coordinador o coordinadora"
+              placeholder="Nombre y apellidos"
+              unaLinea
+              disabled={solo}
+              valor={f.coordinador ?? ""}
+              onCambio={(coordinador) => poner({ coordinador })}
+            />
+          </CeldaHoja>
+          <CeldaHoja negrita>{F.bimestre}</CeldaHoja>
+          <CeldaHoja>
+            <p>{documento?.bimestre?.toUpperCase() ?? porGuardar}</p>
+            <TextoHoja
+              etiqueta="Unidad"
+              placeholder="Ej.: Unidad 04"
+              unaLinea
+              disabled={solo}
+              valor={f.unidad ?? ""}
+              onCambio={(unidad) => poner({ unidad })}
+            />
+          </CeldaHoja>
+        </tr>
+        <tr>
+          <CeldaHoja encabezadoFila negrita>
+            {F.nivelGrado}
+          </CeldaHoja>
+          <CeldaHoja>
+            {`Secundaria - ${bloque.gradoNombre.replace(/\s*de secundaria$/i, "")}`}
+          </CeldaHoja>
+          <CeldaHoja negrita>{F.fecha}</CeldaHoja>
+          <CeldaHoja>
+            {documento
+              ? rangoFechas(documento.fechaInicio, documento.fechaFin)
+              : fechaDocumento(f.fecha)}
+          </CeldaHoja>
+        </tr>
+        <tr>
+          <CeldaHoja encabezadoFila negrita>
+            {F.secciones}
+          </CeldaHoja>
+          <CeldaHoja>
+            <SelectorHoja
+              multiple
+              etiqueta="Otras secciones que usan esta sesión"
+              opciones={otrasSecciones.map((x) => ({
+                valor: x.cursoSeccionId,
+                texto: x.nombre,
+              }))}
+              seleccion={adicionales}
+              disabled={solo || otrasSecciones.length === 0}
+              onCambio={(seccionesAdicionales) => poner({ seccionesAdicionales })}
+            >
+              {nombresSecciones.join(", ")}
+            </SelectorHoja>
+          </CeldaHoja>
+          <CeldaHoja negrita>{F.duracion}</CeldaHoja>
+          <CeldaHoja>{minutosBloque} minutos</CeldaHoja>
+        </tr>
       </TablaHoja>
 
-      <SeccionHoja>{M.acerca}</SeccionHoja>
-      <SubseccionHoja id={ANCLAS_HOJA.competencias}>{M.propositos.titulo}</SubseccionHoja>
-      <div className="mb-[4pt] flex items-start">
-        <span className="shrink-0 font-bold whitespace-pre">{M.propositos.etiquetaProposito}</span>
-        <TextoHoja
-          etiqueta="Propósito de la sesión"
-          placeholder="¿Qué van a aprender hoy los estudiantes? En una o dos frases."
-          disabled={solo}
-          valor={f.proposito ?? ""}
-          onCambio={(proposito) => poner({ proposito })}
-        />
-      </div>
+      <TablaHoja anchos={M.tituloSesion.anchos} etiqueta={M.tituloSesion.titulo}>
+        <tr>
+          <CeldaHoja encabezadoFila negrita>
+            {M.tituloSesion.titulo}
+          </CeldaHoja>
+          <CeldaHoja>
+            <TextoHoja
+              etiqueta="Título de la sesión (obligatorio)"
+              placeholder="Escriba aquí el título de la sesión"
+              unaLinea
+              disabled={solo}
+              valor={f.titulo}
+              onCambio={(titulo) => poner({ titulo })}
+            />
+          </CeldaHoja>
+        </tr>
+      </TablaHoja>
+
       <TablaHoja
+        id={ANCLAS_HOJA.competencias}
         anchos={M.propositos.anchos}
+        titulo={M.propositos.titulo}
         columnas={M.propositos.columnas}
-        etiqueta={M.propositos.titulo}
       >
         {filasCompetencia.map((c, i) => (
           <FilaCompetencia
@@ -222,63 +276,6 @@ export function HojaSesionEditable({
         </AccionHoja>
       )}
 
-      <SubseccionHoja id={ANCLAS_HOJA.evaluacion}>{M.evaluacion.titulo}</SubseccionHoja>
-      <TablaHoja
-        anchos={M.evaluacion.anchos}
-        columnas={M.evaluacion.columnas}
-        etiqueta={M.evaluacion.titulo}
-      >
-        <tr>
-          <CeldaHoja>
-            <TextoHoja
-              etiqueta="Evidencia de aprendizaje"
-              placeholder="Ej.: Resuelven 5 ecuaciones y explican un procedimiento."
-              disabled={solo}
-              valor={f.evidencia ?? ""}
-              onCambio={(evidencia) => poner({ evidencia })}
-            />
-          </CeldaHoja>
-          <CeldaHoja>
-            <ListaHoja
-              items={f.criterios ?? []}
-              texto={(t) => t}
-              conTexto={(_, t) => t}
-              nuevo={(t) => t}
-              etiqueta="Criterio de evaluación"
-              placeholder="Escriba un criterio"
-              textoAgregar="Agregar criterio"
-              disabled={solo}
-              onCambio={(criterios) => poner({ criterios })}
-            />
-            {!solo && (
-              <AccionHoja onClick={onUsarDesempenos}>Usar mis desempeños como criterios</AccionHoja>
-            )}
-          </CeldaHoja>
-          <CeldaHoja>
-            <SelectorHoja
-              etiqueta="Instrumento de evaluación"
-              opciones={instrumentos.map((o) => ({ valor: o.codigo, texto: o.nombre }))}
-              seleccion={f.instrumentoCodigo ? [f.instrumentoCodigo] : []}
-              disabled={solo}
-              onCambio={([v]) => poner({ instrumentoCodigo: v })}
-            >
-              {instrumento?.nombre ?? f.instrumentoCodigo ?? (
-                <AyudaHoja>Elegir instrumento</AyudaHoja>
-              )}
-            </SelectorHoja>
-          </CeldaHoja>
-        </tr>
-      </TablaHoja>
-
-      <SubseccionHoja>{M.transversales.titulo}</SubseccionHoja>
-      <TablaTransversales
-        valor={f.competenciasTransversales ?? []}
-        catalogo={competencias.filter((c) => c.tipo === "transversal")}
-        solo={solo}
-        onCambio={(competenciasTransversales) => poner({ competenciasTransversales })}
-      />
-
-      <SubseccionHoja>{M.enfoques.titulo}</SubseccionHoja>
       <TablaEnfoques
         valor={f.enfoques ?? []}
         catalogo={enfoques}
@@ -286,36 +283,21 @@ export function HojaSesionEditable({
         onCambio={(e) => poner({ enfoques: e })}
       />
 
-      <SeccionHoja>{M.secuencia}</SeccionHoja>
-      <SubseccionHoja>{M.materiales.titulo}</SubseccionHoja>
-      <TablaHoja
-        anchos={M.materiales.anchos}
-        columnas={M.materiales.columnas}
-        etiqueta={M.materiales.titulo}
-      >
-        <tr>
-          {(["impresos", "manipulativos", "digitales"] as const).map((k, i) => (
-            <CeldaHoja key={k}>
-              <ListaHoja
-                items={f.materiales?.[k] ?? []}
-                texto={(t) => t}
-                conTexto={(_, t) => t}
-                nuevo={(t) => t}
-                etiqueta={M.materiales.columnas[i] ?? k}
-                placeholder={["Ej.: Fichas de trabajo", "Ej.: Conos, plumones", "Ej.: Video"][i]}
-                disabled={solo}
-                onCambio={(lista) => poner({ materiales: { ...f.materiales, [k]: lista } })}
-              />
-            </CeldaHoja>
-          ))}
-        </tr>
-      </TablaHoja>
+      <TablaTransversales
+        valor={f.competenciasTransversales ?? []}
+        catalogo={competencias.filter((c) => c.tipo === "transversal")}
+        solo={solo}
+        onCambio={(competenciasTransversales) => poner({ competenciasTransversales })}
+      />
 
-      <SubseccionHoja id={ANCLAS_HOJA.secuencia}>{M.momentos.titulo}</SubseccionHoja>
       <TablaMomentos
         valor={f.momentos ?? []}
         solo={solo}
         onCambio={(momentos) => poner({ momentos })}
+        proposito={f.proposito ?? ""}
+        onProposito={(proposito) => poner({ proposito })}
+        mapa={f.mapaVisual ?? []}
+        onMapa={(mapaVisual) => poner({ mapaVisual })}
       />
       {!solo && (
         <p
@@ -336,20 +318,112 @@ export function HojaSesionEditable({
         </p>
       )}
 
-      <SeccionHoja id={ANCLAS_HOJA.referencias}>{M.referencias}</SeccionHoja>
-      <ListaHoja
-        items={f.referencias ?? []}
-        texto={(t) => t}
-        conTexto={(_, t) => t}
-        nuevo={(t) => t}
-        etiqueta="Referencia bibliográfica"
-        placeholder="Escriba una referencia"
-        textoAgregar="Agregar referencia"
-        disabled={solo}
-        onCambio={(referencias) => poner({ referencias })}
-      />
+      <TablaHoja
+        id={ANCLAS_HOJA.evaluacion}
+        anchos={M.evaluacion.anchos}
+        titulo={M.evaluacion.titulo}
+        columnas={M.evaluacion.columnas}
+      >
+        <tr>
+          <CeldaHoja>
+            <ListaHoja
+              items={f.criterios ?? []}
+              texto={(t) => t}
+              conTexto={(_, t) => t}
+              nuevo={(t) => t}
+              etiqueta="Criterio de evaluación"
+              placeholder="Escriba un criterio"
+              textoAgregar="Agregar criterio"
+              disabled={solo}
+              onCambio={(criterios) => poner({ criterios })}
+            />
+            {!solo && (
+              <AccionHoja onClick={onUsarDesempenos}>Usar mis desempeños como criterios</AccionHoja>
+            )}
+          </CeldaHoja>
+          <CeldaHoja>
+            <TextoHoja
+              etiqueta="Evidencias de aprendizaje (una por línea)"
+              placeholder="Una evidencia por línea"
+              disabled={solo}
+              valor={f.evidencia ?? ""}
+              onCambio={(evidencia) => poner({ evidencia })}
+            />
+          </CeldaHoja>
+          <CeldaHoja>
+            <TextoHoja
+              etiqueta="Producto"
+              placeholder="Ej.: Informe escrito grupal"
+              disabled={solo}
+              valor={f.producto ?? ""}
+              onCambio={(producto) => poner({ producto })}
+            />
+          </CeldaHoja>
+          <CeldaHoja>
+            <SelectorHoja
+              etiqueta="Instrumento de evaluación"
+              opciones={instrumentos.map((o) => ({ valor: o.codigo, texto: o.nombre }))}
+              seleccion={f.instrumentoCodigo ? [f.instrumentoCodigo] : []}
+              disabled={solo}
+              onCambio={([v]) => poner({ instrumentoCodigo: v })}
+            >
+              {instrumento?.nombre ?? f.instrumentoCodigo ?? (
+                <AyudaHoja>Elegir instrumento</AyudaHoja>
+              )}
+            </SelectorHoja>
+          </CeldaHoja>
+        </tr>
+      </TablaHoja>
 
-      <FirmasHoja linea={M.firmas.linea} roles={M.firmas.roles} />
+      <TablaHoja anchos={M.acuerdos.anchos} titulo={M.acuerdos.titulo}>
+        <tr>
+          <CeldaHoja>
+            {listaTextos(
+              f.acuerdos ?? [],
+              "Acuerdo de convivencia",
+              "Ej.: Levantar la mano para participar",
+              (acuerdos) => poner({ acuerdos }),
+            )}
+          </CeldaHoja>
+        </tr>
+      </TablaHoja>
+
+      <TablaHoja
+        anchos={M.materiales.anchos}
+        titulo={M.materiales.titulo}
+        columnas={M.materiales.columnas}
+      >
+        <tr>
+          <CeldaHoja>
+            {listaTextos(
+              recursos,
+              "Material o recurso",
+              "Ej.: Cuaderno de trabajo, páginas 10-12",
+              (lista) => poner({ materiales: { recursos: lista, comunidad } }),
+            )}
+          </CeldaHoja>
+          <CeldaHoja>
+            {listaTextos(
+              comunidad,
+              "Espacio de interacción",
+              "Ej.: Entrevista a una persona mayor",
+              (lista) => poner({ materiales: { ...f.materiales, comunidad: lista } }),
+            )}
+          </CeldaHoja>
+        </tr>
+      </TablaHoja>
+
+      <FirmasHoja
+        linea={M.firmas.linea}
+        roles={M.firmas.roles}
+        nombres={[docente, f.coordinador]}
+      />
+      {/lista de cotejo/i.test(instrumento?.nombre ?? "") && (
+        <p className="mt-[8pt] font-sans text-[8pt] text-(--hoja-tenue) print:hidden">
+          El Word y el PDF agregan como anexo la lista de cotejo, con sus criterios y los
+          estudiantes matriculados de cada sección.
+        </p>
+      )}
     </Hoja>
   );
 }
@@ -481,8 +555,8 @@ function TablaTransversales({
     <>
       <TablaHoja
         anchos={M.transversales.anchos}
+        titulo={M.transversales.titulo}
         columnas={M.transversales.columnas}
-        etiqueta={M.transversales.titulo}
       >
         {valor.map((t) => {
           const c = catalogo.find((x) => x.id === t.competenciaId);
@@ -518,8 +592,8 @@ function TablaTransversales({
               </CeldaHoja>
               <CeldaHoja>
                 <TextoHoja
-                  etiqueta={`Desempeño precisado de ${nombre}`}
-                  placeholder="Desempeño precisado (opcional)"
+                  etiqueta={`Actividad que desarrolla de ${nombre}`}
+                  placeholder="Actividad que desarrolla (opcional)"
                   disabled={solo}
                   valor={t.desempeno ?? ""}
                   onCambio={(desempeno) => poner(t.competenciaId, { desempeno })}
@@ -569,8 +643,8 @@ function TablaEnfoques({
     <>
       <TablaHoja
         anchos={M.enfoques.anchos}
+        titulo={M.enfoques.titulo}
         columnas={M.enfoques.columnas}
-        etiqueta={M.enfoques.titulo}
       >
         {valor.map((e) => {
           const c = catalogo.find((x) => x.id === e.enfoqueId);
@@ -597,15 +671,15 @@ function TablaEnfoques({
                   seleccion={e.valores}
                   disabled={solo}
                   onCambio={(valores) => {
-                    // Al quitar un valor se quitan también sus acciones observables.
-                    const permitidas = new Set(
+                    // Al quitar un valor se quitan sus acciones del catálogo, no las escritas.
+                    const retiradas = new Set(
                       (c?.valores ?? [])
-                        .filter((v) => valores.includes(v.nombre))
+                        .filter((v) => !valores.includes(v.nombre))
                         .flatMap((v) => v.acciones),
                     );
                     poner(e.enfoqueId, {
                       valores,
-                      acciones: e.acciones.filter((a) => permitidas.has(a)),
+                      acciones: e.acciones.filter((a) => !retiradas.has(a)),
                     });
                   }}
                 >
@@ -617,21 +691,31 @@ function TablaEnfoques({
                 </SelectorHoja>
               </CeldaHoja>
               <CeldaHoja>
-                <SelectorHoja
-                  multiple
-                  etiqueta={`Acciones observables de ${nombre}`}
-                  opciones={acciones.map((a) => ({ valor: a, texto: a }))}
-                  seleccion={e.acciones}
+                <ListaHoja
+                  items={e.acciones}
+                  texto={(t) => t}
+                  conTexto={(_, t) => t}
+                  nuevo={(t) => t}
+                  etiqueta={`Actividad de ${nombre}`}
+                  placeholder="¿Qué actividad desarrolla?"
+                  textoAgregar="Escribir una actividad"
                   disabled={solo}
-                  vacioLista="Primero elija un valor."
                   onCambio={(a) => poner(e.enfoqueId, { acciones: a })}
-                >
-                  {e.acciones.length > 0 ? (
-                    <VinetasHoja items={e.acciones} />
-                  ) : (
-                    <AyudaHoja>{solo ? M.vacio : "Elegir acciones observables"}</AyudaHoja>
-                  )}
-                </SelectorHoja>
+                />
+                {!solo && acciones.length > 0 && (
+                  <SelectorHoja
+                    multiple
+                    etiqueta={`Actividades sugeridas de ${nombre}`}
+                    opciones={acciones.map((a) => ({ valor: a, texto: a }))}
+                    seleccion={e.acciones}
+                    className="mt-[2pt] w-auto"
+                    onCambio={(a) => poner(e.enfoqueId, { acciones: a })}
+                  >
+                    <span className="font-sans text-[8pt] font-medium text-(--hoja-accion)">
+                      Elegir del catálogo
+                    </span>
+                  </SelectorHoja>
+                )}
               </CeldaHoja>
             </tr>
           );
@@ -664,19 +748,28 @@ function TablaMomentos({
   valor,
   solo,
   onCambio,
+  proposito,
+  onProposito,
+  mapa,
+  onMapa,
 }: {
   valor: MomentoForm[];
   solo: boolean;
   onCambio: (v: MomentoForm[]) => void;
+  proposito: string;
+  onProposito: (v: string) => void;
+  mapa: ConceptoMapa[];
+  onMapa: (v: ConceptoMapa[]) => void;
 }) {
   const de = (m: Momento): MomentoForm => valor.find((x) => x.momento === m) ?? { momento: m };
   const poner = (m: Momento, p: Partial<MomentoForm>) =>
     onCambio([...valor.filter((x) => x.momento !== m), { ...de(m), ...p }]);
   return (
     <TablaHoja
+      id={ANCLAS_HOJA.secuencia}
       anchos={M.momentos.anchos}
+      titulo={M.momentos.titulo}
       columnas={M.momentos.columnas}
-      etiqueta={M.momentos.titulo}
     >
       {M.momentos.orden.map((m) => {
         const guia = MOMENTOS.find((x) => x.codigo === m);
@@ -693,6 +786,21 @@ function TablaMomentos({
                 valor={x.actividades ?? ""}
                 onCambio={(actividades) => poner(m, { actividades })}
               />
+              {m === "inicio" && (
+                <div className="flex items-start">
+                  <span className="shrink-0 font-bold whitespace-pre">
+                    {M.momentos.etiquetaProposito}
+                  </span>
+                  <TextoHoja
+                    etiqueta="Propósito de la sesión"
+                    placeholder="¿Qué van a aprender hoy los estudiantes?"
+                    disabled={solo}
+                    valor={proposito}
+                    onCambio={onProposito}
+                  />
+                </div>
+              )}
+              {m === "desarrollo" && <MapaVisual valor={mapa} solo={solo} onCambio={onMapa} />}
             </CeldaHoja>
             <CeldaHoja centrada>
               <span className="inline-flex items-baseline justify-center gap-[2pt]">
@@ -711,6 +819,66 @@ function TablaMomentos({
         );
       })}
     </TablaHoja>
+  );
+}
+
+const MAXIMO_CONCEPTOS = 6;
+
+function MapaVisual({
+  valor,
+  solo,
+  onCambio,
+}: {
+  valor: ConceptoMapa[];
+  solo: boolean;
+  onCambio: (v: ConceptoMapa[]) => void;
+}) {
+  const poner = (i: number, p: Partial<ConceptoMapa>) =>
+    onCambio(valor.map((c, k) => (k === i ? { ...c, ...p } : c)));
+  return (
+    <>
+      {valor.length > 0 && (
+        <TablaHoja anchos={valor.map(() => 100 / valor.length)} titulo={M.momentos.mapaVisual}>
+          <tr>
+            {valor.map((c, i) => (
+              <CeldaHoja key={i} centrada>
+                <TextoHoja
+                  etiqueta={`Concepto ${i + 1}`}
+                  placeholder="Concepto"
+                  unaLinea
+                  className="text-center font-bold"
+                  disabled={solo}
+                  valor={c.concepto}
+                  onCambio={(concepto) => poner(i, { concepto })}
+                />
+                <TextoHoja
+                  etiqueta={`Definición ${i + 1}`}
+                  placeholder="Definición"
+                  className="text-center"
+                  disabled={solo}
+                  valor={c.definicion}
+                  onCambio={(definicion) => poner(i, { definicion })}
+                />
+                {!solo && (
+                  <QuitarFilaHoja
+                    etiqueta={`Quitar concepto ${i + 1}`}
+                    onClick={() => onCambio(valor.filter((_, k) => k !== i))}
+                  />
+                )}
+              </CeldaHoja>
+            ))}
+          </tr>
+        </TablaHoja>
+      )}
+      {!solo && valor.length < MAXIMO_CONCEPTOS && (
+        <AccionHoja
+          icono={PlusSignIcon}
+          onClick={() => onCambio([...valor, { concepto: "", definicion: "" }])}
+        >
+          Agregar concepto al mapa visual (opcional)
+        </AccionHoja>
+      )}
+    </>
   );
 }
 

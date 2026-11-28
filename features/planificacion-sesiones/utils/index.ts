@@ -60,6 +60,11 @@ export function aPayload(p: Planificacion): GuardarPlanificacionPayload {
     enfoques: p.enfoques,
     materiales: p.materiales,
     referencias: p.referencias,
+    producto: p.producto ?? undefined,
+    coordinador: p.coordinador ?? undefined,
+    acuerdos: p.acuerdos,
+    mapaVisual: p.mapaVisual,
+    seccionesAdicionales: p.seccionesAdicionales,
     momentos: p.momentos.map((m) => ({
       momento: m.momento,
       actividades: m.actividades ?? undefined,
@@ -78,10 +83,15 @@ export function limpiarPayload(f: GuardarPlanificacionPayload): GuardarPlanifica
     ...f,
     criterios: llenas(f.criterios),
     referencias: llenas(f.referencias),
+    acuerdos: llenas(f.acuerdos),
+    mapaVisual: f.mapaVisual?.filter((c) => c.concepto.trim() || c.definicion.trim()),
+    enfoques: f.enfoques?.map((e) => ({ ...e, acciones: llenas(e.acciones) ?? [] })),
     materiales: f.materiales && {
       impresos: llenas(f.materiales.impresos),
       manipulativos: llenas(f.materiales.manipulativos),
       digitales: llenas(f.materiales.digitales),
+      recursos: llenas(f.materiales.recursos),
+      comunidad: llenas(f.materiales.comunidad),
     },
     competencias: (f.competencias ?? [])
       .filter((c) => c.competenciaId)
@@ -130,3 +140,4 @@ export function semanasDeBimestre(fechaInicio: string, fechaFin: string): Semana
   return semanas;
 }
 export * from "./progreso";
+export * from "./documento";

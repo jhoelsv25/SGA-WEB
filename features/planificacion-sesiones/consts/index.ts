@@ -38,6 +38,7 @@ export const PLANIFICACION_ENDPOINTS = {
   POR_ID: (id: string) => `/planificacion-sesiones/${id}`,
   LISTA: (id: string) => `/planificacion-sesiones/${id}/lista`,
   COPIAR: (id: string) => `/planificacion-sesiones/${id}/copiar`,
+  PREDETERMINADOS: "/planificacion-sesiones/predeterminados",
   DOCUMENTO: (id: string) => `/planificacion-sesiones/${id}/documento`,
   PDF: (id: string) => `/planificacion-sesiones/${id}/documento.pdf`,
   DOCX: (id: string) => `/planificacion-sesiones/${id}/documento.docx`,

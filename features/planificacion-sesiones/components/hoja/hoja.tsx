@@ -43,59 +43,53 @@ export function Hoja({ children, etiqueta }: { children: React.ReactNode; etique
   );
 }
 
-/** Título de sección (I, II, III, IV): 11 pt negrita, 12 pt antes y 5 pt después. */
-export function SeccionHoja({ children, id }: { children: React.ReactNode; id?: string }) {
-  return (
-    <h2 id={id} className="mt-[12pt] mb-[5pt] scroll-mt-24 text-[11pt] font-bold">
-      {children}
-    </h2>
-  );
-}
-
-/** Subtítulo (2.1, 3.2…): 10 pt negrita, 8 pt antes y 4 pt después. */
-export function SubseccionHoja({ children, id }: { children: React.ReactNode; id?: string }) {
-  return (
-    <h3 id={id} className="mt-[8pt] mb-[4pt] scroll-mt-24 text-[10pt] font-bold">
-      {children}
-    </h3>
-  );
-}
-
-/** Tabla de ancho completo con las columnas y anchos del documento. */
+/** Tabla de ancho completo con el título de la sección, las columnas y anchos del documento. */
 export function TablaHoja({
   anchos,
+  titulo,
   columnas,
   children,
   etiqueta,
+  id,
 }: {
   anchos: readonly number[];
+  titulo?: string;
   columnas?: readonly string[] | null;
   children: React.ReactNode;
   etiqueta?: string;
+  id?: string;
 }) {
+  const encabezado =
+    "border border-(--hoja-borde) bg-(--hoja-encabezado) px-[5pt] py-[3pt] align-top font-bold";
   return (
     <table
-      aria-label={etiqueta}
-      className="w-full table-fixed border-collapse border border-(--hoja-borde)"
+      id={id}
+      aria-label={etiqueta ?? titulo}
+      className="mt-[8pt] w-full table-fixed border-collapse scroll-mt-24 border border-(--hoja-borde)"
     >
       <colgroup>
         {anchos.map((a, i) => (
           <col key={i} style={{ width: `${a}%` }} />
         ))}
       </colgroup>
-      {columnas && (
+      {(titulo || columnas) && (
         <thead>
-          <tr>
-            {columnas.map((c) => (
-              <th
-                key={c}
-                scope="col"
-                className="border border-(--hoja-borde) bg-(--hoja-encabezado) px-[5pt] py-[3pt] text-center align-top font-bold"
-              >
-                {c}
+          {titulo && (
+            <tr>
+              <th colSpan={anchos.length} className={cn(encabezado, "text-left")}>
+                {titulo}
               </th>
-            ))}
-          </tr>
+            </tr>
+          )}
+          {columnas && (
+            <tr>
+              {columnas.map((c, i) => (
+                <th key={`${i}-${c}`} scope="col" className={cn(encabezado, "text-center")}>
+                  {c}
+                </th>
+              ))}
+            </tr>
+          )}
         </thead>
       )}
       <tbody>{children}</tbody>
@@ -151,13 +145,22 @@ export function LineasHoja({ texto, vacio = "—" }: { texto: string | null; vac
   return <p className="whitespace-pre-wrap">{texto?.trim() ? texto : vacio}</p>;
 }
 
-/** Espacio de firmas al pie, sin bordes. */
-export function FirmasHoja({ linea, roles }: { linea: string; roles: readonly string[] }) {
+/** Espacio de firmas al pie, sin bordes, con el nombre de quien firma. */
+export function FirmasHoja({
+  linea,
+  roles,
+  nombres,
+}: {
+  linea: string;
+  roles: readonly string[];
+  nombres: readonly (string | null | undefined)[];
+}) {
   return (
     <div className="mt-[40pt] grid grid-cols-2 text-center">
-      {roles.map((r) => (
+      {roles.map((r, i) => (
         <div key={r}>
           <p>{linea}</p>
+          {nombres[i] && <p>{nombres[i]}</p>}
           <p className="font-bold">{r}</p>
         </div>
       ))}

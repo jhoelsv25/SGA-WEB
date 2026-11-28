@@ -14,6 +14,7 @@ import type {
   HorasRealesPayload,
   OpcionCatalogo,
   PanelSupervision,
+  Predeterminados,
   Planificacion,
   RespuestaPlanificacion,
   Semana,
@@ -34,6 +35,12 @@ export const getSemana = (fecha?: string) =>
 
 export const getPlanificacion = (id: string) =>
   pedir(apiClient.get<Planificacion>(E.POR_ID(id)), "Error al cargar la planificación.");
+
+export const getPredeterminados = () =>
+  pedir(
+    apiClient.get<Predeterminados>(E.PREDETERMINADOS),
+    "Error al cargar los datos de su última sesión.",
+  );
 
 export const guardarPlanificacion = (payload: GuardarPlanificacionPayload) =>
   pedir(

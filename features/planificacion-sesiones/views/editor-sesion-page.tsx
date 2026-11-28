@@ -19,9 +19,10 @@ import {
   useMarcarLista,
   useOpciones,
   usePlanificacion,
+  usePredeterminados,
   useSemana,
 } from "../hooks";
-import type { Bloque, GuardarPlanificacionPayload, Planificacion } from "../types";
+import type { Bloque, GuardarPlanificacionPayload, Planificacion, Predeterminados } from "../types";
 import {
   aPayload,
   estadoSecciones,
@@ -44,9 +45,7 @@ export function EditorSesionPage({ id, horarioId, fecha }: Props) {
   const existente = usePlanificacion(id);
   const semana = useSemana(id ? undefined : fecha);
   const opciones = useOpciones();
-  const referencias = (opciones.data ?? [])
-    .filter((o) => o.tipo === "referencia")
-    .map((o) => o.nombre);
+  const predeterminados = usePredeterminados(!id);
   const bloqueNuevo = semana.data?.bloques.find(
     (b) => b.bloque.horarioId === horarioId && b.fecha === fecha,
   )?.bloque;
@@ -63,15 +62,21 @@ export function EditorSesionPage({ id, horarioId, fecha }: Props) {
         ]}
       />
       <PageState
-        isLoading={(id ? existente.isLoading : semana.isLoading) || opciones.isLoading}
+        isLoading={
+          (id ? existente.isLoading : semana.isLoading || predeterminados.isLoading) ||
+          opciones.isLoading
+        }
         isError={id ? existente.isError : semana.isError}
         error={id ? existente.error : semana.error}
         onRetry={() => void (id ? existente.refetch() : semana.refetch())}
       >
         {id && existente.data ? (
-          <Formulario inicial={existente.data} referencias={referencias} />
+          <Formulario inicial={existente.data} />
         ) : horarioId && fecha && bloqueNuevo ? (
-          <Formulario nuevo={{ horarioId, fecha, bloque: bloqueNuevo }} referencias={referencias} />
+          <Formulario
+            nuevo={{ horarioId, fecha, bloque: bloqueNuevo }}
+            predeterminados={predeterminados.data}
+          />
         ) : null}
       </PageState>
     </div>
@@ -81,9 +86,9 @@ export function EditorSesionPage({ id, horarioId, fecha }: Props) {
 function Formulario({
   inicial,
   nuevo,
-  referencias,
+  predeterminados,
 }: {
-  referencias: string[];
+  predeterminados?: Predeterminados;
   inicial?: Planificacion;
   nuevo?: { horarioId: string; fecha: string; bloque: Bloque };
 }) {
@@ -98,7 +103,8 @@ function Formulario({
           titulo: "",
           criterios: [],
           competencias: [{ competenciaId: "", capacidades: [], desempenos: [] }],
-          referencias,
+          coordinador: predeterminados?.coordinador ?? undefined,
+          acuerdos: predeterminados?.acuerdos ?? [],
           momentos: [],
         },
   );
@@ -106,7 +112,7 @@ function Formulario({
   const autoguardar = useGuardarPlanificacion(true);
   const lista = useMarcarLista();
   const { data: opciones = [] } = useOpciones();
-  // Datos informativos que llena el sistema (institución, director, docente).
+  // Datos que llena el sistema (lema, institución, bimestre, fechas).
   const documento = useDocumento(plan?.id);
   const ultimoGuardado = React.useRef(JSON.stringify(f));
   const [guardadoEn, setGuardadoEn] = React.useState<Date | null>(null);
@@ -115,6 +121,22 @@ function Formulario({
   const solo = plan?.estado === "ejecutada";
   const minutos = bloque ? minutosDeBloque(bloque.horaInicio, bloque.horaFin) : 0;
   const poner = (p: Partial<GuardarPlanificacionPayload>) => setF((a) => ({ ...a, ...p }));
+
+  // Otras secciones del docente en el mismo curso y grado, según su horario
+  const semana = useSemana(f.fecha || undefined);
+  const otrasSecciones = [
+    ...new Map(
+      (semana.data?.bloques ?? [])
+        .map((b) => b.bloque)
+        .filter(
+          (b) =>
+            b.cursoNombre === bloque?.cursoNombre &&
+            b.gradoNumero === bloque?.gradoNumero &&
+            b.cursoSeccionId !== bloque?.cursoSeccionId,
+        )
+        .map((b) => [b.cursoSeccionId, b.seccionNombre]),
+    ),
+  ].map(([cursoSeccionId, nombre]) => ({ cursoSeccionId, nombre }));
 
   const instrumentos = opciones.filter((o) => o.tipo === "instrumento_evaluacion");
 
@@ -172,7 +194,7 @@ function Formulario({
   const usarDesempenosComoCriterios = () => {
     const textos = (f.competencias ?? []).flatMap((c) => c.desempenos.map((d) => d.texto));
     if (textos.length === 0) {
-      toast.error("Primero elija los desempeños en la tabla 2.1.");
+      toast.error("Primero elija los desempeños en la sección III.");
       return;
     }
     poner({ criterios: textos });
@@ -224,8 +246,8 @@ function Formulario({
           f={f}
           poner={poner}
           bloque={bloque}
-          institucion={documento.data?.institucion ?? null}
-          director={documento.data?.director ?? null}
+          documento={documento.data}
+          otrasSecciones={otrasSecciones}
           docente={documento.data?.docente ?? plan?.docenteNombre ?? null}
           borrador={!plan || plan.estado === "borrador"}
           solo={solo}
