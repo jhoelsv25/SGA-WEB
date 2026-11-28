@@ -25,9 +25,7 @@ export function MisLibretasPage() {
   }, [libretas]);
 
   const estudianteActivo =
-    estudianteFiltro && estudiantesUnicos.includes(estudianteFiltro)
-      ? estudianteFiltro
-      : "";
+    estudianteFiltro && estudiantesUnicos.includes(estudianteFiltro) ? estudianteFiltro : "";
 
   const libretasFiltradas = React.useMemo(() => {
     if (!estudianteActivo) return libretas;

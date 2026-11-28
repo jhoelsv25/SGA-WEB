@@ -118,3 +118,13 @@ export interface ResumenPersonasResponse {
   conCuenta: number;
   provisionales: number;
 }
+
+export interface OcrDocumentoPersona {
+  dni: string | null;
+  apellidoPaterno: string | null;
+  apellidoMaterno: string | null;
+  nombres: string | null;
+  fechaNacimiento: string | null;
+  sexo: "M" | "F" | null;
+  estrategia: string;
+}

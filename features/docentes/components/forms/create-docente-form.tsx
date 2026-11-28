@@ -12,6 +12,7 @@ import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { PersonaVinculadaCard } from "../../../personas/components/persona-vinculada-card";
+import { BotonOcrDocumento } from "../../../personas/components/boton-ocr-documento";
 import {
   BajaFichaActualField,
   MOTIVO_BAJA_MIN,
@@ -20,7 +21,11 @@ import { fichaVigenteAlRegistrar } from "../../../personas/utils/ficha-academica
 import { createDocenteSchema, type CreateDocenteFormValues } from "../../schemas/docentes.schema";
 import { parseIsoDate, formatToIsoDate } from "../../utils/dates";
 import type { CreateDocenteInput, JornadaHoras, TipoContrato } from "../../types/docentes.types";
-import type { Persona, TipoDocumento } from "../../../personas/types/personas.types";
+import type {
+  OcrDocumentoPersona,
+  Persona,
+  TipoDocumento,
+} from "../../../personas/types/personas.types";
 
 const contratoOptions: { value: TipoContrato; label: string }[] = [
   { value: "nombrado", label: "Nombrado" },
@@ -75,6 +80,7 @@ export function CreateDocenteForm({
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<CreateDocenteFormValues>({
     resolver: zodResolver(createDocenteSchema),
@@ -101,6 +107,22 @@ export function CreateDocenteForm({
           },
     },
   });
+
+  const aplicarDatosOcr = (datos: OcrDocumentoPersona) => {
+    const opts = { shouldDirty: true, shouldValidate: true };
+    if (datos.dni) {
+      setValue("nuevaPersona.tipoDocumento", "dni", opts);
+      setValue("nuevaPersona.numeroDocumento", datos.dni, opts);
+    }
+    if (datos.nombres) setValue("nuevaPersona.nombres", datos.nombres, opts);
+    if (datos.apellidoPaterno)
+      setValue("nuevaPersona.apellidoPaterno", datos.apellidoPaterno, opts);
+    if (datos.apellidoMaterno)
+      setValue("nuevaPersona.apellidoMaterno", datos.apellidoMaterno, opts);
+    if (datos.fechaNacimiento)
+      setValue("nuevaPersona.fechaNacimiento", datos.fechaNacimiento, opts);
+    if (datos.sexo) setValue("nuevaPersona.sexo", datos.sexo, opts);
+  };
 
   const handleFormSubmit = async (values: CreateDocenteFormValues) => {
     if (requiereBaja && motivoBaja.trim().length < MOTIVO_BAJA_MIN) {
@@ -160,9 +182,12 @@ export function CreateDocenteForm({
       {/* 2. Datos personales (Solo si se registra una nueva persona) */}
       {modo === "registrar" && (
         <div className="border-border/70 space-y-3 rounded-xl border p-3.5">
-          <Label className="text-foreground text-sm font-semibold">
-            1. Datos de la nueva persona a incorporar
-          </Label>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Label className="text-foreground text-sm font-semibold">
+              1. Datos de la nueva persona a incorporar
+            </Label>
+            <BotonOcrDocumento onDatosExtraidos={aplicarDatosOcr} disabled={isLoading} />
+          </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
