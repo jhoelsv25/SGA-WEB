@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import { firmarPeticionKiosko } from "@/lib/llave-kiosko";
 import type { DatosRegistroMarcacion, ResultadoMarcacion, ResultadoResolucion } from "../types";
 import type { EstadoMarcacion } from "../types";
 
@@ -59,10 +60,12 @@ export class ServicioMarcacionKiosko implements ServicioMarcacion {
   }
 
   async registrarMarcacion(datos: DatosRegistroMarcacion): Promise<ResultadoMarcacion> {
+    const ruta = "/marcaciones/kiosko";
+    const cuerpo = { codigo: datos.codigo, pin: datos.pin ?? "" };
     const respuesta = await apiClient.post<MarcacionKioskoApi>(
-      "/marcaciones/kiosko",
-      { codigo: datos.codigo, pin: datos.pin ?? "" },
-      { headers: datos.tokenEquipo ? { "x-kiosk-token": datos.tokenEquipo } : undefined },
+      ruta,
+      cuerpo,
+      await firmarPeticionKiosko("POST", ruta, cuerpo),
     );
     const api = respuesta.data;
     const estado: EstadoMarcacion = !api.registrada

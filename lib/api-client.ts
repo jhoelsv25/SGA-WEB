@@ -178,7 +178,7 @@ apiClient.interceptors.response.use(
         url.includes("/auth/refresh-token") ||
         url.includes("/auth/register");
       // El kiosko no tiene sesión: su 401 significa "equipo no autorizado"
-      const esValidacionKiosko = url.includes("/equipos/validar-kiosko");
+      const esPedidoKiosko = Boolean(originalRequest?.headers?.["x-kiosk-signature"]);
 
       // Si es 401 y no es petición de autenticación recursiva
       if (
@@ -186,7 +186,7 @@ apiClient.interceptors.response.use(
         originalRequest &&
         !originalRequest._retry &&
         !isAuthRoute &&
-        !esValidacionKiosko
+        !esPedidoKiosko
       ) {
         originalRequest._retry = true;
 

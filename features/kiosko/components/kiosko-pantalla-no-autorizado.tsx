@@ -9,13 +9,14 @@ import { ESTADO_SOLICITUD_KIOSKO } from "@/features/equipos/consts";
 import { useSolicitudKiosko } from "@/features/equipos/hooks/use-solicitudes-kiosko";
 
 interface KioskoPantallaNoAutorizadoProps {
-  tieneTokenLocal: boolean;
+  /** Motivo por el que no se pudo validar el equipo. */
+  detalle?: string;
   horaActual?: string;
   onReintentar: () => void;
 }
 
 export function KioskoPantallaNoAutorizado({
-  tieneTokenLocal,
+  detalle,
   horaActual,
   onReintentar,
 }: KioskoPantallaNoAutorizadoProps) {
@@ -64,21 +65,10 @@ export function KioskoPantallaNoAutorizado({
           <p className="text-muted-foreground text-xs">{mensajeSolicitud}</p>
         </div>
 
-        <div className="border-border/80 bg-muted/40 space-y-2 rounded-xl border p-3.5 text-left font-mono text-xs">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Estado clave local:</span>
-            <span
-              className={
-                tieneTokenLocal
-                  ? "text-warning-text font-semibold"
-                  : "text-destructive font-semibold"
-              }
-            >
-              {tieneTokenLocal ? "Token presente pero inactivo" : "Sin clave configurada"}
-            </span>
-          </div>
+        <div className="border-border/80 bg-muted/40 space-y-2 rounded-xl border p-3.5 text-left text-xs">
+          {detalle && <p className="text-foreground font-medium">{detalle}</p>}
           {horaActual && (
-            <div className="flex justify-between">
+            <div className="flex justify-between font-mono">
               <span className="text-muted-foreground">Hora del sistema:</span>
               <span className="text-foreground">{horaActual}</span>
             </div>

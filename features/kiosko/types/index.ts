@@ -35,8 +35,6 @@ export interface DatosRegistroMarcacion {
   pin?: string;
   tipo: TipoMarcacion;
   equipoId?: string;
-  /** Token secreto del kiosko autorizado (header x-kiosk-token). */
-  tokenEquipo?: string;
   notas?: string;
   idLocal?: string;
 }
