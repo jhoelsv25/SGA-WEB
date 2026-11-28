@@ -2,9 +2,12 @@ import * as React from "react";
 import type { Metadata } from "next";
 import { siteConfig } from "@/config";
 import {
+  AvisoPortal,
+  ProgresoPagina,
   HeroSection,
   ModulesSection,
   FeaturesSection,
+  NewsSection,
   FaqSection,
   CtaSection,
 } from "@/features/portal";
@@ -104,9 +107,12 @@ export default function PortalPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(portalJsonLd) }}
       />
+      <ProgresoPagina />
+      <AvisoPortal />
       <HeroSection />
-      <ModulesSection />
       <FeaturesSection />
+      <NewsSection />
+      <ModulesSection />
       <FaqSection />
       <CtaSection />
     </div>

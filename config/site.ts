@@ -19,7 +19,8 @@ export const siteConfig = {
     badge: "I.E. Nuestra Señora del Carmen · Lircay",
     motto: "Excelencia en la Gestión Educativa y Formación Integral",
     modularCode: "0543210",
-    address: "Jr. Bolognesi 346, Lircay, Angaraes, Huancavelica, Perú",
+    website: "https://colegiocarmelinas.edu.pe/",
+    address: "Av. Esmeralda 450, Lircay, Angaraes, Huancavelica, Perú",
     location: {
       district: "Lircay",
       province: "Angaraes",
@@ -32,13 +33,13 @@ export const siteConfig = {
       dre: "DRE Huancavelica",
       levels: ["Educación Secundaria"],
     },
-    // EJEMPLO: todos los datos de contacto son de prueba hasta tener los reales
+    // Datos tomados del sitio oficial https://colegiocarmelinas.edu.pe/
     contact: {
-      phone: "+51 967 123 456",
-      supportPhone: "(067) 456-789",
-      email: "contacto@carmelinas.edu.pe",
-      supportEmail: "soporte@carmelinas.edu.pe",
-      schedule: "Lunes a Viernes de 8:00am a 5:30pm",
+      phone: "975 772 422",
+      supportPhone: "(067) 45 3030",
+      email: "info@colegiocarmelinas.edu.pe",
+      supportEmail: "info@colegiocarmelinas.edu.pe",
+      schedule: "Lunes a viernes: 8:00 a.m. – 4:00 p.m.",
     },
   },
 

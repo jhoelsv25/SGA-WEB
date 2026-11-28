@@ -66,6 +66,16 @@ export function PortalFooter() {
                   Servicios del colegio
                 </Link>
               </li>
+              <li>
+                <a
+                  href={siteConfig.institution.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors"
+                >
+                  Sitio web del colegio
+                </a>
+              </li>
             </ul>
           </div>
 

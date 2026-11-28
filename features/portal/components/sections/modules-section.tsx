@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config";
 import { cn } from "@/lib/utils";
+import { Revelar } from "../interactivo";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
 import {
   ArrowRight01Icon,
@@ -126,25 +126,33 @@ export function ModulesSection() {
   const activo = ROLES_SHOWCASE.find((r) => r.id === activoId) ?? ROLES_SHOWCASE[0];
 
   return (
-    <section id="modulos" className="bg-background py-20 sm:py-24">
+    <section
+      id="modulos"
+      className="from-primary/8 via-primary/4 to-background relative isolate overflow-hidden bg-linear-to-b py-20 sm:py-28"
+    >
+      <div
+        aria-hidden="true"
+        className="bg-primary/10 pointer-events-none absolute -top-32 -left-32 -z-10 size-[28rem] rounded-full blur-3xl"
+      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <Badge variant="outline" className="border-primary/30 bg-primary/5 text-primary text-xs">
+        <Revelar className="mx-auto max-w-3xl text-center">
+          <p className="text-primary inline-flex items-center gap-3 text-xs font-bold tracking-[0.2em] uppercase">
+            <span className="bg-primary h-px w-8" />
             Comunidad educativa
-          </Badge>
-          <h2 className="text-foreground mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+            <span className="bg-primary h-px w-8" />
+          </p>
+          <h2 className="text-foreground mt-5 text-4xl font-black tracking-tight sm:text-5xl lg:leading-[1.05]">
             Una intranet adaptada a cada miembro del colegio
           </h2>
           <p className="text-muted-foreground mt-4 text-base leading-relaxed">
-            Selecciona un perfil para explorar qué herramientas encuentra al ingresar al sistema.
+            Elige un rol para ver qué herramientas encuentra al ingresar.
           </p>
-        </div>
+        </Revelar>
 
-        {/* Selector de pestañas por rol */}
         <div
           role="tablist"
-          aria-label="Perfiles del sistema"
-          className="mt-10 flex flex-wrap items-center justify-center gap-2"
+          aria-label="Roles del sistema"
+          className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-2 sm:grid-cols-4"
         >
           {ROLES_SHOWCASE.map((rol) => {
             const seleccionado = rol.id === activo.id;
@@ -156,45 +164,45 @@ export function ModulesSection() {
                 aria-selected={seleccionado}
                 onClick={() => setActivoId(rol.id)}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold transition-all",
+                  "flex flex-col items-center gap-2 rounded-2xl border px-3 py-4 text-center text-sm font-semibold transition-all",
                   seleccionado
-                    ? "border-primary bg-primary text-primary-foreground shadow-primary/20 shadow-md"
-                    : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                    ? "border-primary from-primary shadow-primary/30 -translate-y-0.5 bg-linear-to-br to-[#2a0714] text-white shadow-lg"
+                    : "border-border bg-background/70 text-muted-foreground hover:border-primary/40 hover:text-foreground hover:-translate-y-0.5",
                 )}
               >
-                <HugeiconsIcon icon={rol.icono} className="size-4" />
+                <HugeiconsIcon icon={rol.icono} className="size-6" />
                 <span>{rol.tab}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Showcase abierto del rol seleccionado (sin envoltorio de card gigante) */}
-        <div className="border-border/70 mt-10 grid grid-cols-1 items-center gap-10 border-t pt-10 lg:grid-cols-12">
+        <div
+          key={activo.id}
+          className="animate-in fade-in slide-in-from-bottom-4 mt-12 grid grid-cols-1 items-center gap-10 duration-500 lg:grid-cols-12 lg:gap-14"
+        >
           <div className="space-y-5 lg:col-span-6">
             <span className="text-primary inline-flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
               <HugeiconsIcon icon={activo.icono} className="size-4" />
               {activo.categoria}
             </span>
-            <h3 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
+            <h3 className="text-foreground text-3xl font-black tracking-tight sm:text-4xl">
               {activo.titulo}
             </h3>
-            <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
-              {activo.descripcion}
-            </p>
-            <ul className="space-y-2.5 pt-1 text-sm">
+            <p className="text-muted-foreground text-base leading-relaxed">{activo.descripcion}</p>
+            <ul className="space-y-3 pt-1">
               {activo.puntos.map((punto) => (
-                <li key={punto} className="text-foreground flex items-start gap-2.5">
+                <li key={punto} className="text-foreground flex items-start gap-3 text-base">
                   <HugeiconsIcon
                     icon={CheckmarkCircle02Icon}
-                    className="text-primary mt-0.5 size-4.5 shrink-0"
+                    className="text-primary mt-0.5 size-5 shrink-0"
                   />
                   <span>{punto}</span>
                 </li>
               ))}
             </ul>
-            <div className="pt-2">
-              <Button asChild className="gap-2 rounded-full px-6">
+            <div className="pt-3">
+              <Button asChild size="lg" className="h-12 gap-2 rounded-lg px-7 font-semibold">
                 <Link href={activo.enlace.href}>
                   <span>{activo.enlace.texto}</span>
                   <HugeiconsIcon icon={ArrowRight01Icon} className="size-4" />
@@ -203,18 +211,35 @@ export function ModulesSection() {
             </div>
           </div>
 
-          {/* Vista previa del rol: lista abierta */}
-          <div className="lg:col-span-5 lg:col-start-8">
-            <p className="text-foreground text-base font-bold">{activo.vistaTitulo}</p>
-            <p className="text-muted-foreground text-sm">{activo.vistaSubtitulo}</p>
-            <ul className="divide-border border-border mt-4 divide-y border-y">
-              {activo.itemsVista.map((item) => (
-                <li key={item.titulo} className="flex items-center justify-between gap-3 py-3.5">
-                  <span className="text-foreground text-sm">{item.titulo}</span>
-                  <span className="text-primary shrink-0 text-xs font-semibold">{item.estado}</span>
-                </li>
-              ))}
-            </ul>
+          {/* Vista previa estilo ventana de la aplicación */}
+          <div className="lg:col-span-6">
+            <div className="border-border bg-card overflow-hidden rounded-2xl border shadow-2xl">
+              <div className="from-primary flex items-center gap-2 bg-linear-to-r to-[#2a0714] px-4 py-3">
+                <span className="size-3 rounded-full bg-white/40" />
+                <span className="size-3 rounded-full bg-white/40" />
+                <span className="size-3 rounded-full bg-white/40" />
+                <span className="ml-3 truncate text-xs font-semibold text-white/85">
+                  {siteConfig.acronym} · {activo.vistaTitulo}
+                </span>
+              </div>
+              <div className="p-6 sm:p-8">
+                <p className="text-foreground text-lg font-black">{activo.vistaTitulo}</p>
+                <p className="text-muted-foreground text-sm">{activo.vistaSubtitulo}</p>
+                <ul className="mt-5 space-y-3">
+                  {activo.itemsVista.map((item) => (
+                    <li
+                      key={item.titulo}
+                      className="bg-muted/60 hover:bg-primary/8 flex items-center justify-between gap-3 rounded-xl px-4 py-4 transition-colors"
+                    >
+                      <span className="text-foreground text-sm font-medium">{item.titulo}</span>
+                      <span className="bg-primary/10 text-primary shrink-0 rounded-full px-3 py-1 text-xs font-bold">
+                        {item.estado}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
