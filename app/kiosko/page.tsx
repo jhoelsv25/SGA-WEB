@@ -1,12 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserCheck01Icon, ShieldCheckIcon } from "@hugeicons/core-free-icons";
 import { ApiClientError } from "@/lib/api-client";
+import { LlaveKioskoError } from "@/lib/llave-kiosko";
 import { Spinner } from "@/components/common/spinner";
-import { KIOSK_TOKEN_STORAGE_KEY } from "@/features/equipos/consts";
 import { parseUsuariosPermitidos } from "@/features/equipos";
 import { useValidarKioskoQuery } from "@/features/equipos/hooks";
 import {
@@ -62,28 +61,7 @@ function esErrorDeRed(error: unknown): boolean {
   return false;
 }
 
-function getLocalStorageKioskToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(KIOSK_TOKEN_STORAGE_KEY);
-}
-
-function subscribeToStorage(callback: () => void) {
-  window.addEventListener("storage", callback);
-  return () => window.removeEventListener("storage", callback);
-}
-
 function KioskoContent() {
-  const searchParams = useSearchParams();
-  const tokenFromUrl = searchParams.get("token");
-
-  const storedToken = React.useSyncExternalStore(
-    subscribeToStorage,
-    getLocalStorageKioskToken,
-    () => null,
-  );
-
-  const effectiveToken = tokenFromUrl || storedToken || "";
-
   // Estado real de conectividad del dispositivo
   const { estaEnLinea } = useConexionRed();
 
@@ -97,11 +75,12 @@ function KioskoContent() {
     isError: falloValidacion,
     error: errorValidacion,
     refetch: checkToken,
-  } = useValidarKioskoQuery(effectiveToken || undefined);
+  } = useValidarKioskoQuery();
 
-  // Un 401 es una respuesta válida (clave no autorizada), no una caída de conexión
+  // Un 401 o un navegador sin soporte son respuestas válidas, no una caída de conexión
   const claveRechazada =
-    errorValidacion instanceof ApiClientError && errorValidacion.statusCode === 401;
+    errorValidacion instanceof LlaveKioskoError ||
+    (errorValidacion instanceof ApiClientError && errorValidacion.statusCode === 401);
   const hasValidationError = falloValidacion && !claveRechazada;
 
   // Reloj digital en tiempo real sincronizado
@@ -260,7 +239,6 @@ function KioskoContent() {
             codigo: codigoAProcesar.trim(),
             tipo: tipoEfectivo,
             equipoId: validationResult?.equipo?.id,
-            tokenEquipo: effectiveToken,
           });
 
           locutarConNombre(resultado.persona.nombre, fraseDeVoz(resultado), sonidoHabilitado);
@@ -290,7 +268,6 @@ function KioskoContent() {
             pin: pinAProcesar.trim(),
             tipo: tipoEfectivo,
             equipoId: validationResult?.equipo?.id,
-            tokenEquipo: effectiveToken,
           });
 
           locutarConNombre(resultado.persona.nombre, fraseDeVoz(resultado), sonidoHabilitado);
@@ -375,7 +352,6 @@ function KioskoContent() {
       sonidoHabilitado,
       tipoEfectivo,
       validationResult,
-      effectiveToken,
       estaEnLinea,
       horaFormateada,
       encolarMarcacion,
@@ -481,10 +457,10 @@ function KioskoContent() {
   }
 
   // PANTALLA 3: Equipo no autorizado (respuesta válida de la API con valido: false o sin token)
-  if (!effectiveToken || !validationResult?.valido || !validationResult.equipo) {
+  if (claveRechazada || !validationResult?.valido || !validationResult.equipo) {
     return (
       <KioskoPantallaNoAutorizado
-        tieneTokenLocal={Boolean(effectiveToken)}
+        detalle={errorValidacion?.message}
         horaActual={horaFormateada}
         onReintentar={() => void checkToken()}
       />
@@ -496,7 +472,7 @@ function KioskoContent() {
 
   // RF-011: el Kiosko de Sesiones tiene su propio flujo (sesiones del día, tema y firmas)
   if (equipo.proposito === "sesiones") {
-    return <KioskoSesiones token={effectiveToken} equipo={equipo} />;
+    return <KioskoSesiones equipo={equipo} />;
   }
   const valorActual = paso === "codigo" ? codigoValor : pinValor;
   const puedeEnviar = paso === "codigo" ? codigoValor.length >= 3 : pinValor.length >= 1;

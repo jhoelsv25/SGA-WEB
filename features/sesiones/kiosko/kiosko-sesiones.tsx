@@ -28,7 +28,6 @@ import { ListaSesionesKiosko } from "./lista-sesiones-kiosko";
 const SIN_CONEXION = "Sin conexión. No se registró la firma; intente nuevamente.";
 
 interface KioskoSesionesProps {
-  token: string;
   equipo: NonNullable<ValidarEquipoResponse["equipo"]>;
 }
 
@@ -37,7 +36,7 @@ function mensajeDeError(error: unknown, enLinea: boolean): string {
   return error instanceof Error && error.message ? error.message : SIN_CONEXION;
 }
 
-export function KioskoSesiones({ token, equipo }: KioskoSesionesProps) {
+export function KioskoSesiones({ equipo }: KioskoSesionesProps) {
   const { estaEnLinea } = useConexionRed();
   const { horaFormateada, fechaFormateada } = useRelojDigital();
   const [sonido, setSonido] = React.useState(true);
@@ -98,7 +97,7 @@ export function KioskoSesiones({ token, equipo }: KioskoSesionesProps) {
     const cred = { codigo: codigo.trim(), pin: pinCompleto };
     setProcesando(true);
     try {
-      const respuesta = await sesionesEnKiosko(token, cred);
+      const respuesta = await sesionesEnKiosko(cred);
       locutarConNombre(
         respuesta.docenteNombre,
         respuesta.sesiones.length === 0 ? (respuesta.mensaje ?? "") : "Elija su clase.",
@@ -131,8 +130,8 @@ export function KioskoSesiones({ token, equipo }: KioskoSesionesProps) {
     try {
       const resultado =
         tipo === "ingreso"
-          ? await firmarIngreso(token, elegidaId, { ...cred, tema })
-          : await firmarSalida(token, elegidaId, cred);
+          ? await firmarIngreso(elegidaId, { ...cred, tema })
+          : await firmarSalida(elegidaId, cred);
       kioskoAudio.reproducirExito(sonido);
       locutarConNombre(
         datos?.docenteNombre ?? "",

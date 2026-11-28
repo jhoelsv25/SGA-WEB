@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import { firmarPeticionKiosko, obtenerLlavePublicaKiosko } from "@/lib/llave-kiosko";
 import type {
   AutorizarEquipoResponse,
   CreateEquipoPayload,
@@ -51,26 +52,24 @@ export async function updateEquipo(id: string, payload: UpdateEquipoPayload): Pr
 }
 
 export async function autorizarEquipo(id: string): Promise<AutorizarEquipoResponse> {
-  const response = await apiClient.post<AutorizarEquipoResponse>(`/equipos/${id}/autorizar`);
-  return response.data;
-}
-
-export async function validarKiosko(token?: string): Promise<ValidarEquipoResponse> {
-  const headers: Record<string, string> = {};
-  if (token) {
-    headers["x-kiosk-token"] = token;
-  }
-
-  const response = await apiClient.get<ValidarEquipoResponse>("/equipos/validar-kiosko", {
-    headers,
-    params: token ? { token } : undefined,
+  const response = await apiClient.post<AutorizarEquipoResponse>(`/equipos/${id}/autorizar`, {
+    llavePublica: await obtenerLlavePublicaKiosko(),
   });
   return response.data;
 }
 
-export async function registrarSolicitudKiosko(secreto: string): Promise<EstadoSolicitudKiosko> {
+export async function validarKiosko(): Promise<ValidarEquipoResponse> {
+  const ruta = "/equipos/validar-kiosko";
+  const response = await apiClient.get<ValidarEquipoResponse>(
+    ruta,
+    await firmarPeticionKiosko("GET", ruta),
+  );
+  return response.data;
+}
+
+export async function registrarSolicitudKiosko(): Promise<EstadoSolicitudKiosko> {
   const response = await apiClient.post<EstadoSolicitudKiosko>("/solicitudes-kiosko", {
-    secreto,
+    llavePublica: await obtenerLlavePublicaKiosko(),
   });
   return response.data;
 }

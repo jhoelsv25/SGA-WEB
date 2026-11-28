@@ -11,7 +11,6 @@ import {
   validarKiosko,
   type GetEquiposFilters,
 } from "../api";
-import { KIOSK_TOKEN_STORAGE_KEY } from "../consts";
 import type { CreateEquipoPayload, UpdateEquipoPayload } from "../types";
 
 export const equipoKeys = {
@@ -20,7 +19,7 @@ export const equipoKeys = {
   list: (filters?: GetEquiposFilters) => [...equipoKeys.lists(), { filters }] as const,
   details: () => [...equipoKeys.all, "detail"] as const,
   detail: (id: string) => [...equipoKeys.details(), id] as const,
-  validar: (token?: string) => [...equipoKeys.all, "validar", token] as const,
+  validar: () => [...equipoKeys.all, "validar-kiosko"] as const,
 };
 
 export function useEquiposQuery(filters?: GetEquiposFilters) {
@@ -98,12 +97,8 @@ export function useAutorizarEquipoMutation() {
 
   return useMutation({
     mutationFn: (id: string) => autorizarEquipo(id),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: equipoKeys.lists() });
-      // Guardar token en localStorage para que este dispositivo quede autorizado
-      if (typeof window !== "undefined" && data.tokenAutorizacion) {
-        localStorage.setItem(KIOSK_TOKEN_STORAGE_KEY, data.tokenAutorizacion);
-      }
       toast.success("Equipo autorizado. Ya puede usarse como kiosko.");
     },
     onError: (error: unknown) => {
@@ -116,11 +111,10 @@ export function useAutorizarEquipoMutation() {
   });
 }
 
-export function useValidarKioskoQuery(token?: string) {
+export function useValidarKioskoQuery() {
   return useQuery({
-    queryKey: equipoKeys.validar(token),
-    queryFn: () => validarKiosko(token),
-    enabled: Boolean(token),
+    queryKey: equipoKeys.validar(),
+    queryFn: validarKiosko,
     retry: 1,
     staleTime: 1000 * 60 * 1, // 1 minuto
   });

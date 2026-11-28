@@ -15,7 +15,7 @@ import type {
   SolicitudJustificacionPayload,
   SugerirTemaResponse,
 } from "../types";
-import { cabeceraKiosko } from "../utils";
+import { firmarPeticionKiosko } from "@/lib/llave-kiosko";
 
 export async function getPanelSesionesHoy(): Promise<PanelSesiones> {
   try {
@@ -192,15 +192,13 @@ export async function solicitarJustificacion(
 
 // --- Kiosko de Sesiones (sin sesión de usuario)
 
-export async function sesionesEnKiosko(
-  token: string,
-  credenciales: CredencialesKiosko,
-): Promise<SesionesKiosko> {
+export async function sesionesEnKiosko(credenciales: CredencialesKiosko): Promise<SesionesKiosko> {
   try {
+    const ruta = SESIONES_ENDPOINTS.KIOSKO_SESIONES;
     const { data } = await apiClient.post<SesionesKiosko>(
-      SESIONES_ENDPOINTS.KIOSKO_SESIONES,
+      ruta,
       credenciales,
-      cabeceraKiosko(token),
+      await firmarPeticionKiosko("POST", ruta, credenciales),
     );
     return data;
   } catch (error) {
@@ -209,15 +207,15 @@ export async function sesionesEnKiosko(
 }
 
 export async function firmarIngreso(
-  token: string,
   sesionId: string,
   payload: CredencialesKiosko & { tema: string },
 ): Promise<MensajeSesion> {
   try {
+    const ruta = SESIONES_ENDPOINTS.KIOSKO_INGRESO(sesionId);
     const { data } = await apiClient.post<MensajeSesion>(
-      SESIONES_ENDPOINTS.KIOSKO_INGRESO(sesionId),
+      ruta,
       payload,
-      cabeceraKiosko(token),
+      await firmarPeticionKiosko("POST", ruta, payload),
     );
     return data;
   } catch (error) {
@@ -226,15 +224,15 @@ export async function firmarIngreso(
 }
 
 export async function firmarSalida(
-  token: string,
   sesionId: string,
   credenciales: CredencialesKiosko,
 ): Promise<MensajeSesion> {
   try {
+    const ruta = SESIONES_ENDPOINTS.KIOSKO_SALIDA(sesionId);
     const { data } = await apiClient.post<MensajeSesion>(
-      SESIONES_ENDPOINTS.KIOSKO_SALIDA(sesionId),
+      ruta,
       credenciales,
-      cabeceraKiosko(token),
+      await firmarPeticionKiosko("POST", ruta, credenciales),
     );
     return data;
   } catch (error) {

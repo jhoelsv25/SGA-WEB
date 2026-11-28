@@ -1,10 +1,6 @@
 import type { StatusBadgeTone } from "@/components/common/status-badge";
 import type { PropositoEquipo, TipoEquipo, UsuarioPermitido } from "../types";
 
-export const KIOSK_TOKEN_STORAGE_KEY = "sga_kiosk_token";
-/** Secreto propio del navegador; de él sale su código y, al aprobarse, es su clave. */
-export const KIOSK_SECRETO_STORAGE_KEY = "sga_kiosk_secreto";
-
 export const ESTADO_SOLICITUD_KIOSKO = { PENDIENTE: 1, APROBADA: 2, RECHAZADA: 3 } as const;
 
 export const ESTADO_SOLICITUD_KIOSKO_META: Record<

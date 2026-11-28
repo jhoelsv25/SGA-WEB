@@ -44,8 +44,6 @@ export interface UpdateEquipoPayload {
 
 export interface AutorizarEquipoResponse {
   message: string;
-  /** Clave secreta del kiosko; la API la entrega solo en esta respuesta. */
-  tokenAutorizacion: string;
   equipo: Equipo;
 }
 
