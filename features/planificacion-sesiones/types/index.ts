@@ -75,6 +75,18 @@ export interface Materiales {
   impresos?: string[];
   manipulativos?: string[];
   digitales?: string[];
+  recursos?: string[];
+  comunidad?: string[];
+}
+
+export interface ConceptoMapa {
+  concepto: string;
+  definicion: string;
+}
+
+export interface Predeterminados {
+  coordinador: string | null;
+  acuerdos: string[];
 }
 
 export interface Planificacion {
@@ -95,6 +107,11 @@ export interface Planificacion {
   enfoques: EnfoquePlanificado[];
   materiales: Materiales;
   referencias: string[];
+  producto: string | null;
+  coordinador: string | null;
+  acuerdos: string[];
+  mapaVisual: ConceptoMapa[];
+  seccionesAdicionales: string[];
   estado: EstadoPlanificacion;
   bloque: Bloque;
   competencias: CompetenciaPlanificada[];
@@ -170,29 +187,42 @@ export interface GuardarPlanificacionPayload {
   enfoques?: EnfoquePlanificado[];
   materiales?: Materiales;
   referencias?: string[];
+  producto?: string;
+  coordinador?: string;
+  acuerdos?: string[];
+  mapaVisual?: ConceptoMapa[];
+  seccionesAdicionales?: string[];
   momentos?: { momento: Momento; actividades?: string; minutos?: number }[];
 }
 
 export interface DocumentoSesion {
+  lema: string;
   institucion: string;
-  director: string;
   docente: string;
-  gradoSeccion: string;
+  coordinador: string | null;
   area: string;
-  fecha: string;
-  numero: number | null;
+  bimestre: string | null;
   unidad: string | null;
+  nivelGrado: string;
+  fechaInicio: string;
+  fechaFin: string;
+  secciones: string[];
+  duracionMin: number;
+  numero: number | null;
   titulo: string;
   proposito: string | null;
   competencias: CompetenciaPlanificada[];
-  evidencia: string | null;
-  criterios: string[];
-  instrumento: string | null;
-  transversales: { competencia: string; capacidades: string[]; desempeno: string | null }[];
   enfoques: { enfoque: string; valores: string[]; acciones: string[] }[];
-  materiales: { impresos: string[]; manipulativos: string[]; digitales: string[] };
+  transversales: { competencia: string; capacidades: string[]; actividad: string | null }[];
   momentos: MomentoPlanificado[];
-  referencias: string[];
+  mapaVisual: ConceptoMapa[];
+  criterios: string[];
+  evidencia: string | null;
+  producto: string | null;
+  instrumento: string | null;
+  acuerdos: string[];
+  materiales: { recursos: string[]; comunidad: string[] };
+  listasCotejo: { seccion: string; estudiantes: string[] }[];
   borrador: boolean;
 }
 

@@ -18,6 +18,7 @@ import {
   getOpciones,
   getPanelSupervision,
   getPlanificacion,
+  getPredeterminados,
   getPlanificacionSupervision,
   getSemana,
   guardarPlanificacion,
@@ -45,6 +46,15 @@ export function usePlanificacion(id?: string) {
     queryKey: planKeys.detalle(id ?? ""),
     queryFn: () => getPlanificacion(id as string),
     enabled: Boolean(id),
+  });
+}
+
+export function usePredeterminados(habilitado: boolean) {
+  return useQuery({
+    queryKey: ["planificacion-sesiones", "predeterminados"] as const,
+    queryFn: getPredeterminados,
+    enabled: habilitado,
+    gcTime: 0,
   });
 }
 

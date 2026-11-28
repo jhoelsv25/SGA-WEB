@@ -1,7 +1,7 @@
 import type { GuardarPlanificacionPayload } from "../types";
 import { sumaMinutos } from "./index";
 
-export type ClaveSeccion = "datos" | "competencias" | "evaluacion" | "secuencia" | "referencias";
+export type ClaveSeccion = "datos" | "competencias" | "evaluacion" | "secuencia";
 
 export interface EstadoSeccion {
   clave: ClaveSeccion;
@@ -44,11 +44,6 @@ export function estadoSecciones(
       clave: "secuencia",
       etiqueta: "Inicio, desarrollo y cierre",
       listo: todosLlenos && sumaMinutos(momentos) === minutosBloque,
-    },
-    {
-      clave: "referencias",
-      etiqueta: "Referencias",
-      listo: (f.referencias ?? []).some((r) => lleno(r)),
     },
   ];
 }
