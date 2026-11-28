@@ -24,8 +24,11 @@ function esReemplazo(estado: EstadoLibreta | null): boolean {
 
 export function PanelSubirLibretas({ contexto }: { contexto: ContextoLibretas }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const periodos = contexto.periodos.filter((periodo) => periodo.programada);
   const [seccionId, setSeccionId] = useState("");
-  const [periodoId, setPeriodoId] = useState("");
+  const [periodoId, setPeriodoId] = useState(
+    () => periodos.find((p) => p.vigente)?.id ?? periodos[0]?.id ?? "",
+  );
   const [archivos, setArchivos] = useState<File[]>([]);
   const [arrastrando, setArrastrando] = useState(false);
   const [manuales, setManuales] = useState<Record<string, { matriculaId: string; motivo: string }>>(
@@ -41,7 +44,6 @@ export function PanelSubirLibretas({ contexto }: { contexto: ContextoLibretas })
     vista.reset();
   });
 
-  const periodos = contexto.periodos.filter((periodo) => periodo.programada);
   const preview = vista.data;
 
   const asignaciones = useMemo(() => {

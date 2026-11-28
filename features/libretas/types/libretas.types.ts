@@ -6,7 +6,10 @@ export interface PeriodoLibreta {
   id: string;
   nombre: string;
   fechaLimite: string | null;
+  fechaInicio?: string | null;
+  fechaFin?: string | null;
   programada: boolean;
+  vigente?: boolean;
 }
 
 export interface SeccionLibreta {

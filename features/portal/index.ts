@@ -7,3 +7,6 @@ export * from "./components/sections/faq-section";
 export * from "./components/sections/cta-section";
 export * from "./components/legal/privacy-content";
 export * from "./components/legal/terms-content";
+export * from "./components/aviso-portal";
+export * from "./components/sections/news-section";
+export * from "./components/interactivo";

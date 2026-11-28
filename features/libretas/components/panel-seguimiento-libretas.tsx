@@ -17,7 +17,10 @@ export function PanelSeguimientoLibretas({
   contexto: ContextoLibretas;
   puedeHistorial: boolean;
 }) {
-  const [periodoId, setPeriodoId] = useState("");
+  const periodos = contexto.periodos.filter((periodo) => periodo.programada);
+  const [periodoId, setPeriodoId] = useState(
+    () => periodos.find((p) => p.vigente)?.id ?? periodos[0]?.id ?? "",
+  );
   const [seccionId, setSeccionId] = useState<string | null>(null);
   const seguimiento = useSeguimientoLibretasQuery(periodoId || undefined);
   const detalle = useDetalleLibretasQuery(seccionId ?? undefined, periodoId || undefined);

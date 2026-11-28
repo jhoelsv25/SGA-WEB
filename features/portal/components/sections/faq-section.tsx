@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Badge } from "@/components/ui/badge";
 import { siteConfig } from "@/config";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowDown01Icon, ArrowUp01Icon, Call02Icon, Mail01Icon } from "@hugeicons/core-free-icons";
@@ -15,19 +14,17 @@ export function FaqSection() {
   };
 
   return (
-    <section id="faq" className="bg-background py-20 sm:py-24">
+    <section id="faq" className="bg-muted/40 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
           {/* Columna izquierda editorial sin card */}
           <div className="space-y-6 lg:col-span-4">
             <div>
-              <Badge
-                variant="outline"
-                className="border-primary/30 bg-primary/5 text-primary text-xs font-semibold"
-              >
+              <p className="text-primary flex items-center gap-3 text-xs font-bold tracking-[0.2em] uppercase">
+                <span className="bg-primary h-px w-10" />
                 Guía rápida
-              </Badge>
-              <h2 className="text-foreground mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              </p>
+              <h2 className="text-foreground mt-5 text-4xl font-black tracking-tight sm:text-5xl lg:leading-[1.05]">
                 Orientación para la comunidad educativa
               </h2>
               <p className="text-muted-foreground mt-3 text-sm leading-relaxed sm:text-base">
