@@ -12,12 +12,13 @@ import { Spinner } from "@/components/common/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { PersonaVinculadaCard } from "../../../personas/components/persona-vinculada-card";
+import { BotonOcrDocumento } from "../../../personas/components/boton-ocr-documento";
 import {
   createApoderadoSchema,
   type CreateApoderadoFormValues,
 } from "../../schemas/apoderados.schema";
 import { parseIsoDate, formatToIsoDate } from "../../utils/dates";
-import type { Persona } from "../../../personas/types/personas.types";
+import type { OcrDocumentoPersona, Persona } from "../../../personas/types/personas.types";
 import type { GradoInstruccion, Parentesco } from "../../types/apoderados.types";
 
 const gradoInstruccionOptions: { value: GradoInstruccion; label: string }[] = [
@@ -67,6 +68,7 @@ export function CreateApoderadoForm({
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<CreateApoderadoFormValues>({
     resolver: zodResolver(createApoderadoSchema),
@@ -100,6 +102,22 @@ export function CreateApoderadoForm({
     },
   });
 
+  const aplicarDatosOcr = (datos: OcrDocumentoPersona) => {
+    const opts = { shouldDirty: true, shouldValidate: true };
+    if (datos.dni) {
+      setValue("nuevaPersona.tipoDocumento", "dni", opts);
+      setValue("nuevaPersona.numeroDocumento", datos.dni, opts);
+    }
+    if (datos.nombres) setValue("nuevaPersona.nombres", datos.nombres, opts);
+    if (datos.apellidoPaterno)
+      setValue("nuevaPersona.apellidoPaterno", datos.apellidoPaterno, opts);
+    if (datos.apellidoMaterno)
+      setValue("nuevaPersona.apellidoMaterno", datos.apellidoMaterno, opts);
+    if (datos.fechaNacimiento)
+      setValue("nuevaPersona.fechaNacimiento", datos.fechaNacimiento, opts);
+    if (datos.sexo) setValue("nuevaPersona.sexo", datos.sexo, opts);
+  };
+
   const handleFormSubmit = async (values: CreateApoderadoFormValues) => {
     await onSubmit(values);
   };
@@ -123,9 +141,12 @@ export function CreateApoderadoForm({
       {/* 3. Formulario de Persona Nueva (solo si no se vinculó del padrón) */}
       {modo === "registrar" && (
         <div className="border-border/80 bg-card space-y-4 rounded-xl border p-4">
-          <Label className="text-foreground text-sm font-semibold">
-            2. Datos Personales del Apoderado
-          </Label>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Label className="text-foreground text-sm font-semibold">
+              2. Datos Personales del Apoderado
+            </Label>
+            <BotonOcrDocumento onDatosExtraidos={aplicarDatosOcr} disabled={isLoading} />
+          </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">

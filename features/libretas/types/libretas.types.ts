@@ -1,6 +1,7 @@
 export type EstadoLibreta = "pendiente" | "a_tiempo" | "fuera_de_plazo";
 export type AlcanceLibreta = "tutoria" | "mis_secciones" | "colegio";
 export type AsignacionLibreta = "automatica" | "manual";
+export type MetodoReconocimientoLibreta = "nombre" | "ocr";
 
 export interface PeriodoLibreta {
   id: string;
@@ -37,6 +38,7 @@ export interface ArchivoAsignadoPreview {
   matriculaId: string;
   nombreCompleto: string;
   asignacion: AsignacionLibreta;
+  metodoReconocimiento?: MetodoReconocimientoLibreta;
   estado: EstadoLibreta | null;
 }
 
@@ -63,6 +65,7 @@ export interface AsignacionManual {
   nombreArchivo: string;
   matriculaId: string;
   motivo?: string;
+  origen?: "manual" | "ocr";
 }
 
 export interface ResultadoPublicacion {

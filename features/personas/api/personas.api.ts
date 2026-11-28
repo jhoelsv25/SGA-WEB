@@ -4,6 +4,7 @@ import type {
   ChangeCargoInput,
   CreatePersonaInput,
   HistorialCorreccionCritica,
+  OcrDocumentoPersona,
   PaginatedPersonasResponse,
   Persona,
   PersonaQueryParams,
@@ -101,6 +102,21 @@ export const personasApi = {
       return data;
     } catch (error) {
       handleApiError(error, "Error al cambiar el cargo de la persona.");
+    }
+  },
+
+  async extraerDatosDocumentoOcr(archivo: File): Promise<OcrDocumentoPersona> {
+    try {
+      const formData = new FormData();
+      formData.append("archivo", archivo);
+      const { data } = await apiClient.post<OcrDocumentoPersona>(
+        "/personas/ocr-documento",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      return data;
+    } catch (error) {
+      handleApiError(error, "No se pudo leer el documento con OCR.");
     }
   },
 };

@@ -35,26 +35,54 @@ export function PanelSubirLibretas({ contexto }: { contexto: ContextoLibretas })
     {},
   );
   const [motivos, setMotivos] = useState<Record<string, string>>({});
+  const [excluidos, setExcluidos] = useState<string[]>([]);
   const [archivoManual, setArchivoManual] = useState<string | null>(null);
   const vista = useVistaPreviaLibretasMutation();
   const publicar = usePublicarLibretasMutation(() => {
     setArchivos([]);
     setManuales({});
     setMotivos({});
+    setExcluidos([]);
     vista.reset();
   });
 
   const preview = vista.data;
 
+  const asignadasVisibles = useMemo(() => {
+    if (!preview) return [];
+    const excluidosSet = new Set(excluidos);
+    return preview.asignadas.filter((item) => !excluidosSet.has(item.nombreArchivo));
+  }, [preview, excluidos]);
+
   const asignaciones = useMemo(() => {
     if (!preview) return [];
     const lista: AsignacionManual[] = [];
-    for (const item of preview.asignadas) {
-      if (!esReemplazo(item.estado)) continue;
-      const motivo = (motivos[item.nombreArchivo] ?? "").trim();
-      lista.push({ nombreArchivo: item.nombreArchivo, matriculaId: item.matriculaId, motivo });
+    const yaIncluidos = new Set<string>();
+    for (const item of asignadasVisibles) {
+      const correccion = manuales[item.nombreArchivo];
+      if (correccion) {
+        lista.push({
+          nombreArchivo: item.nombreArchivo,
+          matriculaId: correccion.matriculaId,
+          motivo: correccion.motivo || undefined,
+        });
+        yaIncluidos.add(item.nombreArchivo);
+        continue;
+      }
+      const reemplazo = esReemplazo(item.estado);
+      const porOcr = item.metodoReconocimiento === "ocr";
+      if (!reemplazo && !porOcr) continue;
+      const motivo = reemplazo ? (motivos[item.nombreArchivo] ?? "").trim() : undefined;
+      lista.push({
+        nombreArchivo: item.nombreArchivo,
+        matriculaId: item.matriculaId,
+        motivo,
+        origen: porOcr ? "ocr" : undefined,
+      });
+      yaIncluidos.add(item.nombreArchivo);
     }
     for (const [nombreArchivo, manual] of Object.entries(manuales)) {
+      if (yaIncluidos.has(nombreArchivo)) continue;
       lista.push({
         nombreArchivo,
         matriculaId: manual.matriculaId,
@@ -62,7 +90,7 @@ export function PanelSubirLibretas({ contexto }: { contexto: ContextoLibretas })
       });
     }
     return lista;
-  }, [preview, motivos, manuales]);
+  }, [preview, asignadasVisibles, motivos, manuales]);
 
   function incorporar(entrantes: File[]) {
     if (archivos.length + entrantes.length > MAX_ARCHIVOS) {
@@ -87,24 +115,31 @@ export function PanelSubirLibretas({ contexto }: { contexto: ContextoLibretas })
     setArchivos(siguientes);
     setManuales({});
     setMotivos({});
+    setExcluidos([]);
     vista.reset();
   }
 
   function publicarCarga() {
     if (!preview) return;
-    const faltaMotivo = preview.asignadas.some(
-      (item) => esReemplazo(item.estado) && !(motivos[item.nombreArchivo] ?? "").trim(),
-    );
+    const faltaMotivo = asignadasVisibles.some((item) => {
+      if (manuales[item.nombreArchivo]) return false;
+      return esReemplazo(item.estado) && !(motivos[item.nombreArchivo] ?? "").trim();
+    });
     if (faltaMotivo) {
       toast.error("Indique el motivo del reemplazo.");
       return;
     }
-    const publicables = preview.asignadas.length + Object.keys(manuales).length;
+    const manualesSinReconocer = Object.keys(manuales).filter(
+      (nombre) => !asignadasVisibles.some((item) => item.nombreArchivo === nombre),
+    );
+    const publicables = asignadasVisibles.length + manualesSinReconocer.length;
     if (publicables === 0) {
       toast.error("No hay libretas asignadas para publicar.");
       return;
     }
-    publicar.mutate({ seccionId, periodoId, archivos, asignaciones });
+    const excluidosSet = new Set(excluidos);
+    const archivosAPublicar = archivos.filter((archivo) => !excluidosSet.has(archivo.name));
+    publicar.mutate({ seccionId, periodoId, archivos: archivosAPublicar, asignaciones });
   }
 
   return (
@@ -161,8 +196,8 @@ export function PanelSubirLibretas({ contexto }: { contexto: ContextoLibretas })
         <HugeiconsIcon icon={Upload01Icon} className="size-6" />
         <span className="text-sm font-medium">Arrastra los PDF o haz clic para elegirlos</span>
         <span className="text-muted-foreground text-xs">
-          Hasta {MAX_ARCHIVOS} archivos, 5 MB cada uno. El nombre debe incluir el código del
-          estudiante.
+          Hasta {MAX_ARCHIVOS} archivos, 5 MB cada uno. Si el nombre no incluye el código del
+          estudiante, se intentará leer automáticamente del PDF.
         </span>
       </button>
       <input
@@ -204,43 +239,92 @@ export function PanelSubirLibretas({ contexto }: { contexto: ContextoLibretas })
 
           <section className="space-y-2">
             <h3 className="text-sm font-semibold">Asignadas</h3>
-            {preview.asignadas.length === 0 ? (
+            {asignadasVisibles.length === 0 ? (
               <p className="text-muted-foreground text-xs">
                 Ningún archivo coincidió con un estudiante de la sección.
               </p>
             ) : (
               <ul className="space-y-2">
-                {preview.asignadas.map((item) => (
-                  <li key={item.nombreArchivo} className="rounded-lg border p-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm">
-                        {item.nombreArchivo} · {item.nombreCompleto}
-                      </p>
-                      <Badge
-                        variant={
-                          item.estado === "pendiente" || !item.estado ? "secondary" : "warning"
-                        }
-                      >
-                        {item.estado ? ETIQUETA_ESTADO[item.estado] : "Pendiente"}
-                      </Badge>
-                    </div>
-                    {esReemplazo(item.estado) ? (
-                      <div className="mt-2 space-y-1.5">
-                        <Label className="text-sm font-medium">Motivo del reemplazo *</Label>
-                        <Input
-                          value={motivos[item.nombreArchivo] ?? ""}
-                          onChange={(evento) =>
-                            setMotivos((actual) => ({
-                              ...actual,
-                              [item.nombreArchivo]: evento.target.value,
-                            }))
-                          }
-                          placeholder="Por qué se reemplaza"
-                        />
+                {asignadasVisibles.map((item) => {
+                  const correccion = manuales[item.nombreArchivo];
+                  const estudianteCorregido = correccion
+                    ? preview.estudiantes.find(
+                        (fila) => fila.matriculaId === correccion.matriculaId,
+                      )
+                    : undefined;
+                  const nombreMostrado = estudianteCorregido?.nombreCompleto ?? item.nombreCompleto;
+                  const estadoMostrado = correccion
+                    ? (estudianteCorregido?.estado ?? null)
+                    : item.estado;
+                  const porOcr = item.metodoReconocimiento === "ocr";
+                  return (
+                    <li key={item.nombreArchivo} className="rounded-lg border p-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm">
+                          {item.nombreArchivo} · {nombreMostrado}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {correccion ? (
+                            <Badge variant="outline">Corregido manualmente</Badge>
+                          ) : porOcr ? (
+                            <Badge variant="outline">Detectado por OCR</Badge>
+                          ) : null}
+                          <Badge
+                            variant={
+                              estadoMostrado === "pendiente" || !estadoMostrado
+                                ? "secondary"
+                                : "warning"
+                            }
+                          >
+                            {estadoMostrado ? ETIQUETA_ESTADO[estadoMostrado] : "Pendiente"}
+                          </Badge>
+                        </div>
                       </div>
-                    ) : null}
-                  </li>
-                ))}
+                      {porOcr ? (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setArchivoManual(item.nombreArchivo)}
+                          >
+                            Cambiar estudiante
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setExcluidos((actual) => [...actual, item.nombreArchivo]);
+                              setManuales((actual) => {
+                                const copia = { ...actual };
+                                delete copia[item.nombreArchivo];
+                                return copia;
+                              });
+                            }}
+                          >
+                            Quitar
+                          </Button>
+                        </div>
+                      ) : null}
+                      {!correccion && esReemplazo(item.estado) ? (
+                        <div className="mt-2 space-y-1.5">
+                          <Label className="text-sm font-medium">Motivo del reemplazo *</Label>
+                          <Input
+                            value={motivos[item.nombreArchivo] ?? ""}
+                            onChange={(evento) =>
+                              setMotivos((actual) => ({
+                                ...actual,
+                                [item.nombreArchivo]: evento.target.value,
+                              }))
+                            }
+                            placeholder="Por qué se reemplaza"
+                          />
+                        </div>
+                      ) : null}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </section>
